@@ -1,0 +1,99 @@
+package errorfamily
+
+import (
+	"errors"
+	"maps"
+	"sync"
+)
+
+// Classify returns the Family of any error by checking multiple sources:
+//
+//  1. Classified interface — the error itself declares its family
+//  2. Retryable interface — infer from retryability if no family
+//  3. Registered sentinels — known third-party errors mapped in init()
+//  4. Default — Transient (fail-open for retry)
+//
+// Returns Rejection for nil errors.
+func Classify(err error) Family {
+	if err == nil {
+		return Rejection
+	}
+
+	// 1. Check for explicit classification.
+	if c, ok := errors.AsType[Classified](err); ok {
+		return c.ErrorFamily()
+	}
+
+	// 2. Check for retryability (infer family).
+	if r, ok := errors.AsType[Retryable](err); ok {
+		if r.IsRetryable() {
+			return Transient
+		}
+		return Rejection
+	}
+
+	// 3. Check registered third-party sentinels.
+	if family, ok := lookupRegistered(err); ok {
+		return family
+	}
+
+	// 4. Default: Transient (fail-open so unknown errors get retried).
+	return Transient
+}
+
+// IsRetryable reports whether the error is worth retrying.
+// Uses Classify() and checks if the result is Transient.
+func IsRetryable(err error) bool {
+	return Classify(err).IsRetryable()
+}
+
+// ExitCode returns the appropriate process exit code for an error.
+// Nil errors return 0. Other errors are classified and mapped to BSD sysexits.h codes.
+func ExitCode(err error) int {
+	if err == nil {
+		return 0
+	}
+	return Classify(err).ExitCode()
+}
+
+// RegisterClassification maps a third-party sentinel error to a Family.
+// Thread-safe. Call from init() in external packages:
+//
+//	func init() {
+//	    errorfamily.RegisterClassification(sql.ErrConnDone, errorfamily.Transient)
+//	}
+//
+// This is for errors you don't own (stdlib, libraries).
+// For your own errors, implement the Classified interface instead.
+func RegisterClassification(sentinel error, family Family) {
+	registry.mu.Lock()
+	defer registry.mu.Unlock()
+	registry.entries[sentinel] = family
+}
+
+func RegisterClassifications(classifications map[error]Family) {
+	registry.mu.Lock()
+	defer registry.mu.Unlock()
+
+	maps.Copy(registry.entries, classifications)
+}
+
+var registry = struct {
+	mu      sync.RWMutex
+	entries map[error]Family
+}{
+	entries: make(map[error]Family),
+}
+
+func lookupRegistered(err error) (Family, bool) {
+	registry.mu.RLock()
+	defer registry.mu.RUnlock()
+
+	for sentinel, family := range registry.entries {
+		if errors.Is(err, sentinel) {
+			return family, true
+		}
+	}
+
+	return Rejection, false
+}
