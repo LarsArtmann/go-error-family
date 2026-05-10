@@ -443,7 +443,7 @@ type externalError struct {
 	context map[string]string
 }
 
-func (e *externalError) Error() string                    { return "external: " + e.code }
+func (e *externalError) Error() string                   { return "external: " + e.code }
 func (e *externalError) ErrorCode() string               { return e.code }
 func (e *externalError) ErrorFamily() Family             { return e.family }
 func (e *externalError) ErrorContext() map[string]string { return e.context }

@@ -7,7 +7,7 @@ import (
 	"strings"
 	"time"
 
-	"github.com/larsartmann/go-error-family"
+	errorfamily "github.com/larsartmann/go-error-family"
 )
 
 // NetworkRule diagnoses network-related errors.

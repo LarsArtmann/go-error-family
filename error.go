@@ -15,12 +15,12 @@ import (
 //
 // Implements: error, Coded, Classified, Contextual, Retryable, fmt.Formatter.
 type Error struct {
-	code     string            // machine-readable identity (e.g. "db.timeout")
-	message  string            // human-readable technical message
-	family   Family            // behavioral classification
-	context  map[string]string // factual details about the error
-	cause    error             // underlying error in the chain
-	timestamp time.Time        // when the error occurred
+	code      string            // machine-readable identity (e.g. "db.timeout")
+	message   string            // human-readable technical message
+	family    Family            // behavioral classification
+	context   map[string]string // factual details about the error
+	cause     error             // underlying error in the chain
+	timestamp time.Time         // when the error occurred
 }
 
 // Error implements the error interface.

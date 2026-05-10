@@ -7,7 +7,7 @@ import (
 	"strconv"
 	"time"
 
-	"github.com/larsartmann/go-error-family"
+	errorfamily "github.com/larsartmann/go-error-family"
 )
 
 // PostgresRule diagnoses PostgreSQL-related errors.

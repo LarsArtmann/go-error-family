@@ -20,17 +20,18 @@ Created `go-error-family` from scratch — a structured error protocol library f
 
 ### Core Protocol Package (`errorfamily`)
 
-| Component | File | Lines | Status |
-|---|---|---|---|
-| `Family` int enum | `family.go` | 160 | Complete — 5 families with String/IsRetryable/ExitCode/Tone/Audience |
-| Consumer interfaces | `interfaces.go` | 38 | Complete — Coded, Classified, Contextual, Retryable (all embed `error` for Go 1.26 `errors.AsType`) |
-| Reference `Error` struct | `error.go` | 185 | Complete — Is/Unwrap/Format/Context/Summary/MatchesContext |
-| Classification engine | `classify.go` | 99 | Complete — Classify/IsRetryable/ExitCode/RegisterClassification/RegisterClassifications |
-| Constructors | `constructors.go` | 91 | Complete — New/Newf/Wrap/Wrapf + 5 family-specific constructors each |
-| CLI boundary handler | `handle.go` | 268 | Complete — HandleError/HandleErrorDetailed/MessageTemplate/Wix framework |
-| Tests | `errorfamily_test.go` | 397 | Complete — 26 tests covering all core functionality |
+| Component                | File                  | Lines | Status                                                                                              |
+| ------------------------ | --------------------- | ----- | --------------------------------------------------------------------------------------------------- |
+| `Family` int enum        | `family.go`           | 160   | Complete — 5 families with String/IsRetryable/ExitCode/Tone/Audience                                |
+| Consumer interfaces      | `interfaces.go`       | 38    | Complete — Coded, Classified, Contextual, Retryable (all embed `error` for Go 1.26 `errors.AsType`) |
+| Reference `Error` struct | `error.go`            | 185   | Complete — Is/Unwrap/Format/Context/Summary/MatchesContext                                          |
+| Classification engine    | `classify.go`         | 99    | Complete — Classify/IsRetryable/ExitCode/RegisterClassification/RegisterClassifications             |
+| Constructors             | `constructors.go`     | 91    | Complete — New/Newf/Wrap/Wrapf + 5 family-specific constructors each                                |
+| CLI boundary handler     | `handle.go`           | 268   | Complete — HandleError/HandleErrorDetailed/MessageTemplate/Wix framework                            |
+| Tests                    | `errorfamily_test.go` | 397   | Complete — 26 tests covering all core functionality                                                 |
 
 **Test coverage:**
+
 - Family: String, ParseFamily, IsRetryable, ExitCode, Tone
 - Error: Error(), Unwrap(), Is(), ErrorCode(), ErrorFamily(), ErrorContext(), context isolation
 - Error: Format (%s, %v, %+v), Summary, MatchesContext, MatchesContextValue
@@ -41,27 +42,27 @@ Created `go-error-family` from scratch — a structured error protocol library f
 
 ### Diagnostic System (`diagnose`)
 
-| Component | File | Lines | Status |
-|---|---|---|---|
-| Runner + interfaces | `diagnose.go` | 260 | Complete — concurrent rule execution, confidence sorting |
-| System snapshot | `context.go` | 117 | Complete — OS/Arch/Hostname/Env with secret redaction |
-| PostgresRule | `rules_postgres.go` | 139 | Complete — pg_isready, TCP fallback, platform-aware fix suggestions |
-| FilesystemRule | `rules_filesystem.go` | 173 | Complete — path existence, permissions, writability, auto-fix for mkdir |
-| NetworkRule | `rules_network.go` | 99 | Complete — DNS resolution, TCP connectivity |
-| GitRule | `rules_git.go` | 130 | Complete — repo check, dirty state, merge conflicts, remote reachability |
+| Component           | File                  | Lines | Status                                                                   |
+| ------------------- | --------------------- | ----- | ------------------------------------------------------------------------ |
+| Runner + interfaces | `diagnose.go`         | 260   | Complete — concurrent rule execution, confidence sorting                 |
+| System snapshot     | `context.go`          | 117   | Complete — OS/Arch/Hostname/Env with secret redaction                    |
+| PostgresRule        | `rules_postgres.go`   | 139   | Complete — pg_isready, TCP fallback, platform-aware fix suggestions      |
+| FilesystemRule      | `rules_filesystem.go` | 173   | Complete — path existence, permissions, writability, auto-fix for mkdir  |
+| NetworkRule         | `rules_network.go`    | 99    | Complete — DNS resolution, TCP connectivity                              |
+| GitRule             | `rules_git.go`        | 130   | Complete — repo check, dirty state, merge conflicts, remote reachability |
 
 ### AI Debug Agent (`agent`)
 
-| Component | File | Lines | Status |
-|---|---|---|---|
-| Full agent scaffold | `agent.go` | 374 | Complete — 4 involvement levels, risk classification, command allow/deny, deterministic fallback |
+| Component           | File       | Lines | Status                                                                                           |
+| ------------------- | ---------- | ----- | ------------------------------------------------------------------------------------------------ |
+| Full agent scaffold | `agent.go` | 374   | Complete — 4 involvement levels, risk classification, command allow/deny, deterministic fallback |
 
 ### Documentation
 
-| Doc | Status |
-|---|---|
-| README.md | Complete — quick start, constructors, classification, custom types, diagnostics, agent, architecture |
-| Design document (in docs/ repo) | Complete — 1,119 lines covering audit, analysis, first principles, final design |
+| Doc                             | Status                                                                                               |
+| ------------------------------- | ---------------------------------------------------------------------------------------------------- |
+| README.md                       | Complete — quick start, constructors, classification, custom types, diagnostics, agent, architecture |
+| Design document (in docs/ repo) | Complete — 1,119 lines covering audit, analysis, first principles, final design                      |
 
 ---
 
@@ -77,6 +78,7 @@ The four diagnostic rules (Postgres, Filesystem, Network, Git) have zero test fi
 - **GitRule** — never tested against real git repos
 
 These rules use `os.Stat`, `exec.Command`, `net.Dial` directly — no interfaces, no dependency injection. Testing them properly requires either:
+
 1. Extracting command/connection logic behind interfaces
 2. Using temp directories and mock servers in tests
 3. Accepting that some tests only pass in environments with the tools installed
@@ -84,12 +86,14 @@ These rules use `os.Stat`, `exec.Command`, `net.Dial` directly — no interfaces
 ### AI Debug Agent — Scaffold Only
 
 The agent has:
+
 - Full type system (Involvement, RiskLevel, Config, FixStep, AgentResult)
 - Involvement-based approval logic (shouldApply)
 - Deterministic analysis fallback (deterministicAnalyze)
 - Prompt building (buildPrompt)
 
 But it does NOT have:
+
 - An actual AI provider integration (no OpenAI/Anthropic/Crush SDK calls)
 - Command execution sandbox (ApplyFixes marks steps as applied but doesn't execute)
 - Any tests
@@ -97,6 +101,7 @@ But it does NOT have:
 ### CLI Boundary Handler — Basic Templates Only
 
 `HandleError()` works end-to-end but the template system is primitive:
+
 - `codeToWhat()` and `codeToFix()` use `strings.Contains` on code names — fragile
 - No `MessageTemplate` overrides registered by default
 - No integration with the diagnostic runner (HandleConfig.DiagnosticRunner is declared but not wired)
@@ -110,13 +115,13 @@ But it does NOT have:
 
 Zero repos import `go-error-family`. The library exists in isolation.
 
-| Repo | What needs to happen | Status |
-|---|---|---|
-| **go-cqrs-lite** | Extract Family/Classify/RegisterClassification into go-error-family import | Not started |
-| **go-finding** | Add ErrorCode()/ErrorContext() methods to FindingError | Not started |
-| **hierarchical-errors** | Add ErrorCode() to its Error struct | Not started |
-| **auto-deduplicate** | Add ErrorFamily()/ErrorContext(), move Present() to CLI layer | Not started |
-| **docs-organizer** | Add Is(), ErrorCode(), ErrorContext() to DocsError | Not started |
+| Repo                    | What needs to happen                                                       | Status      |
+| ----------------------- | -------------------------------------------------------------------------- | ----------- |
+| **go-cqrs-lite**        | Extract Family/Classify/RegisterClassification into go-error-family import | Not started |
+| **go-finding**          | Add ErrorCode()/ErrorContext() methods to FindingError                     | Not started |
+| **hierarchical-errors** | Add ErrorCode() to its Error struct                                        | Not started |
+| **auto-deduplicate**    | Add ErrorFamily()/ErrorContext(), move Present() to CLI layer              | Not started |
+| **docs-organizer**      | Add Is(), ErrorCode(), ErrorContext() to DocsError                         | Not started |
 
 ### CI/CD Pipeline
 
@@ -129,6 +134,7 @@ No GitHub Actions, no linting pipeline, no release automation.
 ### Linting
 
 No `.golangci.yml` configuration. LSP shows hints and warnings:
+
 - `agent/agent.go`: stringsseq, stringscutprefix, QF1012 (WriteString → Fprintf) hints
 - `diagnose/context.go`: unused function `formatCommandFix`
 - `diagnose/rules_filesystem.go`: unused function `isDirectory`
@@ -196,58 +202,58 @@ Build is clean. Tests pass. No compile errors. No panics.
 
 ### Critical — Quality (Do First)
 
-| # | Task | Effort | Impact |
-|---|---|---|---|
-| 1 | Write diagnose package tests (FilesystemRule with temp dirs) | 2h | Rules are currently untested |
-| 2 | Fix all LSP hints/warnings (unused funcs, string hints) | 30min | Code hygiene |
-| 3 | Write agent package tests (involvement levels, deterministic analysis) | 1h | Agent is untested |
-| 4 | Write HandleError tests (all families, templates, context substitution) | 1h | CLI handler is untested |
-| 5 | Wire HandleError to diagnostic runner | 30min | Two systems don't talk to each other |
+| #   | Task                                                                    | Effort | Impact                               |
+| --- | ----------------------------------------------------------------------- | ------ | ------------------------------------ |
+| 1   | Write diagnose package tests (FilesystemRule with temp dirs)            | 2h     | Rules are currently untested         |
+| 2   | Fix all LSP hints/warnings (unused funcs, string hints)                 | 30min  | Code hygiene                         |
+| 3   | Write agent package tests (involvement levels, deterministic analysis)  | 1h     | Agent is untested                    |
+| 4   | Write HandleError tests (all families, templates, context substitution) | 1h     | CLI handler is untested              |
+| 5   | Wire HandleError to diagnostic runner                                   | 30min  | Two systems don't talk to each other |
 
 ### High — Testability
 
-| # | Task | Effort | Impact |
-|---|---|---|---|
-| 6 | Extract CommandRunner interface for diagnose rules | 1h | Makes all rules mockable |
-| 7 | Add ConnectionTester interface for PostgresRule/NetworkRule | 30min | Makes network rules mockable |
-| 8 | Write PostgresRule integration test with mock server | 1h | Validates pg_isready logic |
-| 9 | Write GitRule integration test with temp repos | 1h | Validates git status logic |
+| #   | Task                                                        | Effort | Impact                       |
+| --- | ----------------------------------------------------------- | ------ | ---------------------------- |
+| 6   | Extract CommandRunner interface for diagnose rules          | 1h     | Makes all rules mockable     |
+| 7   | Add ConnectionTester interface for PostgresRule/NetworkRule | 30min  | Makes network rules mockable |
+| 8   | Write PostgresRule integration test with mock server        | 1h     | Validates pg_isready logic   |
+| 9   | Write GitRule integration test with temp repos              | 1h     | Validates git status logic   |
 
 ### High — Ecosystem Integration
 
-| # | Task | Effort | Impact |
-|---|---|---|---|
-| 10 | Push repo to GitHub | 15min | Importable by consumers |
-| 11 | Tag v0.1.0-alpha | 5min | Signals API stability expectations |
-| 12 | Add go-error-family to docs/LIBRARY_GUIDE.md | 30min | Discoverability |
-| 13 | Add go-error-family to projects-management-automation go.work | 15min | Workspace integration |
+| #   | Task                                                          | Effort | Impact                             |
+| --- | ------------------------------------------------------------- | ------ | ---------------------------------- |
+| 10  | Push repo to GitHub                                           | 15min  | Importable by consumers            |
+| 11  | Tag v0.1.0-alpha                                              | 5min   | Signals API stability expectations |
+| 12  | Add go-error-family to docs/LIBRARY_GUIDE.md                  | 30min  | Discoverability                    |
+| 13  | Add go-error-family to projects-management-automation go.work | 15min  | Workspace integration              |
 
 ### Medium — Feature Completeness
 
-| # | Task | Effort | Impact |
-|---|---|---|---|
-| 14 | Add `Mark(err, sentinel)` function | 30min | Identity stamping without global registry |
-| 15 | Add golangci.yml configuration | 30min | Consistent linting |
-| 16 | Write ADR-001: Why Family int over string categories | 30min | Architecture documentation |
-| 17 | Add Nix flake.nix for build/test automation | 1h | Ecosystem standard |
-| 18 | Add CI pipeline (GitHub Actions: build, test, vet, lint) | 1h | Automated quality gates |
+| #   | Task                                                     | Effort | Impact                                    |
+| --- | -------------------------------------------------------- | ------ | ----------------------------------------- |
+| 14  | Add `Mark(err, sentinel)` function                       | 30min  | Identity stamping without global registry |
+| 15  | Add golangci.yml configuration                           | 30min  | Consistent linting                        |
+| 16  | Write ADR-001: Why Family int over string categories     | 30min  | Architecture documentation                |
+| 17  | Add Nix flake.nix for build/test automation              | 1h     | Ecosystem standard                        |
+| 18  | Add CI pipeline (GitHub Actions: build, test, vet, lint) | 1h     | Automated quality gates                   |
 
 ### Medium — First Consumer Migration
 
-| # | Task | Effort | Impact |
-|---|---|---|---|
-| 19 | Migrate go-cqrs-lite: import go-error-family for Family/Classify | 2h | Proves the protocol works |
-| 20 | Add interfaces to docs-organizer (Is, ErrorCode, ErrorContext) | 30min | Second consumer |
-| 21 | Add interfaces to go-finding (ErrorCode, ErrorContext) | 30min | Third consumer |
+| #   | Task                                                             | Effort | Impact                    |
+| --- | ---------------------------------------------------------------- | ------ | ------------------------- |
+| 19  | Migrate go-cqrs-lite: import go-error-family for Family/Classify | 2h     | Proves the protocol works |
+| 20  | Add interfaces to docs-organizer (Is, ErrorCode, ErrorContext)   | 30min  | Second consumer           |
+| 21  | Add interfaces to go-finding (ErrorCode, ErrorContext)           | 30min  | Third consumer            |
 
 ### Lower — Polish
 
-| # | Task | Effort | Impact |
-|---|---|---|---|
-| 22 | Wire AI agent to a real provider (Crush SDK or OpenAI) | 3h | Agent actually works |
-| 23 | Add message template overrides for common error codes | 1h | Better default UX |
-| 24 | Add IsPostgresRunning standalone helper to go-cqrs-lite | 15min | Useful utility |
-| 25 | Write examples/ directory with runnable Go examples | 1h | GoDoc integration |
+| #   | Task                                                    | Effort | Impact               |
+| --- | ------------------------------------------------------- | ------ | -------------------- |
+| 22  | Wire AI agent to a real provider (Crush SDK or OpenAI)  | 3h     | Agent actually works |
+| 23  | Add message template overrides for common error codes   | 1h     | Better default UX    |
+| 24  | Add IsPostgresRunning standalone helper to go-cqrs-lite | 15min  | Useful utility       |
+| 25  | Write examples/ directory with runnable Go examples     | 1h     | GoDoc integration    |
 
 ---
 
@@ -257,10 +263,10 @@ Build is clean. Tests pass. No compile errors. No panics.
 
 The tradeoff:
 
-| Approach | Pro | Con |
-|---|---|---|
-| **Interfaces** (CommandRunner, ConnectionTester, FileSystem) | Unit-testable without tools installed. Mock-able. CI-friendly. | More code. More abstractions. Rules become less readable. |
-| **Direct calls** + integration tests | Simple, readable rules. No abstraction overhead. | Tests require PostgreSQL/Git installed. CI must provision services. Can't test edge cases (network timeouts) easily. |
+| Approach                                                     | Pro                                                            | Con                                                                                                                  |
+| ------------------------------------------------------------ | -------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------- |
+| **Interfaces** (CommandRunner, ConnectionTester, FileSystem) | Unit-testable without tools installed. Mock-able. CI-friendly. | More code. More abstractions. Rules become less readable.                                                            |
+| **Direct calls** + integration tests                         | Simple, readable rules. No abstraction overhead.               | Tests require PostgreSQL/Git installed. CI must provision services. Can't test edge cases (network timeouts) easily. |
 
 The rest of the LarsArtmann Go ecosystem (go-cqrs-lite, go-finding) uses concrete implementations in production and integration tests. But auto-deduplicate uses samber/do for DI. There's no consistent pattern.
 
@@ -270,19 +276,19 @@ My recommendation: **interfaces** — the rules are small, the interfaces would 
 
 ## Metrics
 
-| Metric | Value |
-|---|---|
-| Total lines of Go code | 2,644 |
-| Total files | 14 Go files + README + go.mod |
-| Test files | 1 (errorfamily_test.go) |
-| Test cases | 26 |
-| Test pass rate | 100% (26/26) |
-| Build errors | 0 |
-| LSP errors | 0 |
-| LSP warnings | 9 (hints + unused funcs) |
-| Packages | 3 (errorfamily, diagnose, agent) |
-| Dependencies | 0 (stdlib only) |
-| Consumers | 0 |
+| Metric                 | Value                            |
+| ---------------------- | -------------------------------- |
+| Total lines of Go code | 2,644                            |
+| Total files            | 14 Go files + README + go.mod    |
+| Test files             | 1 (errorfamily_test.go)          |
+| Test cases             | 26                               |
+| Test pass rate         | 100% (26/26)                     |
+| Build errors           | 0                                |
+| LSP errors             | 0                                |
+| LSP warnings           | 9 (hints + unused funcs)         |
+| Packages               | 3 (errorfamily, diagnose, agent) |
+| Dependencies           | 0 (stdlib only)                  |
+| Consumers              | 0                                |
 
 ---
 

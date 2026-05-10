@@ -25,7 +25,7 @@ import (
 	"sync"
 	"time"
 
-	"github.com/larsartmann/go-error-family"
+	errorfamily "github.com/larsartmann/go-error-family"
 )
 
 // Status represents the result of a diagnostic check.

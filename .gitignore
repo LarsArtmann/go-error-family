@@ -1,0 +1,8 @@
+# Build artifacts
+/go-error-family
+# Copy/paste detection report
+/report/jscpd-report.json
+# Test coverage
+/coverage
+# Dependencies
+node_modules/

@@ -22,7 +22,7 @@ package main
 import (
     "fmt"
     "os"
-    
+
     "github.com/larsartmann/go-error-family"
 )
 
@@ -41,6 +41,7 @@ func main() {
 ```
 
 Output:
+
 ```
 A required resource was not found.
 Check that the path and resource name are correct.
@@ -50,13 +51,13 @@ Exit code: `1` (Rejection → user's fault)
 
 ## The Five Families
 
-| Family | Retryable | Exit Code | Whose Fault | Tone |
-|---|---|---|---|---|
-| **Rejection** | no | 1 | User | Instructional |
-| **Conflict** | no | 1 | User (needs to resolve) | Explanatory |
-| **Transient** | **yes** | 75 | System | Reassuring |
-| **Corruption** | no | 65 | Data damage | Urgent |
-| **Infrastructure** | no | 69 | System | Apologetic |
+| Family             | Retryable | Exit Code | Whose Fault             | Tone          |
+| ------------------ | --------- | --------- | ----------------------- | ------------- |
+| **Rejection**      | no        | 1         | User                    | Instructional |
+| **Conflict**       | no        | 1         | User (needs to resolve) | Explanatory   |
+| **Transient**      | **yes**   | 75        | System                  | Reassuring    |
+| **Corruption**     | no        | 65        | Data damage             | Urgent        |
+| **Infrastructure** | no        | 69        | System                  | Apologetic    |
 
 ## Constructors
 
@@ -152,6 +153,7 @@ for _, r := range results {
 ```
 
 Built-in rules:
+
 - **PostgresRule** — checks `pg_isready`, TCP connectivity
 - **FilesystemRule** — checks path existence, permissions, writability
 - **NetworkRule** — checks DNS resolution, TCP connectivity
@@ -179,12 +181,12 @@ for _, step := range result.FixSteps {
 
 Involvement levels:
 
-| Level | Analyzes | Suggests | Applies Safe | Applies Risky |
-|---|---|---|---|---|
-| Silent | yes | no | no | no |
-| Suggest | yes | yes | with approval | with approval |
-| Assist | yes | yes | **auto** | with approval |
-| Autonomous | yes | yes | **auto** | **auto** |
+| Level      | Analyzes | Suggests | Applies Safe  | Applies Risky |
+| ---------- | -------- | -------- | ------------- | ------------- |
+| Silent     | yes      | no       | no            | no            |
+| Suggest    | yes      | yes      | with approval | with approval |
+| Assist     | yes      | yes      | **auto**      | with approval |
+| Autonomous | yes      | yes      | **auto**      | **auto**      |
 
 ## Architecture
 
@@ -209,6 +211,7 @@ go-error-family/
 Read the full design document: [`docs/2026-05-09_23-30_structured-errors-first-principles-design.md`](https://github.com/larsartmann/go-error-family/blob/main/docs/)
 
 Key principles:
+
 1. **Protocol, not framework** — share the vocabulary, not the implementation
 2. **Each error type implements what it needs** — no god struct
 3. **Presentation is separate from the error** — the CLI layer formats for humans

@@ -99,7 +99,7 @@ func runCommand(ctx context.Context, timeout time.Duration, name string, args ..
 		}
 	}
 
-	return
+	return stdout, stderr, exitCode, err
 }
 
 // commandExists checks if a command is available on the system PATH.

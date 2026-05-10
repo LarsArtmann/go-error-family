@@ -24,7 +24,7 @@ import (
 	"strings"
 	"time"
 
-	"github.com/larsartmann/go-error-family"
+	errorfamily "github.com/larsartmann/go-error-family"
 	"github.com/larsartmann/go-error-family/diagnose"
 )
 
@@ -334,13 +334,13 @@ func (a *agent) deterministicAnalyze(err error, diagnosis []*diagnose.Diagnostic
 }
 
 func extractCommand(suggest string) string {
-	for _, line := range strings.Split(suggest, "\n") {
+	for line := range strings.SplitSeq(suggest, "\n") {
 		line = strings.TrimSpace(line)
-		if strings.HasPrefix(line, "$ ") {
-			return strings.TrimPrefix(line, "$ ")
+		if after, ok := strings.CutPrefix(line, "$ "); ok {
+			return after
 		}
-		if strings.HasPrefix(line, "Run: ") {
-			return strings.TrimPrefix(line, "Run: ")
+		if after, ok := strings.CutPrefix(line, "Run: "); ok {
+			return after
 		}
 	}
 	return ""
@@ -350,22 +350,22 @@ func (a *agent) buildPrompt(err error, diagnosis []*diagnose.DiagnosticResult) s
 	var b strings.Builder
 
 	b.WriteString("Analyze the following error and provide root cause analysis with fix steps.\n\n")
-	b.WriteString(fmt.Sprintf("Error: %s\n", err.Error()))
-	b.WriteString(fmt.Sprintf("Family: %s\n", errorfamily.Classify(err)))
+	fmt.Fprintf(&b, "Error: %s\n", err.Error())
+	fmt.Fprintf(&b, "Family: %s\n", errorfamily.Classify(err))
 
 	if ctx, ok := errors.AsType[errorfamily.Contextual](err); ok {
 		b.WriteString("Context:\n")
 		for k, v := range ctx.ErrorContext() {
-			b.WriteString(fmt.Sprintf("  %s: %s\n", k, v))
+			fmt.Fprintf(&b, "  %s: %s\n", k, v)
 		}
 	}
 
 	if len(diagnosis) > 0 {
 		b.WriteString("\nDiagnostic Results:\n")
 		for _, d := range diagnosis {
-			b.WriteString(fmt.Sprintf("  [%s] %s (confidence: %.1f)\n", d.Status, d.Summary, d.Confidence))
+			fmt.Fprintf(&b, "  [%s] %s (confidence: %.1f)\n", d.Status, d.Summary, d.Confidence)
 			if d.SuggestedFix != "" {
-				b.WriteString(fmt.Sprintf("    Suggested fix: %s\n", d.SuggestedFix))
+				fmt.Fprintf(&b, "    Suggested fix: %s\n", d.SuggestedFix)
 			}
 		}
 	}

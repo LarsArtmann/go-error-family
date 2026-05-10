@@ -30,10 +30,10 @@ func (r *FilesystemRule) Run(ctx context.Context, err error) (*DiagnosticResult,
 	path := r.resolvePath(err)
 	if path == "" {
 		return &DiagnosticResult{
-			Status:      StatusUnknown,
-			Summary:     "No file path found in error context",
-			Confidence:  0.1,
-			Details:     map[string]string{},
+			Status:     StatusUnknown,
+			Summary:    "No file path found in error context",
+			Confidence: 0.1,
+			Details:    map[string]string{},
 		}, nil
 	}
 
