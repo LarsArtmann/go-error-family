@@ -123,8 +123,8 @@ func (r *FilesystemRule) Run(ctx context.Context, err error) (*DiagnosticResult,
 			result.Summary = fmt.Sprintf("Directory exists but is not writable: %s", path)
 			result.SuggestedFix = fmt.Sprintf("Fix write permissions:\n  chmod 755 %s", path)
 		} else {
-			f.Close()
-			os.Remove(testFile)
+			_ = f.Close()
+			_ = os.Remove(testFile)
 			result.Details["writable"] = "true"
 			result.Status = StatusHealthy
 			result.Summary = fmt.Sprintf("Path exists and is writable: %s", path)
@@ -138,7 +138,7 @@ func (r *FilesystemRule) Run(ctx context.Context, err error) (*DiagnosticResult,
 			result.Summary = fmt.Sprintf("File exists but is not readable: %s", path)
 			result.SuggestedFix = fmt.Sprintf("Fix read permissions:\n  chmod 644 %s", path)
 		} else {
-			f.Close()
+			_ = f.Close()
 			result.Details["readable"] = "true"
 			result.Status = StatusHealthy
 			result.Summary = fmt.Sprintf("File exists and is readable: %s (%s)", path, result.Details["permissions"])
@@ -167,12 +167,4 @@ func parentDir(path string) string {
 		return parent
 	}
 	return "."
-}
-
-func isDirectory(path string) (bool, error) {
-	info, err := os.Stat(path)
-	if err != nil {
-		return false, err
-	}
-	return info.IsDir(), nil
 }

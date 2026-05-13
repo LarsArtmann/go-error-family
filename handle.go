@@ -94,7 +94,7 @@ func HandleErrorWithConfig(err error, cfg HandleConfig) int {
 
 	message := renderCLI(code, context, family, cfg)
 
-	fmt.Fprintln(cfg.Output, message)
+	_, _ = fmt.Fprintln(cfg.Output, message)
 
 	return exitCode
 }

@@ -63,7 +63,7 @@ func (r *PostgresRule) Run(ctx context.Context, err error) (*DiagnosticResult, e
 	addr := net.JoinHostPort(host, port)
 	conn, dialErr := net.DialTimeout("tcp", addr, 3*time.Second)
 	if dialErr == nil {
-		conn.Close()
+		_ = conn.Close()
 		result.Status = StatusHealthy
 		result.Summary = fmt.Sprintf("TCP connection to %s succeeded — PostgreSQL may be running", addr)
 		result.Confidence = 0.4
@@ -133,6 +133,6 @@ func IsPostgresRunning(ctx context.Context, host, port string) bool {
 	if err != nil {
 		return false
 	}
-	conn.Close()
+	_ = conn.Close()
 	return true
 }

@@ -2,7 +2,6 @@ package diagnose
 
 import (
 	"context"
-	"fmt"
 	"os"
 	"os/exec"
 	"regexp"
@@ -106,12 +105,4 @@ func runCommand(ctx context.Context, timeout time.Duration, name string, args ..
 func commandExists(name string) bool {
 	_, err := exec.LookPath(name)
 	return err == nil
-}
-
-// formatCommandFix returns a platform-appropriate command string.
-func formatCommandFix(command string) string {
-	if runtime.GOOS == "darwin" {
-		return fmt.Sprintf("Run: %s", command)
-	}
-	return fmt.Sprintf("Run: %s", command)
 }

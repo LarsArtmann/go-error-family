@@ -62,7 +62,7 @@ func (r *NetworkRule) Run(ctx context.Context, err error) (*DiagnosticResult, er
 			result.AutoFixable = false
 			return result, nil
 		}
-		conn.Close()
+		_ = conn.Close()
 		result.Details["tcp_reachable"] = "true"
 	}
 
