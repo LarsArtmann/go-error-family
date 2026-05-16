@@ -158,20 +158,20 @@ func (r *Runner) Run(ctx context.Context, err error) []*DiagnosticResult {
 
 	for i, rule := range rules {
 		wg.Add(1)
-		go func(idx int, rule DiagnosticRule) {
+		go func(idx int, rl DiagnosticRule) {
 			defer wg.Done()
 			start := time.Now()
-			result, err := rule.Run(ctx, err)
-			if err != nil {
-				errs[idx] = err
+			result, runErr := rl.Run(ctx, err)
+			if runErr != nil {
+				errs[idx] = runErr
 				results[idx] = &DiagnosticResult{
-					RuleName: rule.Name(),
+					RuleName: rl.Name(),
 					Status:   StatusUnknown,
-					Summary:  fmt.Sprintf("diagnostic failed: %v", err),
-					Details:  map[string]string{"error": err.Error()},
+					Summary:  fmt.Sprintf("diagnostic failed: %v", runErr),
+					Details:  map[string]string{"error": runErr.Error()},
 				}
 			} else if result != nil {
-				result.RuleName = rule.Name()
+				result.RuleName = rl.Name()
 				result.Duration = time.Since(start)
 				results[idx] = result
 			}
@@ -182,9 +182,9 @@ func (r *Runner) Run(ctx context.Context, err error) []*DiagnosticResult {
 
 	// Filter nils and sort by confidence descending.
 	filtered := make([]*DiagnosticResult, 0, len(results))
-	for _, r := range results {
-		if r != nil {
-			filtered = append(filtered, r)
+	for _, res := range results {
+		if res != nil {
+			filtered = append(filtered, res)
 		}
 	}
 

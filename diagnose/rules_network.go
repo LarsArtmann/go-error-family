@@ -6,8 +6,6 @@ import (
 	"net"
 	"strings"
 	"time"
-
-	errorfamily "github.com/larsartmann/go-error-family"
 )
 
 // NetworkRule diagnoses network-related errors.
@@ -25,7 +23,9 @@ func (r *NetworkRule) Applicable(err error) bool {
 		errorCodeContains(err, "connect") ||
 		errorCodeContains(err, "dial") ||
 		errorCodeContains(err, "timeout") ||
-		familyIs(err, errorfamily.Transient)
+		hasContextSubstring(err, "connection refused") ||
+		hasContextSubstring(err, "no such host") ||
+		hasContextSubstring(err, "i/o timeout")
 }
 
 func (r *NetworkRule) Run(ctx context.Context, err error) (*DiagnosticResult, error) {

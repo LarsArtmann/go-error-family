@@ -21,9 +21,7 @@ type SystemSnapshot struct {
 	GoVersion   string            `json:"go_version"`
 	PID         int               `json:"pid"`
 	WorkingDir  string            `json:"working_dir"`
-	DiskFree    map[string]int64  `json:"disk_free_bytes"`
 	Environment map[string]string `json:"environment"`
-	Uptime      time.Duration     `json:"uptime"`
 }
 
 // GatherSystemSnapshot captures the current system state.
@@ -37,7 +35,6 @@ func GatherSystemSnapshot(ctx context.Context) *SystemSnapshot {
 		GoVersion:   runtime.Version(),
 		PID:         os.Getpid(),
 		WorkingDir:  mustGetwd(),
-		DiskFree:    map[string]int64{},
 		Environment: map[string]string{},
 	}
 
