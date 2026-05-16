@@ -1,18 +1,29 @@
 # go-error-family
 
+[![Go Reference](https://pkg.go.dev/badge/github.com/larsartmann/go-error-family.svg)](https://pkg.go.dev/github.com/larsartmann/go-error-family)
+[![Go Report Card](https://goreportcard.com/badge/github.com/larsartmann/go-error-family)](https://goreportcard.com/report/github.com/larsartmann/go-error-family)
+
 Structured error protocol for Go — behavioral classification, exit codes, and diagnostic rules.
 
 **Share the protocol, not the implementation.**
+
+## Installation
+
+```bash
+go get github.com/larsartmann/go-error-family
+```
+
+Requires Go 1.26+ (uses `errors.AsType`).
 
 ## What It Gives You
 
 - **`Family`** — behavioral classification (Rejection, Conflict, Transient, Corruption, Infrastructure) that maps to retry decisions, exit codes, and user-facing tone
 - **Small interfaces** — `Coded`, `Classified`, `Contextual`, `Retryable` — each error type implements what it needs
 - **`Classify(err)`** — universal classification for any error (interface → registered sentinels → default)
-- **`ExitCode(err)`** — BSD sysexits.h exit codes from Family for shell scripts
-- **`HandleError(err)`** — CLI boundary handler with Wix-quality messages
+- **`ExitCode(err)`** — BSD sysexits.h exit codes derived from Family
+- **`HandleError(err)`** — CLI boundary handler with structured messages (What / Why / Fix / WayOut)
 - **Diagnostic rules** — deterministic checks (PostgreSQL, filesystem, network, git) that auto-discover why an error occurred
-- **AI debug agent** — configurable involvement levels (silent → autonomous)
+- **AI debug agent** — root cause analysis and `FixStep` suggestions from diagnostic context
 
 ## Quick Start
 
@@ -20,21 +31,18 @@ Structured error protocol for Go — behavioral classification, exit codes, and 
 package main
 
 import (
-    "fmt"
     "os"
 
     "github.com/larsartmann/go-error-family"
 )
 
 func run() error {
-    // Create classified errors with code + context
     return errorfamily.NewRejection("file.not_found", "config file missing").
         WithContext("path", "/etc/app/config.yaml")
 }
 
 func main() {
     if err := run(); err != nil {
-        // HandleError: classifies → picks exit code → formats message → writes stderr
         os.Exit(errorfamily.HandleError(err))
     }
 }
@@ -59,6 +67,8 @@ Exit code: `1` (Rejection → user's fault)
 | **Corruption**     | no        | 65        | Data damage             | Urgent        |
 | **Infrastructure** | no        | 69        | System                  | Apologetic    |
 
+Each family also exposes `Audience()` (User / Ops / All) and `Tone()` for presentation-layer decisions.
+
 ## Constructors
 
 ```go
@@ -68,14 +78,16 @@ err := errorfamily.NewRejection("config.invalid", "bad config")
 // With cause
 err := errorfamily.WrapTransient(dbErr, "db.timeout", "query timed out")
 
-// With context
+// With context (chainable)
 err := errorfamily.NewRejection("file.not_found", "config missing").
     WithContext("path", "/etc/app/config.yaml").
     WithContext("format", "yaml")
 
 // Formatted
-err := errorfamily.Newf(Rejection, "file.not_found", "missing: %s", path)
+err := errorfamily.Newf(errorfamily.Rejection, "file.not_found", "missing: %s", path)
 ```
+
+Family-specific constructors: `NewRejection`, `NewConflict`, `NewTransient`, `NewCorruption`, `NewInfrastructure`. Wrap variants: `WrapRejection`, `WrapConflict`, `WrapTransient`, `WrapCorruption`, `WrapInfrastructure`.
 
 ## Classification
 
@@ -90,7 +102,17 @@ if errorfamily.IsRetryable(err) {
 
 // Exit code for CLI
 os.Exit(errorfamily.ExitCode(err))
+
+// Parse from string (e.g. config, HTTP headers)
+family := errorfamily.ParseFamily("transient") // defaults to Transient for unknowns
 ```
+
+Classification precedence — first match wins:
+
+1. `Classified` interface → `ErrorFamily()`
+2. `Retryable` interface → infer Transient (true) or Rejection (false)
+3. Registered sentinels via `errors.Is` chain walk
+4. Default → Transient (fail-open for retry)
 
 ## Registering Third-Party Errors
 
@@ -100,6 +122,12 @@ For errors you don't own (stdlib, libraries):
 func init() {
     errorfamily.RegisterClassification(sql.ErrConnDone, errorfamily.Transient)
     errorfamily.RegisterClassification(os.ErrPermission, errorfamily.Rejection)
+
+    // Batch registration
+    errorfamily.RegisterClassifications(map[error]errorfamily.Family{
+        sql.ErrConnDone: errorfamily.Transient,
+        sql.ErrTxDone:   errorfamily.Transient,
+    })
 }
 ```
 
@@ -134,7 +162,56 @@ func (e *FindingError) ErrorContext() map[string]string {
 }
 ```
 
-Now `errorfamily.Classify()`, `errorfamily.IsRetryable()`, `errorfamily.ExitCode()`, and `errorfamily.HandleError()` all work with your type.
+Now `Classify()`, `IsRetryable()`, `ExitCode()`, and `HandleError()` all work with your type.
+
+## CLI Boundary: HandleError
+
+`HandleError` is the top-of-main handler that classifies the error, picks an exit code, formats a user-facing message, and writes to stderr:
+
+```go
+func main() {
+    if err := run(); err != nil {
+        os.Exit(errorfamily.HandleError(err))
+    }
+}
+```
+
+For more control:
+
+```go
+// Structured result (no stderr write) — for HTTP handlers, gRPC interceptors
+result := errorfamily.HandleErrorDetailed(err)
+fmt.Printf("exit=%d msg=%q fix=%q\n", result.ExitCode, result.Message, result.SuggestedFix)
+
+// Custom config — diagnostics, template overrides, custom output
+exitCode := errorfamily.HandleErrorWithConfig(err, errorfamily.HandleConfig{
+    Diagnose:    true,
+    Output:      myWriter,
+    DiagnosticFunc: myDiagnoseFunc,
+    OnDiagnosed: func(err error, findings []errorfamily.DiagnosticFinding) {
+        logFindings(findings)
+    },
+    TemplateOverride: map[string]errorfamily.MessageTemplate{
+        "file.not_found": {
+            What:   "Could not find {{.path}}",
+            Why:    "The file doesn't exist at the expected location.",
+            Fix:    "Check that {{.path}} exists and is readable.",
+            WayOut: "Run with --verbose for more details.",
+        },
+    },
+})
+```
+
+### Template Resolution
+
+Messages are resolved in this order (first match wins):
+
+1. `HandleConfig.TemplateOverride[code]` — per-call consumer override
+2. `RegisterTemplate(code, tmpl)` — global registry
+3. Built-in `defaultMessages[code]` — exact-match defaults
+4. `Family.DefaultMessage()` — generic family-based fallback
+
+All lookups are exact code matches (case-insensitive). No substring matching.
 
 ## Diagnostic Rules
 
@@ -159,58 +236,46 @@ Built-in rules:
 - **NetworkRule** — checks DNS resolution, TCP connectivity
 - **GitRule** — checks repo state, merge conflicts, remote reachability
 
+Results include `Confidence` (0.0–1.0) and are sorted by confidence descending.
+
 ## AI Debug Agent
 
-Configurable AI-assisted debugging:
+Root cause analysis and fix suggestions from diagnostic context:
 
 ```go
-cfg := agent.DefaultConfig()
-cfg.Enabled = true
-cfg.Involvement = agent.InvolvementSuggest // or Silent, Assist, Autonomous
-cfg.ConfirmFunc = func(action string) bool {
-    fmt.Println("Proposed:", action)
-    return true // user approves
-}
-
-ag := agent.New(cfg)
+ag := agent.New(agent.Config{Enabled: true})
 result, _ := ag.Analyze(ctx, err, diagnosis)
+
+fmt.Println("Root cause:", result.RootCause)
+fmt.Println("Confidence:", result.Confidence)
 for _, step := range result.FixSteps {
-    fmt.Printf("  - %s (risk: %s)\n", step.Description, step.Risk)
+    fmt.Printf("  - %s\n    Command: %s\n", step.Description, step.Command)
 }
 ```
 
-Involvement levels:
+The agent produces analysis but does **not** execute fixes — the consumer decides what to do with `FixStep.Command`.
 
-| Level      | Analyzes | Suggests | Applies Safe  | Applies Risky |
-| ---------- | -------- | -------- | ------------- | ------------- |
-| Silent     | yes      | no       | no            | no            |
-| Suggest    | yes      | yes      | with approval | with approval |
-| Assist     | yes      | yes      | **auto**      | with approval |
-| Autonomous | yes      | yes      | **auto**      | **auto**      |
+`AgentResult` fields: `RootCause`, `Confidence`, `Explanation`, `FixSteps`, `Prevention`, `RelatedErrors`.
 
 ## Architecture
 
 ```
 go-error-family/
-├── family.go        — Family int enum, String, ExitCode, IsRetryable, Tone
-├── interfaces.go    — Coded, Classified, Contextual, Retryable (embed error)
-├── error.go         — Reference Error struct (Is, Unwrap, Format, Context)
-├── classify.go      — Classify, IsRetryable, ExitCode, RegisterClassification
-├── constructors.go  — New, Wrap, NewRejection, WrapTransient, etc.
-├── handle.go        — HandleError (CLI boundary), HandleErrorDetailed
+├── family.go        — Family enum, String, ExitCode, IsRetryable, Tone, Audience, ParseFamily
+├── interfaces.go    — Coded, Classified, Contextual, Retryable (each embeds error)
+├── error.go         — Reference Error struct (Is, Unwrap, Format, WithContext, Summary, etc.)
+├── classify.go      — Classify, IsRetryable, ExitCode, RegisterClassification(s)
+├── constructors.go  — New, Wrap, Newf, Wrapf + family shortcuts
+├── handle.go        — HandleError, HandleErrorWithConfig, HandleErrorDetailed, templates
 ├── diagnose/
-│   ├── diagnose.go  — Runner, DiagnosticRule, DiagnosticResult, helpers
-│   ├── context.go   — SystemSnapshot, command runner, secret redaction
+│   ├── diagnose.go  — Runner, DiagnosticRule interface, DiagnosticResult, helpers
+│   ├── context.go   — internal command runner (unexported)
 │   ├── rules_*.go   — PostgresRule, FilesystemRule, NetworkRule, GitRule
 ├── agent/
-│   └── agent.go     — DebugAgent, Involvement levels, FixStep, Config
+│   └── agent.go     — DebugAgent interface, Config, AgentResult, FixStep
 ```
 
 ## Philosophy
-
-Read the full design document: [`docs/2026-05-09_23-30_structured-errors-first-principles-design.md`](https://github.com/larsartmann/go-error-family/blob/main/docs/)
-
-Key principles:
 
 1. **Protocol, not framework** — share the vocabulary, not the implementation
 2. **Each error type implements what it needs** — no god struct
