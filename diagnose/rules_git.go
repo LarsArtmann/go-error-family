@@ -39,7 +39,6 @@ func (r *GitRule) Run(ctx context.Context, err error) (*DiagnosticResult, error)
 		result.Summary = fmt.Sprintf("Not a git repository: %s", repoPath)
 		result.Details["is_repo"] = "false"
 		result.SuggestedFix = fmt.Sprintf("Initialize a git repository:\n  cd %s && git init", repoPath)
-		result.AutoFixable = false
 		return result, nil
 	}
 	result.Details["is_repo"] = "true"
@@ -71,14 +70,12 @@ func (r *GitRule) Run(ctx context.Context, err error) (*DiagnosticResult, error)
 			result.Summary = fmt.Sprintf("Merge conflicts in %s (%d unmerged files)", repoPath, strings.Count(stdout, "UU")+strings.Count(stdout, "AA"))
 			result.Details["merge_conflicts"] = "true"
 			result.SuggestedFix = "Resolve merge conflicts:\n  git mergetool\n  git add <resolved files>\n  git commit"
-			result.AutoFixable = false
 			return result, nil
 		}
 
 		result.Status = StatusDegraded
 		result.Summary = fmt.Sprintf("Working tree has uncommitted changes (%d files)", lineCount)
 		result.SuggestedFix = "Commit or stash changes:\n  git add . && git commit -m \"wip\"\nOr: git stash"
-		result.AutoFixable = false
 		return result, nil
 	}
 
@@ -97,7 +94,6 @@ func (r *GitRule) Run(ctx context.Context, err error) (*DiagnosticResult, error)
 		result.Summary = fmt.Sprintf("Git repo is clean but remote is unreachable: %s", repoPath)
 		result.Details["remote_reachable"] = "false"
 		result.SuggestedFix = "Check network connectivity and remote URL:\n  git remote -v\n  git ls-remote origin"
-		result.AutoFixable = false
 		return result, nil
 	}
 

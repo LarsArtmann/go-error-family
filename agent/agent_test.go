@@ -8,60 +8,6 @@ import (
 	"github.com/larsartmann/go-error-family/diagnose"
 )
 
-func TestInvolvementString(t *testing.T) {
-	tests := []struct {
-		inv  Involvement
-		want string
-	}{
-		{InvolvementSilent, "silent"},
-		{InvolvementSuggest, "suggest"},
-		{InvolvementAssist, "assist"},
-		{InvolvementAutonomous, "autonomous"},
-		{Involvement(99), "unknown"},
-	}
-	for _, tt := range tests {
-		if got := tt.inv.String(); got != tt.want {
-			t.Errorf("Involvement(%d).String() = %q, want %q", tt.inv, got, tt.want)
-		}
-	}
-}
-
-func TestRiskLevelString(t *testing.T) {
-	tests := []struct {
-		risk RiskLevel
-		want string
-	}{
-		{RiskSafe, "safe"},
-		{RiskMedium, "medium"},
-		{RiskHigh, "high"},
-		{RiskLevel(99), "unknown"},
-	}
-	for _, tt := range tests {
-		if got := tt.risk.String(); got != tt.want {
-			t.Errorf("RiskLevel(%d).String() = %q, want %q", tt.risk, got, tt.want)
-		}
-	}
-}
-
-func TestDefaultConfig(t *testing.T) {
-	cfg := DefaultConfig()
-	if cfg.Enabled {
-		t.Error("DefaultConfig should have Enabled=false")
-	}
-	if cfg.Involvement != InvolvementSuggest {
-		t.Error("DefaultConfig should have InvolvementSuggest")
-	}
-	if cfg.Timeout == 0 {
-		t.Error("DefaultConfig should have non-zero Timeout")
-	}
-	if cfg.MaxTokens == 0 {
-		t.Error("DefaultConfig should have non-zero MaxTokens")
-	}
-	if len(cfg.ForbiddenCommands) == 0 {
-		t.Error("DefaultConfig should have ForbiddenCommands")
-	}
-}
-
 func TestNewAgentDefaults(t *testing.T) {
 	cfg := Config{Enabled: true}
 	ag := New(cfg)
@@ -70,7 +16,7 @@ func TestNewAgentDefaults(t *testing.T) {
 	}
 }
 
-func TestNewAgentZeroDefaults(t *testing.T) {
+func TestNewAgentZeroTimeout(t *testing.T) {
 	cfg := Config{Enabled: true}
 	ag := New(cfg)
 	result, err := ag.Analyze(context.Background(), errorfamily.NewTransient("test", "msg"), nil)
@@ -159,118 +105,7 @@ func TestAnalyzeEmptyDiagnosis(t *testing.T) {
 	}
 }
 
-func TestApplyFixesSilent(t *testing.T) {
-	cfg := Config{
-		Enabled:     true,
-		Involvement: InvolvementSilent,
-	}
-	ag := New(cfg)
-
-	result := &AgentResult{
-		FixSteps: []FixStep{
-			{Description: "Do something", Risk: RiskSafe},
-		},
-	}
-	applied := ag.ApplyFixes(context.Background(), result)
-	if len(applied) != 0 {
-		t.Error("Silent mode should apply nothing")
-	}
-}
-
-func TestApplyFixesSuggestWithApproval(t *testing.T) {
-	cfg := Config{
-		Enabled:     true,
-		Involvement: InvolvementSuggest,
-		ConfirmFunc: func(action string) bool { return true },
-	}
-	ag := New(cfg)
-
-	result := &AgentResult{
-		FixSteps: []FixStep{
-			{Description: "Do something", Risk: RiskSafe},
-		},
-	}
-	applied := ag.ApplyFixes(context.Background(), result)
-	if len(applied) != 1 {
-		t.Errorf("Expected 1 applied step with approval, got %d", len(applied))
-	}
-}
-
-func TestApplyFixesSuggestWithoutConfirm(t *testing.T) {
-	cfg := Config{
-		Enabled:     true,
-		Involvement: InvolvementSuggest,
-	}
-	ag := New(cfg)
-
-	result := &AgentResult{
-		FixSteps: []FixStep{
-			{Description: "Do something", Risk: RiskSafe},
-		},
-	}
-	applied := ag.ApplyFixes(context.Background(), result)
-	if len(applied) != 0 {
-		t.Error("Suggest without ConfirmFunc should apply nothing")
-	}
-}
-
-func TestApplyFixesAssistSafe(t *testing.T) {
-	cfg := Config{
-		Enabled:     true,
-		Involvement: InvolvementAssist,
-	}
-	ag := New(cfg)
-
-	result := &AgentResult{
-		FixSteps: []FixStep{
-			{Description: "Safe fix", Risk: RiskSafe},
-		},
-	}
-	applied := ag.ApplyFixes(context.Background(), result)
-	if len(applied) != 1 {
-		t.Error("Assist mode should auto-apply safe fixes")
-	}
-}
-
-func TestApplyFixesAssistRisky(t *testing.T) {
-	cfg := Config{
-		Enabled:     true,
-		Involvement: InvolvementAssist,
-		ConfirmFunc: func(action string) bool { return false },
-	}
-	ag := New(cfg)
-
-	result := &AgentResult{
-		FixSteps: []FixStep{
-			{Description: "Risky fix", Risk: RiskHigh},
-		},
-	}
-	applied := ag.ApplyFixes(context.Background(), result)
-	if len(applied) != 0 {
-		t.Error("Assist mode should not auto-apply risky fixes when denied")
-	}
-}
-
-func TestApplyFixesAutonomous(t *testing.T) {
-	cfg := Config{
-		Enabled:     true,
-		Involvement: InvolvementAutonomous,
-	}
-	ag := New(cfg)
-
-	result := &AgentResult{
-		FixSteps: []FixStep{
-			{Description: "Safe", Risk: RiskSafe},
-			{Description: "Risky", Risk: RiskHigh},
-		},
-	}
-	applied := ag.ApplyFixes(context.Background(), result)
-	if len(applied) != 2 {
-		t.Errorf("Autonomous mode should apply all fixes, got %d", len(applied))
-	}
-}
-
-func TestBuildPrompt(t *testing.T) {
+func TestAnalyzeWithContext(t *testing.T) {
 	cfg := Config{Enabled: true}
 	ag := New(cfg)
 

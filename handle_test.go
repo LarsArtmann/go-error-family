@@ -80,10 +80,12 @@ func TestHandleErrorWithConfigDiagnostics(t *testing.T) {
 	err := NewTransient("db.timeout", "timed out")
 
 	code := HandleErrorWithConfig(err, HandleConfig{
-		Output:           &buf,
-		Diagnose:         true,
-		DiagnosticRunner: &mockDiagnosticRunner{results: "diagnostic result"},
-		OnDiagnosed: func(e error, results any) {
+		Output:   &buf,
+		Diagnose: true,
+		DiagnosticFunc: func(_ context.Context, _ error) []DiagnosticFinding {
+			return []DiagnosticFinding{{RuleName: "test", Status: "failed", Summary: "something failed", Confidence: 0.9}}
+		},
+		OnDiagnosed: func(_ error, _ []DiagnosticFinding) {
 			called = true
 		},
 	})
@@ -101,10 +103,12 @@ func TestHandleErrorWithConfigNoDiagnoseWhenDisabled(t *testing.T) {
 	err := NewTransient("test", "msg")
 
 	HandleErrorWithConfig(err, HandleConfig{
-		Output:           &buf,
-		Diagnose:         false,
-		DiagnosticRunner: &mockDiagnosticRunner{results: "diagnostic result"},
-		OnDiagnosed: func(e error, results any) {
+		Output:   &buf,
+		Diagnose: false,
+		DiagnosticFunc: func(_ context.Context, _ error) []DiagnosticFinding {
+			return []DiagnosticFinding{{RuleName: "test", Status: "failed", Summary: "something failed", Confidence: 0.9}}
+		},
+		OnDiagnosed: func(_ error, _ []DiagnosticFinding) {
 			called = true
 		},
 	})
@@ -207,11 +211,3 @@ func TestMessageTemplateApply(t *testing.T) {
 type plainErr string
 
 func (e plainErr) Error() string { return string(e) }
-
-type mockDiagnosticRunner struct {
-	results any
-}
-
-func (m *mockDiagnosticRunner) Run(_ context.Context, _ error) any {
-	return m.results
-}

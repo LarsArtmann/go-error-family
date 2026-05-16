@@ -56,17 +56,6 @@ func (r *FilesystemRule) Run(ctx context.Context, err error) (*DiagnosticResult,
 			if parentErr != nil {
 				result.Details["parent_exists"] = "false"
 				result.SuggestedFix = fmt.Sprintf("Create parent directory and path:\n  mkdir -p %s", parent)
-				result.AutoFixable = true
-				result.AutoFix = func(ctx context.Context) (*FixResult, error) {
-					if mkErr := os.MkdirAll(parent, 0o755); mkErr != nil {
-						return nil, mkErr
-					}
-					return &FixResult{
-						Resolved: true,
-						Summary:  fmt.Sprintf("Created directory: %s", parent),
-						Actions:  []string{fmt.Sprintf("mkdir -p %s", parent)},
-					}, nil
-				}
 			} else {
 				result.Details["parent_exists"] = "true"
 				result.Details["parent_permissions"] = parentInfo.Mode().Perm().String()
@@ -74,17 +63,6 @@ func (r *FilesystemRule) Run(ctx context.Context, err error) (*DiagnosticResult,
 					result.SuggestedFix = fmt.Sprintf("Create the file: %s", path)
 				} else {
 					result.SuggestedFix = fmt.Sprintf("Create directory: mkdir -p %s", path)
-					result.AutoFixable = true
-					result.AutoFix = func(ctx context.Context) (*FixResult, error) {
-						if mkErr := os.MkdirAll(path, 0o755); mkErr != nil {
-							return nil, mkErr
-						}
-						return &FixResult{
-							Resolved: true,
-							Summary:  fmt.Sprintf("Created directory: %s", path),
-							Actions:  []string{fmt.Sprintf("mkdir -p %s", path)},
-						}, nil
-					}
 				}
 			}
 			return result, nil
@@ -96,7 +74,7 @@ func (r *FilesystemRule) Run(ctx context.Context, err error) (*DiagnosticResult,
 			result.Details["exists"] = "true"
 			result.Details["permissions"] = "denied"
 			result.SuggestedFix = fmt.Sprintf("Fix permissions:\n  chmod 755 %s\nOr run with appropriate privileges.", path)
-			result.AutoFixable = false
+		
 			return result, nil
 		}
 

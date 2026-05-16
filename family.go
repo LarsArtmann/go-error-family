@@ -73,6 +73,11 @@ func (f Family) IsRetryable() bool {
 	return f == Transient
 }
 
+// IsValid reports whether the Family value is one of the five defined constants.
+func (f Family) IsValid() bool {
+	return f >= Rejection && f <= Infrastructure
+}
+
 // ExitCode returns the BSD sysexits.h compatible exit code for this family.
 // Shell scripts and CI pipelines can use this to make automated decisions.
 func (f Family) ExitCode() int {

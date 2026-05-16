@@ -87,9 +87,11 @@ var registry = struct {
 
 func lookupRegistered(err error) (Family, bool) {
 	registry.mu.RLock()
-	defer registry.mu.RUnlock()
+	snapshot := make(map[error]Family, len(registry.entries))
+	maps.Copy(snapshot, registry.entries)
+	registry.mu.RUnlock()
 
-	for sentinel, family := range registry.entries {
+	for sentinel, family := range snapshot {
 		if errors.Is(err, sentinel) {
 			return family, true
 		}

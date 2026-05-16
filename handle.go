@@ -7,24 +7,20 @@ import (
 	"io"
 	"os"
 	"strings"
+	"sync"
 )
 
 // HandleResult contains the full output of handling an error at the CLI boundary.
 type HandleResult struct {
-	ExitCode      int
-	Message       string
-	Diagnostics   []string
-	SuggestedFix  string
-	ErrorReported bool
+	ExitCode     int
+	Message      string
+	SuggestedFix string
 }
 
 // HandleConfig controls how HandleError processes an error at the CLI boundary.
 type HandleConfig struct {
 	// Output is where human-readable messages are written. Defaults to os.Stderr.
 	Output io.Writer
-
-	// Verbose controls whether diagnostic details are shown.
-	Verbose bool
 
 	// Diagnose controls whether automatic diagnostic rules are run.
 	Diagnose bool
@@ -33,18 +29,26 @@ type HandleConfig struct {
 	// map[errorCode]MessageTemplate
 	TemplateOverride map[string]MessageTemplate
 
-	// DiagnosticRunner is a custom diagnostic runner. If nil, no diagnostics run.
-	DiagnosticRunner DiagnosticRunner
+	// DiagnosticFunc runs diagnostics for the error. If nil, no diagnostics run.
+	DiagnosticFunc DiagnosticFunc
 
 	// OnDiagnosed is called after diagnostics complete, before exit.
-	// Receives the error and diagnostic results. Useful for logging/metrics.
-	OnDiagnosed func(err error, results any)
+	// Receives the error and diagnostic findings. Useful for logging/metrics.
+	OnDiagnosed func(err error, findings []DiagnosticFinding)
 }
 
-// DiagnosticRunner is a minimal interface for the CLI boundary.
-// The diagnose.Runner satisfies this.
-type DiagnosticRunner interface {
-	Run(ctx context.Context, err error) any
+// DiagnosticFunc runs diagnostics for an error and returns results.
+// The diagnose.Runner satisfies this via its Run method.
+type DiagnosticFunc func(ctx context.Context, err error) []DiagnosticFinding
+
+// DiagnosticFinding is a minimal result type for the CLI boundary.
+// Avoids importing diagnose while preserving type safety.
+type DiagnosticFinding struct {
+	RuleName     string
+	Status       string // "healthy", "degraded", "failed", "unknown"
+	Summary      string
+	SuggestedFix string
+	Confidence   float64
 }
 
 // MessageTemplate defines the Wix-style presentation for an error code.
@@ -92,10 +96,10 @@ func HandleErrorWithConfig(err error, cfg HandleConfig) int {
 	code := extractCode(err)
 	ctx := extractContext(err)
 
-	if cfg.Diagnose && cfg.DiagnosticRunner != nil {
-		results := cfg.DiagnosticRunner.Run(context.Background(), err)
+	if cfg.Diagnose && cfg.DiagnosticFunc != nil {
+		findings := cfg.DiagnosticFunc(context.Background(), err)
 		if cfg.OnDiagnosed != nil {
-			cfg.OnDiagnosed(err, results)
+			cfg.OnDiagnosed(err, findings)
 		}
 	}
 
@@ -118,9 +122,8 @@ func HandleErrorDetailed(err error) *HandleResult {
 	context := extractContext(err)
 
 	result := &HandleResult{
-		ExitCode:    family.ExitCode(),
-		Message:     renderMessage(code, context, family),
-		Diagnostics: []string{},
+		ExitCode: family.ExitCode(),
+		Message:  renderMessage(code, context, family),
 	}
 
 	if !IsRetryable(err) {
@@ -145,13 +148,19 @@ func extractContext(err error) map[string]string {
 }
 
 func renderCLI(code string, context map[string]string, family Family, cfg HandleConfig) string {
-	// Check for template override first.
+	// 1. Consumer override (per-call).
 	if cfg.TemplateOverride != nil {
 		if tmpl, ok := cfg.TemplateOverride[code]; ok {
 			return applyTemplate(tmpl, context, family)
 		}
 	}
 
+	// 2. Registered template (global).
+	if tmpl, ok := lookupTemplate(code); ok {
+		return applyTemplate(tmpl, context, family)
+	}
+
+	// 3. Default rendering (exact code match → family fallback).
 	return renderMessage(code, context, family)
 }
 
@@ -190,7 +199,7 @@ func formatWhat(code string, context map[string]string) string {
 	return applyContext(msg, context)
 }
 
-func formatWhy(code string, context map[string]string, family Family) string {
+func formatWhy(_ string, _ map[string]string, family Family) string {
 	// Reassure the user based on family.
 	switch family {
 	case Rejection, Conflict:
@@ -233,7 +242,7 @@ func suggestFix(code string, context map[string]string, family Family) string {
 	}
 }
 
-func applyTemplate(tmpl MessageTemplate, context map[string]string, family Family) string {
+func applyTemplate(tmpl MessageTemplate, context map[string]string, _ Family) string {
 	var parts []string
 	if tmpl.What != "" {
 		parts = append(parts, applyContext(tmpl.What, context))
@@ -259,46 +268,64 @@ func applyContext(template string, context map[string]string) string {
 }
 
 func codeToWhat(code string) string {
-	// Map common code patterns to human-readable "what happened".
 	lower := strings.ToLower(code)
-	switch {
-	case strings.Contains(lower, "not_found"):
-		return "A required resource was not found."
-	case strings.Contains(lower, "permission") || strings.Contains(lower, "denied"):
-		return "Permission was denied."
-	case strings.Contains(lower, "timeout"):
-		return "The operation timed out."
-	case strings.Contains(lower, "connection") || strings.Contains(lower, "connect"):
-		return "Could not establish a connection."
-	case strings.Contains(lower, "conflict"):
-		return "A conflict was detected."
-	case strings.Contains(lower, "validation"):
-		return "Validation failed."
-	case strings.Contains(lower, "config"):
-		return "There is a configuration issue."
-	case strings.Contains(lower, "git"):
-		return "A git operation failed."
-	case strings.Contains(lower, "database") || strings.Contains(lower, "db"):
-		return "A database operation failed."
-	default:
-		return ""
+	if msg, ok := defaultMessages[lower]; ok {
+		return msg.What
 	}
+	return ""
 }
 
 func codeToFix(code string) string {
 	lower := strings.ToLower(code)
-	switch {
-	case strings.Contains(lower, "not_found"):
-		return "Check that the path and resource name are correct."
-	case strings.Contains(lower, "permission") || strings.Contains(lower, "denied"):
-		return "Check file permissions or run with appropriate privileges."
-	case strings.Contains(lower, "timeout"):
-		return "Increase the timeout or check system resources."
-	case strings.Contains(lower, "config"):
-		return "Review your configuration file for errors."
-	default:
-		return ""
+	if msg, ok := defaultMessages[lower]; ok {
+		return msg.Fix
 	}
+	return ""
+}
+
+// defaultMessage holds the What and Fix text for a known error code.
+type defaultMessage struct {
+	What string
+	Fix  string
+}
+
+// defaultMessages maps error codes (lowercase) to human-readable messages.
+// Codes are matched exactly — no substring matching.
+var defaultMessages = map[string]defaultMessage{
+	"file.not_found":    {What: "A required resource was not found.", Fix: "Check that the path and resource name are correct."},
+	"permission.denied": {What: "Permission was denied.", Fix: "Check file permissions or run with appropriate privileges."},
+	"db.timeout":        {What: "The database operation timed out.", Fix: "Increase the timeout or check system resources."},
+	"db.connection":     {What: "Could not establish a database connection.", Fix: "Check that the database is running and reachable."},
+	"db.error":          {What: "A database operation failed.", Fix: "Check the database logs for details."},
+	"config.invalid":    {What: "There is a configuration issue.", Fix: "Review your configuration file for errors."},
+	"config.not_found":  {What: "A configuration file was not found.", Fix: "Check that the config file path is correct."},
+	"conflict":          {What: "A conflict was detected.", Fix: "Refresh your data and try the operation again."},
+	"validation":        {What: "Validation failed.", Fix: "Check your input and try again."},
+	"timeout":           {What: "The operation timed out.", Fix: "Increase the timeout or check system resources."},
+	"connection.refused": {What: "Could not establish a connection.", Fix: "Check that the target service is running."},
+	"git.error":         {What: "A git operation failed.", Fix: "Check the git repository state."},
+}
+
+// RegisterTemplate adds a MessageTemplate for a specific error code.
+// Thread-safe. Overrides any existing template for the same code.
+func RegisterTemplate(code string, tmpl MessageTemplate) {
+	templateRegistry.mu.Lock()
+	defer templateRegistry.mu.Unlock()
+	templateRegistry.entries[strings.ToLower(code)] = tmpl
+}
+
+var templateRegistry = struct {
+	mu      sync.RWMutex
+	entries map[string]MessageTemplate
+}{
+	entries: make(map[string]MessageTemplate),
+}
+
+func lookupTemplate(code string) (MessageTemplate, bool) {
+	templateRegistry.mu.RLock()
+	defer templateRegistry.mu.RUnlock()
+	tmpl, ok := templateRegistry.entries[strings.ToLower(code)]
+	return tmpl, ok
 }
 
 func familyDefaultMessage(family Family) string {

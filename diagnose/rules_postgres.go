@@ -53,7 +53,6 @@ func (r *PostgresRule) Run(ctx context.Context, err error) (*DiagnosticResult, e
 		result.Summary = fmt.Sprintf("PostgreSQL is NOT responding on %s:%s: %s", host, port, stdout)
 		result.SuggestedFix = r.suggestStartFix()
 		result.Confidence = 0.9
-		result.AutoFixable = false // Starting a database is too risky to auto-fix
 		result.Status = StatusFailed
 		return result, nil
 	}
@@ -75,7 +74,6 @@ func (r *PostgresRule) Run(ctx context.Context, err error) (*DiagnosticResult, e
 	result.Details["tcp_error"] = dialErr.Error()
 	result.SuggestedFix = fmt.Sprintf("Check if PostgreSQL is running:\n  pg_isready -h %s -p %s\n\nStart if needed:\n  %s", host, port, r.suggestStartFix())
 	result.Confidence = 0.85
-	result.AutoFixable = false
 
 	return result, nil
 }

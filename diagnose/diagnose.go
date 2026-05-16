@@ -77,26 +77,11 @@ type DiagnosticResult struct {
 	// e.g., "Start PostgreSQL: brew services start postgresql"
 	SuggestedFix string
 
-	// AutoFixable indicates whether this issue can be resolved programmatically.
-	AutoFixable bool
-
-	// AutoFix, if non-nil, can resolve the issue automatically.
-	// Returns a description of what was done.
-	AutoFix func(ctx context.Context) (*FixResult, error)
-
 	// Confidence is 0.0–1.0 indicating how likely this diagnosis explains the error.
 	Confidence float64
 
 	// Duration is how long the diagnostic check took.
 	Duration time.Duration
-}
-
-// FixResult describes the outcome of an automatic fix.
-type FixResult struct {
-	Resolved    bool
-	Summary     string
-	Actions     []string
-	SideEffects []string
 }
 
 // DiagnosticRule is the interface for deterministic error diagnostic checks.
@@ -153,7 +138,6 @@ func (r *Runner) Run(ctx context.Context, err error) []*DiagnosticResult {
 	}
 
 	results := make([]*DiagnosticResult, len(rules))
-	errs := make([]error, len(rules))
 	var wg sync.WaitGroup
 
 	for i, rule := range rules {
@@ -163,7 +147,6 @@ func (r *Runner) Run(ctx context.Context, err error) []*DiagnosticResult {
 			start := time.Now()
 			result, runErr := rl.Run(ctx, err)
 			if runErr != nil {
-				errs[idx] = runErr
 				results[idx] = &DiagnosticResult{
 					RuleName: rl.Name(),
 					Status:   StatusUnknown,

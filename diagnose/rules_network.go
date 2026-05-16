@@ -44,7 +44,6 @@ func (r *NetworkRule) Run(ctx context.Context, err error) (*DiagnosticResult, er
 		result.Summary = fmt.Sprintf("DNS resolution failed for %s: %v", host, dnsErr)
 		result.Details["dns_error"] = dnsErr.Error()
 		result.SuggestedFix = fmt.Sprintf("Check DNS resolution:\n  dig %s\n  nslookup %s\n\nCheck /etc/hosts or your DNS server.", host, host)
-		result.AutoFixable = false
 		return result, nil
 	}
 	result.Details["dns_ips"] = strings.Join(ips, ", ")
@@ -59,7 +58,6 @@ func (r *NetworkRule) Run(ctx context.Context, err error) (*DiagnosticResult, er
 			result.Details["tcp_error"] = dialErr.Error()
 			result.Details["tcp_reachable"] = "false"
 			result.SuggestedFix = fmt.Sprintf("Check connectivity:\n  nc -zv %s %s\n\nCheck firewall rules and service status.", host, port)
-			result.AutoFixable = false
 			return result, nil
 		}
 		_ = conn.Close()
