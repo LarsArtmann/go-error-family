@@ -106,12 +106,9 @@ func (r *GitRule) Run(ctx context.Context, err error) (*DiagnosticResult, error)
 }
 
 func (r *GitRule) resolveRepoPath(err error) string {
-	for _, key := range []string{"git_dir", "repository", "repo", "repo_path"} {
-		if v := contextValue(err, key); v != "" {
-			return v
-		}
+	if v := resolveContextKey(err, []string{"git_dir", "repository", "repo", "repo_path"}, ""); v != "" {
+		return v
 	}
-	// Default to current working directory.
 	if dir, err := os.Getwd(); err == nil {
 		return dir
 	}

@@ -166,7 +166,7 @@ func renderCLI(code string, context map[string]string, family Family, cfg Handle
 
 func renderMessage(code string, context map[string]string, family Family) string {
 	if code == "" {
-		return familyDefaultMessage(family)
+		return family.DefaultMessage()
 	}
 
 	var parts []string
@@ -292,18 +292,18 @@ type defaultMessage struct {
 // defaultMessages maps error codes (lowercase) to human-readable messages.
 // Codes are matched exactly — no substring matching.
 var defaultMessages = map[string]defaultMessage{
-	"file.not_found":    {What: "A required resource was not found.", Fix: "Check that the path and resource name are correct."},
-	"permission.denied": {What: "Permission was denied.", Fix: "Check file permissions or run with appropriate privileges."},
-	"db.timeout":        {What: "The database operation timed out.", Fix: "Increase the timeout or check system resources."},
-	"db.connection":     {What: "Could not establish a database connection.", Fix: "Check that the database is running and reachable."},
-	"db.error":          {What: "A database operation failed.", Fix: "Check the database logs for details."},
-	"config.invalid":    {What: "There is a configuration issue.", Fix: "Review your configuration file for errors."},
-	"config.not_found":  {What: "A configuration file was not found.", Fix: "Check that the config file path is correct."},
-	"conflict":          {What: "A conflict was detected.", Fix: "Refresh your data and try the operation again."},
-	"validation":        {What: "Validation failed.", Fix: "Check your input and try again."},
-	"timeout":           {What: "The operation timed out.", Fix: "Increase the timeout or check system resources."},
+	"file.not_found":     {What: "A required resource was not found.", Fix: "Check that the path and resource name are correct."},
+	"permission.denied":  {What: "Permission was denied.", Fix: "Check file permissions or run with appropriate privileges."},
+	"db.timeout":         {What: "The database operation timed out.", Fix: "Increase the timeout or check system resources."},
+	"db.connection":      {What: "Could not establish a database connection.", Fix: "Check that the database is running and reachable."},
+	"db.error":           {What: "A database operation failed.", Fix: "Check the database logs for details."},
+	"config.invalid":     {What: "There is a configuration issue.", Fix: "Review your configuration file for errors."},
+	"config.not_found":   {What: "A configuration file was not found.", Fix: "Check that the config file path is correct."},
+	"conflict":           {What: "A conflict was detected.", Fix: "Refresh your data and try the operation again."},
+	"validation":         {What: "Validation failed.", Fix: "Check your input and try again."},
+	"timeout":            {What: "The operation timed out.", Fix: "Increase the timeout or check system resources."},
 	"connection.refused": {What: "Could not establish a connection.", Fix: "Check that the target service is running."},
-	"git.error":         {What: "A git operation failed.", Fix: "Check the git repository state."},
+	"git.error":          {What: "A git operation failed.", Fix: "Check the git repository state."},
 }
 
 // RegisterTemplate adds a MessageTemplate for a specific error code.
@@ -328,19 +328,3 @@ func lookupTemplate(code string) (MessageTemplate, bool) {
 	return tmpl, ok
 }
 
-func familyDefaultMessage(family Family) string {
-	switch family {
-	case Rejection:
-		return "The request was invalid. Check your input and try again."
-	case Conflict:
-		return "A conflict was detected. Refresh and try again."
-	case Transient:
-		return "A temporary error occurred. Please try again in a few moments."
-	case Corruption:
-		return "Data appears to be corrupted. This requires manual intervention."
-	case Infrastructure:
-		return "The service is currently unavailable. Please try again later."
-	default:
-		return "An unexpected error occurred."
-	}
-}

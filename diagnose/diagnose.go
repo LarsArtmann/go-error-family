@@ -218,6 +218,17 @@ func contextValue(err error, key string) string {
 	return ""
 }
 
+// resolveContextKey searches the error's context for the first non-empty value
+// among the given keys, returning defaultVal if none match.
+func resolveContextKey(err error, keys []string, defaultVal string) string {
+	for _, key := range keys {
+		if v := contextValue(err, key); v != "" {
+			return v
+		}
+	}
+	return defaultVal
+}
+
 func hasContextSubstring(err error, substr string) bool {
 	lower := strings.ToLower(substr)
 	if ctx, ok := errors.AsType[errorfamily.Contextual](err); ok {

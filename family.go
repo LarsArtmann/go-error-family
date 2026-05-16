@@ -32,40 +32,40 @@ const (
 	Infrastructure
 )
 
+// familyInfo holds all per-family data in one place.
+// Adding a new family requires exactly one entry here.
+type familyInfo struct {
+	Name    string
+	Exit    int
+	Tone    Tone
+	Message string
+}
+
+var familyData = [...]familyInfo{
+	Rejection:      {Name: "rejection", Exit: 1, Tone: ToneInstructional, Message: "The request was invalid. Check your input and try again."},
+	Conflict:       {Name: "conflict", Exit: 1, Tone: ToneExplanatory, Message: "A conflict was detected. Refresh and try again."},
+	Transient:      {Name: "transient", Exit: 75, Tone: ToneReassuring, Message: "A temporary error occurred. Please try again in a few moments."},
+	Corruption:     {Name: "corruption", Exit: 65, Tone: ToneUrgent, Message: "Data appears to be corrupted. This requires manual intervention."},
+	Infrastructure: {Name: "infrastructure", Exit: 69, Tone: ToneApologetic, Message: "The service is currently unavailable. Please try again later."},
+}
+
 func (f Family) String() string {
-	switch f {
-	case Rejection:
-		return "rejection"
-	case Conflict:
-		return "conflict"
-	case Transient:
-		return "transient"
-	case Corruption:
-		return "corruption"
-	case Infrastructure:
-		return "infrastructure"
-	default:
-		return "unknown"
+	if f.IsValid() {
+		return familyData[f].Name
 	}
+	return "unknown"
 }
 
 // ParseFamily parses a family string, case-insensitive.
 // Returns Transient for unrecognized values (fail-open for retry).
 func ParseFamily(s string) Family {
-	switch strings.ToLower(s) {
-	case "rejection":
-		return Rejection
-	case "conflict":
-		return Conflict
-	case "transient":
-		return Transient
-	case "corruption":
-		return Corruption
-	case "infrastructure":
-		return Infrastructure
-	default:
-		return Transient
+	lower := strings.ToLower(s)
+	for i, info := range familyData {
+		if info.Name == lower {
+			return Family(i)
+		}
 	}
+	return Transient
 }
 
 // IsRetryable reports whether operations that encounter this error should be retried.
@@ -79,22 +79,19 @@ func (f Family) IsValid() bool {
 }
 
 // ExitCode returns the BSD sysexits.h compatible exit code for this family.
-// Shell scripts and CI pipelines can use this to make automated decisions.
 func (f Family) ExitCode() int {
-	switch f {
-	case Rejection:
-		return 1 // EX_USAGE — user error
-	case Conflict:
-		return 1 // EX_USAGE — state conflict (user needs to resolve)
-	case Transient:
-		return 75 // EX_TEMPFAIL — temporary failure, try again
-	case Corruption:
-		return 65 // EX_DATAERR — data is damaged
-	case Infrastructure:
-		return 69 // EX_UNAVAILABLE — service unavailable
-	default:
-		return 70 // EX_SOFTWARE — internal software error
+	if f.IsValid() {
+		return familyData[f].Exit
 	}
+	return 70 // EX_SOFTWARE — internal software error
+}
+
+// DefaultMessage returns the default human-readable message for this family.
+func (f Family) DefaultMessage() string {
+	if f.IsValid() {
+		return familyData[f].Message
+	}
+	return "An unexpected error occurred."
 }
 
 // Audience describes who should be notified about this error.
@@ -136,18 +133,8 @@ const (
 )
 
 func (f Family) Tone() Tone {
-	switch f {
-	case Rejection:
-		return ToneInstructional
-	case Conflict:
-		return ToneExplanatory
-	case Transient:
-		return ToneReassuring
-	case Corruption:
-		return ToneUrgent
-	case Infrastructure:
-		return ToneApologetic
-	default:
-		return ToneApologetic
+	if f.IsValid() {
+		return familyData[f].Tone
 	}
+	return ToneApologetic
 }

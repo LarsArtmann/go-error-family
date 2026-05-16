@@ -74,7 +74,7 @@ func (r *FilesystemRule) Run(ctx context.Context, err error) (*DiagnosticResult,
 			result.Details["exists"] = "true"
 			result.Details["permissions"] = "denied"
 			result.SuggestedFix = fmt.Sprintf("Fix permissions:\n  chmod 755 %s\nOr run with appropriate privileges.", path)
-		
+
 			return result, nil
 		}
 
@@ -128,12 +128,7 @@ func (r *FilesystemRule) Run(ctx context.Context, err error) (*DiagnosticResult,
 }
 
 func (r *FilesystemRule) resolvePath(err error) string {
-	for _, key := range []string{"path", "file", "dir", "directory", "config_path", "output_path"} {
-		if v := contextValue(err, key); v != "" {
-			return v
-		}
-	}
-	return ""
+	return resolveContextKey(err, []string{"path", "file", "dir", "directory", "config_path", "output_path"}, "")
 }
 
 func parentDir(path string) string {

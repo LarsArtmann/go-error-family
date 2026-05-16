@@ -72,28 +72,26 @@ func (r *NetworkRule) Run(ctx context.Context, err error) (*DiagnosticResult, er
 }
 
 func (r *NetworkRule) resolveHost(err error) string {
-	for _, key := range []string{"host", "remote", "endpoint"} {
-		if v := contextValue(err, key); v != "" {
-			// Strip scheme and port if URL-like.
-			v = strings.TrimPrefix(v, "http://")
-			v = strings.TrimPrefix(v, "https://")
-			if idx := strings.Index(v, ":"); idx > 0 {
-				v = v[:idx]
-			}
-			if idx := strings.Index(v, "/"); idx > 0 {
-				v = v[:idx]
-			}
-			return v
-		}
+	v := resolveContextKey(err, []string{"host", "remote", "endpoint"}, "")
+	if v == "" {
+		return ""
 	}
-	return ""
+	v = strings.TrimPrefix(v, "http://")
+	v = strings.TrimPrefix(v, "https://")
+	v = stripAfter(v, ":")
+	v = stripAfter(v, "/")
+	return v
+}
+
+// stripAfter returns s truncated before the first occurrence of sep.
+// If sep is not found, returns s unchanged.
+func stripAfter(s, sep string) string {
+	if idx := strings.Index(s, sep); idx > 0 {
+		return s[:idx]
+	}
+	return s
 }
 
 func (r *NetworkRule) resolvePort(err error) string {
-	for _, key := range []string{"port"} {
-		if v := contextValue(err, key); v != "" {
-			return v
-		}
-	}
-	return ""
+	return resolveContextKey(err, []string{"port"}, "")
 }

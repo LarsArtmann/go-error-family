@@ -25,11 +25,11 @@ This means a type implementing both `Classified` and `Retryable` will use `Class
 
 **Updated:** 2026-05-16
 
-| Package | Coverage |
-|---|---|
-| root (`errorfamily`) | 88.3% |
-| `agent` | 100% |
-| `diagnose` | 59.6% (rules that shell out to system commands are integration-test territory) |
+| Package              | Coverage                                                                       |
+| -------------------- | ------------------------------------------------------------------------------ |
+| root (`errorfamily`) | 88.3%                                                                          |
+| `agent`              | 100%                                                                           |
+| `diagnose`           | 59.6% (rules that shell out to system commands are integration-test territory) |
 
 Test files:
 

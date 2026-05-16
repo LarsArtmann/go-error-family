@@ -79,12 +79,7 @@ func (r *PostgresRule) Run(ctx context.Context, err error) (*DiagnosticResult, e
 }
 
 func (r *PostgresRule) resolveHost(err error) string {
-	for _, key := range []string{"db_host", "postgres_host", "host", "PGHOST"} {
-		if v := contextValue(err, key); v != "" {
-			return v
-		}
-	}
-	return "localhost"
+	return resolveContextKey(err, []string{"db_host", "postgres_host", "host", "PGHOST"}, "localhost")
 }
 
 func (r *PostgresRule) resolvePort(err error) string {

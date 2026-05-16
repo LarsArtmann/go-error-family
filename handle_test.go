@@ -74,20 +74,24 @@ func TestHandleErrorWithConfigNilError(t *testing.T) {
 	}
 }
 
+func testDiagnosticFunc(_ context.Context, _ error) []DiagnosticFinding {
+	return []DiagnosticFinding{{RuleName: "test", Status: "failed", Summary: "something failed", Confidence: 0.9}}
+}
+
+func testOnDiagnosedPtr(called *bool) func(error, []DiagnosticFinding) {
+	return func(_ error, _ []DiagnosticFinding) { *called = true }
+}
+
 func TestHandleErrorWithConfigDiagnostics(t *testing.T) {
 	var buf bytes.Buffer
 	called := false
 	err := NewTransient("db.timeout", "timed out")
 
 	code := HandleErrorWithConfig(err, HandleConfig{
-		Output:   &buf,
-		Diagnose: true,
-		DiagnosticFunc: func(_ context.Context, _ error) []DiagnosticFinding {
-			return []DiagnosticFinding{{RuleName: "test", Status: "failed", Summary: "something failed", Confidence: 0.9}}
-		},
-		OnDiagnosed: func(_ error, _ []DiagnosticFinding) {
-			called = true
-		},
+		Output:         &buf,
+		Diagnose:       true,
+		DiagnosticFunc: testDiagnosticFunc,
+		OnDiagnosed:    testOnDiagnosedPtr(&called),
 	})
 	if code != 75 {
 		t.Errorf("exit code = %d, want 75", code)
@@ -103,14 +107,10 @@ func TestHandleErrorWithConfigNoDiagnoseWhenDisabled(t *testing.T) {
 	err := NewTransient("test", "msg")
 
 	HandleErrorWithConfig(err, HandleConfig{
-		Output:   &buf,
-		Diagnose: false,
-		DiagnosticFunc: func(_ context.Context, _ error) []DiagnosticFinding {
-			return []DiagnosticFinding{{RuleName: "test", Status: "failed", Summary: "something failed", Confidence: 0.9}}
-		},
-		OnDiagnosed: func(_ error, _ []DiagnosticFinding) {
-			called = true
-		},
+		Output:         &buf,
+		Diagnose:       false,
+		DiagnosticFunc: testDiagnosticFunc,
+		OnDiagnosed:    testOnDiagnosedPtr(&called),
 	})
 	if called {
 		t.Error("OnDiagnosed should NOT be called when Diagnose is false")

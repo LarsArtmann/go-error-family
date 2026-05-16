@@ -96,12 +96,12 @@ No lock held during `errors.Is`. No deadlock possible. Small copy cost (n is tin
 
 ## Priority Order
 
-| # | Fix | Effort | Impact |
-|---|---|---|---|
-| 4 | Delete `SystemSnapshot` | 5min | Remove dead code |
-| 5 | Snapshot map in `lookupRegistered` | 10min | Eliminate deadlock risk |
-| 1 | Remove `ApplyFixes` and command execution config | 30min | Stop lying to callers |
-| 2 | Replace `codeToWhat`/`codeToFix` with template registry | 1h | Predictable, testable presentation |
-| 3 | Move `HandleError` to `cli` package | 1h | Kill `any`, proper package split |
+| #   | Fix                                                     | Effort | Impact                             |
+| --- | ------------------------------------------------------- | ------ | ---------------------------------- |
+| 4   | Delete `SystemSnapshot`                                 | 5min   | Remove dead code                   |
+| 5   | Snapshot map in `lookupRegistered`                      | 10min  | Eliminate deadlock risk            |
+| 1   | Remove `ApplyFixes` and command execution config        | 30min  | Stop lying to callers              |
+| 2   | Replace `codeToWhat`/`codeToFix` with template registry | 1h     | Predictable, testable presentation |
+| 3   | Move `HandleError` to `cli` package                     | 1h     | Kill `any`, proper package split   |
 
 Items 4 and 5 are no-brainers. Items 1–3 are architectural — do them before v0.1.0 or the API will be harder to change.
