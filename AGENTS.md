@@ -8,7 +8,6 @@ Structured error protocol library. Library only — no `main`, no build system, 
 - **`Classify` defaults unknown errors to `Transient`** (retryable). This is a fail-open design — unknown errors get retried rather than silently dropped. Same for `ParseFamily` with unrecognized strings.
 - **`errors.Is` matches on `code + family` only**, ignoring message. Two `*Error`s with different messages but same code and family will match.
 - **`Wrap(nil, ...)` returns `nil`** — nil-safe, but means you can't construct an error wrapping nil.
-- **NetworkRule fires on ALL Transient-family errors** (via `familyIs(err, Transient)` in `Applicable`). Any Transient error triggers full DNS + TCP diagnostics, even if unrelated to networking.
 - **Consumer interfaces (`Coded`, `Classified`, `Contextual`, `Retryable`) embed `error`** — this is required for Go 1.26's `errors.AsType[T]()` which demands `T` satisfy the `error` interface. Don't remove the embedding.
 
 ## Classification Precedence
@@ -22,9 +21,22 @@ Structured error protocol library. Library only — no `main`, no build system, 
 
 This means a type implementing both `Classified` and `Retryable` will use `Classified` and ignore `Retryable`. Registering a sentinel for an error that already implements `Classified` has no effect.
 
-## Test Gaps
+## Test Coverage
 
-`diagnose/` and `agent/` have **zero test files**. Modifying these packages requires manual verification. Root package tests are in `errorfamily_test.go` (table-driven, `testing.T`).
+**Updated:** 2026-05-16
+
+|                      | Package                                                                       |     | Coverage |     |
+| -------------------- | ----------------------------------------------------------------------------- | --- | -------- | --- |
+| root (`errorfamily`) | ~87%                                                                          |
+| `agent`              | ~97%                                                                          |
+| `diagnose`           | ~55% (rules that shell out to system commands are integration-test territory) |
+
+Test files:
+
+- `errorfamily_test.go` — root package tests
+- `handle_test.go` — HandleError, HandleErrorWithConfig, HandleErrorDetailed, template overrides, diagnostics wiring
+- `diagnose/diagnose_test.go` — Runner, rule matching helpers, Applicable methods, rule Run methods for local paths
+- `agent/agent_test.go` — Analyze, ApplyFixes, all involvement levels, extractCommand, buildPrompt
 
 ## Incomplete Features
 
@@ -34,3 +46,8 @@ This means a type implementing both `Classified` and `Retryable` will use `Class
 ## Diagnostic Rule Pattern
 
 When adding a new `DiagnosticRule`, use the matching helpers in `diagnose/diagnose.go` (not `context.go`): `hasContextKey`, `contextValue`, `hasContextSubstring`, `familyIs`, `errorCodeContains`. Rules run concurrently via `Runner.Run` and results sort by confidence descending.
+
+## Architecture Decisions
+
+- **`handle.go` wires diagnostics** — `HandleErrorWithConfig` calls `DiagnosticRunner.Run` when `cfg.Diagnose` is true and `cfg.OnDiagnosed` receives the raw results.
+- **`SystemSnapshot` only captures what's populated** — removed dead `DiskFree` and `Uptime` fields that were declared but never filled.

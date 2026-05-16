@@ -90,9 +90,16 @@ func HandleErrorWithConfig(err error, cfg HandleConfig) int {
 	exitCode := family.ExitCode()
 
 	code := extractCode(err)
-	context := extractContext(err)
+	ctx := extractContext(err)
 
-	message := renderCLI(code, context, family, cfg)
+	if cfg.Diagnose && cfg.DiagnosticRunner != nil {
+		results := cfg.DiagnosticRunner.Run(context.Background(), err)
+		if cfg.OnDiagnosed != nil {
+			cfg.OnDiagnosed(err, results)
+		}
+	}
+
+	message := renderCLI(code, ctx, family, cfg)
 
 	_, _ = fmt.Fprintln(cfg.Output, message)
 

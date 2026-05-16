@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"strings"
 	"testing"
+	"time"
 )
 
 func TestFamilyString(t *testing.T) {
@@ -467,5 +468,105 @@ func TestErrorChain(t *testing.T) {
 	coded, ok := errors.AsType[Coded](top)
 	if !ok || coded.ErrorCode() != "db.error" {
 		t.Error("AsType[Coded] should find through chain")
+	}
+}
+
+func TestErrorTimestamp(t *testing.T) {
+	before := time.Now().UTC()
+	err := NewRejection("test", "msg")
+	after := time.Now().UTC()
+
+	ts := err.Timestamp()
+	if ts.Before(before) || ts.After(after) {
+		t.Errorf("Timestamp() = %v, expected between %v and %v", ts, before, after)
+	}
+}
+
+func TestErrorFamilyAccessor(t *testing.T) {
+	err := NewTransient("test", "msg")
+	if err.Family() != Transient {
+		t.Errorf("Family() = %v, want Transient", err.Family())
+	}
+}
+
+func TestErrorAudience(t *testing.T) {
+	tests := []struct {
+		family   Family
+		expected Audience
+	}{
+		{Rejection, AudienceUser},
+		{Conflict, AudienceUser},
+		{Transient, AudienceAll},
+		{Corruption, AudienceOps},
+		{Infrastructure, AudienceOps},
+	}
+	for _, tt := range tests {
+		if got := tt.family.Audience(); got != tt.expected {
+			t.Errorf("Family(%d).Audience() = %v, want %v", tt.family, got, tt.expected)
+		}
+	}
+}
+
+func TestErrorWithCauseBuilder(t *testing.T) {
+	cause := fmt.Errorf("root")
+	err := NewRejection("test", "msg").WithCause(cause)
+
+	if err.Cause() != cause {
+		t.Error("WithCause should set the cause")
+	}
+	if err.Unwrap() != cause {
+		t.Error("Unwrap should return cause set by WithCause")
+	}
+}
+
+func TestErrorIsNonErrorTarget(t *testing.T) {
+	err := NewRejection("test", "msg")
+	target := fmt.Errorf("plain error")
+	if errors.Is(err, target) {
+		t.Error("errors.Is should not match non-*Error target")
+	}
+}
+
+func TestErrorFormatVerboseWithCause(t *testing.T) {
+	cause := NewTransient("db.timeout", "connection lost")
+	err := WrapRejection(cause, "handler.failed", "handler error")
+
+	verbose := fmt.Sprintf("%+v", err)
+	if !strings.Contains(verbose, "caused by:") {
+		t.Errorf("%%+v with cause should contain 'caused by:': %q", verbose)
+	}
+	if !strings.Contains(verbose, "db.timeout") {
+		t.Errorf("%%+v should show cause chain: %q", verbose)
+	}
+}
+
+func TestErrorSummaryWithCause(t *testing.T) {
+	cause := fmt.Errorf("root")
+	err := WrapRejection(cause, "test.code", "something failed")
+
+	summary := err.Summary()
+	if !strings.Contains(summary, "test.code") {
+		t.Errorf("Summary() should contain code: %q", summary)
+	}
+	if !strings.Contains(summary, "root") {
+		t.Errorf("Summary() should contain cause: %q", summary)
+	}
+}
+
+func TestErrorContextValueMissing(t *testing.T) {
+	err := NewRejection("test", "msg")
+	if v := err.ContextValue("nonexistent"); v != "" {
+		t.Errorf("ContextValue on empty context should return empty string, got %q", v)
+	}
+}
+
+func TestErrorContextEmptyOrNil(t *testing.T) {
+	err := NewRejection("test", "msg")
+	ctx := err.ErrorContext()
+	if len(ctx) != 0 {
+		t.Errorf("ErrorContext() on error without context should be empty, got %v", ctx)
+	}
+	if err.HasContext("anything") {
+		t.Error("HasContext should be false for error without context")
 	}
 }
