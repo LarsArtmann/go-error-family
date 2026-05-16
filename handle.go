@@ -327,4 +327,3 @@ func lookupTemplate(code string) (MessageTemplate, bool) {
 	tmpl, ok := templateRegistry.entries[strings.ToLower(code)]
 	return tmpl, ok
 }
-
