@@ -13,6 +13,7 @@ Go library for structured error classification. Three packages: root (`errorfami
 ## A) FULLY DONE ✓
 
 ### Bug Fixes
+
 1. **Variable shadowing in `diagnose/Runner.Run`** — goroutine closure shadowed `err` (outer parameter) and `r` (receiver). Renamed to `rl`/`runErr`/`res`. (`diagnose/diagnose.go:161`)
 2. **NetworkRule over-matching ALL Transient errors** — `familyIs(err, Transient)` caused any Transient error to trigger full DNS+TCP diagnostics. Replaced with specific signal patterns (`connection refused`, `no such host`, `i/o timeout`). Removed unused `errorfamily` import. (`diagnose/rules_network.go:22-29`)
 3. **Dead code in `SystemSnapshot`** — `DiskFree` and `Uptime` fields declared but never populated in `GatherSystemSnapshot`. Removed. (`diagnose/context.go`)
@@ -20,11 +21,11 @@ Go library for structured error classification. Three packages: root (`errorfami
 
 ### Test Coverage (0% → significant)
 
-| Package | Before | After | Test File |
-|---|---|---|---|
-| `errorfamily` (root) | 47.9% | **87.0%** | `errorfamily_test.go` (extended) |
-| `agent` | 0.0% | **97.4%** | `agent/agent_test.go` (new, 307 lines) |
-| `diagnose` | 0.0% | **54.8%** | `diagnose/diagnose_test.go` (new, 481 lines) |
+| Package              | Before | After     | Test File                                    |
+| -------------------- | ------ | --------- | -------------------------------------------- |
+| `errorfamily` (root) | 47.9%  | **87.0%** | `errorfamily_test.go` (extended)             |
+| `agent`              | 0.0%   | **97.4%** | `agent/agent_test.go` (new, 307 lines)       |
+| `diagnose`           | 0.0%   | **54.8%** | `diagnose/diagnose_test.go` (new, 481 lines) |
 
 **Root package tests added:** `Timestamp()`, `Family()`, `Audience()`, `WithCause()` builder, `Is` with non-Error target, `%+v` with cause chain, `Summary()` with cause, `ContextValue` missing key, empty context edge cases.
 
@@ -35,6 +36,7 @@ Go library for structured error classification. Three packages: root (`errorfami
 **Agent tests added:** `Involvement.String()`, `RiskLevel.String()`, `DefaultConfig()`, `New()` defaults, `Analyze` disabled/enabled/with diagnosis/with empty diagnosis/no failures, `ApplyFixes` for all 4 involvement levels (silent/suggest/assist/autonomous), `ApplyFixes` with/without `ConfirmFunc`, `extractCommand`, `buildPrompt`.
 
 ### Documentation
+
 5. **AGENTS.md** updated — removed stale "Test Gaps" section (no longer true), added coverage table, documented diagnostics wiring, removed stale NetworkRule gotcha (fixed), documented architecture decisions.
 
 ---
@@ -45,7 +47,7 @@ Go library for structured error classification. Three packages: root (`errorfami
 
 2. **`handle.go` unused parameters** — `formatWhy(code, context, family)` and `applyTemplate(tmpl, context, family)` have unused params flagged by gopls. These are "reserved for future use" per design but still smell like dead code. Not fixed — needs design decision.
 
-3. **Root package at 87%** — remaining 13% is mostly `formatVerbose` edge cases, `WithContext` nil-map path (already tested via different path), and `Is` non-*Error target (tested now). Some paths are defensive branches that are hard to hit without white-box testing.
+3. **Root package at 87%** — remaining 13% is mostly `formatVerbose` edge cases, `WithContext` nil-map path (already tested via different path), and `Is` non-\*Error target (tested now). Some paths are defensive branches that are hard to hit without white-box testing.
 
 ---
 
@@ -82,16 +84,19 @@ Go library for structured error classification. Three packages: root (`errorfami
 ## E) WHAT WE SHOULD IMPROVE (beyond the top 25)
 
 ### Structural
+
 - The `diagnose/` package has a hard dependency on `errorfamily` root package for matching helpers. These helpers (`hasContextKey`, `contextValue`, etc.) are tightly coupled to the `errorfamily` interfaces. Consider extracting a matching package or making the helpers accept interfaces.
 - `handle.go` is 313 lines doing too many things: CLI formatting, template rendering, diagnostics orchestration, exit code mapping. Should be split: `handle.go` (entry points), `render.go` (formatting), `template.go` (template engine).
 - The `DiagnosticRunner` interface in `handle.go` returns `any` — this is a code smell. It should return `[]*diagnose.DiagnosticResult` or a generic result type.
 
 ### Quality
+
 - `diagnose/` rules that shell out to system commands (`PostgresRule`, `GitRule`) need integration tests with mocked command execution. The current tests only test `Applicable()` matching and some local-path `Run()` methods.
 - No example tests (`func Example*`) — the README has code examples but there are no runnable Go example tests that appear in godoc.
 - The `codeToWhat` and `codeToFix` functions in `handle.go` are hard-coded pattern matchers. These should be configurable/extensible, like the `TemplateOverride` pattern.
 
 ### API Surface
+
 - `Error.WithContext()` returns `*Error`, not `error` — prevents use in `error`-returning functions without explicit cast. Consider adding a `WithContextE()` that returns `error`.
 - No `Error.WithTimestamp()` method — timestamp is always `time.Now().UTC()` at creation. Useful for testing and error replay.
 - `RegisterClassification` has no `UnregisterClassification` or `ClearClassifications` — sentinels can only accumulate. Problematic for tests that register global state.
@@ -100,33 +105,33 @@ Go library for structured error classification. Three packages: root (`errorfami
 
 ## F) TOP #25 THINGS TO DO NEXT
 
-| # | Priority | Task | Impact |
-|---|---|---|---|
-| 1 | 🔴 Critical | Push the 3 commits to origin/master | Unblocking: current work is unpushed |
-| 2 | 🔴 Critical | Add CI pipeline (GitHub Actions: `go test`, `go vet`, `go build`) | Prevent regressions |
-| 3 | 🟠 High | Tighten `DiagnosticRunner` interface: return `[]*DiagnosticResult` instead of `any` | Type safety |
-| 4 | 🟠 High | Wire or remove `HandleConfig.Verbose` field | Dead config smell |
-| 5 | 🟠 High | Add `UnregisterClassification` / `ClearClassifications` for test isolation | Registry accumulates forever |
-| 6 | 🟠 High | Add integration tests for `diagnose/` rules with mocked command execution | Push diagnose coverage to 80%+ |
-| 7 | 🟠 High | Split `handle.go` into `handle.go` + `render.go` + `template.go` | Single file doing too much |
-| 8 | 🟡 Medium | Add `Error.WithTimestamp(t time.Time)` for testing/replay | Testing, error replay |
-| 9 | 🟡 Medium | Add example tests (`func ExampleNewRejection()`) for godoc | Documentation |
-| 10 | 🟡 Medium | Add error code validation (dot-separated lowercase) in constructors | Prevent invalid codes at creation |
-| 11 | 🟡 Medium | Make `codeToWhat`/`codeToFix` configurable via `HandleConfig` | Extensibility |
-| 12 | 🟡 Medium | Add benchmarks for `Classify()`, `Is()`, `Error()`, `Format()` | Performance baseline |
-| 13 | 🟡 Medium | Add fuzz tests for `ParseFamily`, `errorCodeContains`, `hasContextSubstring` | Edge case discovery |
-| 14 | 🟡 Medium | Extract diagnose matching helpers into testable, interface-driven package | Reduce coupling |
-| 15 | 🟡 Medium | Audit `isSecretKey` regex against comprehensive secret key patterns | Security: leaked env vars |
-| 16 | 🟢 Low | Add `WithContextE()` that returns `error` instead of `*Error` | Convenience |
-| 17 | 🟢 Low | Add `GoString()` method to `Error` for `%#v` formatting | Debugging |
-| 18 | 🟢 Low | Document O(n) behavior of `lookupRegistered` for large sentinel counts | Performance documentation |
-| 19 | 🟢 Low | Add `RegisterClassificationFunc` for dynamic classification | Complex classification logic |
-| 20 | 🟢 Low | Add `errors.Join` support for multi-error classification | Go 1.20+ multi-errors |
-| 21 | 🟢 Low | Add `Family.MarshalText`/`UnmarshalText` for JSON/YAML | Configuration files |
-| 22 | 🟢 Low | Add `Error.MarshalJSON` for structured logging | Observability |
-| 23 | 🟢 Low | Create `flake.nix` for reproducible builds | Nix ecosystem |
-| 24 | 🟢 Low | Add `CHANGELOG.md` entry for this session's changes | Documentation |
-| 25 | 🟢 Low | Consider `context.Context` propagation through error chain | Cancellation in error handling |
+| #   | Priority    | Task                                                                                | Impact                               |
+| --- | ----------- | ----------------------------------------------------------------------------------- | ------------------------------------ |
+| 1   | 🔴 Critical | Push the 3 commits to origin/master                                                 | Unblocking: current work is unpushed |
+| 2   | 🔴 Critical | Add CI pipeline (GitHub Actions: `go test`, `go vet`, `go build`)                   | Prevent regressions                  |
+| 3   | 🟠 High     | Tighten `DiagnosticRunner` interface: return `[]*DiagnosticResult` instead of `any` | Type safety                          |
+| 4   | 🟠 High     | Wire or remove `HandleConfig.Verbose` field                                         | Dead config smell                    |
+| 5   | 🟠 High     | Add `UnregisterClassification` / `ClearClassifications` for test isolation          | Registry accumulates forever         |
+| 6   | 🟠 High     | Add integration tests for `diagnose/` rules with mocked command execution           | Push diagnose coverage to 80%+       |
+| 7   | 🟠 High     | Split `handle.go` into `handle.go` + `render.go` + `template.go`                    | Single file doing too much           |
+| 8   | 🟡 Medium   | Add `Error.WithTimestamp(t time.Time)` for testing/replay                           | Testing, error replay                |
+| 9   | 🟡 Medium   | Add example tests (`func ExampleNewRejection()`) for godoc                          | Documentation                        |
+| 10  | 🟡 Medium   | Add error code validation (dot-separated lowercase) in constructors                 | Prevent invalid codes at creation    |
+| 11  | 🟡 Medium   | Make `codeToWhat`/`codeToFix` configurable via `HandleConfig`                       | Extensibility                        |
+| 12  | 🟡 Medium   | Add benchmarks for `Classify()`, `Is()`, `Error()`, `Format()`                      | Performance baseline                 |
+| 13  | 🟡 Medium   | Add fuzz tests for `ParseFamily`, `errorCodeContains`, `hasContextSubstring`        | Edge case discovery                  |
+| 14  | 🟡 Medium   | Extract diagnose matching helpers into testable, interface-driven package           | Reduce coupling                      |
+| 15  | 🟡 Medium   | Audit `isSecretKey` regex against comprehensive secret key patterns                 | Security: leaked env vars            |
+| 16  | 🟢 Low      | Add `WithContextE()` that returns `error` instead of `*Error`                       | Convenience                          |
+| 17  | 🟢 Low      | Add `GoString()` method to `Error` for `%#v` formatting                             | Debugging                            |
+| 18  | 🟢 Low      | Document O(n) behavior of `lookupRegistered` for large sentinel counts              | Performance documentation            |
+| 19  | 🟢 Low      | Add `RegisterClassificationFunc` for dynamic classification                         | Complex classification logic         |
+| 20  | 🟢 Low      | Add `errors.Join` support for multi-error classification                            | Go 1.20+ multi-errors                |
+| 21  | 🟢 Low      | Add `Family.MarshalText`/`UnmarshalText` for JSON/YAML                              | Configuration files                  |
+| 22  | 🟢 Low      | Add `Error.MarshalJSON` for structured logging                                      | Observability                        |
+| 23  | 🟢 Low      | Create `flake.nix` for reproducible builds                                          | Nix ecosystem                        |
+| 24  | 🟢 Low      | Add `CHANGELOG.md` entry for this session's changes                                 | Documentation                        |
+| 25  | 🟢 Low      | Consider `context.Context` propagation through error chain                          | Cancellation in error handling       |
 
 ---
 
@@ -135,6 +140,7 @@ Go library for structured error classification. Three packages: root (`errorfami
 **Should `diagnose/` rules that shell out to system commands be integration-tested with a command-mock interface, or should the rule implementations be refactored to accept injectable `runCommand`/`commandExists` functions?**
 
 The current `runCommand` and `commandExists` are package-level functions, not methods. This makes them untestable without actually executing system commands. Refactoring them into an interface (e.g., `CommandRunner`) that rules accept would:
+
 - Allow unit tests to mock `pg_isready`, `git status`, `net.DialTimeout`
 - Push diagnose coverage from 55% to 80%+
 - But break the current simple API (rules are zero-value structs)
