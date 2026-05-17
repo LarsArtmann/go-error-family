@@ -15,9 +15,9 @@ go-error-family is a structured error protocol library for Go. It is **open-sour
 
 **What changed since last report (00:23):**
 
-| Commit | What |
-|--------|------|
-| `8eb52eb` | Data-driven architecture: unified rendering, `ruleSpec` for diagnose rules, deleted `MatchesContext` dead code |
+| Commit    | What                                                                                                                                                |
+| --------- | --------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `8eb52eb` | Data-driven architecture: unified rendering, `ruleSpec` for diagnose rules, deleted `MatchesContext` dead code                                      |
 | `567dcd8` | Removed `buildPrompt` dead code, enforced `Config.Timeout`, removed unused `AgentResult` fields, added `Audience.String()`, expanded tests to 97.1% |
 
 ---
@@ -112,19 +112,19 @@ go-error-family is a structured error protocol library for Go. It is **open-sour
 
 The diagnose package works correctly but has significant coverage gaps:
 
-| Function | Coverage | Gap |
-|----------|----------|-----|
-| `FilesystemRule.Run()` | 47.5% | Permission denied, write-test, read-test branches untested |
-| `GitRule.Run()` | 17.3% | Merge conflicts, dirty tree, no remotes, remote unreachable branches untested |
-| `NetworkRule.Run()` | 59.3% | Moderate coverage, some branches missed |
-| `PostgresRule.Run()` | 35.5% | pg_isready success, TCP fallback branches untested |
-| `PostgresRule.suggestStartFix()` | 0.0% | All 4 branches (brew/systemctl/service/default) untested |
-| `IsPostgresRunning()` | 53.8% | Only smoke-tested, no return-value assertions |
-| `*.Name()` (all 4 rules) | 0.0% | Never directly asserted |
-| `runCommand()` | Indirect only | No `context_test.go` exists |
-| `commandExists()` | Indirect only | No direct test |
-| `ruleSpec.matches()` | Indirect only | No dedicated unit test |
-| `Runner.Run()` concurrent | Untested | No test verifies goroutine interleaving |
+| Function                         | Coverage      | Gap                                                                           |
+| -------------------------------- | ------------- | ----------------------------------------------------------------------------- |
+| `FilesystemRule.Run()`           | 47.5%         | Permission denied, write-test, read-test branches untested                    |
+| `GitRule.Run()`                  | 17.3%         | Merge conflicts, dirty tree, no remotes, remote unreachable branches untested |
+| `NetworkRule.Run()`              | 59.3%         | Moderate coverage, some branches missed                                       |
+| `PostgresRule.Run()`             | 35.5%         | pg_isready success, TCP fallback branches untested                            |
+| `PostgresRule.suggestStartFix()` | 0.0%          | All 4 branches (brew/systemctl/service/default) untested                      |
+| `IsPostgresRunning()`            | 53.8%         | Only smoke-tested, no return-value assertions                                 |
+| `*.Name()` (all 4 rules)         | 0.0%          | Never directly asserted                                                       |
+| `runCommand()`                   | Indirect only | No `context_test.go` exists                                                   |
+| `commandExists()`                | Indirect only | No direct test                                                                |
+| `ruleSpec.matches()`             | Indirect only | No dedicated unit test                                                        |
+| `Runner.Run()` concurrent        | Untested      | No test verifies goroutine interleaving                                       |
 
 **Root cause:** Rules shell out to system commands (`git status`, `pg_isready`, network checks). These are integration-test territory — they depend on local environment state.
 
@@ -150,8 +150,8 @@ The diagnose package works correctly but has significant coverage gaps:
 9. **README missing items** — no license badge, no changelog link, no test coverage badge
 10. **CHANGELOG `[Unreleased]` section** — empty, should document the 2 unpushed commits
 11. **v0.2.0 release planning** — no milestone or release planning document
-11. **API stability guarantees** — no versioning policy documented
-12. **Example application** — no `example/` directory showing real-world usage
+12. **API stability guarantees** — no versioning policy documented
+13. **Example application** — no `example/` directory showing real-world usage
 
 ---
 
@@ -166,6 +166,7 @@ Nothing is genuinely broken. But here's what's concerning:
 ### Diagnose Coverage Will Stay Low Without a Strategy
 
 60.6% diagnose coverage is a **structural problem**, not a laziness problem. The rules execute external commands. Without either:
+
 - (a) a command executor interface that can be mocked, or
 - (b) an integration test environment (Docker, testcontainers)
 
@@ -215,48 +216,48 @@ Ranked by impact × effort (Pareto ordering):
 
 ### Tier 1: HIGH IMPACT, LOW EFFORT (do these first)
 
-| # | Task | Effort | Impact |
-|---|------|--------|--------|
-| 1 | **Push 2 unpushed commits to origin** | 1 min | Prevents data loss |
-| 2 | **Add GitHub Actions CI** (`go test`, `go vet`, `go build` on push/PR) | 15 min | Safety net for all future work |
-| 3 | **Update CHANGELOG `[Unreleased]`** with refactoring changes | 5 min | Honest docs |
-| 4 | **Add `diagnose/context_test.go`** — direct tests for `runCommand()` (mockable scenarios) and `commandExists()` | 20 min | Closes 2 coverage gaps |
-| 5 | **Add `ruleSpec.matches()` direct unit test** | 10 min | Closes coverage gap for core matching logic |
-| 6 | **Add `*Rule.Name()` tests** (all 4 rules) | 5 min | Trivial 0% → 100% on 4 functions |
-| 7 | **Add `PostgresRule.suggestStartFix()` table-driven test** | 10 min | 0% → ~100% on 4 branches |
-| 8 | **Add README license badge + changelog link** | 5 min | Professional polish |
+| #   | Task                                                                                                            | Effort | Impact                                      |
+| --- | --------------------------------------------------------------------------------------------------------------- | ------ | ------------------------------------------- |
+| 1   | **Push 2 unpushed commits to origin**                                                                           | 1 min  | Prevents data loss                          |
+| 2   | **Add GitHub Actions CI** (`go test`, `go vet`, `go build` on push/PR)                                          | 15 min | Safety net for all future work              |
+| 3   | **Update CHANGELOG `[Unreleased]`** with refactoring changes                                                    | 5 min  | Honest docs                                 |
+| 4   | **Add `diagnose/context_test.go`** — direct tests for `runCommand()` (mockable scenarios) and `commandExists()` | 20 min | Closes 2 coverage gaps                      |
+| 5   | **Add `ruleSpec.matches()` direct unit test**                                                                   | 10 min | Closes coverage gap for core matching logic |
+| 6   | **Add `*Rule.Name()` tests** (all 4 rules)                                                                      | 5 min  | Trivial 0% → 100% on 4 functions            |
+| 7   | **Add `PostgresRule.suggestStartFix()` table-driven test**                                                      | 10 min | 0% → ~100% on 4 branches                    |
+| 8   | **Add README license badge + changelog link**                                                                   | 5 min  | Professional polish                         |
 
 ### Tier 2: HIGH IMPACT, MEDIUM EFFORT
 
-| # | Task | Effort | Impact |
-|---|------|--------|--------|
-| 9 | **Extract `CommandRunner` interface in diagnose** | 1 hr | Unlocks full unit testing of all rules |
-| 10 | **Add GoReleaser config** for automated releases | 30 min | Professional release pipeline |
-| 11 | **Add `flake.nix`** for reproducible builds | 30 min | Per AGENTS.md policy |
-| 12 | **Add concurrent `Runner.Run()` test** with `-race` | 20 min | Verifies thread safety |
-| 13 | **Add `Runner.Run()` nil-result filtering test** | 10 min | Closes untested path |
-| 14 | **Test `GitRule.Run()` branches** — merge conflicts, dirty tree, no remotes | 30 min | 17.3% → ~70% coverage |
-| 15 | **Test `PostgresRule.Run()` branches** — TCP fallback, pg_isready success | 20 min | 35.5% → ~70% |
+| #   | Task                                                                        | Effort | Impact                                 |
+| --- | --------------------------------------------------------------------------- | ------ | -------------------------------------- |
+| 9   | **Extract `CommandRunner` interface in diagnose**                           | 1 hr   | Unlocks full unit testing of all rules |
+| 10  | **Add GoReleaser config** for automated releases                            | 30 min | Professional release pipeline          |
+| 11  | **Add `flake.nix`** for reproducible builds                                 | 30 min | Per AGENTS.md policy                   |
+| 12  | **Add concurrent `Runner.Run()` test** with `-race`                         | 20 min | Verifies thread safety                 |
+| 13  | **Add `Runner.Run()` nil-result filtering test**                            | 10 min | Closes untested path                   |
+| 14  | **Test `GitRule.Run()` branches** — merge conflicts, dirty tree, no remotes | 30 min | 17.3% → ~70% coverage                  |
+| 15  | **Test `PostgresRule.Run()` branches** — TCP fallback, pg_isready success   | 20 min | 35.5% → ~70%                           |
 
 ### Tier 3: MEDIUM IMPACT, LOW EFFORT
 
-| # | Task | Effort | Impact |
-|---|------|--------|--------|
-| 16 | **Add `FilesystemRule.Run()` error branch tests** — permission denied, not writable, not readable | 20 min | 47.5% → ~80% |
-| 17 | **Test `NetworkRule.Run()` uncovered branches** | 15 min | 59.3% → ~80% |
-| 18 | **Extract pure helper functions** (`stripAfter`, `resolvePort`, `resolvePath`, `resolveRepoPath`) | 20 min | Testability |
-| 19 | **Add `CONTRIBUTING.md`** for open-source contributors | 15 min | Community readiness |
-| 20 | **Add Go Report Card badge** to README | 2 min | Already has it — verify link works |
+| #   | Task                                                                                              | Effort | Impact                             |
+| --- | ------------------------------------------------------------------------------------------------- | ------ | ---------------------------------- |
+| 16  | **Add `FilesystemRule.Run()` error branch tests** — permission denied, not writable, not readable | 20 min | 47.5% → ~80%                       |
+| 17  | **Test `NetworkRule.Run()` uncovered branches**                                                   | 15 min | 59.3% → ~80%                       |
+| 18  | **Extract pure helper functions** (`stripAfter`, `resolvePort`, `resolvePath`, `resolveRepoPath`) | 20 min | Testability                        |
+| 19  | **Add `CONTRIBUTING.md`** for open-source contributors                                            | 15 min | Community readiness                |
+| 20  | **Add Go Report Card badge** to README                                                            | 2 min  | Already has it — verify link works |
 
 ### Tier 4: NICE TO HAVE
 
-| # | Task | Effort | Impact |
-|---|------|--------|--------|
-| 21 | **Add `example/` directory** with a working CLI app | 30 min | Discoverability |
-| 22 | **Add `NetworkRule.resolvePort()` direct test** | 10 min | Closes untested helper |
-| 23 | **Add versioning policy** to README (semver compatibility guarantees) | 15 min | Consumer confidence |
-| 24 | **Plan v0.2.0 release** — milestone document with breaking changes | 20 min | Release management |
-| 25 | **Add `IsPostgresRunning()` assertions** in existing smoke test | 5 min | 53.8% → higher |
+| #   | Task                                                                  | Effort | Impact                 |
+| --- | --------------------------------------------------------------------- | ------ | ---------------------- |
+| 21  | **Add `example/` directory** with a working CLI app                   | 30 min | Discoverability        |
+| 22  | **Add `NetworkRule.resolvePort()` direct test**                       | 10 min | Closes untested helper |
+| 23  | **Add versioning policy** to README (semver compatibility guarantees) | 15 min | Consumer confidence    |
+| 24  | **Plan v0.2.0 release** — milestone document with breaking changes    | 20 min | Release management     |
+| 25  | **Add `IsPostgresRunning()` assertions** in existing smoke test       | 5 min  | 53.8% → higher         |
 
 ---
 
@@ -265,6 +266,7 @@ Ranked by impact × effort (Pareto ordering):
 **Should we push the 2 unpushed commits now, or wait for a v0.2.0 release?**
 
 The commits (`8eb52eb` + `567dcd8`) contain significant refactoring:
+
 - Unified rendering pipeline (6 functions → 1 data-driven path)
 - Deleted dead code (`buildPrompt`, `MatchesContext`, `AgentResult.Prevention/RelatedErrors`)
 - Added `Audience.String()`, enforced `Config.Timeout`
@@ -280,66 +282,66 @@ However, the CHANGELOG `[Unreleased]` section is empty. If we push without updat
 
 ## Current Metrics Summary
 
-| Metric | Value |
-|--------|-------|
-| Production lines | 3,372 (root 1,005 + agent 144 + diagnose 1,213 + tests 1,581 — wait, tests are separate) |
-| Production-only lines | ~1,791 (3,372 total minus 1,581 test lines) |
-| Test lines | 1,581 |
-| Test count | 165 tests, 102 top-level, **0 failures** |
-| Root coverage | **97.1%** |
-| Agent coverage | **100%** |
-| Diagnose coverage | **60.6%** |
-| Total coverage | **76.2%** |
-| `go vet` | Clean |
-| `-race` | Clean |
-| Clone groups (art-dupl -t 15) | 20 (all non-actionable) |
-| External dependencies | **Zero** |
-| Go version | 1.26.2 |
-| Published version | v0.1.1 |
-| Unpushed commits | 2 |
+| Metric                        | Value                                                                                    |
+| ----------------------------- | ---------------------------------------------------------------------------------------- |
+| Production lines              | 3,372 (root 1,005 + agent 144 + diagnose 1,213 + tests 1,581 — wait, tests are separate) |
+| Production-only lines         | ~1,791 (3,372 total minus 1,581 test lines)                                              |
+| Test lines                    | 1,581                                                                                    |
+| Test count                    | 165 tests, 102 top-level, **0 failures**                                                 |
+| Root coverage                 | **97.1%**                                                                                |
+| Agent coverage                | **100%**                                                                                 |
+| Diagnose coverage             | **60.6%**                                                                                |
+| Total coverage                | **76.2%**                                                                                |
+| `go vet`                      | Clean                                                                                    |
+| `-race`                       | Clean                                                                                    |
+| Clone groups (art-dupl -t 15) | 20 (all non-actionable)                                                                  |
+| External dependencies         | **Zero**                                                                                 |
+| Go version                    | 1.26.2                                                                                   |
+| Published version             | v0.1.1                                                                                   |
+| Unpushed commits              | 2                                                                                        |
 
 ## File Inventory
 
 ### Root Package
 
-| File | Lines | Purpose |
-|------|-------|---------|
-| `family.go` | 171 | Family, Audience, Tone types; familyData registry |
-| `handle.go` | 262 | CLI boundary handler, template system, rendering pipeline |
-| `error.go` | 160 | Error struct, methods, builders |
-| `classify.go` | 101 | Classification engine, sentinel registration |
-| `constructors.go` | 99 | 15 factory functions |
-| `interfaces.go` | 41 | Consumer interfaces (Coded, Classified, Contextual, Retryable) |
-| `errorfamily_test.go` | 655 | Root package tests |
-| `handle_test.go` | 278 | Handler and template tests |
+| File                  | Lines | Purpose                                                        |
+| --------------------- | ----- | -------------------------------------------------------------- |
+| `family.go`           | 171   | Family, Audience, Tone types; familyData registry              |
+| `handle.go`           | 262   | CLI boundary handler, template system, rendering pipeline      |
+| `error.go`            | 160   | Error struct, methods, builders                                |
+| `classify.go`         | 101   | Classification engine, sentinel registration                   |
+| `constructors.go`     | 99    | 15 factory functions                                           |
+| `interfaces.go`       | 41    | Consumer interfaces (Coded, Classified, Contextual, Retryable) |
+| `errorfamily_test.go` | 655   | Root package tests                                             |
+| `handle_test.go`      | 278   | Handler and template tests                                     |
 
 ### Agent Package
 
-| File | Lines | Purpose |
-|------|-------|---------|
-| `agent/agent.go` | 144 | DebugAgent interface, deterministic analysis |
-| `agent/agent_test.go` | 167 | Full coverage tests |
+| File                  | Lines | Purpose                                      |
+| --------------------- | ----- | -------------------------------------------- |
+| `agent/agent.go`      | 144   | DebugAgent interface, deterministic analysis |
+| `agent/agent_test.go` | 167   | Full coverage tests                          |
 
 ### Diagnose Package
 
-| File | Lines | Purpose |
-|------|-------|---------|
-| `diagnose/diagnose.go` | 282 | Runner, DiagnosticRule interface, ruleSpec, matching helpers |
-| `diagnose/context.go` | 40 | runCommand, commandExists |
-| `diagnose/rules_filesystem.go` | 143 | FilesystemRule (file/dir permissions, readability) |
-| `diagnose/rules_git.go` | 120 | GitRule (repo state, merge conflicts, remotes) |
-| `diagnose/rules_network.go` | 96 | NetworkRule (connectivity checks) |
-| `diagnose/rules_postgres.go` | 132 | PostgresRule (pg_isready, TCP fallback) |
-| `diagnose/diagnose_test.go` | 481 | Rule and runner tests |
+| File                           | Lines | Purpose                                                      |
+| ------------------------------ | ----- | ------------------------------------------------------------ |
+| `diagnose/diagnose.go`         | 282   | Runner, DiagnosticRule interface, ruleSpec, matching helpers |
+| `diagnose/context.go`          | 40    | runCommand, commandExists                                    |
+| `diagnose/rules_filesystem.go` | 143   | FilesystemRule (file/dir permissions, readability)           |
+| `diagnose/rules_git.go`        | 120   | GitRule (repo state, merge conflicts, remotes)               |
+| `diagnose/rules_network.go`    | 96    | NetworkRule (connectivity checks)                            |
+| `diagnose/rules_postgres.go`   | 132   | PostgresRule (pg_isready, TCP fallback)                      |
+| `diagnose/diagnose_test.go`    | 481   | Rule and runner tests                                        |
 
 ### Documentation
 
-| File | Lines | Purpose |
-|------|-------|---------|
-| `README.md` | 285 | Public-facing docs |
-| `CHANGELOG.md` | ~60 | Version history |
-| `AGENTS.md` | 63 | AI assistant context |
-| `LICENSE` | 21 | MIT |
+| File           | Lines | Purpose                               |
+| -------------- | ----- | ------------------------------------- |
+| `README.md`    | 285   | Public-facing docs                    |
+| `CHANGELOG.md` | ~60   | Version history                       |
+| `AGENTS.md`    | 63    | AI assistant context                  |
+| `LICENSE`      | 21    | MIT                                   |
 | `docs/status/` | 1,786 | 8 status reports (including this one) |
 
 ---
