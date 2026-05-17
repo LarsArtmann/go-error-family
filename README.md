@@ -255,7 +255,7 @@ for _, step := range result.FixSteps {
 
 The agent produces analysis but does **not** execute fixes — the consumer decides what to do with `FixStep.Command`.
 
-`AgentResult` fields: `RootCause`, `Confidence`, `Explanation`, `FixSteps`, `Prevention`, `RelatedErrors`.
+`AgentResult` fields: `RootCause`, `Confidence`, `Explanation`, `FixSteps`.
 
 ## Architecture
 

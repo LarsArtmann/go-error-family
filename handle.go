@@ -122,8 +122,8 @@ func HandleErrorDetailed(err error) *HandleResult {
 	context := extractContext(err)
 
 	result := &HandleResult{
-		ExitCode:     family.ExitCode(),
-		Message:      renderMessage(code, context, family),
+		ExitCode: family.ExitCode(),
+		Message:  renderMessage(code, context, family),
 	}
 
 	if !IsRetryable(err) {

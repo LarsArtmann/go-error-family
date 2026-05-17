@@ -25,6 +25,8 @@ func runCommand(ctx context.Context, timeout time.Duration, name string, args ..
 		if exitErr, ok := err.(*exec.ExitError); ok {
 			exitCode = exitErr.ExitCode()
 			err = nil
+		} else {
+			exitCode = -1
 		}
 	}
 

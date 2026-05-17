@@ -3,6 +3,7 @@ package agent
 import (
 	"context"
 	"testing"
+	"time"
 
 	errorfamily "github.com/larsartmann/go-error-family"
 	"github.com/larsartmann/go-error-family/diagnose"
@@ -121,7 +122,31 @@ func TestAnalyzeWithContext(t *testing.T) {
 	if analyzeErr != nil {
 		t.Fatalf("Analyze() error: %v", analyzeErr)
 	}
-	_ = result
+	if result.RootCause != "Cannot connect" {
+		t.Errorf("RootCause = %q, want %q", result.RootCause, "Cannot connect")
+	}
+	if result.Confidence < 0.9 {
+		t.Errorf("Confidence = %f, want >= 0.9", result.Confidence)
+	}
+	if len(result.FixSteps) != 1 {
+		t.Fatalf("FixSteps len = %d, want 1", len(result.FixSteps))
+	}
+	if result.FixSteps[0].Description != "Cannot connect" {
+		t.Errorf("FixSteps[0].Description = %q, want %q", result.FixSteps[0].Description, "Cannot connect")
+	}
+}
+
+func TestAnalyzeTimeoutExceeded(t *testing.T) {
+	cfg := Config{Enabled: true, Timeout: 1 * time.Nanosecond}
+	ag := New(cfg)
+
+	ctx, cancel := context.WithCancel(context.Background())
+	cancel()
+
+	_, err := ag.Analyze(ctx, errorfamily.NewTransient("test", "msg"), nil)
+	if err == nil {
+		t.Fatal("Expected error from cancelled context, got nil")
+	}
 }
 
 func TestExtractCommand(t *testing.T) {

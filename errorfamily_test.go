@@ -552,3 +552,104 @@ func TestErrorContextEmptyOrNil(t *testing.T) {
 		t.Error("HasContext should be false for error without context")
 	}
 }
+
+func TestFamilyDefaultMessageAll(t *testing.T) {
+	tests := []struct {
+		family Family
+		want   string
+	}{
+		{Rejection, "The request was invalid. Check your input and try again."},
+		{Conflict, "A conflict was detected. Refresh and try again."},
+		{Transient, "A temporary error occurred. Please try again in a few moments."},
+		{Corruption, "Data appears to be corrupted. This requires manual intervention."},
+		{Infrastructure, "The service is currently unavailable. Please try again later."},
+		{Family(99), "An unexpected error occurred."},
+	}
+	for _, tt := range tests {
+		t.Run(tt.family.String(), func(t *testing.T) {
+			if got := tt.family.DefaultMessage(); got != tt.want {
+				t.Errorf("DefaultMessage() = %q, want %q", got, tt.want)
+			}
+		})
+	}
+}
+
+func TestFamilyDefaultWhyAll(t *testing.T) {
+	tests := []struct {
+		family Family
+		want   string
+	}{
+		{Rejection, ""},
+		{Conflict, ""},
+		{Transient, "This is a temporary issue. No data was lost."},
+		{Corruption, "Some data appears to be damaged. This requires attention."},
+		{Infrastructure, "This is a system issue, not something you caused."},
+		{Family(99), ""},
+	}
+	for _, tt := range tests {
+		t.Run(tt.family.String(), func(t *testing.T) {
+			if got := tt.family.DefaultWhy(); got != tt.want {
+				t.Errorf("DefaultWhy() = %q, want %q", got, tt.want)
+			}
+		})
+	}
+}
+
+func TestFamilyDefaultFixAll(t *testing.T) {
+	tests := []struct {
+		family Family
+		want   string
+	}{
+		{Rejection, "Check your input and try again."},
+		{Conflict, "Refresh your data and try the operation again."},
+		{Transient, "Wait a moment and try again."},
+		{Corruption, "This may require manual intervention. Check the logs for details."},
+		{Infrastructure, "The service may be temporarily unavailable. Try again later."},
+		{Family(99), "Try again or contact support."},
+	}
+	for _, tt := range tests {
+		t.Run(tt.family.String(), func(t *testing.T) {
+			if got := tt.family.DefaultFix(); got != tt.want {
+				t.Errorf("DefaultFix() = %q, want %q", got, tt.want)
+			}
+		})
+	}
+}
+
+func TestFamilyToneAll(t *testing.T) {
+	tests := []struct {
+		family Family
+		want   Tone
+	}{
+		{Rejection, ToneInstructional},
+		{Conflict, ToneExplanatory},
+		{Transient, ToneReassuring},
+		{Corruption, ToneUrgent},
+		{Infrastructure, ToneApologetic},
+		{Family(99), ToneApologetic},
+	}
+	for _, tt := range tests {
+		t.Run(tt.family.String(), func(t *testing.T) {
+			if got := tt.family.Tone(); got != tt.want {
+				t.Errorf("Tone() = %q, want %q", got, tt.want)
+			}
+		})
+	}
+}
+
+func TestAudienceString(t *testing.T) {
+	tests := []struct {
+		a    Audience
+		want string
+	}{
+		{AudienceUser, "user"},
+		{AudienceOps, "ops"},
+		{AudienceAll, "all"},
+		{Audience(99), "unknown"},
+	}
+	for _, tt := range tests {
+		if got := tt.a.String(); got != tt.want {
+			t.Errorf("Audience(%d).String() = %q, want %q", tt.a, got, tt.want)
+		}
+	}
+}

@@ -15,7 +15,6 @@ package agent
 
 import (
 	"context"
-	"errors"
 	"fmt"
 	"strings"
 	"time"
@@ -47,12 +46,6 @@ type AgentResult struct {
 	// FixSteps are ordered steps to resolve the error.
 	// The consumer decides whether to execute them.
 	FixSteps []FixStep
-
-	// Prevention describes how to prevent this error in the future.
-	Prevention string
-
-	// RelatedErrors lists error codes that commonly co-occur.
-	RelatedErrors []string
 }
 
 // FixStep describes a single action to resolve an error.
@@ -96,15 +89,17 @@ func (a *agent) Analyze(ctx context.Context, err error, diagnosis []*diagnose.Di
 		}, nil
 	}
 
-	// Build the analysis prompt from error and diagnostic context.
-	// In a real implementation, this would be sent to an AI provider.
-	// For now, deterministic analysis from diagnostic results.
-	_ = a.buildPrompt(err, diagnosis)
+	ctx, cancel := context.WithTimeout(ctx, a.cfg.Timeout)
+	defer cancel()
 
-	return a.deterministicAnalyze(err, diagnosis)
+	return a.deterministicAnalyze(ctx, err, diagnosis)
 }
 
-func (a *agent) deterministicAnalyze(err error, diagnosis []*diagnose.DiagnosticResult) (*AgentResult, error) {
+func (a *agent) deterministicAnalyze(ctx context.Context, err error, diagnosis []*diagnose.DiagnosticResult) (*AgentResult, error) {
+	if ctx.Err() != nil {
+		return nil, ctx.Err()
+	}
+
 	result := &AgentResult{
 		Confidence: 0.5,
 	}
@@ -146,31 +141,4 @@ func extractCommand(suggest string) string {
 		}
 	}
 	return ""
-}
-
-func (a *agent) buildPrompt(err error, diagnosis []*diagnose.DiagnosticResult) string {
-	var b strings.Builder
-
-	b.WriteString("Analyze the following error and provide root cause analysis with fix steps.\n\n")
-	fmt.Fprintf(&b, "Error: %s\n", err.Error())
-	fmt.Fprintf(&b, "Family: %s\n", errorfamily.Classify(err))
-
-	if ctx, ok := errors.AsType[errorfamily.Contextual](err); ok {
-		b.WriteString("Context:\n")
-		for k, v := range ctx.ErrorContext() {
-			fmt.Fprintf(&b, "  %s: %s\n", k, v)
-		}
-	}
-
-	if len(diagnosis) > 0 {
-		b.WriteString("\nDiagnostic Results:\n")
-		for _, d := range diagnosis {
-			fmt.Fprintf(&b, "  [%s] %s (confidence: %.1f)\n", d.Status, d.Summary, d.Confidence)
-			if d.SuggestedFix != "" {
-				fmt.Fprintf(&b, "    Suggested fix: %s\n", d.SuggestedFix)
-			}
-		}
-	}
-
-	return b.String()
 }

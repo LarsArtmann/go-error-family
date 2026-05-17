@@ -124,6 +124,19 @@ const (
 	AudienceAll
 )
 
+func (a Audience) String() string {
+	switch a {
+	case AudienceUser:
+		return "user"
+	case AudienceOps:
+		return "ops"
+	case AudienceAll:
+		return "all"
+	default:
+		return "unknown"
+	}
+}
+
 // Audience returns who should be notified about errors of this family.
 func (f Family) Audience() Audience {
 	switch f {

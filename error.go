@@ -158,5 +158,3 @@ func (e *Error) ContextValue(key string) string {
 	}
 	return e.context[key]
 }
-
-

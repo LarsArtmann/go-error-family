@@ -23,20 +23,20 @@ This means a type implementing both `Classified` and `Retryable` will use `Class
 
 ## Test Coverage
 
-**Updated:** 2026-05-16
+**Updated:** 2026-05-17
 
 | Package              | Coverage                                                                       |
 | -------------------- | ------------------------------------------------------------------------------ |
-| root (`errorfamily`) | 93.0%                                                                          |
+| root (`errorfamily`) | 97.1%                                                                          |
 | `agent`              | 100%                                                                           |
-| `diagnose`           | 60.7% (rules that shell out to system commands are integration-test territory) |
+| `diagnose`           | 60.6% (rules that shell out to system commands are integration-test territory) |
 
 Test files:
 
 - `errorfamily_test.go` — root package tests
 - `handle_test.go` — HandleError, HandleErrorWithConfig, HandleErrorDetailed, template overrides, diagnostics wiring
 - `diagnose/diagnose_test.go` — Runner, rule matching helpers, Applicable methods, rule Run methods for local paths
-- `agent/agent_test.go` — Analyze (enabled/disabled/with diagnosis/empty), extractCommand
+- `agent/agent_test.go` — Analyze (enabled/disabled/with diagnosis/empty/timeout), extractCommand
 
 ## Agent Is Analysis-Only
 
