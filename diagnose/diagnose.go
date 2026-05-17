@@ -251,3 +251,32 @@ func errorCodeContains(err error, substr string) bool {
 	}
 	return false
 }
+
+// ruleSpec declares the matching criteria for a diagnostic rule.
+type ruleSpec struct {
+	ContextKeys   []string
+	CodeContains  []string
+	ContextSubstr []string
+	Extra         func(error) bool
+}
+
+// matches reports whether the error matches this spec's criteria.
+func (s ruleSpec) matches(err error) bool {
+	if len(s.ContextKeys) > 0 && hasContextKey(err, s.ContextKeys...) {
+		return true
+	}
+	for _, substr := range s.CodeContains {
+		if errorCodeContains(err, substr) {
+			return true
+		}
+	}
+	for _, substr := range s.ContextSubstr {
+		if hasContextSubstring(err, substr) {
+			return true
+		}
+	}
+	if s.Extra != nil && s.Extra(err) {
+		return true
+	}
+	return false
+}

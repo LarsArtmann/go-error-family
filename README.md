@@ -261,15 +261,15 @@ The agent produces analysis but does **not** execute fixes — the consumer deci
 
 ```
 go-error-family/
-├── family.go        — Family enum, String, ExitCode, IsRetryable, Tone, Audience, ParseFamily
+├── family.go        — Family enum + data-driven familyData (Name, Exit, Tone, Message, Why, Fix)
 ├── interfaces.go    — Coded, Classified, Contextual, Retryable (each embeds error)
-├── error.go         — Reference Error struct (Is, Unwrap, Format, WithContext, Summary, etc.)
+├── error.go         — Reference Error struct (Is, Unwrap, Format, WithContext, accessors)
 ├── classify.go      — Classify, IsRetryable, ExitCode, RegisterClassification(s)
-├── constructors.go  — New, Wrap, Newf, Wrapf + family shortcuts
-├── handle.go        — HandleError, HandleErrorWithConfig, HandleErrorDetailed, templates
+├── constructors.go  — New, Wrap, Newf, Wrapf + family-specific shortcuts
+├── handle.go        — HandleError, HandleErrorDetailed, template system, defaultMessages
 ├── diagnose/
-│   ├── diagnose.go  — Runner, DiagnosticRule interface, DiagnosticResult, helpers
-│   ├── context.go   — internal command runner (unexported)
+│   ├── diagnose.go  — Runner, DiagnosticRule, ruleSpec (data-driven matching), helpers
+│   ├── context.go   — runCommand, commandExists (unexported)
 │   ├── rules_*.go   — PostgresRule, FilesystemRule, NetworkRule, GitRule
 ├── agent/
 │   └── agent.go     — DebugAgent interface, Config, AgentResult, FixStep

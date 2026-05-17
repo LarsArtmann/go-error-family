@@ -122,12 +122,16 @@ func HandleErrorDetailed(err error) *HandleResult {
 	context := extractContext(err)
 
 	result := &HandleResult{
-		ExitCode: family.ExitCode(),
-		Message:  renderMessage(code, context, family),
+		ExitCode:     family.ExitCode(),
+		Message:      renderMessage(code, context, family),
 	}
 
 	if !IsRetryable(err) {
-		result.SuggestedFix = suggestFix(code, context, family)
+		if tmpl, ok := lookupDefault(code); ok && tmpl.Fix != "" {
+			result.SuggestedFix = applyContext(tmpl.Fix, context)
+		} else {
+			result.SuggestedFix = family.DefaultFix()
+		}
 	}
 
 	return result
@@ -169,86 +173,32 @@ func renderMessage(code string, context map[string]string, family Family) string
 		return family.DefaultMessage()
 	}
 
+	// Code-specific template from defaults.
+	if tmpl, ok := lookupDefault(code); ok {
+		return applyTemplate(tmpl, context, family)
+	}
+
+	// Family fallback with code as header.
 	var parts []string
-
-	// What happened
-	what := formatWhat(code, context)
-	parts = append(parts, what)
-
-	// Why (if we know)
-	why := formatWhy(code, context, family)
-	if why != "" {
+	parts = append(parts, fmt.Sprintf("Error: %s", code))
+	if why := family.DefaultWhy(); why != "" {
 		parts = append(parts, why)
 	}
-
-	// Fix (if actionable)
-	fix := suggestFix(code, context, family)
-	if fix != "" {
+	if fix := family.DefaultFix(); fix != "" {
 		parts = append(parts, fix)
 	}
-
 	return strings.Join(parts, "\n")
 }
 
-func formatWhat(code string, context map[string]string) string {
-	// Try to make the message specific from code + context.
-	msg := codeToWhat(code)
-	if msg == "" {
-		return fmt.Sprintf("Error: %s", code)
-	}
-	return applyContext(msg, context)
-}
-
-func formatWhy(_ string, _ map[string]string, family Family) string {
-	// Reassure the user based on family.
-	switch family {
-	case Rejection, Conflict:
-		// User's fault — explain what they can check.
-		return ""
-	case Transient:
-		return "This is a temporary issue. No data was lost."
-	case Corruption:
-		return "Some data appears to be damaged. This requires attention."
-	case Infrastructure:
-		return "This is a system issue, not something you caused."
-	default:
-		return ""
-	}
-}
-
-func suggestFix(code string, context map[string]string, family Family) string {
-	fix := codeToFix(code)
-	if fix != "" {
-		return applyContext(fix, context)
-	}
-
-	// Family-based fallback.
-	switch family {
-	case Rejection:
-		if path, ok := context["path"]; ok {
-			return fmt.Sprintf("Check that %s is correct.", path)
-		}
-		return "Check your input and try again."
-	case Conflict:
-		return "Refresh your data and try the operation again."
-	case Transient:
-		return "Wait a moment and try again."
-	case Corruption:
-		return "This may require manual intervention. Check the logs for details."
-	case Infrastructure:
-		return "The service may be temporarily unavailable. Try again later."
-	default:
-		return "Try again or contact support."
-	}
-}
-
-func applyTemplate(tmpl MessageTemplate, context map[string]string, _ Family) string {
+func applyTemplate(tmpl MessageTemplate, context map[string]string, family Family) string {
 	var parts []string
 	if tmpl.What != "" {
 		parts = append(parts, applyContext(tmpl.What, context))
 	}
-	if tmpl.Why != "" {
-		parts = append(parts, applyContext(tmpl.Why, context))
+	if why := tmpl.Why; why != "" {
+		parts = append(parts, applyContext(why, context))
+	} else if why := family.DefaultWhy(); why != "" {
+		parts = append(parts, why)
 	}
 	if tmpl.Fix != "" {
 		parts = append(parts, applyContext(tmpl.Fix, context))
@@ -267,31 +217,14 @@ func applyContext(template string, context map[string]string) string {
 	return s
 }
 
-func codeToWhat(code string) string {
-	lower := strings.ToLower(code)
-	if msg, ok := defaultMessages[lower]; ok {
-		return msg.What
-	}
-	return ""
-}
-
-func codeToFix(code string) string {
-	lower := strings.ToLower(code)
-	if msg, ok := defaultMessages[lower]; ok {
-		return msg.Fix
-	}
-	return ""
-}
-
-// defaultMessage holds the What and Fix text for a known error code.
-type defaultMessage struct {
-	What string
-	Fix  string
+func lookupDefault(code string) (MessageTemplate, bool) {
+	tmpl, ok := defaultMessages[strings.ToLower(code)]
+	return tmpl, ok
 }
 
 // defaultMessages maps error codes (lowercase) to human-readable messages.
 // Codes are matched exactly — no substring matching.
-var defaultMessages = map[string]defaultMessage{
+var defaultMessages = map[string]MessageTemplate{
 	"file.not_found":     {What: "A required resource was not found.", Fix: "Check that the path and resource name are correct."},
 	"permission.denied":  {What: "Permission was denied.", Fix: "Check file permissions or run with appropriate privileges."},
 	"db.timeout":         {What: "The database operation timed out.", Fix: "Increase the timeout or check system resources."},

@@ -27,9 +27,9 @@ This means a type implementing both `Classified` and `Retryable` will use `Class
 
 | Package              | Coverage                                                                       |
 | -------------------- | ------------------------------------------------------------------------------ |
-| root (`errorfamily`) | 90.8%                                                                          |
+| root (`errorfamily`) | 93.0%                                                                          |
 | `agent`              | 100%                                                                           |
-| `diagnose`           | 59.5% (rules that shell out to system commands are integration-test territory) |
+| `diagnose`           | 60.7% (rules that shell out to system commands are integration-test territory) |
 
 Test files:
 
@@ -53,7 +53,7 @@ Error messages are resolved in this order:
 1. `HandleConfig.TemplateOverride[code]` — per-call consumer override
 2. `lookupTemplate(code)` — global registry via `RegisterTemplate`
 3. `defaultMessages[code]` — built-in exact-match templates
-4. `familyDefaultMessage(family)` — generic family-based fallback
+4. `family.DefaultMessage()` — generic family-based fallback
 
 No substring matching. All lookups are exact code matches (case-insensitive).
 

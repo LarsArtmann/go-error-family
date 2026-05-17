@@ -18,14 +18,13 @@ type NetworkRule struct{}
 func (r *NetworkRule) Name() string { return "network" }
 
 func (r *NetworkRule) Applicable(err error) bool {
-	return hasContextKey(err, "host", "port", "url", "endpoint", "address", "remote") ||
-		errorCodeContains(err, "network") ||
-		errorCodeContains(err, "connect") ||
-		errorCodeContains(err, "dial") ||
-		errorCodeContains(err, "timeout") ||
-		hasContextSubstring(err, "connection refused") ||
-		hasContextSubstring(err, "no such host") ||
-		hasContextSubstring(err, "i/o timeout")
+	return networkSpec.matches(err)
+}
+
+var networkSpec = ruleSpec{
+	ContextKeys:   []string{"host", "port", "url", "endpoint", "address", "remote"},
+	CodeContains:  []string{"network", "connect", "dial", "timeout"},
+	ContextSubstr: []string{"connection refused", "no such host", "i/o timeout"},
 }
 
 func (r *NetworkRule) Run(ctx context.Context, err error) (*DiagnosticResult, error) {

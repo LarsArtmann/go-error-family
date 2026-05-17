@@ -19,9 +19,13 @@ type GitRule struct{}
 func (r *GitRule) Name() string { return "git" }
 
 func (r *GitRule) Applicable(err error) bool {
-	return hasContextKey(err, "git", "repository", "repo", "branch", "git_dir") ||
-		errorCodeContains(err, "git") ||
-		hasContextSubstring(err, "git")
+	return gitSpec.matches(err)
+}
+
+var gitSpec = ruleSpec{
+	ContextKeys:   []string{"git", "repository", "repo", "branch", "git_dir"},
+	CodeContains:  []string{"git"},
+	ContextSubstr: []string{"git"},
 }
 
 func (r *GitRule) Run(ctx context.Context, err error) (*DiagnosticResult, error) {

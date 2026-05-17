@@ -3,7 +3,6 @@ package errorfamily
 import (
 	"fmt"
 	"maps"
-	"strings"
 	"time"
 )
 
@@ -160,25 +159,4 @@ func (e *Error) ContextValue(key string) string {
 	return e.context[key]
 }
 
-// MatchesContext reports whether the error's context contains any of the given keys.
-// Useful for diagnostic rule matching.
-func (e *Error) MatchesContext(keys ...string) bool {
-	for _, key := range keys {
-		if _, ok := e.context[key]; ok {
-			return true
-		}
-	}
-	return false
-}
 
-// MatchesContextValue reports whether any context value contains the substring.
-// Useful for diagnostic rule matching on context content.
-func (e *Error) MatchesContextValue(substring string) bool {
-	substr := strings.ToLower(substring)
-	for _, v := range e.context {
-		if strings.Contains(strings.ToLower(v), substr) {
-			return true
-		}
-	}
-	return false
-}

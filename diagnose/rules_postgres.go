@@ -20,13 +20,14 @@ type PostgresRule struct{}
 func (r *PostgresRule) Name() string { return "postgres" }
 
 func (r *PostgresRule) Applicable(err error) bool {
-	return hasContextSubstring(err, "postgres") ||
-		hasContextSubstring(err, "postgresql") ||
-		hasContextSubstring(err, "database") ||
-		hasContextKey(err, "db_host", "db_port", "db_name", "database_url", "postgres_host") ||
-		errorCodeContains(err, "db.") ||
-		errorCodeContains(err, "database") ||
-		(familyIs(err, errorfamily.Transient) && hasContextSubstring(err, "sql"))
+	return postgresSpec.matches(err)
+}
+
+var postgresSpec = ruleSpec{
+	ContextSubstr: []string{"postgres", "postgresql", "database", "sql"},
+	ContextKeys:   []string{"db_host", "db_port", "db_name", "database_url", "postgres_host"},
+	CodeContains:  []string{"db.", "database"},
+	Extra:         func(err error) bool { return familyIs(err, errorfamily.Transient) && hasContextSubstring(err, "sql") },
 }
 
 func (r *PostgresRule) Run(ctx context.Context, err error) (*DiagnosticResult, error) {

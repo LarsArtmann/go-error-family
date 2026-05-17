@@ -215,24 +215,6 @@ func TestErrorSummary(t *testing.T) {
 	}
 }
 
-func TestErrorMatchesContext(t *testing.T) {
-	err := NewRejection("file.not_found", "msg").
-		WithContext("path", "/etc/app/config.yaml")
-
-	if !err.MatchesContext("path", "host") {
-		t.Error("MatchesContext should find 'path'")
-	}
-	if err.MatchesContext("host", "port") {
-		t.Error("MatchesContext should not find 'host'")
-	}
-	if !err.MatchesContextValue("config") {
-		t.Error("MatchesContextValue should find 'config' in path value")
-	}
-	if err.MatchesContextValue("nonexistent_xyz") {
-		t.Error("MatchesContextValue should not find random string")
-	}
-}
-
 func TestConstructors(t *testing.T) {
 	tests := []struct {
 		name   string

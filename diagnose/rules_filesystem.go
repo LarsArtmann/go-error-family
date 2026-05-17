@@ -18,12 +18,12 @@ type FilesystemRule struct{}
 func (r *FilesystemRule) Name() string { return "filesystem" }
 
 func (r *FilesystemRule) Applicable(err error) bool {
-	return hasContextKey(err, "path", "file", "dir", "directory", "config_path", "output_path") ||
-		errorCodeContains(err, "file") ||
-		errorCodeContains(err, "dir") ||
-		errorCodeContains(err, "path") ||
-		errorCodeContains(err, "config") ||
-		errorCodeContains(err, "permission")
+	return filesystemSpec.matches(err)
+}
+
+var filesystemSpec = ruleSpec{
+	ContextKeys:  []string{"path", "file", "dir", "directory", "config_path", "output_path"},
+	CodeContains: []string{"file", "dir", "path", "config", "permission"},
 }
 
 func (r *FilesystemRule) Run(ctx context.Context, err error) (*DiagnosticResult, error) {
