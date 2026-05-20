@@ -19,7 +19,6 @@ errorfamily/          ← root package: types, constructors, classification, CLI
   constructors.go       New/Wrap + family shortcuts
   classify.go           Classify(), RegisterClassification()
   handle.go             HandleError(), HandleErrorDetailed(), template system
-  batch.go              ErrorBatch, BatchResult[T], Outcome[T] — partial success
 
 diagnose/             ← concurrent diagnostic rules
   diagnose.go           Runner, DiagnosticRule interface, rule matching helpers
@@ -230,90 +229,56 @@ results := runner.Run(ctx, err)
 diagnose.IsPostgresRunning(ctx, host, port) bool  // pg_isready or TCP check
 ```
 
-### Partial Success / Batch Operations
+### Partial Success (Recipe)
 
-Two types for collecting multiple errors from batch or multi-step operations:
+This library does not provide batch/multi-error types — partial success is a **consumption pattern**, not a classification concern. Use the existing primitives to compose what your domain needs:
 
 ```go
-// ErrorBatch: error-only collector (no values)
-batch := errorfamily.NewErrorBatch()
+// 1. Process items, collect per-item results.
+type outcome struct {
+    value Item
+    err   error
+}
+var results []outcome
 for _, item := range items {
-    if err := process(item); err != nil {
-        batch.Add(err)
+    v, err := process(item)
+    results = append(results, outcome{value: v, err: err})
+}
+
+// 2. Separate successes from failures.
+var successes []Item
+var failures []outcome
+for _, r := range results {
+    if r.err == nil {
+        successes = append(successes, r.value)
+    } else {
+        failures = append(failures, r)
     }
 }
-if batch.HasFailures() {
-    os.Exit(batch.ExitCode())  // or: return batch.Err()
+
+// 3. Use Classify to decide what to do with each failure.
+for _, f := range failures {
+    switch errorfamily.Classify(f.err) {
+    case errorfamily.Transient:
+        // retry with backoff
+    case errorfamily.Rejection:
+        // skip, log, or surface to user
+    case errorfamily.Corruption:
+        // escalate to ops
+    }
 }
 
-// BatchResult[T]: value + error collector
-result := errorfamily.NewBatchResult[ProcessedItem]()
-for _, item := range items {
-    processed, err := process(item)
-    result.Add(processed, err)
+// 4. If you need a single exit code, pick the worst family.
+// Severity: Corruption > Infrastructure > Conflict > Rejection > Transient.
+worst := errorfamily.Transient
+for _, f := range failures {
+    if errorfamily.Classify(f.err).ExitCode() > worst.ExitCode() {
+        worst = errorfamily.Classify(f.err)
+    }
 }
-for _, item := range result.Successes() { /* use successful values */ }
-for _, failure := range result.Failures() { /* handle failures */ }
-for _, failure := range result.RetryableFailures() { /* retry transient ones */ }
 ```
 
-**Dominant Family** (determines exit code, tone, retryability):
-
-Severity order: `Corruption > Infrastructure > Conflict > Rejection > Transient`. If ALL failures are Transient, the batch is retryable.
-
-**`Err()` returns a `batchError`** that implements `Classified`, `Coded`, `Contextual`, `Retryable` — so batch errors flow through `HandleError`, `Classify`, and all existing tools. Returns `nil` if all succeeded.
-
-```go
-// Error format
-result.Err().Error()          // "[rejection:batch] 3 of 10 items failed"
-fmt.Sprintf("%+v", result.Err())  // verbose: each failure numbered on its own line
-
-// Integration with existing tools
-errorfamily.HandleError(result.Err())              // works at CLI boundary
-errorfamily.Classify(result.Err())                 // returns dominant family
-errorfamily.HandleErrorDetailed(result.Err())      // structured HTTP result
-```
-
-**Thread-safe**: both `ErrorBatch` and `BatchResult` support concurrent `Add` calls.
-
-**ErrorBatch API:**
-
-```go
-NewErrorBatch() *ErrorBatch
-batch.Add(err error)                    // nil errors ignored
-batch.AddBatch(other *ErrorBatch)       // merge
-batch.Len() int                         // error count
-batch.HasFailures() bool
-batch.Errors() []error                  // copy
-batch.Families() map[Family]int         // histogram
-batch.DominantFamily() Family           // most severe
-batch.HasRetryable() bool               // any Transient?
-batch.Retryable() []error               // Transient errors
-batch.Err() error                       // nil if empty; implements all interfaces
-batch.ExitCode() int                    // 0 if empty, family exit code otherwise
-```
-
-**BatchResult[T] API:**
-
-```go
-NewBatchResult[T]() *BatchResult[T]
-result.Add(value T, err error)          // record outcome
-result.AddOutcome(o Outcome[T])         // pre-built outcome
-result.AddResult(other *BatchResult[T]) // merge
-result.Len() int                        // total outcomes
-result.Successes() []T                  // values from OK outcomes
-result.Failures() []Outcome[T]          // failed outcomes
-result.HasFailures() bool
-result.AllSucceeded() bool              // true only if len > 0 and all OK
-result.AllFailed() bool                 // true only if len > 0 and all failed
-result.IsPartial() bool                 // mix of success and failure
-result.Families() map[Family]int        // histogram of failure families
-result.DominantFamily() Family          // most severe failure family
-result.HasRetryable() bool
-result.RetryableFailures() []Outcome[T]
-result.Err() error                      // nil if all OK; implements all interfaces
-result.ExitCode() int                   // 0 if all OK, family exit code otherwise
-```
+Why not a built-in `ErrorBatch` type? Because batch semantics vary by domain — some consumers want fail-fast, some want collect-all, some want per-item retry with circuit breakers. The library provides the **classification vocabulary**; you compose the **collection strategy**.
 
 ### Agent (Analysis-Only)
 
@@ -400,11 +365,10 @@ Test files and scope:
 
 - `errorfamily_test.go` — Family, ParseFamily, Error, constructors, Classify, RegisterClassification, errors.Is/As integration
 - `handle_test.go` — HandleError, HandleErrorWithConfig, HandleErrorDetailed, template overrides, diagnostics wiring
-- `batch_test.go` — ErrorBatch, BatchResult[T], Outcome[T], dominant family, thread safety, HandleError integration
 - `diagnose/diagnose_test.go` — Runner, rule matching helpers, Applicable, Run for local paths
 - `agent/agent_test.go` — Analyze (enabled/disabled/with diagnosis/empty/timeout), extractCommand
 
-**Coverage:** root 98.0% | agent 100% | diagnose 60.6% (rules that shell out are integration-test territory)
+**Coverage:** root 97.1% | agent 100% | diagnose 60.6% (rules that shell out are integration-test territory)
 
 ### Test Style
 
@@ -457,7 +421,6 @@ func TestExample(t *testing.T) {
 | Add a diagnostic rule          | New file in `diagnose/`, implement `DiagnosticRule`, add to `DefaultRunner()` |
 | Change CLI boundary behavior   | `handle.go`                                                                   |
 | Modify agent analysis          | `agent/agent.go`                                                              |
-| Partial success / batch ops    | `batch.go`                                                                    |
 | Understand the Error struct    | `error.go`                                                                    |
 | Understand consumer interfaces | `interfaces.go`                                                               |
 
