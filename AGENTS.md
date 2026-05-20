@@ -1,6 +1,6 @@
 # go-error-family
 
-Structured error protocol library. Library only — no `main`, no build system, no external deps.
+Structured error protocol library. Library only — no `main`, no build system, no external deps. Full API reference: `SKILL.md`.
 
 ## Surprising Behaviors
 
@@ -21,42 +21,22 @@ Structured error protocol library. Library only — no `main`, no build system, 
 
 This means a type implementing both `Classified` and `Retryable` will use `Classified` and ignore `Retryable`. Registering a sentinel for an error that already implements `Classified` has no effect.
 
-## Test Coverage
-
-**Updated:** 2026-05-17
-
-| Package              | Coverage                                                                       |
-| -------------------- | ------------------------------------------------------------------------------ |
-| root (`errorfamily`) | 97.1%                                                                          |
-| `agent`              | 100%                                                                           |
-| `diagnose`           | 60.6% (rules that shell out to system commands are integration-test territory) |
-
-Test files:
-
-- `errorfamily_test.go` — root package tests
-- `handle_test.go` — HandleError, HandleErrorWithConfig, HandleErrorDetailed, template overrides, diagnostics wiring
-- `diagnose/diagnose_test.go` — Runner, rule matching helpers, Applicable methods, rule Run methods for local paths
-- `agent/agent_test.go` — Analyze (enabled/disabled/with diagnosis/empty/timeout), extractCommand
-
 ## Agent Is Analysis-Only
 
 The `DebugAgent` interface has a single method: `Analyze`. It produces root cause analysis and `FixStep` suggestions. The library does NOT execute fixes — the consumer decides what to do with `FixStep.Command`. The `Involvement` and `RiskLevel` concepts belong to the consumer, not the library.
 
 ## Diagnostic Rule Pattern
 
-When adding a new `DiagnosticRule`, use the matching helpers in `diagnose/diagnose.go` (not `context.go`): `hasContextKey`, `contextValue`, `hasContextSubstring`, `familyIs`, `errorCodeContains`. Rules run concurrently via `Runner.Run` and results sort by confidence descending.
+When adding a new `DiagnosticRule`, use the matching helpers in `diagnose/diagnose.go` (not `context.go`): `hasContextKey`, `contextValue`, `resolveContextKey`, `hasContextSubstring`, `familyIs`, `errorCodeContains`. Rules run concurrently via `Runner.Run` and results sort by confidence descending.
 
-## Template System
+## Test Coverage
 
-Error messages are resolved in this order:
+**Updated:** 2026-05-20
 
-1. `HandleConfig.TemplateOverride[code]` — per-call consumer override
-2. `lookupTemplate(code)` — global registry via `RegisterTemplate`
-3. `defaultMessages[code]` — built-in exact-match templates
-4. `family.DefaultMessage()` — generic family-based fallback
+| Package              | Coverage |
+| -------------------- | -------- |
+| root (`errorfamily`) | 97.1%    |
+| `agent`              | 100%     |
+| `diagnose`           | 60.6%    |
 
-No substring matching. All lookups are exact code matches (case-insensitive).
-
-## DiagnosticFunc Type
-
-`HandleConfig.DiagnosticFunc` is a function type `func(ctx, err) []DiagnosticFinding`. This avoids the `any` return type that a circular-import-avoiding interface would require. The `diagnose.Runner` can be adapted to satisfy this type with a thin wrapper.
+Diagnose rules that shell out to system commands are integration-test territory.

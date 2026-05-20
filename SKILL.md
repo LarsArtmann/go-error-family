@@ -36,15 +36,38 @@ agent/                ← analysis-only debug agent
 
 ## The Five Families
 
-| Family          | Retry? | Exit | Whose fault | Tone           | When                                       |
-| --------------- | ------ | ---- | ----------- | -------------- | ------------------------------------------ |
-| `Rejection`     | No     | 1    | User        | Instructional  | Bad input, unauthorized, not found         |
-| `Conflict`      | No     | 1    | User        | Explanatory    | Version mismatch, duplicate, state clash   |
-| `Transient`     | **Yes** | 75   | System      | Reassuring     | Temporary infra failure (the only retryable one) |
-| `Corruption`    | No     | 65   | System      | Urgent         | Source of truth damaged, unparseable data  |
-| `Infrastructure`| No     | 69   | System      | Apologetic     | System cannot serve, nil deps, startup fail|
+| Family           | Retry?  | Exit | Whose fault | Audience | Tone          | When                                             |
+| ---------------- | ------- | ---- | ----------- | -------- | ------------- | ------------------------------------------------ |
+| `Rejection`      | No      | 1    | User        | User     | Instructional | Bad input, unauthorized, not found               |
+| `Conflict`       | No      | 1    | User        | User     | Explanatory   | Version mismatch, duplicate, state clash         |
+| `Transient`      | **Yes** | 75   | System      | All      | Reassuring    | Temporary infra failure (the only retryable one) |
+| `Corruption`     | No      | 65   | System      | Ops      | Urgent        | Source of truth damaged, unparseable data        |
+| `Infrastructure` | No      | 69   | System      | Ops      | Apologetic    | System cannot serve, nil deps, startup fail      |
 
 Only `Transient` is retryable. Everything else is not. This is the core design decision.
+
+### Family Methods
+
+```go
+family.IsRetryable() bool      // true only for Transient
+family.ExitCode() int          // BSD sysexits.h code (see table above)
+family.IsValid() bool          // true if within defined range
+family.String() string         // "rejection", "transient", etc.
+family.Tone() Tone             // presentation tone hint
+family.Audience() Audience     // who to notify: User, Ops, or All
+family.DefaultMessage() string // generic human-readable message
+family.DefaultWhy() string     // generic "why" explanation
+family.DefaultFix() string     // generic fix suggestion
+```
+
+### Audience & Tone Types
+
+```go
+type Audience int // AudienceUser, AudienceOps, AudienceAll
+type Tone string  // "instructional", "explanatory", "reassuring", "urgent", "apologetic"
+```
+
+Audience mapping: Rejection/Conflict → User, Corruption/Infrastructure → Ops, Transient → All.
 
 ---
 
@@ -79,6 +102,37 @@ type Retryable interface {    // explicit retry hint (overrides Family)
 ---
 
 ## Quick API Reference
+
+### Error Struct Methods
+
+```go
+// Accessors (beyond the interface methods)
+err.ErrorCode() string                  // from Coded
+err.ErrorFamily() Family                // from Classified
+err.ErrorContext() map[string]string     // from Contextual (returns a copy)
+err.IsRetryable() bool                  // from Retryable
+
+// Direct accessors (no interface assertion needed)
+err.Code() string                       // same as ErrorCode()
+err.Family() Family                     // same as ErrorFamily()
+err.Message() string                    // human-readable technical message
+err.Cause() error                       // underlying error in the chain
+err.Timestamp() time.Time               // when the error was created
+
+// Mutators (chainable)
+err.WithContext(key, value string) *Error
+err.WithCause(cause error) *Error
+
+// Helpers
+err.HasContext(key string) bool
+err.ContextValue(key string) string
+err.Summary() string                    // "code: message" (no family prefix)
+
+// Formatting (fmt.Formatter)
+fmt.Sprintf("%v", err)    // [family:code] message[: cause]
+fmt.Sprintf("%+v", err)   // verbose: context, timestamp, cause chain
+fmt.Sprintf("%s", err)    // message only
+```
 
 ### Creating Errors
 
@@ -116,6 +170,7 @@ errorfamily.RegisterClassifications(map[error]errorfamily.Family{...})
 ```
 
 **Classification precedence** (first match wins):
+
 1. `Classified` interface → `ErrorFamily()`
 2. `Retryable` interface → infer `Transient` (true) or `Rejection` (false)
 3. Registered sentinels via `errors.Is` chain walk (lock-free snapshot)
@@ -166,6 +221,14 @@ results := runner.Run(ctx, err)
 // results sorted by confidence desc; nil if no rules applicable
 ```
 
+**DiagnosticResult fields:** `RuleName`, `Status` (Healthy/Degraded/Failed/Unknown), `Summary`, `Details` (map[string]string), `SuggestedFix`, `Confidence` (0.0–1.0), `Duration`.
+
+**Standalone helpers:**
+
+```go
+diagnose.IsPostgresRunning(ctx, host, port) bool  // pg_isready or TCP check
+```
+
 ### Agent (Analysis-Only)
 
 ```go
@@ -179,16 +242,16 @@ result, err := ag.Analyze(ctx, err, diagnosis)
 
 ## Surprising Behaviors (Gotchas)
 
-| Behavior | Why |
-|----------|-----|
-| `Classify(nil)` returns `Rejection` | nil error = caller's fault |
-| `Classify` defaults unknown → `Transient` | Fail-open: unknown errors get retried |
-| `ParseFamily("unknown")` → `Transient` | Same fail-open design |
-| `errors.Is` matches on **code + family** only | Two `*Error`s with different messages but same code+family match |
-| `Wrap(nil, ...)` returns `nil` | Nil-safe, but can't construct error wrapping nil |
-| `Error.ErrorContext()` returns a **copy** | Mutations won't affect the original |
-| Template `{{.key}}` uses `strings.ReplaceAll` | Not html/template — just simple substitution |
-| `DiagnosticFunc` is a function type, not interface | Avoids circular import between root and diagnose packages |
+| Behavior                                           | Why                                                              |
+| -------------------------------------------------- | ---------------------------------------------------------------- |
+| `Classify(nil)` returns `Rejection`                | nil error = caller's fault                                       |
+| `Classify` defaults unknown → `Transient`          | Fail-open: unknown errors get retried                            |
+| `ParseFamily("unknown")` → `Transient`             | Same fail-open design                                            |
+| `errors.Is` matches on **code + family** only      | Two `*Error`s with different messages but same code+family match |
+| `Wrap(nil, ...)` returns `nil`                     | Nil-safe, but can't construct error wrapping nil                 |
+| `Error.ErrorContext()` returns a **copy**          | Mutations won't affect the original                              |
+| Template `{{.key}}` uses `strings.ReplaceAll`      | Not html/template — just simple substitution                     |
+| `DiagnosticFunc` is a function type, not interface | Avoids circular import between root and diagnose packages        |
 
 ---
 
@@ -229,21 +292,12 @@ func (r *MyRule) Applicable(err error) bool { return mySpec.matches(err) }
 
 ### Built-in Rules
 
-| Rule | Matches On | Checks |
-|------|-----------|--------|
-| `PostgresRule` | Context keys: `db_host/db_port/db_name/database_url/postgres_host`. Codes: `db.`, `database`. Context: `postgres/postgresql/database/sql` | pg_isready, TCP connectivity, suggests start command |
-| `FilesystemRule` | Context keys: `path/file/dir/directory/config_path/output_path`. Codes: `file/dir/path/config/permission` | File existence, permissions, writability, parent dir |
-| `NetworkRule` | Context keys: `host/port/url/endpoint/address/remote`. Codes: `network/connect/dial/timeout` | DNS resolution, TCP connectivity, port reachability |
-| `GitRule` | Context keys: `git/repository/repo/branch/git_dir`. Codes: `git` | Repo existence, working tree cleanliness, merge conflicts, remote reachability |
-
----
-
-## Error Formatting
-
-`*Error` implements `fmt.Formatter`:
-- `%v` — compact: `[family:code] message: cause`
-- `%+v` — verbose multi-line with context, timestamp, cause chain
-- `%s` — message only
+| Rule             | Matches On                                                                                                                                                                                           | Checks                                                                         |
+| ---------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------ |
+| `PostgresRule`   | Context keys: `db_host/db_port/db_name/database_url/postgres_host`. Codes: `db.`, `database`. Context substr: `postgres/postgresql/database/sql`. Extra: `Transient` family + context contains `sql` | pg_isready, TCP connectivity, suggests start command                           |
+| `FilesystemRule` | Context keys: `path/file/dir/directory/config_path/output_path`. Codes: `file/dir/path/config/permission`                                                                                            | File existence, permissions, writability, parent dir                           |
+| `NetworkRule`    | Context keys: `host/port/url/endpoint/address/remote`. Codes: `network/connect/dial/timeout`. Context substr: `connection refused/no such host/i/o timeout`                                          | DNS resolution, TCP connectivity, port reachability                            |
+| `GitRule`        | Context keys: `git/repository/repo/branch/git_dir`. Codes: `git`. Context substr: `git`                                                                                                              | Repo existence, working tree cleanliness, merge conflicts, remote reachability |
 
 ---
 
@@ -257,6 +311,7 @@ go test -run TestName ./...                      # specific test
 ```
 
 Test files and scope:
+
 - `errorfamily_test.go` — Family, ParseFamily, Error, constructors, Classify, RegisterClassification, errors.Is/As integration
 - `handle_test.go` — HandleError, HandleErrorWithConfig, HandleErrorDetailed, template overrides, diagnostics wiring
 - `diagnose/diagnose_test.go` — Runner, rule matching helpers, Applicable, Run for local paths
@@ -306,17 +361,17 @@ func TestExample(t *testing.T) {
 
 ## Key Files for Common Tasks
 
-| Task | File(s) |
-|------|---------|
-| Add a new Family | `family.go` (const + familyData entry) |
-| Add a new constructor shortcut | `constructors.go` |
-| Change classification logic | `classify.go` |
-| Add/modify message templates | `handle.go` (defaultMessages) or use `RegisterTemplate()` |
-| Add a diagnostic rule | New file in `diagnose/`, implement `DiagnosticRule`, add to `DefaultRunner()` |
-| Change CLI boundary behavior | `handle.go` |
-| Modify agent analysis | `agent/agent.go` |
-| Understand the Error struct | `error.go` |
-| Understand consumer interfaces | `interfaces.go` |
+| Task                           | File(s)                                                                       |
+| ------------------------------ | ----------------------------------------------------------------------------- |
+| Add a new Family               | `family.go` (const + familyData entry)                                        |
+| Add a new constructor shortcut | `constructors.go`                                                             |
+| Change classification logic    | `classify.go`                                                                 |
+| Add/modify message templates   | `handle.go` (defaultMessages) or use `RegisterTemplate()`                     |
+| Add a diagnostic rule          | New file in `diagnose/`, implement `DiagnosticRule`, add to `DefaultRunner()` |
+| Change CLI boundary behavior   | `handle.go`                                                                   |
+| Modify agent analysis          | `agent/agent.go`                                                              |
+| Understand the Error struct    | `error.go`                                                                    |
+| Understand consumer interfaces | `interfaces.go`                                                               |
 
 ---
 
