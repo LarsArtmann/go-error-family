@@ -17,54 +17,54 @@ The library is **functionally complete** for v1.0. The remaining work is polish,
 
 ## Fully Done ✓
 
-| Item | Details |
-| --- | --- |
-| **Family enum** | 5 families (Rejection/Conflict/Transient/Corruption/Infrastructure) with exit codes, tone, audience, defaults |
-| **Error struct** | Reference implementation with code, message, family, context, cause, timestamp |
-| **Consumer interfaces** | Coded, Classified, Contextual, Retryable — all embed `error` for `errors.AsType[T]()` |
-| **Constructors** | New/Wrap/Newf/Wrapf + family shortcuts (10 constructors) |
-| **Classification** | 4-level precedence: Classified → Retryable → Registered sentinels → Transient default |
-| **CLI boundary** | HandleError, HandleErrorWithConfig, HandleErrorDetailed — Wix-style messages |
-| **Template system** | defaultMessages map + RegisterTemplate() + HandleConfig.TemplateOverride |
-| **Diagnostic framework** | Runner, DiagnosticRule interface, ruleSpec matching, concurrent execution |
-| **4 diagnostic rules** | Postgres, Filesystem, Network, Git — all data-driven via ruleSpec |
-| **Agent** | DebugAgent interface, deterministic analyzer, timeout enforcement |
-| **Root coverage** | 97.1% (every function covered except minor branches) |
-| **Agent coverage** | 100% |
-| **Thread safety** | sync.RWMutex for classification and template registries, snapshots for reads |
-| **Open source** | MIT license, tagged v0.1.1, pushed to origin |
-| **Architecture** | Clean dependency graph: root → stdlib, diagnose → root, agent → root+diagnose |
-| **File sizes** | All production files under 282 lines (handle.go is largest) |
-| **Partial success recipe** | Documented in SKILL.md — composition pattern, not library type |
+| Item                       | Details                                                                                                       |
+| -------------------------- | ------------------------------------------------------------------------------------------------------------- |
+| **Family enum**            | 5 families (Rejection/Conflict/Transient/Corruption/Infrastructure) with exit codes, tone, audience, defaults |
+| **Error struct**           | Reference implementation with code, message, family, context, cause, timestamp                                |
+| **Consumer interfaces**    | Coded, Classified, Contextual, Retryable — all embed `error` for `errors.AsType[T]()`                         |
+| **Constructors**           | New/Wrap/Newf/Wrapf + family shortcuts (10 constructors)                                                      |
+| **Classification**         | 4-level precedence: Classified → Retryable → Registered sentinels → Transient default                         |
+| **CLI boundary**           | HandleError, HandleErrorWithConfig, HandleErrorDetailed — Wix-style messages                                  |
+| **Template system**        | defaultMessages map + RegisterTemplate() + HandleConfig.TemplateOverride                                      |
+| **Diagnostic framework**   | Runner, DiagnosticRule interface, ruleSpec matching, concurrent execution                                     |
+| **4 diagnostic rules**     | Postgres, Filesystem, Network, Git — all data-driven via ruleSpec                                             |
+| **Agent**                  | DebugAgent interface, deterministic analyzer, timeout enforcement                                             |
+| **Root coverage**          | 97.1% (every function covered except minor branches)                                                          |
+| **Agent coverage**         | 100%                                                                                                          |
+| **Thread safety**          | sync.RWMutex for classification and template registries, snapshots for reads                                  |
+| **Open source**            | MIT license, tagged v0.1.1, pushed to origin                                                                  |
+| **Architecture**           | Clean dependency graph: root → stdlib, diagnose → root, agent → root+diagnose                                 |
+| **File sizes**             | All production files under 282 lines (handle.go is largest)                                                   |
+| **Partial success recipe** | Documented in SKILL.md — composition pattern, not library type                                                |
 
 ---
 
 ## Partially Done ⚠️
 
-| Item | Current State | Gap |
-| --- | --- | --- |
-| **Diagnose coverage** | 60.6% | Rules that shell out (git, pg_isready) are hard to unit test; integration-test territory |
-| **DOMAIN_LANGUAGE.md** | Template exists | Not filled in for this project — placeholder glossary, no real terms |
-| **CHANGELOG.md** | Has v0.1.0 and v0.1.1 | Missing entries for recent doc/cleanup commits |
+| Item                   | Current State         | Gap                                                                                      |
+| ---------------------- | --------------------- | ---------------------------------------------------------------------------------------- |
+| **Diagnose coverage**  | 60.6%                 | Rules that shell out (git, pg_isready) are hard to unit test; integration-test territory |
+| **DOMAIN_LANGUAGE.md** | Template exists       | Not filled in for this project — placeholder glossary, no real terms                     |
+| **CHANGELOG.md**       | Has v0.1.0 and v0.1.1 | Missing entries for recent doc/cleanup commits                                           |
 
 ---
 
 ## Not Started ✗
 
-| Item | Impact | Notes |
-| --- | --- | --- |
-| CI/CD pipeline | High | release.yml exists but no test-on-push, coverage report, or lint gate |
-| Real consumers / examples | High | Zero known consumers — library is untested in real projects |
-| `go vet` / `staticcheck` in CI | Medium | Both pass locally but not enforced |
-| pkg.go.dev documentation | Medium | v0.1.1 has a validation error (external bug) |
-| Versioned Go docs | Low | Go doc comments are good but not reviewed for godoc rendering |
+| Item                           | Impact | Notes                                                                 |
+| ------------------------------ | ------ | --------------------------------------------------------------------- |
+| CI/CD pipeline                 | High   | release.yml exists but no test-on-push, coverage report, or lint gate |
+| Real consumers / examples      | High   | Zero known consumers — library is untested in real projects           |
+| `go vet` / `staticcheck` in CI | Medium | Both pass locally but not enforced                                    |
+| pkg.go.dev documentation       | Medium | v0.1.1 has a validation error (external bug)                          |
+| Versioned Go docs              | Low    | Go doc comments are good but not reviewed for godoc rendering         |
 
 ---
 
 ## Split Brain Found & Fixed ✓
 
-| Split Brain | Status |
-| --- | --- |
+| Split Brain                                                                                                                                                                                                                  | Status             |
+| ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------ |
 | **AGENTS.md referenced `ErrorBatch`/`BatchResult[T]`** which were deleted in commit 4e982c9. Caused by `git checkout -- AGENTS.md` which restored the stale batch docs. **Fixed:** replaced with composition recipe pointer. | FIXED this session |
 
 ---
@@ -144,19 +144,19 @@ The library is **functionally complete** for v1.0. The remaining work is polish,
 
 ## Metrics
 
-| Metric | Value |
-| --- | --- |
-| Production LOC | 1,791 |
-| Test LOC | 1,581 |
-| Test functions | 102 |
-| Total checks (incl. subtests) | 270 |
-| Packages | 3 (root, diagnose, agent) |
-| Production files | 13 |
-| Test files | 4 |
-| Largest production file | handle.go (262 lines) |
-| Largest test file | errorfamily_test.go (655 lines) |
-| External dependencies | 0 |
-| Go version | 1.26.2 |
+| Metric                        | Value                           |
+| ----------------------------- | ------------------------------- |
+| Production LOC                | 1,791                           |
+| Test LOC                      | 1,581                           |
+| Test functions                | 102                             |
+| Total checks (incl. subtests) | 270                             |
+| Packages                      | 3 (root, diagnose, agent)       |
+| Production files              | 13                              |
+| Test files                    | 4                               |
+| Largest production file       | handle.go (262 lines)           |
+| Largest test file             | errorfamily_test.go (655 lines) |
+| External dependencies         | 0                               |
+| Go version                    | 1.26.2                          |
 
 ---
 
