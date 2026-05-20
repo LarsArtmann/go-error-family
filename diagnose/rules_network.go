@@ -33,7 +33,7 @@ func (r *NetworkRule) Run(ctx context.Context, err error) (*DiagnosticResult, er
 
 	result := &DiagnosticResult{
 		Details:    map[string]string{"host": host, "port": port},
-		Confidence: 0.7,
+		Confidence: ConfidenceLikely,
 	}
 
 	// Check 1: DNS resolution.
@@ -65,7 +65,7 @@ func (r *NetworkRule) Run(ctx context.Context, err error) (*DiagnosticResult, er
 
 	result.Status = StatusHealthy
 	result.Summary = fmt.Sprintf("Network connectivity OK for %s (DNS resolves, TCP connects)", host)
-	result.Confidence = 0.3 // Network is fine — probably not the root cause
+	result.Confidence = ConfidenceNotCause // Network is fine — probably not the root cause
 
 	return result, nil
 }
@@ -77,18 +77,13 @@ func (r *NetworkRule) resolveHost(err error) string {
 	}
 	v = strings.TrimPrefix(v, "http://")
 	v = strings.TrimPrefix(v, "https://")
-	v = stripAfter(v, ":")
-	v = stripAfter(v, "/")
-	return v
-}
-
-// stripAfter returns s truncated before the first occurrence of sep.
-// If sep is not found, returns s unchanged.
-func stripAfter(s, sep string) string {
-	if idx := strings.Index(s, sep); idx > 0 {
-		return s[:idx]
+	if idx := strings.Index(v, ":"); idx > 0 {
+		v = v[:idx]
 	}
-	return s
+	if idx := strings.Index(v, "/"); idx > 0 {
+		v = v[:idx]
+	}
+	return v
 }
 
 func (r *NetworkRule) resolvePort(err error) string {

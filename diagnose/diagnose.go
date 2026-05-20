@@ -197,6 +197,24 @@ func DefaultRunner() *Runner {
 	)
 }
 
+// Confidence levels for diagnostic results.
+const (
+	// ConfidenceNone indicates the check provided almost no useful signal.
+	ConfidenceNone float64 = 0.1
+	// ConfidenceNotCause indicates the checked component is healthy — probably not the root cause.
+	ConfidenceNotCause float64 = 0.3
+	// ConfidencePartial indicates the check succeeded but with caveats (e.g., TCP ok but no pg_isready).
+	ConfidencePartial float64 = 0.4
+	// ConfidenceLikely indicates the check found a likely root cause.
+	ConfidenceLikely float64 = 0.7
+	// ConfidenceHigh indicates the check found a probable root cause.
+	ConfidenceHigh float64 = 0.8
+	// ConfidenceVeryHigh indicates strong evidence the checked component is the root cause.
+	ConfidenceVeryHigh float64 = 0.85
+	// ConfidenceCertain indicates the check conclusively identified the root cause.
+	ConfidenceCertain float64 = 0.9
+)
+
 // Helper functions for rule matching.
 
 func hasContextKey(err error, keys ...string) bool {

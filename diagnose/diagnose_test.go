@@ -3,6 +3,7 @@ package diagnose
 import (
 	"context"
 	"errors"
+	"path/filepath"
 	"testing"
 	"time"
 
@@ -446,8 +447,8 @@ func TestParentDir(t *testing.T) {
 		{"nopath", "."},
 	}
 	for _, tt := range tests {
-		if got := parentDir(tt.path); got != tt.want {
-			t.Errorf("parentDir(%q) = %q, want %q", tt.path, got, tt.want)
+		if got := filepath.Dir(tt.path); got != tt.want {
+			t.Errorf("filepath.Dir(%q) = %q, want %q", tt.path, got, tt.want)
 		}
 	}
 }

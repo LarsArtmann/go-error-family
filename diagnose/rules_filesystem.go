@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"os"
+	"path/filepath"
 	"strings"
 	"time"
 )
@@ -32,14 +33,14 @@ func (r *FilesystemRule) Run(ctx context.Context, err error) (*DiagnosticResult,
 		return &DiagnosticResult{
 			Status:     StatusUnknown,
 			Summary:    "No file path found in error context",
-			Confidence: 0.1,
+			Confidence: ConfidenceNone,
 			Details:    map[string]string{},
 		}, nil
 	}
 
 	result := &DiagnosticResult{
 		Details:    map[string]string{"path": path},
-		Confidence: 0.8,
+		Confidence: ConfidenceHigh,
 	}
 
 	// Check 1: Does the path exist?
@@ -51,7 +52,7 @@ func (r *FilesystemRule) Run(ctx context.Context, err error) (*DiagnosticResult,
 			result.Details["exists"] = "false"
 
 			// Check parent directory.
-			parent := parentDir(path)
+			parent := filepath.Dir(path)
 			parentInfo, parentErr := os.Stat(parent)
 			if parentErr != nil {
 				result.Details["parent_exists"] = "false"
@@ -106,7 +107,7 @@ func (r *FilesystemRule) Run(ctx context.Context, err error) (*DiagnosticResult,
 			result.Details["writable"] = "true"
 			result.Status = StatusHealthy
 			result.Summary = fmt.Sprintf("Path exists and is writable: %s", path)
-			result.Confidence = 0.3 // Path is fine — probably not the root cause
+			result.Confidence = ConfidenceNotCause // Path is fine — probably not the root cause
 		}
 	} else {
 		// Check if file is readable.
@@ -120,7 +121,7 @@ func (r *FilesystemRule) Run(ctx context.Context, err error) (*DiagnosticResult,
 			result.Details["readable"] = "true"
 			result.Status = StatusHealthy
 			result.Summary = fmt.Sprintf("File exists and is readable: %s (%s)", path, result.Details["permissions"])
-			result.Confidence = 0.3
+			result.Confidence = ConfidenceNotCause
 		}
 	}
 
@@ -129,15 +130,4 @@ func (r *FilesystemRule) Run(ctx context.Context, err error) (*DiagnosticResult,
 
 func (r *FilesystemRule) resolvePath(err error) string {
 	return resolveContextKey(err, []string{"path", "file", "dir", "directory", "config_path", "output_path"}, "")
-}
-
-func parentDir(path string) string {
-	if strings.Contains(path, "/") {
-		parent := path[:strings.LastIndex(path, "/")]
-		if parent == "" {
-			return "/"
-		}
-		return parent
-	}
-	return "."
 }

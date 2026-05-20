@@ -33,7 +33,7 @@ func (r *GitRule) Run(ctx context.Context, err error) (*DiagnosticResult, error)
 
 	result := &DiagnosticResult{
 		Details:    map[string]string{"repo_path": repoPath},
-		Confidence: 0.7,
+		Confidence: ConfidenceLikely,
 	}
 
 	// Check 1: Is this a git repo?
@@ -88,7 +88,7 @@ func (r *GitRule) Run(ctx context.Context, err error) (*DiagnosticResult, error)
 	if strings.TrimSpace(remotesStdout) == "" {
 		result.Status = StatusHealthy
 		result.Summary = fmt.Sprintf("Git repo is clean, no remotes configured: %s", repoPath)
-		result.Confidence = 0.3
+		result.Confidence = ConfidenceNotCause
 		return result, nil
 	}
 
@@ -104,7 +104,7 @@ func (r *GitRule) Run(ctx context.Context, err error) (*DiagnosticResult, error)
 	result.Status = StatusHealthy
 	result.Summary = fmt.Sprintf("Git repo is clean and remote is reachable: %s", repoPath)
 	result.Details["remote_reachable"] = "true"
-	result.Confidence = 0.3
+	result.Confidence = ConfidenceNotCause
 
 	return result, nil
 }

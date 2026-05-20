@@ -48,12 +48,12 @@ func (r *PostgresRule) Run(ctx context.Context, err error) (*DiagnosticResult, e
 		if exitCode == 0 {
 			result.Status = StatusHealthy
 			result.Summary = fmt.Sprintf("PostgreSQL is running on %s:%s", host, port)
-			result.Confidence = 0.3 // Postgres is fine — probably not the root cause
+			result.Confidence = ConfidenceNotCause // Postgres is fine — probably not the root cause
 			return result, nil
 		}
 		result.Summary = fmt.Sprintf("PostgreSQL is NOT responding on %s:%s: %s", host, port, stdout)
 		result.SuggestedFix = r.suggestStartFix()
-		result.Confidence = 0.9
+		result.Confidence = ConfidenceCertain
 		result.Status = StatusFailed
 		return result, nil
 	}
@@ -66,7 +66,7 @@ func (r *PostgresRule) Run(ctx context.Context, err error) (*DiagnosticResult, e
 		_ = conn.Close()
 		result.Status = StatusHealthy
 		result.Summary = fmt.Sprintf("TCP connection to %s succeeded — PostgreSQL may be running", addr)
-		result.Confidence = 0.4
+		result.Confidence = ConfidencePartial
 		return result, nil
 	}
 
@@ -74,7 +74,7 @@ func (r *PostgresRule) Run(ctx context.Context, err error) (*DiagnosticResult, e
 	result.Summary = fmt.Sprintf("Cannot connect to %s: %v", addr, dialErr)
 	result.Details["tcp_error"] = dialErr.Error()
 	result.SuggestedFix = fmt.Sprintf("Check if PostgreSQL is running:\n  pg_isready -h %s -p %s\n\nStart if needed:\n  %s", host, port, r.suggestStartFix())
-	result.Confidence = 0.85
+	result.Confidence = ConfidenceVeryHigh
 
 	return result, nil
 }
