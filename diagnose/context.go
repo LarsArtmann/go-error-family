@@ -2,6 +2,7 @@ package diagnose
 
 import (
 	"context"
+	"fmt"
 	"os/exec"
 	"strings"
 	"time"
@@ -27,6 +28,7 @@ func runCommand(ctx context.Context, timeout time.Duration, name string, args ..
 			err = nil
 		} else {
 			exitCode = -1
+			err = fmt.Errorf("timeout=%v: %w", timeout, err)
 		}
 	}
 
