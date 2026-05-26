@@ -14,12 +14,15 @@ Structured error protocol library. Library only — no `main`, no build system, 
 
 `Classify(err)` checks in order — first match wins:
 
-1. `Classified` interface → `ErrorFamily()`
-2. `Retryable` interface → infer `Transient` (true) or `Rejection` (false)
-3. Registered sentinels via `errors.Is` chain walk (lock-free snapshot)
-4. Default → `Transient`
+1. **Multi-error** (`errors.Join`) → classify each sub-error, first non-Transient wins
+2. `Classified` interface → `ErrorFamily()`
+3. `Retryable` interface → infer `Transient` (true) or `Rejection` (false)
+4. Registered sentinels via `errors.Is` chain walk (lock-free snapshot)
+5. Default → `Transient`
 
 This means a type implementing both `Classified` and `Retryable` will use `Classified` and ignore `Retryable`. Registering a sentinel for an error that already implements `Classified` has no effect.
+
+**Multi-error behavior:** For `errors.Join(err1, err2, ...)`, each sub-error is classified recursively. The first sub-error with a non-Transient family determines the result. If all are Transient, the result is Transient. This is fail-closed: if any part of a multi-error is not retryable, the whole operation is not retryable.
 
 ## Agent Is Analysis-Only
 

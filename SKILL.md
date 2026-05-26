@@ -173,10 +173,11 @@ errorfamily.RegisterClassifications(map[error]errorfamily.Family{...})
 
 **Classification precedence** (first match wins):
 
-1. `Classified` interface → `ErrorFamily()`
-2. `Retryable` interface → infer `Transient` (true) or `Rejection` (false)
-3. Registered sentinels via `errors.Is` chain walk (lock-free snapshot)
-4. Default → `Transient` (fail-open)
+1. **Multi-error** (`errors.Join`) → classify each sub-error, first non-Transient wins
+2. `Classified` interface → `ErrorFamily()`
+3. `Retryable` interface → infer `Transient` (true) or `Rejection` (false)
+4. Registered sentinels via `errors.Is` chain walk (lock-free snapshot)
+5. Default → `Transient` (fail-open)
 
 ### CLI Boundary (main.go pattern)
 

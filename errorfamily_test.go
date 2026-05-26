@@ -334,6 +334,37 @@ func TestClassifyWithRetryable(t *testing.T) {
 	}
 }
 
+func TestClassifyMultiError(t *testing.T) {
+	transient := NewTransient("db.timeout", "timed out")
+	rejection := NewRejection("validation", "invalid")
+	conflict := NewConflict("state", "stale")
+
+	tests := []struct {
+		name string
+		err  error
+		want Family
+	}{
+		{"single transient", errors.Join(transient), Transient},
+		{"single rejection", errors.Join(rejection), Rejection},
+		{"single conflict", errors.Join(conflict), Conflict},
+		{"transient then rejection", errors.Join(transient, rejection), Rejection},
+		{"rejection then transient", errors.Join(rejection, transient), Rejection},
+		{"transient then conflict", errors.Join(transient, conflict), Conflict},
+		{"all transient", errors.Join(transient, transient), Transient},
+		{"with plain error", errors.Join(transient, errors.New("plain")), Transient},
+		{"plain then rejection", errors.Join(errors.New("plain"), rejection), Rejection},
+		{"nested join", errors.Join(errors.Join(transient), rejection), Rejection},
+		{"all plain", errors.Join(errors.New("a"), errors.New("b")), Transient},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			if got := Classify(tt.err); got != tt.want {
+				t.Errorf("Classify() = %v, want %v", got, tt.want)
+			}
+		})
+	}
+}
+
 type retryableOnlyError struct {
 	retryable bool
 }

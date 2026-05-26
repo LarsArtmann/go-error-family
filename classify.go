@@ -8,10 +8,11 @@ import (
 
 // Classify returns the Family of any error by checking multiple sources:
 //
-//  1. Classified interface — the error itself declares its family
-//  2. Retryable interface — infer from retryability if no family
-//  3. Registered sentinels — known third-party errors mapped in init()
-//  4. Default — Transient (fail-open for retry)
+//  1. Multi-error support (errors.Join) — first non-Transient wins
+//  2. Classified interface — the error itself declares its family
+//  3. Retryable interface — infer from retryability if no family
+//  4. Registered sentinels — known third-party errors mapped in init()
+//  5. Default — Transient (fail-open for retry)
 //
 // Returns Rejection for nil errors.
 func Classify(err error) Family {
@@ -19,12 +20,26 @@ func Classify(err error) Family {
 		return Rejection
 	}
 
-	// 1. Check for explicit classification.
+	// 1. Multi-error support (errors.Join).
+	// errors.AsType traverses multi-errors and returns the first match,
+	// but we want fail-closed behavior: if any sub-error is not retryable,
+	// the whole operation should not be retried.
+	if u, ok := err.(interface{ Unwrap() []error }); ok {
+		for _, sub := range u.Unwrap() {
+			family := Classify(sub)
+			if family != Transient {
+				return family
+			}
+		}
+		return Transient
+	}
+
+	// 2. Check for explicit classification.
 	if c, ok := errors.AsType[Classified](err); ok {
 		return c.ErrorFamily()
 	}
 
-	// 2. Check for retryability (infer family).
+	// 3. Check for retryability (infer family).
 	if r, ok := errors.AsType[Retryable](err); ok {
 		if r.IsRetryable() {
 			return Transient
@@ -32,12 +47,12 @@ func Classify(err error) Family {
 		return Rejection
 	}
 
-	// 3. Check registered third-party sentinels.
+	// 4. Check registered third-party sentinels.
 	if family, ok := lookupRegistered(err); ok {
 		return family
 	}
 
-	// 4. Default: Transient (fail-open so unknown errors get retried).
+	// 5. Default: Transient (fail-open so unknown errors get retried).
 	return Transient
 }
 
