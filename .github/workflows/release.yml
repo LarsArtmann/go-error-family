@@ -22,8 +22,19 @@ jobs:
           go-version-file: "go.mod"
           cache: true
 
-      - name: Run tests
+      - name: Run tests (workspace)
         run: go test -race ./...
+
+      - name: Run tests (git submodule)
+        working-directory: ./diagnose/git
+        run: go test -race ./...
+
+      - name: Run tests (postgres submodule)
+        working-directory: ./diagnose/postgres
+        run: go test -race ./...
+
+      - name: Verify root builds without workspace
+        run: GOWORK=off go build ./...
 
       - name: Run golangci-lint
         uses: golangci/golangci-lint-action@v6

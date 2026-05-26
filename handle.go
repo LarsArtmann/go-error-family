@@ -257,15 +257,24 @@ var defaultMessages = map[string]MessageTemplate{
 		What: "Could not establish a database connection.",
 		Fix:  "Check that the database is running and reachable.",
 	},
-	codeDBError:       {What: "A database operation failed.", Fix: "Check the database logs for details."},
-	codeConfigInvalid: {What: "There is a configuration issue.", Fix: "Review your configuration file for errors."},
+	codeDBError: {
+		What: "A database operation failed.",
+		Fix:  "Check the database logs for details.",
+	},
+	codeConfigInvalid: {
+		What: "There is a configuration issue.",
+		Fix:  "Review your configuration file for errors.",
+	},
 	codeConfigNotFound: {
 		What: "A configuration file was not found.",
 		Fix:  "Check that the config file path is correct.",
 	},
 	codeConflict:   {What: "A conflict was detected.", Fix: msgRefreshData},
 	codeValidation: {What: "Validation failed.", Fix: msgCheckInput},
-	codeTimeout:    {What: "The operation timed out.", Fix: "Increase the timeout or check system resources."},
+	codeTimeout: {
+		What: "The operation timed out.",
+		Fix:  "Increase the timeout or check system resources.",
+	},
 	codeConnectionRefused: {
 		What: "Could not establish a connection.",
 		Fix:  "Check that the target service is running.",

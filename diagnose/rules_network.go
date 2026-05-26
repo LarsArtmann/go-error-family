@@ -72,7 +72,10 @@ func (r *NetworkRule) Run(ctx context.Context, err error) (*DiagnosticResult, er
 	}
 
 	result.Status = StatusHealthy
-	result.Summary = fmt.Sprintf("Network connectivity OK for %s (DNS resolves, TCP connects)", host)
+	result.Summary = fmt.Sprintf(
+		"Network connectivity OK for %s (DNS resolves, TCP connects)",
+		host,
+	)
 	result.Confidence = ConfidenceNotCause // Network is fine — probably not the root cause
 
 	return result, nil

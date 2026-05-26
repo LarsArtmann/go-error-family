@@ -64,7 +64,11 @@ type FixStep struct {
 type DebugAgent interface {
 	// Analyze examines an error with diagnostic context and produces
 	// a root cause analysis with fix suggestions.
-	Analyze(ctx context.Context, err error, diagnosis []*diagnose.DiagnosticResult) (*AgentResult, error)
+	Analyze(
+		ctx context.Context,
+		err error,
+		diagnosis []*diagnose.DiagnosticResult,
+	) (*AgentResult, error)
 }
 
 // New creates a new debug agent with the given configuration.
@@ -80,7 +84,11 @@ type agent struct {
 	cfg Config
 }
 
-func (a *agent) Analyze(ctx context.Context, err error, diagnosis []*diagnose.DiagnosticResult) (*AgentResult, error) {
+func (a *agent) Analyze(
+	ctx context.Context,
+	err error,
+	diagnosis []*diagnose.DiagnosticResult,
+) (*AgentResult, error) {
 	if !a.cfg.Enabled {
 		return &AgentResult{
 			RootCause:   "agent disabled",
@@ -117,7 +125,10 @@ func (a *agent) deterministicAnalyze(
 				result.FixSteps = append(result.FixSteps, FixStep{
 					Description: d.Summary,
 					Command:     extractCommand(d.SuggestedFix),
-					Rationale:   fmt.Sprintf("Diagnostic rule '%s' identified this issue", d.RuleName),
+					Rationale: fmt.Sprintf(
+						"Diagnostic rule '%s' identified this issue",
+						d.RuleName,
+					),
 				})
 			}
 		}

@@ -69,11 +69,23 @@
 
           checks = {
             build = pkgs.runCommand "go-error-family-build" { nativeBuildInputs = [ goPkg ]; } ''
-              export GOWORK=off
+              export HOME=$TMPDIR
+              export CGO_ENABLED=0
               cp -r ${./.} src && chmod -R u+w src && cd src
               ${goPkg}/bin/go build ./...
               touch $out
             '';
+
+            build-standalone =
+              pkgs.runCommand "go-error-family-build-standalone" { nativeBuildInputs = [ goPkg ]; }
+                ''
+                  export HOME=$TMPDIR
+                  export CGO_ENABLED=0
+                  export GOWORK=off
+                  cp -r ${./.} src && chmod -R u+w src && cd src
+                  ${goPkg}/bin/go build ./...
+                  touch $out
+                '';
           };
 
           apps = {

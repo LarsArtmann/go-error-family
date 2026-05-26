@@ -115,7 +115,12 @@ func TestAnalyzeWithContext(t *testing.T) {
 		WithContext("port", "5432")
 
 	diagnosis := []*diagnose.DiagnosticResult{
-		{Status: diagnose.StatusFailed, Summary: "Cannot connect", Confidence: 0.9, SuggestedFix: "Check connection"},
+		{
+			Status:       diagnose.StatusFailed,
+			Summary:      "Cannot connect",
+			Confidence:   0.9,
+			SuggestedFix: "Check connection",
+		},
 	}
 
 	result, analyzeErr := ag.Analyze(context.Background(), err, diagnosis)
@@ -132,7 +137,11 @@ func TestAnalyzeWithContext(t *testing.T) {
 		t.Fatalf("FixSteps len = %d, want 1", len(result.FixSteps))
 	}
 	if result.FixSteps[0].Description != "Cannot connect" {
-		t.Errorf("FixSteps[0].Description = %q, want %q", result.FixSteps[0].Description, "Cannot connect")
+		t.Errorf(
+			"FixSteps[0].Description = %q, want %q",
+			result.FixSteps[0].Description,
+			"Cannot connect",
+		)
 	}
 }
 

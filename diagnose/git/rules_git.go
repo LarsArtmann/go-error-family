@@ -47,7 +47,10 @@ func (r *GitRule) Run(ctx context.Context, err error) (*diagnose.DiagnosticResul
 		result.Status = diagnose.StatusFailed
 		result.Summary = "Not a git repository: " + repoPath
 		result.Details["is_repo"] = strFalse
-		result.SuggestedFix = fmt.Sprintf("Initialize a git repository:\n  cd %s && git init", repoPath)
+		result.SuggestedFix = fmt.Sprintf(
+			"Initialize a git repository:\n  cd %s && git init",
+			repoPath,
+		)
 		return result, nil
 	}
 	result.Details["is_repo"] = strTrue
@@ -70,8 +73,20 @@ func (r *GitRule) Run(ctx context.Context, err error) (*diagnose.DiagnosticResul
 }
 
 // checkWorkingTree returns true if the result has been set (either dirty or conflicts found).
-func (r *GitRule) checkWorkingTree(ctx context.Context, result *diagnose.DiagnosticResult, repoPath string) bool {
-	stdout, exitCode, _ := diagnose.RunCommand(ctx, 5*time.Second, "git", "-C", repoPath, "status", "--porcelain")
+func (r *GitRule) checkWorkingTree(
+	ctx context.Context,
+	result *diagnose.DiagnosticResult,
+	repoPath string,
+) bool {
+	stdout, exitCode, _ := diagnose.RunCommand(
+		ctx,
+		5*time.Second,
+		"git",
+		"-C",
+		repoPath,
+		"status",
+		"--porcelain",
+	)
 	if exitCode != 0 {
 		result.Status = diagnose.StatusUnknown
 		result.Summary = "git status failed in " + repoPath
@@ -89,7 +104,8 @@ func (r *GitRule) checkWorkingTree(ctx context.Context, result *diagnose.Diagnos
 	result.Details["dirty_files"] = strconv.Itoa(lineCount)
 
 	// Check for merge conflicts.
-	if strings.Contains(trimmed, "UU") || strings.Contains(trimmed, "AA") || strings.Contains(trimmed, "DU") {
+	if strings.Contains(trimmed, "UU") || strings.Contains(trimmed, "AA") ||
+		strings.Contains(trimmed, "DU") {
 		result.Status = diagnose.StatusFailed
 		result.Summary = fmt.Sprintf(
 			"Merge conflicts in %s (%d unmerged files)",
@@ -107,7 +123,11 @@ func (r *GitRule) checkWorkingTree(ctx context.Context, result *diagnose.Diagnos
 	return true
 }
 
-func (r *GitRule) checkRemote(ctx context.Context, result *diagnose.DiagnosticResult, repoPath string) {
+func (r *GitRule) checkRemote(
+	ctx context.Context,
+	result *diagnose.DiagnosticResult,
+	repoPath string,
+) {
 	remotesStdout, _, _ := diagnose.RunCommand(ctx, 3*time.Second, "git", "-C", repoPath, "remote")
 	if strings.TrimSpace(remotesStdout) == "" {
 		result.Status = diagnose.StatusHealthy
@@ -146,7 +166,11 @@ const (
 )
 
 func (r *GitRule) resolveRepoPath(err error) string {
-	if v := diagnose.ResolveContextKey(err, []string{"git_dir", "repository", "repo", "repo_path"}, ""); v != "" {
+	if v := diagnose.ResolveContextKey(
+		err,
+		[]string{"git_dir", "repository", "repo", "repo_path"},
+		"",
+	); v != "" {
 		return v
 	}
 	if dir, err := os.Getwd(); err == nil {

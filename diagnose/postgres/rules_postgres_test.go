@@ -13,9 +13,17 @@ func TestPostgresRuleApplicable(t *testing.T) {
 		err  error
 		want bool
 	}{
-		{"postgres context", errorfamily.NewTransient("test", "msg").WithContext("db_host", "localhost"), true},
+		{
+			"postgres context",
+			errorfamily.NewTransient("test", "msg").WithContext("db_host", "localhost"),
+			true,
+		},
 		{"db code", errorfamily.NewTransient("db.timeout", "msg"), true},
-		{"sql substring", errorfamily.NewTransient("test", "msg").WithContext("url", "postgres://host"), true},
+		{
+			"sql substring",
+			errorfamily.NewTransient("test", "msg").WithContext("url", "postgres://host"),
+			true,
+		},
 		{"unrelated", errorfamily.NewTransient("test", "msg"), false},
 	}
 	for _, tt := range tests {
@@ -30,7 +38,9 @@ func TestPostgresRuleApplicable(t *testing.T) {
 
 func TestPostgresRuleRun(t *testing.T) {
 	r := &PostgresRule{}
-	err := errorfamily.NewTransient("db.timeout", "msg").WithContext("host", "localhost").WithContext("port", "5432")
+	err := errorfamily.NewTransient("db.timeout", "msg").
+		WithContext("host", "localhost").
+		WithContext("port", "5432")
 
 	result, runErr := r.Run(context.Background(), err)
 	if runErr != nil {

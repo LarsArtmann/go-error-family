@@ -39,7 +39,11 @@ func TestRunnerNoRules(t *testing.T) {
 
 func TestRunnerRegister(t *testing.T) {
 	runner := NewRunner()
-	rule := &staticRule{name: "test", applicable: true, result: &DiagnosticResult{Status: StatusHealthy}}
+	rule := &staticRule{
+		name:       "test",
+		applicable: true,
+		result:     &DiagnosticResult{Status: StatusHealthy},
+	}
 	runner.Register(rule)
 
 	err := errorfamily.NewTransient("test", "msg")
@@ -53,7 +57,11 @@ func TestRunnerRegister(t *testing.T) {
 }
 
 func TestRunnerFiltersInapplicable(t *testing.T) {
-	rule := &staticRule{name: "never", applicable: false, result: &DiagnosticResult{Status: StatusHealthy}}
+	rule := &staticRule{
+		name:       "never",
+		applicable: false,
+		result:     &DiagnosticResult{Status: StatusHealthy},
+	}
 	runner := NewRunner(rule)
 
 	err := errorfamily.NewTransient("test", "msg")
@@ -118,7 +126,11 @@ func TestRunnerContextCancellation(t *testing.T) {
 	ctx, cancel := context.WithCancel(context.Background())
 	cancel()
 
-	rule := &staticRule{name: "cancelled", applicable: true, result: &DiagnosticResult{Status: StatusHealthy}}
+	rule := &staticRule{
+		name:       "cancelled",
+		applicable: true,
+		result:     &DiagnosticResult{Status: StatusHealthy},
+	}
 	runner := NewRunner(rule)
 
 	results := runner.Run(ctx, errorfamily.NewTransient("test", "msg"))
@@ -204,11 +216,19 @@ func TestNetworkRuleApplicable(t *testing.T) {
 		err  error
 		want bool
 	}{
-		{"host context", errorfamily.NewTransient("test", "msg").WithContext("host", "example.com"), true},
+		{
+			"host context",
+			errorfamily.NewTransient("test", "msg").WithContext("host", "example.com"),
+			true,
+		},
 		{"connect code", errorfamily.NewTransient("network.connect", "msg"), true},
 		{"timeout code", errorfamily.NewTransient("timeout", "msg"), true},
 		{"unrelated", errorfamily.NewRejection("file.not_found", "msg"), false},
-		{"connection refused substring", errorfamily.NewTransient("test", "connection refused"), true},
+		{
+			"connection refused substring",
+			errorfamily.NewTransient("test", "connection refused"),
+			true,
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
@@ -226,7 +246,11 @@ func TestFilesystemRuleApplicable(t *testing.T) {
 		err  error
 		want bool
 	}{
-		{"path context", errorfamily.NewRejection("test", "msg").WithContext("path", "/etc/config"), true},
+		{
+			"path context",
+			errorfamily.NewRejection("test", "msg").WithContext("path", "/etc/config"),
+			true,
+		},
 		{"file code", errorfamily.NewRejection("file.not_found", "msg"), true},
 		{"config code", errorfamily.NewRejection("config.invalid", "msg"), true},
 		{"unrelated", errorfamily.NewTransient("db.timeout", "msg"), false},
@@ -327,7 +351,8 @@ func TestNetworkRuleRunNoHost(t *testing.T) {
 
 func TestNetworkRuleResolveHostWithURL(t *testing.T) {
 	r := &NetworkRule{}
-	err := errorfamily.NewTransient("test", "msg").WithContext("host", "https://example.com:8080/path")
+	err := errorfamily.NewTransient("test", "msg").
+		WithContext("host", "https://example.com:8080/path")
 	if host := r.resolveHost(err); host != "example.com" {
 		t.Errorf("resolveHost with URL = %q, want 'example.com'", host)
 	}

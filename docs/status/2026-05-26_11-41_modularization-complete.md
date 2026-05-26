@@ -11,6 +11,7 @@
 ## A) FULLY DONE
 
 ### 1. Modularization of Diagnostic Rules
+
 - **GitRule** extracted to `diagnose/git/` submodule with own `go.mod`
 - **PostgresRule** extracted to `diagnose/postgres/` submodule with own `go.mod`
 - **go.work** workspace file created linking root + 2 submodules
@@ -18,7 +19,9 @@
 - Tests moved from `diagnose/diagnose_test.go` to dedicated test files in each submodule
 
 ### 2. API Surface Expansion
+
 The following previously-unexported helpers are now **public** (exported from `diagnose`):
+
 - `RuleSpec` / `RuleSpec.Matches`
 - `HasContextKey`, `ContextValue`, `ResolveContextKey`
 - `HasContextSubstring`, `FamilyIs`, `ErrorCodeContains`
@@ -27,17 +30,20 @@ The following previously-unexported helpers are now **public** (exported from `d
 This enables third-party rule authors to build on the framework without forking.
 
 ### 3. DefaultRunner() Breaking Change
+
 - Now includes **only** zero-dependency rules: `FilesystemRule`, `NetworkRule`
 - GitRule and PostgresRule removed from default set
 - Consumers opt in via explicit import + `NewRunner(&git.GitRule{}, &postgres.PostgresRule{})`
 
 ### 4. Test & Lint Hygiene
+
 - **All tests pass** in all 3 modules (root, diagnose/core, diagnose/git, diagnose/postgres)
 - **0 golangci-lint issues** across all modules
 - **0 go vet issues** across all modules
 - Updated `.golangci.yml` exclusion rules for `diagnose/git` and `diagnose/postgres` paths
 
 ### 5. Documentation Updates
+
 - `README.md`: architecture tree, built-in vs opt-in rules, import examples
 - `SKILL.md`: updated diagnostic rules table, helper API, module paths
 - `AGENTS.md`: updated coverage table, submodule guidance
@@ -45,11 +51,13 @@ This enables third-party rule authors to build on the framework without forking.
 - `.gitignore`: override global `go.work` ignore for this repo
 
 ### 6. errors.Join Support (Previous Session)
+
 - `Classify` now handles `Unwrap() []error` before `errors.AsType`
 - First non-Transient wins (fail-closed)
 - 11 test cases covering edge cases
 
 ### 7. Lint Cleanup (Previous Session)
+
 - All 83 golangci-lint issues resolved
 - Disabled `exhaustruct` and `gochecknoglobals` (false positives)
 - Refactored `FilesystemRule.Run` into 4 helpers, `GitRule.Run` into 2 helpers
@@ -59,30 +67,35 @@ This enables third-party rule authors to build on the framework without forking.
 ## B) PARTIALLY DONE
 
 ### 1. Test Coverage — Mixed Bag
-| Module | Coverage | Status |
-|--------|----------|--------|
-| root (`errorfamily`) | **97.2%** | Excellent |
-| `agent` | **100.0%** | Perfect |
-| `diagnose` (core) | **66.8%** | Improved (was 60.6%) |
-| `diagnose/git` | **23.1%** | Poor — integration-test territory, but gap is real |
-| `diagnose/postgres` | **44.8%** | Below target — network mocks needed |
+
+| Module               | Coverage   | Status                                             |
+| -------------------- | ---------- | -------------------------------------------------- |
+| root (`errorfamily`) | **97.2%**  | Excellent                                          |
+| `agent`              | **100.0%** | Perfect                                            |
+| `diagnose` (core)    | **66.8%**  | Improved (was 60.6%)                               |
+| `diagnose/git`       | **23.1%**  | Poor — integration-test territory, but gap is real |
+| `diagnose/postgres`  | **44.8%**  | Below target — network mocks needed                |
 
 **Gap analysis:**
+
 - Git and Postgres rules shell out to system commands (`git`, `pg_isready`) and network calls. Pure unit testing is hard.
 - But: `resolveHost`, `resolvePort`, `suggestStartFix`, `Applicable`, `IsPostgresRunning` (non-shell paths) ARE testable and NOT fully covered.
 
 ### 2. Nix Flake — Partially Broken
+
 - `nix flake check` **fails** on `checks.build`: Go build cache permission denied (`/homeless-shelter/.cache/go-build`)
 - `nix build` **fails**: no `defaultPackage` attribute defined
 - Dev shell works fine
 - Apps (`nix run .#test`, `nix run .#lint`) work
 
 ### 3. Documentation — 90% Complete
+
 - Missing: migration guide for consumers upgrading from v0.1.x to v0.2.0
 - Missing: explicit "how to write a custom diagnostic rule" tutorial in README
 - Missing: go.work usage notes for contributors
 
 ### 4. Release Workflow
+
 - `.github/workflows/release.yml` tests `go test -race ./...` and `golangci-lint run ./...`
 - But: it does **NOT** test submodules (`diagnose/git`, `diagnose/postgres`) individually
 - No coverage threshold enforcement in CI
@@ -112,6 +125,7 @@ This enables third-party rule authors to build on the framework without forking.
 ## D) TOTALLY FUCKED UP
 
 ### 1. Nix Build Check (`nix flake check`)
+
 ```
 failed to initialize build cache at /homeless-shelter/.cache/go-build:
 mkdir /homeless-shelter: permission denied
@@ -124,6 +138,7 @@ mkdir /homeless-shelter: permission denied
 **Deeper issue:** With `GOWORK=off`, submodules will try to download `github.com/larsartmann/go-error-family v0.1.2` from the internet. In a pure Nix build (no internet), this may fail unless the module is already in the Go module proxy cache. We need a `vendor` directory or `replace` directives for reproducible Nix builds.
 
 ### 2. `nix build` — No Default Package
+
 ```
 error: flake does not provide attribute 'packages.x86_64-linux.default'
 ```
@@ -131,13 +146,16 @@ error: flake does not provide attribute 'packages.x86_64-linux.default'
 This is expected (it's a library, not a binary), but the error message is unfriendly. We should either add a `packages.default` that builds the library or document that `nix build` is not applicable.
 
 ### 3. Test Duplication
+
 jscpd reports **6.99% duplicated lines in Go code**. Much of this is:
+
 - Identical table-driven test patterns across `diagnose/git/rules_git_test.go`, `diagnose/postgres/rules_postgres_test.go`, and `diagnose/diagnose_test.go`
 - Boilerplate: `tests := []struct{ name string; err error; want bool }` followed by identical `t.Run` loops
 
 **Not catastrophic** but worth a shared test helper if we add more submodules.
 
 ### 4. `report/jscpd-report.json` is a Generated File in Git
+
 This file is 692 lines, 47.98% self-duplicated (it's a JSON report of its own clones). It should be in `.gitignore` and generated on demand.
 
 ---
@@ -145,12 +163,14 @@ This file is 692 lines, 47.98% self-duplicated (it's a JSON report of its own cl
 ## E) WHAT WE SHOULD IMPROVE
 
 ### Immediate (This Week)
+
 1. **Fix `flake.nix` build check** — Set `HOME=$TMPDIR` in the derivation
 2. **Add `report/` to `.gitignore`** — Generated reports don't belong in git
 3. **Add CI jobs for submodules** — `go test ./...` in `diagnose/git` and `diagnose/postgres`
 4. **Add GOWORK=off CI check** — Verify modules build standalone without workspace
 
 ### Short-Term (This Month)
+
 5. **Raise test coverage for git/postgres** — Mock `RunCommand` with an interface for testability
 6. **Add benchmarks** — `BenchmarkClassify`, `BenchmarkRunnerRun`, `BenchmarkHandleError`
 7. **Add fuzz tests** — `FuzzClassify`, `FuzzParseFamily`
@@ -159,6 +179,7 @@ This file is 692 lines, 47.98% self-duplicated (it's a JSON report of its own cl
 10. **Add `examples/` directory** — Real-world usage patterns
 
 ### Medium-Term (Next Quarter)
+
 11. **Coverage thresholds in CI** — Fail build if coverage drops below 70% (core) / 50% (submodules)
 12. **Integration test suite** — Docker-based postgres tests, temp-git-repo tests
 13. **Performance baselines** — Track benchmark regressions in CI
@@ -170,6 +191,7 @@ This file is 692 lines, 47.98% self-duplicated (it's a JSON report of its own cl
 ## F) TOP #25 THINGS TO GET DONE NEXT
 
 ### P0 — Blockers for v0.2.0 Release
+
 1. **Fix `nix flake check` build failure** (`HOME=$TMPDIR`)
 2. **Add `report/` to `.gitignore`**
 3. **Add CI tests for submodules** (`.github/workflows/release.yml`)
@@ -177,6 +199,7 @@ This file is 692 lines, 47.98% self-duplicated (it's a JSON report of its own cl
 5. **Update release workflow** to run `go test ./...` in each module directory
 
 ### P1 — Quality & Polish
+
 6. **Mock `RunCommand`/`CommandExists`** for git/postgres tests (raise coverage to 80%+)
 7. **Add benchmark suite** (`BenchmarkClassify`, `BenchmarkRunnerRun`, `BenchmarkHandleError`)
 8. **Add fuzz tests** for `Classify` and `ParseFamily`
@@ -185,6 +208,7 @@ This file is 692 lines, 47.98% self-duplicated (it's a JSON report of its own cl
 11. **Add `go.work` usage notes** to CONTRIBUTING.md
 
 ### P2 — Features
+
 12. **Migrate GitRule to go-git** — Eliminate runtime `git` CLI dependency
 13. **Typed context keys** — `ContextKey` type + constants for all standard keys
 14. **Add `DefaultRunnerMinimal()`** or `DefaultRunnerWith(opts ...RuleOption)` — More flexible runner construction
@@ -192,6 +216,7 @@ This file is 692 lines, 47.98% self-duplicated (it's a JSON report of its own cl
 16. **Add `Context()` to `DiagnosticResult`** — Surface the context used for the diagnosis
 
 ### P3 — Architecture & Long-Term Health
+
 17. **Add `internal/` package** for shared test helpers to reduce duplication
 18. **Add coverage badge** to README (shields.io)
 19. **Add `go vet` to CI** (already in flake, add to GitHub Actions)
@@ -220,11 +245,13 @@ This file is 692 lines, 47.98% self-duplicated (it's a JSON report of its own cl
    - We build WITH `go.work` enabled but `go.work` uses relative paths that break when Nix copies source to `/build/`
 
 **What I've tried:**
+
 - Setting `GOWORK=off` causes the submodule to fetch root from internet → fails in sandbox
 - Keeping `GOWORK=on` means `go.work` relative paths (`./diagnose/git`) must resolve from the build directory → may or may not work depending on copy structure
 - Adding `replace` directives to submodules would fix Nix but violates the go-modularize skill's rule about mixing replace + go.work
 
 **What I think the answer might be:**
+
 - Use `GOWORK=off` but add `replace` directives ONLY for the build check derivation (patch go.mod during build)
 - Or: use `buildGoModule` from nixpkgs which handles Go module vendoring properly
 - Or: accept that `nix flake check` for a multi-module Go library is inherently tricky and document the limitation
@@ -235,21 +262,21 @@ This file is 692 lines, 47.98% self-duplicated (it's a JSON report of its own cl
 
 ## Metrics at a Glance
 
-| Metric | Value |
-|--------|-------|
-| Go files | 19 |
-| Total lines of Go | ~3,619 |
-| Modules | 3 (root, diagnose/git, diagnose/postgres) |
-| Tests passing | 100% (all modules) |
-| Lint issues | 0 (all modules) |
-| Coverage (root) | 97.2% |
-| Coverage (agent) | 100% |
-| Coverage (diagnose core) | 66.8% |
-| Coverage (diagnose/git) | 23.1% |
-| Coverage (diagnose/postgres) | 44.8% |
-| External dependencies | 0 (root), 1 each (submodules: root module) |
-| Open TODO/FIXME/HACK | 0 |
-| Commits since last status | 5 |
+| Metric                       | Value                                      |
+| ---------------------------- | ------------------------------------------ |
+| Go files                     | 19                                         |
+| Total lines of Go            | ~3,619                                     |
+| Modules                      | 3 (root, diagnose/git, diagnose/postgres)  |
+| Tests passing                | 100% (all modules)                         |
+| Lint issues                  | 0 (all modules)                            |
+| Coverage (root)              | 97.2%                                      |
+| Coverage (agent)             | 100%                                       |
+| Coverage (diagnose core)     | 66.8%                                      |
+| Coverage (diagnose/git)      | 23.1%                                      |
+| Coverage (diagnose/postgres) | 44.8%                                      |
+| External dependencies        | 0 (root), 1 each (submodules: root module) |
+| Open TODO/FIXME/HACK         | 0                                          |
+| Commits since last status    | 5                                          |
 
 ---
 

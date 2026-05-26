@@ -1,7 +1,7 @@
 # Build artifacts
 /go-error-family
-# Copy/paste detection report
-/report/jscpd-report.json
+# Copy/paste detection reports
+/report/
 # Test coverage
 /coverage
 # Dependencies

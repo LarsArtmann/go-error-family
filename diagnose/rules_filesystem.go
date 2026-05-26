@@ -141,7 +141,9 @@ func (r *FilesystemRule) checkDirWritable(result *DiagnosticResult, path string)
 }
 
 func (r *FilesystemRule) checkFileReadable(result *DiagnosticResult, path string) {
-	f, err := os.Open(path) //nolint:gosec // Intentional: read-test of user-provided path from error context.
+	f, err := os.Open( //nolint:gosec // Intentional: read-test of user-provided path from error context.
+		path,
+	)
 	if err != nil {
 		result.Details["readable"] = strFalse
 		result.Status = StatusDegraded
@@ -152,10 +154,18 @@ func (r *FilesystemRule) checkFileReadable(result *DiagnosticResult, path string
 	_ = f.Close()
 	result.Details["readable"] = strTrue
 	result.Status = StatusHealthy
-	result.Summary = fmt.Sprintf("File exists and is readable: %s (%s)", path, result.Details["permissions"])
+	result.Summary = fmt.Sprintf(
+		"File exists and is readable: %s (%s)",
+		path,
+		result.Details["permissions"],
+	)
 	result.Confidence = ConfidenceNotCause
 }
 
 func (r *FilesystemRule) resolvePath(err error) string {
-	return ResolveContextKey(err, []string{"path", "file", "dir", "directory", "config_path", "output_path"}, "")
+	return ResolveContextKey(
+		err,
+		[]string{"path", "file", "dir", "directory", "config_path", "output_path"},
+		"",
+	)
 }

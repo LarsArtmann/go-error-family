@@ -75,7 +75,9 @@ func TestHandleErrorWithConfigNilError(t *testing.T) {
 }
 
 func testDiagnosticFunc(_ context.Context, _ error) []DiagnosticFinding {
-	return []DiagnosticFinding{{RuleName: "test", Status: "failed", Summary: "something failed", Confidence: 0.9}}
+	return []DiagnosticFinding{
+		{RuleName: "test", Status: "failed", Summary: "something failed", Confidence: 0.9},
+	}
 }
 
 func testOnDiagnosedPtr(called *bool) func(error, []DiagnosticFinding) {
