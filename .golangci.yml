@@ -105,6 +105,10 @@ linters:
         linters:
           - wrapcheck
           - noctx
+      - path: diagnose/rules_filesystem\.go
+        linters:
+          - gosec
+        text: G304
       - path: agent/
         linters:
           - wrapcheck

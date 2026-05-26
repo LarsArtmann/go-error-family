@@ -11,6 +11,17 @@ import (
 	"github.com/larsartmann/go-error-family/diagnose"
 )
 
+// Common string constants to satisfy goconst linter.
+const (
+	strPostgres     = "postgres"
+	strDBHost       = "db_host"
+	strDBPort       = "db_port"
+	strDBName       = "db_name"
+	strDatabaseURL  = "database_url"
+	strPostgresHost = "postgres_host"
+	strHost         = "host"
+)
+
 // PostgresRule diagnoses PostgreSQL-related errors.
 // Checks: pg_isready, TCP connectivity, service status.
 //
@@ -18,15 +29,15 @@ import (
 // or error codes containing "db" or "database", or Transient family errors with db-related context.
 type PostgresRule struct{}
 
-func (r *PostgresRule) Name() string { return "postgres" }
+func (r *PostgresRule) Name() string { return strPostgres }
 
 func (r *PostgresRule) Applicable(err error) bool {
 	return postgresSpec.Matches(err)
 }
 
 var postgresSpec = diagnose.RuleSpec{
-	ContextSubstr: []string{"postgres", "postgresql", "database", "sql"},
-	ContextKeys:   []string{"db_host", "db_port", "db_name", "database_url", "postgres_host"},
+	ContextSubstr: []string{strPostgres, "postgresql", "database", "sql"},
+	ContextKeys:   []string{strDBHost, strDBPort, strDBName, strDatabaseURL, strPostgresHost},
 	CodeContains:  []string{"db.", "database"},
 	Extra: func(err error) bool {
 		return diagnose.FamilyIs(err, errorfamily.Transient) &&
@@ -41,8 +52,8 @@ func (r *PostgresRule) Run(ctx context.Context, err error) (*diagnose.Diagnostic
 
 	result := &diagnose.DiagnosticResult{
 		Details: map[string]string{
-			"host": host,
-			"port": port,
+			strHost: host,
+			"port":  port,
 		},
 	}
 
@@ -110,7 +121,7 @@ const strLocalhost = "localhost"
 func (r *PostgresRule) resolveHost(err error) string {
 	return diagnose.ResolveContextKey(
 		err,
-		[]string{"db_host", "postgres_host", "host", "PGHOST"},
+		[]string{strDBHost, strPostgresHost, strHost, "PGHOST"},
 		strLocalhost,
 	)
 }

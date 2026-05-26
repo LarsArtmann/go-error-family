@@ -44,10 +44,22 @@ Not a library type — partial success is a consumption pattern, not a classific
 
 | Package              | Coverage |
 | -------------------- | -------- |
-| root (`errorfamily`) | 97.1%    |
+| root (`errorfamily`) | 97.2%    |
 | `agent`              | 100%     |
-| `diagnose` (core)    | 60.6%    |
-| `diagnose/git`       | ~85%     |
-| `diagnose/postgres`  | ~85%     |
+| `diagnose` (core)    | 66.8%    |
+| `diagnose/git`       | 69.2%    |
+| `diagnose/postgres`  | 58.6%    |
 
-Diagnose rules that shell out to system commands are integration-test territory.
+Diagnose rules that shell out to system commands are integration-test territory. Git and postgres rules use temp git repos for real integration tests where possible.
+
+## Fuzz Tests
+
+`fuzz_test.go` contains: `FuzzParseFamily`, `FuzzParseFamilyRoundTrip`, `FuzzClassify`, `FuzzClassifyPlainError`, `FuzzErrorFormatting`.
+
+## Lint Configuration
+
+**Updated:** 2026-05-26
+
+- G304 (gosec file inclusion) is excluded for `diagnose/rules_filesystem.go` via `.golangci.yml` path-based exclusion — `os.Open(path)` and `os.Create(testFile)` are intentional in diagnostic rules.
+- Do NOT use `//nolint:gosec` directives for G304 in the diagnose package — the `.golangci.yml` exclusion handles it. Inline nolint directives break when `golines` wraps lines.
+- The postgres submodule uses extracted string constants (e.g., `strPostgres`, `strDBHost`) to satisfy goconst.

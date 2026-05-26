@@ -123,7 +123,6 @@ func (r *FilesystemRule) suggestCreate(result *DiagnosticResult, path string) {
 
 func (r *FilesystemRule) checkDirWritable(result *DiagnosticResult, path string) {
 	testFile := fmt.Sprintf("%s/.write_test_%d", path, time.Now().UnixNano())
-	//nolint:gosec // Intentional: write-test in user-provided directory.
 	f, err := os.Create(testFile)
 	if err != nil {
 		result.Details["writable"] = strFalse
@@ -141,7 +140,6 @@ func (r *FilesystemRule) checkDirWritable(result *DiagnosticResult, path string)
 }
 
 func (r *FilesystemRule) checkFileReadable(result *DiagnosticResult, path string) {
-	//nolint:gosec // Intentional: read-test of user-provided path.
 	f, err := os.Open(path)
 	if err != nil {
 		result.Details["readable"] = strFalse
