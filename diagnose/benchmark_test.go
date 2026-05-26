@@ -32,9 +32,21 @@ func BenchmarkRunnerRunOneRule(b *testing.B) {
 
 func BenchmarkRunnerRunThreeRules(b *testing.B) {
 	rules := []DiagnosticRule{
-		&staticRule{name: "low", applicable: true, result: &DiagnosticResult{Status: StatusHealthy, Confidence: 0.3}},
-		&staticRule{name: "mid", applicable: true, result: &DiagnosticResult{Status: StatusDegraded, Confidence: 0.6}},
-		&staticRule{name: "high", applicable: true, result: &DiagnosticResult{Status: StatusFailed, Confidence: 0.9}},
+		&staticRule{
+			name:       "low",
+			applicable: true,
+			result:     &DiagnosticResult{Status: StatusHealthy, Confidence: 0.3},
+		},
+		&staticRule{
+			name:       "mid",
+			applicable: true,
+			result:     &DiagnosticResult{Status: StatusDegraded, Confidence: 0.6},
+		},
+		&staticRule{
+			name:       "high",
+			applicable: true,
+			result:     &DiagnosticResult{Status: StatusFailed, Confidence: 0.9},
+		},
 	}
 	runner := NewRunner(rules...)
 	err := errorfamily.NewTransient("test", "msg")

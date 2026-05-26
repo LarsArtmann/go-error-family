@@ -83,7 +83,7 @@ func getUser(w http.ResponseWriter, r *http.Request) error {
 	if id == "dbfail" {
 		return errorfamily.NewTransient("db.timeout", "database connection timed out")
 	}
-	_, _ = fmt.Fprintf(w, `{"user": {"id": %q}}\n`, id) //nolint:gosec // Safe: %q escapes string output
+	_, _ = fmt.Fprintf(w, `{"user": {"id": %q}}\n`, id)
 	return nil
 }
 
@@ -94,6 +94,5 @@ func main() {
 	fmt.Println("curl http://localhost:8080/user          → 400 Bad Request")
 	fmt.Println("curl http://localhost:8080/user?id=notfound → 404 Not Found")
 	fmt.Println("curl http://localhost:8080/user?id=dbfail   → 503 Service Unavailable")
-	//nolint:gosec // Example uses ListenAndServe without timeouts. Production should use http.Server.
 	_ = http.ListenAndServe(":8080", mux)
 }

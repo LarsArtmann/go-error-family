@@ -108,6 +108,9 @@ linters:
       - path: agent/
         linters:
           - wrapcheck
+      - path: examples/
+        linters:
+          - gosec
       - path: _test\.go
         text: unused
         linters:
