@@ -371,18 +371,22 @@ go test ./...                                    # all tests
 go test -cover ./...                             # with coverage
 go test -coverprofile=cover.out ./... && go tool cover -func=cover.out  # detailed coverage
 go test -run TestName ./...                      # specific test
+go test -bench=. -run=^$ ./...                    # benchmarks only
 ```
 
 Test files and scope:
 
 - `errorfamily_test.go` — Family, ParseFamily, Error, constructors, Classify, RegisterClassification, errors.Is/As integration
+- `benchmark_test.go` — Performance baselines for Classify, HandleError, ExitCode, ParseFamily, etc.
 - `handle_test.go` — HandleError, HandleErrorWithConfig, HandleErrorDetailed, template overrides, diagnostics wiring
 - `diagnose/diagnose_test.go` — Runner, rule matching helpers, Applicable, Run for FilesystemRule/NetworkRule
+- `diagnose/benchmark_test.go` — Benchmarks for Runner.Run, RuleSpec.Matches, DefaultRunner
 - `diagnose/git/rules_git_test.go` — GitRule Applicable, Run
 - `diagnose/postgres/rules_postgres_test.go` — PostgresRule Applicable, Run, resolveHost, resolvePort, IsPostgresRunning
 - `agent/agent_test.go` — Analyze (enabled/disabled/with diagnosis/empty/timeout), extractCommand
 
-**Coverage:** root 97.1% | agent 100% | diagnose core 60.6% | git ~85% | postgres ~85% (rules that shell out are integration-test territory)
+**Coverage:** root 97.2% | agent 100% | diagnose core 66.8% | git ~23% | postgres ~45%
+(rules that shell out to system commands are integration-test territory; coverage for git/postgres submodules can be improved with RunCommand mocking)
 
 ### Test Style
 

@@ -288,6 +288,10 @@ go-error-family/
 │   └── postgres/           — submodule: PostgresRule
 ├── agent/
 │   └── agent.go            — DebugAgent interface, Config, AgentResult, FixStep
+├── examples/
+│   ├── cmd/cli             — CLI boundary handler example
+│   ├── cmd/http            — HTTP middleware with status code mapping
+│   └── cmd/custom_rule     — Writing your own DiagnosticRule
 ```
 
 ## Philosophy

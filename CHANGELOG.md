@@ -6,6 +6,14 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ## [Unreleased]
 
+### Added
+
+- Benchmark suite: 16 benchmarks covering `Classify`, `HandleError`, `Runner.Run`, `ParseFamily`, and more across root and diagnose modules
+- Runnable examples in `examples/`:
+  - `cmd/cli` — CLI boundary handler with contextual messages
+  - `cmd/http` — HTTP middleware with family-to-status-code mapping
+  - `cmd/custom_rule` — How to implement `DiagnosticRule` from scratch
+
 ### Changed
 
 - **Modularized diagnostic rules** — `GitRule` moved to `diagnose/git` submodule, `PostgresRule` moved to `diagnose/postgres` submodule
