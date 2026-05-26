@@ -10,3 +10,6 @@ node_modules/
 *.db
 # Nix build output
 /result
+
+# Override global ignore: go.work is required for multi-module workspace
+!go.work

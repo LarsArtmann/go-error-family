@@ -229,12 +229,24 @@ for _, r := range results {
 }
 ```
 
-Built-in rules:
+Built-in rules (zero-dependency, included in `DefaultRunner`):
 
-- **PostgresRule** — checks `pg_isready`, TCP connectivity
 - **FilesystemRule** — checks path existence, permissions, writability
 - **NetworkRule** — checks DNS resolution, TCP connectivity
-- **GitRule** — checks repo state, merge conflicts, remote reachability
+
+Opt-in submodules (import explicitly):
+
+```go
+import (
+    "github.com/larsartmann/go-error-family/diagnose/git"
+    "github.com/larsartmann/go-error-family/diagnose/postgres"
+)
+
+runner := diagnose.NewRunner(&git.GitRule{}, &postgres.PostgresRule{}, &diagnose.FilesystemRule{})
+```
+
+- **GitRule** (`diagnose/git`) — checks repo state, merge conflicts, remote reachability
+- **PostgresRule** (`diagnose/postgres`) — checks `pg_isready`, TCP connectivity
 
 Results include `Confidence` (0.0–1.0) and are sorted by confidence descending.
 
@@ -261,18 +273,21 @@ The agent produces analysis but does **not** execute fixes — the consumer deci
 
 ```
 go-error-family/
-├── family.go        — Family enum + data-driven familyData (Name, Exit, Tone, Message, Why, Fix)
-├── interfaces.go    — Coded, Classified, Contextual, Retryable (each embeds error)
-├── error.go         — Reference Error struct (Is, Unwrap, Format, WithContext, accessors)
-├── classify.go      — Classify, IsRetryable, ExitCode, RegisterClassification(s)
-├── constructors.go  — New, Wrap, Newf, Wrapf + family-specific shortcuts
-├── handle.go        — HandleError, HandleErrorDetailed, template system, defaultMessages
+├── family.go               — Family enum + data-driven familyData (Name, Exit, Tone, Message, Why, Fix)
+├── interfaces.go           — Coded, Classified, Contextual, Retryable (each embeds error)
+├── error.go                — Reference Error struct (Is, Unwrap, Format, WithContext, accessors)
+├── classify.go             — Classify, IsRetryable, ExitCode, RegisterClassification(s)
+├── constructors.go         — New, Wrap, Newf, Wrapf + family-specific shortcuts
+├── handle.go               — HandleError, HandleErrorDetailed, template system, defaultMessages
 ├── diagnose/
-│   ├── diagnose.go  — Runner, DiagnosticRule, ruleSpec (data-driven matching), helpers
-│   ├── context.go   — runCommand, commandExists (unexported)
-│   ├── rules_*.go   — PostgresRule, FilesystemRule, NetworkRule, GitRule
+│   ├── diagnose.go         — Runner, DiagnosticRule interface, RuleSpec (data-driven matching), helpers
+│   ├── context.go          — RunCommand, CommandExists (exported for rule authors)
+│   ├── rules_filesystem.go — FilesystemRule
+│   ├── rules_network.go    — NetworkRule
+│   ├── git/                — submodule: GitRule
+│   └── postgres/           — submodule: PostgresRule
 ├── agent/
-│   └── agent.go     — DebugAgent interface, Config, AgentResult, FixStep
+│   └── agent.go            — DebugAgent interface, Config, AgentResult, FixStep
 ```
 
 ## Philosophy

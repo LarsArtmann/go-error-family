@@ -18,10 +18,10 @@ type NetworkRule struct{}
 func (r *NetworkRule) Name() string { return "network" }
 
 func (r *NetworkRule) Applicable(err error) bool {
-	return networkSpec.matches(err)
+	return networkSpec.Matches(err)
 }
 
-var networkSpec = ruleSpec{
+var networkSpec = RuleSpec{
 	ContextKeys:   []string{strHost, strPort, "url", "endpoint", "address", "remote"},
 	CodeContains:  []string{"network", "connect", "dial", "timeout"},
 	ContextSubstr: []string{"connection refused", "no such host", "i/o timeout"},
@@ -79,7 +79,7 @@ func (r *NetworkRule) Run(ctx context.Context, err error) (*DiagnosticResult, er
 }
 
 func (r *NetworkRule) resolveHost(err error) string {
-	v := resolveContextKey(err, []string{strHost, "remote", "endpoint"}, "")
+	v := ResolveContextKey(err, []string{strHost, "remote", "endpoint"}, "")
 	if v == "" {
 		return ""
 	}
@@ -95,5 +95,5 @@ func (r *NetworkRule) resolveHost(err error) string {
 }
 
 func (r *NetworkRule) resolvePort(err error) string {
-	return resolveContextKey(err, []string{strPort}, "")
+	return ResolveContextKey(err, []string{strPort}, "")
 }

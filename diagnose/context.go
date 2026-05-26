@@ -10,8 +10,8 @@ import (
 	"time"
 )
 
-// runCommand executes a command with timeout and returns its output.
-func runCommand(
+// RunCommand executes a command with timeout and returns its output.
+func RunCommand(
 	ctx context.Context,
 	timeout time.Duration,
 	name string,
@@ -43,8 +43,8 @@ func runCommand(
 	return stdout, exitCode, err
 }
 
-// commandExists checks if a command is available on the system PATH.
-func commandExists(name string) bool {
+// CommandExists checks if a command is available on the system PATH.
+func CommandExists(name string) bool {
 	_, err := exec.LookPath(name)
 	return err == nil
 }

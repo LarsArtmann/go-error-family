@@ -19,11 +19,11 @@ type FilesystemRule struct{}
 func (r *FilesystemRule) Name() string { return "filesystem" }
 
 func (r *FilesystemRule) Applicable(err error) bool {
-	return filesystemSpec.matches(err)
+	return filesystemSpec.Matches(err)
 }
 
 //nolint:goconst // Spec keys are descriptive literals, not worth extracting.
-var filesystemSpec = ruleSpec{
+var filesystemSpec = RuleSpec{
 	ContextKeys: []string{
 		"path",
 		"file",
@@ -157,5 +157,5 @@ func (r *FilesystemRule) checkFileReadable(result *DiagnosticResult, path string
 }
 
 func (r *FilesystemRule) resolvePath(err error) string {
-	return resolveContextKey(err, []string{"path", "file", "dir", "directory", "config_path", "output_path"}, "")
+	return ResolveContextKey(err, []string{"path", "file", "dir", "directory", "config_path", "output_path"}, "")
 }

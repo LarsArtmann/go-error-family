@@ -1,4 +1,4 @@
-package diagnose
+package git
 
 import (
 	"context"
@@ -8,6 +8,8 @@ import (
 	"strconv"
 	"strings"
 	"time"
+
+	"github.com/larsartmann/go-error-family/diagnose"
 )
 
 // GitRule diagnoses git-related errors.
@@ -20,29 +22,29 @@ type GitRule struct{}
 func (r *GitRule) Name() string { return "git" } //nolint:goconst // Rule name, not worth extracting
 
 func (r *GitRule) Applicable(err error) bool {
-	return gitSpec.matches(err)
+	return gitSpec.Matches(err)
 }
 
-var gitSpec = ruleSpec{
+var gitSpec = diagnose.RuleSpec{
 	ContextKeys:   []string{"git", "repository", "repo", "branch", "git_dir"},
 	CodeContains:  []string{"git"},
 	ContextSubstr: []string{"git"},
 }
 
 //nolint:nilerr // Diagnostic rules return results, not errors; local stat errors are expected.
-func (r *GitRule) Run(ctx context.Context, err error) (*DiagnosticResult, error) {
+func (r *GitRule) Run(ctx context.Context, err error) (*diagnose.DiagnosticResult, error) {
 	repoPath := r.resolveRepoPath(err)
 
-	result := &DiagnosticResult{
+	result := &diagnose.DiagnosticResult{
 		Details:    map[string]string{"repo_path": repoPath},
-		Confidence: ConfidenceLikely,
+		Confidence: diagnose.ConfidenceLikely,
 	}
 
 	// Check 1: Is this a git repo?
 	gitDir := filepath.Join(repoPath, ".git")
 	info, gitDirErr := os.Stat(gitDir)
 	if gitDirErr != nil || !info.IsDir() {
-		result.Status = StatusFailed
+		result.Status = diagnose.StatusFailed
 		result.Summary = "Not a git repository: " + repoPath
 		result.Details["is_repo"] = strFalse
 		result.SuggestedFix = fmt.Sprintf("Initialize a git repository:\n  cd %s && git init", repoPath)
@@ -50,8 +52,8 @@ func (r *GitRule) Run(ctx context.Context, err error) (*DiagnosticResult, error)
 	}
 	result.Details["is_repo"] = strTrue
 
-	if !commandExists("git") {
-		result.Status = StatusUnknown
+	if !diagnose.CommandExists("git") {
+		result.Status = diagnose.StatusUnknown
 		result.Summary = "git command not found on PATH"
 		return result, nil
 	}
@@ -68,10 +70,10 @@ func (r *GitRule) Run(ctx context.Context, err error) (*DiagnosticResult, error)
 }
 
 // checkWorkingTree returns true if the result has been set (either dirty or conflicts found).
-func (r *GitRule) checkWorkingTree(ctx context.Context, result *DiagnosticResult, repoPath string) bool {
-	stdout, exitCode, _ := runCommand(ctx, 5*time.Second, "git", "-C", repoPath, "status", "--porcelain")
+func (r *GitRule) checkWorkingTree(ctx context.Context, result *diagnose.DiagnosticResult, repoPath string) bool {
+	stdout, exitCode, _ := diagnose.RunCommand(ctx, 5*time.Second, "git", "-C", repoPath, "status", "--porcelain")
 	if exitCode != 0 {
-		result.Status = StatusUnknown
+		result.Status = diagnose.StatusUnknown
 		result.Summary = "git status failed in " + repoPath
 		return true
 	}
@@ -88,7 +90,7 @@ func (r *GitRule) checkWorkingTree(ctx context.Context, result *DiagnosticResult
 
 	// Check for merge conflicts.
 	if strings.Contains(trimmed, "UU") || strings.Contains(trimmed, "AA") || strings.Contains(trimmed, "DU") {
-		result.Status = StatusFailed
+		result.Status = diagnose.StatusFailed
 		result.Summary = fmt.Sprintf(
 			"Merge conflicts in %s (%d unmerged files)",
 			repoPath,
@@ -99,38 +101,52 @@ func (r *GitRule) checkWorkingTree(ctx context.Context, result *DiagnosticResult
 		return true
 	}
 
-	result.Status = StatusDegraded
+	result.Status = diagnose.StatusDegraded
 	result.Summary = fmt.Sprintf("Working tree has uncommitted changes (%d files)", lineCount)
 	result.SuggestedFix = "Commit or stash changes:\n  git add . && git commit -m \"wip\"\nOr: git stash"
 	return true
 }
 
-func (r *GitRule) checkRemote(ctx context.Context, result *DiagnosticResult, repoPath string) {
-	remotesStdout, _, _ := runCommand(ctx, 3*time.Second, "git", "-C", repoPath, "remote")
+func (r *GitRule) checkRemote(ctx context.Context, result *diagnose.DiagnosticResult, repoPath string) {
+	remotesStdout, _, _ := diagnose.RunCommand(ctx, 3*time.Second, "git", "-C", repoPath, "remote")
 	if strings.TrimSpace(remotesStdout) == "" {
-		result.Status = StatusHealthy
+		result.Status = diagnose.StatusHealthy
 		result.Summary = "Git repo is clean, no remotes configured: " + repoPath
-		result.Confidence = ConfidenceNotCause
+		result.Confidence = diagnose.ConfidenceNotCause
 		return
 	}
 
-	_, remoteExitCode, _ := runCommand(ctx, 10*time.Second, "git", "-C", repoPath, "ls-remote", "--heads", "origin")
+	_, remoteExitCode, _ := diagnose.RunCommand(
+		ctx,
+		10*time.Second,
+		"git",
+		"-C",
+		repoPath,
+		"ls-remote",
+		"--heads",
+		"origin",
+	)
 	if remoteExitCode != 0 {
-		result.Status = StatusDegraded
+		result.Status = diagnose.StatusDegraded
 		result.Summary = "Git repo is clean but remote is unreachable: " + repoPath
 		result.Details["remote_reachable"] = strFalse
 		result.SuggestedFix = "Check network connectivity and remote URL:\n  git remote -v\n  git ls-remote origin"
 		return
 	}
 
-	result.Status = StatusHealthy
+	result.Status = diagnose.StatusHealthy
 	result.Summary = "Git repo is clean and remote is reachable: " + repoPath
 	result.Details["remote_reachable"] = strTrue
-	result.Confidence = ConfidenceNotCause
+	result.Confidence = diagnose.ConfidenceNotCause
 }
 
+const (
+	strTrue  = "true"
+	strFalse = "false"
+)
+
 func (r *GitRule) resolveRepoPath(err error) string {
-	if v := resolveContextKey(err, []string{"git_dir", "repository", "repo", "repo_path"}, ""); v != "" {
+	if v := diagnose.ResolveContextKey(err, []string{"git_dir", "repository", "repo", "repo_path"}, ""); v != "" {
 		return v
 	}
 	if dir, err := os.Getwd(); err == nil {

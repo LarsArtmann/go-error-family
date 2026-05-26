@@ -20,13 +20,17 @@ errorfamily/          ← root package: types, constructors, classification, CLI
   classify.go           Classify(), RegisterClassification()
   handle.go             HandleError(), HandleErrorDetailed(), template system
 
-diagnose/             ← concurrent diagnostic rules
-  diagnose.go           Runner, DiagnosticRule interface, rule matching helpers
-  context.go            runCommand, commandExists (shared OS helpers)
-  rules_postgres.go     PostgresRule
+diagnose/             ← concurrent diagnostic rules (zero-dep core)
+  diagnose.go           Runner, DiagnosticRule interface, RuleSpec, exported helpers
+  context.go            RunCommand, CommandExists (exported for rule authors)
   rules_filesystem.go   FilesystemRule
   rules_network.go      NetworkRule
+
+diagnose/git/         ← submodule: GitRule (opt-in)
   rules_git.go          GitRule
+
+diagnose/postgres/    ← submodule: PostgresRule (opt-in)
+  rules_postgres.go     PostgresRule, IsPostgresRunning
 
 agent/                ← analysis-only debug agent
   agent.go              DebugAgent interface, deterministic analyzer
@@ -215,21 +219,25 @@ exitCode := errorfamily.HandleErrorWithConfig(err, errorfamily.HandleConfig{
 ### Diagnostics
 
 ```go
-// One-shot with all built-in rules
+// One-shot with zero-dep built-in rules (Filesystem, Network)
 results := diagnose.RunAuto(ctx, err)
 
-// Custom runner
-runner := diagnose.NewRunner(&diagnose.PostgresRule{}, &myCustomRule{})
+// Custom runner with opt-in submodules
+import (
+    "github.com/larsartmann/go-error-family/diagnose/git"
+    "github.com/larsartmann/go-error-family/diagnose/postgres"
+)
+runner := diagnose.NewRunner(&git.GitRule{}, &postgres.PostgresRule{}, &myCustomRule{})
 results := runner.Run(ctx, err)
 // results sorted by confidence desc; nil if no rules applicable
 ```
 
 **DiagnosticResult fields:** `RuleName`, `Status` (Healthy/Degraded/Failed/Unknown), `Summary`, `Details` (map[string]string), `SuggestedFix`, `Confidence` (0.0–1.0), `Duration`.
 
-**Standalone helpers:**
+**Standalone helpers (postgres submodule):**
 
 ```go
-diagnose.IsPostgresRunning(ctx, host, port) bool  // pg_isready or TCP check
+postgres.IsPostgresRunning(ctx, host, port) bool  // pg_isready or TCP check
 ```
 
 ### Partial Success (Recipe)
@@ -328,31 +336,31 @@ Built-in codes: `file.not_found`, `permission.denied`, `db.timeout`, `db.connect
 ### Adding a New Rule
 
 1. Implement `diagnose.DiagnosticRule` (3 methods: `Name`, `Applicable`, `Run`)
-2. Use `ruleSpec` for matching — define it as a package-level `var`:
+2. Use `diagnose.RuleSpec` for matching — define it as a package-level `var`:
 
 ```go
-var mySpec = ruleSpec{
+var mySpec = diagnose.RuleSpec{
     ContextKeys:   []string{"my_key"},          // matches if error context has any of these keys
     CodeContains:  []string{"my."},              // matches if error code contains substring
     ContextSubstr: []string{"my_thing"},         // matches if any context value contains substring
     Extra:         func(err error) bool { ... }, // custom logic
 }
 
-func (r *MyRule) Applicable(err error) bool { return mySpec.matches(err) }
+func (r *MyRule) Applicable(err error) bool { return mySpec.Matches(err) }
 ```
 
-3. Use matching helpers from `diagnose/diagnose.go` (NOT context.go): `hasContextKey`, `contextValue`, `resolveContextKey`, `hasContextSubstring`, `familyIs`, `errorCodeContains`
-4. Rules run concurrently via `Runner.Run`; results sorted by confidence descending
-5. Register in `DefaultRunner()` (diagnose.go) if it's a built-in rule
+3. Use matching helpers from `diagnose` package: `HasContextKey`, `ContextValue`, `ResolveContextKey`, `HasContextSubstring`, `FamilyIs`, `ErrorCodeContains`
+4. Use execution helpers: `diagnose.RunCommand`, `diagnose.CommandExists`
+5. Rules run concurrently via `Runner.Run`; results sorted by confidence descending
 
 ### Built-in Rules
 
-| Rule             | Matches On                                                                                                                                                                | Checks                        |
-| ---------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------- |
-| `PostgresRule`   | Keys: `db_host`, `db_port`, `db_name`, `database_url`, `postgres_host`. Codes: `db.`, `database`. Substr: `postgres`, `postgresql`, `database`, `sql` + Transient family  | pg_isready, TCP, start cmd    |
-| `FilesystemRule` | Keys: `path`, `file`, `dir`, `directory`, `config_path`, `output_path`. Codes: `file`, `dir`, `path`, `config`, `permission`                                              | Existence, permissions, write |
-| `NetworkRule`    | Keys: `host`, `port`, `url`, `endpoint`, `address`, `remote`. Codes: `network`, `connect`, `dial`, `timeout`. Substr: `connection refused`, `no such host`, `i/o timeout` | DNS, TCP, port reachability   |
-| `GitRule`        | Keys: `git`, `repository`, `repo`, `branch`, `git_dir`. Codes: `git`. Substr: `git`                                                                                       | Repo, tree, merge, remote     |
+| Rule             | Module                                                     | Matches On                                                                                                                                                                | Checks                        |
+| ---------------- | ---------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------- |
+| `FilesystemRule` | `github.com/larsartmann/go-error-family/diagnose`          | Keys: `path`, `file`, `dir`, `directory`, `config_path`, `output_path`. Codes: `file`, `dir`, `path`, `config`, `permission`                                              | Existence, permissions, write |
+| `NetworkRule`    | `github.com/larsartmann/go-error-family/diagnose`          | Keys: `host`, `port`, `url`, `endpoint`, `address`, `remote`. Codes: `network`, `connect`, `dial`, `timeout`. Substr: `connection refused`, `no such host`, `i/o timeout` | DNS, TCP, port reachability   |
+| `GitRule`        | `github.com/larsartmann/go-error-family/diagnose/git`      | Keys: `git`, `repository`, `repo`, `branch`, `git_dir`. Codes: `git`. Substr: `git`                                                                                       | Repo, tree, merge, remote     |
+| `PostgresRule`   | `github.com/larsartmann/go-error-family/diagnose/postgres` | Keys: `db_host`, `db_port`, `db_name`, `database_url`, `postgres_host`. Codes: `db.`, `database`. Substr: `postgres`, `postgresql`, `database`, `sql` + Transient family  | pg_isready, TCP, start cmd    |
 
 ---
 
@@ -369,10 +377,12 @@ Test files and scope:
 
 - `errorfamily_test.go` — Family, ParseFamily, Error, constructors, Classify, RegisterClassification, errors.Is/As integration
 - `handle_test.go` — HandleError, HandleErrorWithConfig, HandleErrorDetailed, template overrides, diagnostics wiring
-- `diagnose/diagnose_test.go` — Runner, rule matching helpers, Applicable, Run for local paths
+- `diagnose/diagnose_test.go` — Runner, rule matching helpers, Applicable, Run for FilesystemRule/NetworkRule
+- `diagnose/git/rules_git_test.go` — GitRule Applicable, Run
+- `diagnose/postgres/rules_postgres_test.go` — PostgresRule Applicable, Run, resolveHost, resolvePort, IsPostgresRunning
 - `agent/agent_test.go` — Analyze (enabled/disabled/with diagnosis/empty/timeout), extractCommand
 
-**Coverage:** root 97.1% | agent 100% | diagnose 60.6% (rules that shell out are integration-test territory)
+**Coverage:** root 97.1% | agent 100% | diagnose core 60.6% | git ~85% | postgres ~85% (rules that shell out are integration-test territory)
 
 ### Test Style
 

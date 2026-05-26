@@ -1,4 +1,4 @@
-package diagnose
+package postgres
 
 import (
 	"context"
@@ -8,6 +8,7 @@ import (
 	"time"
 
 	errorfamily "github.com/larsartmann/go-error-family"
+	"github.com/larsartmann/go-error-family/diagnose"
 )
 
 // PostgresRule diagnoses PostgreSQL-related errors.
@@ -20,41 +21,43 @@ type PostgresRule struct{}
 func (r *PostgresRule) Name() string { return "postgres" }
 
 func (r *PostgresRule) Applicable(err error) bool {
-	return postgresSpec.matches(err)
+	return postgresSpec.Matches(err)
 }
 
-var postgresSpec = ruleSpec{
+var postgresSpec = diagnose.RuleSpec{
 	ContextSubstr: []string{"postgres", "postgresql", "database", "sql"},
 	ContextKeys:   []string{"db_host", "db_port", "db_name", "database_url", "postgres_host"},
 	CodeContains:  []string{"db.", "database"},
-	Extra:         func(err error) bool { return familyIs(err, errorfamily.Transient) && hasContextSubstring(err, "sql") },
+	Extra: func(err error) bool {
+		return diagnose.FamilyIs(err, errorfamily.Transient) && diagnose.HasContextSubstring(err, "sql")
+	},
 }
 
-func (r *PostgresRule) Run(ctx context.Context, err error) (*DiagnosticResult, error) {
+func (r *PostgresRule) Run(ctx context.Context, err error) (*diagnose.DiagnosticResult, error) {
 	host := r.resolveHost(err)
 	port := r.resolvePort(err)
 
-	result := &DiagnosticResult{
+	result := &diagnose.DiagnosticResult{
 		Details: map[string]string{
-			strHost: host,
-			strPort: port,
+			"host": host,
+			"port": port,
 		},
 	}
 
 	// Check 1: pg_isready
-	if commandExists("pg_isready") {
-		stdout, exitCode, _ := runCommand(ctx, 5*time.Second, "pg_isready", "-h", host, "-p", port)
+	if diagnose.CommandExists("pg_isready") {
+		stdout, exitCode, _ := diagnose.RunCommand(ctx, 5*time.Second, "pg_isready", "-h", host, "-p", port)
 		result.Details["pg_isready"] = stdout
 		if exitCode == 0 {
-			result.Status = StatusHealthy
+			result.Status = diagnose.StatusHealthy
 			result.Summary = fmt.Sprintf("PostgreSQL is running on %s:%s", host, port)
-			result.Confidence = ConfidenceNotCause // Postgres is fine — probably not the root cause
+			result.Confidence = diagnose.ConfidenceNotCause // Postgres is fine — probably not the root cause
 			return result, nil
 		}
 		result.Summary = fmt.Sprintf("PostgreSQL is NOT responding on %s:%s: %s", host, port, stdout)
 		result.SuggestedFix = r.suggestStartFix()
-		result.Confidence = ConfidenceCertain
-		result.Status = StatusFailed
+		result.Confidence = diagnose.ConfidenceCertain
+		result.Status = diagnose.StatusFailed
 		return result, nil
 	}
 
@@ -64,13 +67,13 @@ func (r *PostgresRule) Run(ctx context.Context, err error) (*DiagnosticResult, e
 	conn, dialErr := net.DialTimeout("tcp", addr, 3*time.Second)
 	if dialErr == nil {
 		_ = conn.Close()
-		result.Status = StatusHealthy
+		result.Status = diagnose.StatusHealthy
 		result.Summary = fmt.Sprintf("TCP connection to %s succeeded — PostgreSQL may be running", addr)
-		result.Confidence = ConfidencePartial
+		result.Confidence = diagnose.ConfidencePartial
 		return result, nil
 	}
 
-	result.Status = StatusFailed
+	result.Status = diagnose.StatusFailed
 	result.Summary = fmt.Sprintf("Cannot connect to %s: %v", addr, dialErr)
 	result.Details["tcp_error"] = dialErr.Error()
 	result.SuggestedFix = fmt.Sprintf(
@@ -79,18 +82,20 @@ func (r *PostgresRule) Run(ctx context.Context, err error) (*DiagnosticResult, e
 		port,
 		r.suggestStartFix(),
 	)
-	result.Confidence = ConfidenceVeryHigh
+	result.Confidence = diagnose.ConfidenceVeryHigh
 
 	return result, nil
 }
 
+const strLocalhost = "localhost"
+
 func (r *PostgresRule) resolveHost(err error) string {
-	return resolveContextKey(err, []string{"db_host", "postgres_host", strHost, "PGHOST"}, strLocalhost)
+	return diagnose.ResolveContextKey(err, []string{"db_host", "postgres_host", "host", "PGHOST"}, strLocalhost)
 }
 
 func (r *PostgresRule) resolvePort(err error) string {
-	for _, key := range []string{"db_port", "postgres_port", strPort, "PGPORT"} {
-		if v := contextValue(err, key); v != "" {
+	for _, key := range []string{"db_port", "postgres_port", "port", "PGPORT"} {
+		if v := diagnose.ContextValue(err, key); v != "" {
 			if _, err := strconv.Atoi(v); err == nil {
 				return v
 			}
@@ -101,11 +106,11 @@ func (r *PostgresRule) resolvePort(err error) string {
 
 func (r *PostgresRule) suggestStartFix() string {
 	switch {
-	case commandExists("brew"):
+	case diagnose.CommandExists("brew"):
 		return "brew services start postgresql"
-	case commandExists("systemctl"):
+	case diagnose.CommandExists("systemctl"):
 		return "sudo systemctl start postgresql"
-	case commandExists("service"):
+	case diagnose.CommandExists("service"):
 		return "sudo service postgresql start"
 	default:
 		return "pg_ctl start"
@@ -122,8 +127,8 @@ func IsPostgresRunning(ctx context.Context, host, port string) bool {
 		port = "5432"
 	}
 
-	if commandExists("pg_isready") {
-		_, exitCode, _ := runCommand(ctx, 5*time.Second, "pg_isready", "-h", host, "-p", port)
+	if diagnose.CommandExists("pg_isready") {
+		_, exitCode, _ := diagnose.RunCommand(ctx, 5*time.Second, "pg_isready", "-h", host, "-p", port)
 		return exitCode == 0
 	}
 

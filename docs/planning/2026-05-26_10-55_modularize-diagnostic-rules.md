@@ -49,12 +49,12 @@ github.com/larsartmann/go-error-family         (root module)
 
 ### Why GitRule First?
 
-| Rule | Current | After | Dependency |
-|------|---------|-------|------------|
-| FilesystemRule | `os.Stat`, `os.Create` | same | stdlib only |
-| NetworkRule | `net.DialTimeout` | same | stdlib only |
-| GitRule | `exec.Command("git", ...)` | `go-git` | `go-git` (new dep) |
-| PostgresRule | `exec.Command("pg_isready", ...)` | same | still shells out |
+| Rule           | Current                           | After    | Dependency         |
+| -------------- | --------------------------------- | -------- | ------------------ |
+| FilesystemRule | `os.Stat`, `os.Create`            | same     | stdlib only        |
+| NetworkRule    | `net.DialTimeout`                 | same     | stdlib only        |
+| GitRule        | `exec.Command("git", ...)`        | `go-git` | `go-git` (new dep) |
+| PostgresRule   | `exec.Command("pg_isready", ...)` | same     | still shells out   |
 
 GitRule is the only rule that benefits from a non-stdlib dependency (`go-git`). Extracting it first proves the pattern. PostgresRule could follow later if we find a pure-Go postgres client worth depending on.
 
@@ -63,11 +63,13 @@ GitRule is the only rule that benefits from a non-stdlib dependency (`go-git`). 
 `DefaultRunner()` currently includes all 4 rules. After extraction, it would include only FilesystemRule and NetworkRule.
 
 **Before:**
+
 ```go
 runner := diagnose.DefaultRunner() // Postgres + Filesystem + Network + Git
 ```
 
 **After:**
+
 ```go
 runner := diagnose.DefaultRunner()  // Filesystem + Network only
 runner.Register(gitrule.New())      // opt into git diagnostics
@@ -83,11 +85,11 @@ Add `DefaultRunnerMinimal()` and keep `DefaultRunner()` as-is. But this creates 
 
 ### Consumer Impact
 
-| Consumer Type | Before | After |
-|--------------|--------|-------|
+| Consumer Type  | Before                     | After                                                         |
+| -------------- | -------------------------- | ------------------------------------------------------------- |
 | Uses all rules | `diagnose.DefaultRunner()` | `diagnose.DefaultRunner()` + `runner.Register(gitrule.New())` |
-| Uses no rules | `NewRunner()` | Same |
-| Wants git only | `DefaultRunner()` | `gitrule.NewRunner()` (convenience) |
+| Uses no rules  | `NewRunner()`              | Same                                                          |
+| Wants git only | `DefaultRunner()`          | `gitrule.NewRunner()` (convenience)                           |
 
 ---
 
@@ -115,6 +117,7 @@ var filesystemSpec = ruleSpec{
 ```
 
 **Why this helps:**
+
 - Prevents typos in context keys (compile-time vs runtime)
 - Makes the "vocabulary" of the library explicit
 - IDEs can autocomplete context keys
@@ -127,37 +130,37 @@ var filesystemSpec = ruleSpec{
 
 ### Phase 1: GitRule Extraction (this session)
 
-| Step | File | Action |
-|------|------|--------|
-| 1 | `diagnose/git/go.mod` | Create with module path `github.com/larsartmann/go-error-family/diagnose/git` |
-| 2 | `diagnose/git/rules_git.go` | Move GitRule from `diagnose/`. Replace `exec.Command` calls with `go-git` |
-| 3 | `diagnose/git/rules_git_test.go` | Move git tests from `diagnose/diagnose_test.go` |
-| 4 | `diagnose/diagnose.go` | Remove GitRule from `DefaultRunner()` |
-| 5 | `diagnose/diagnose_test.go` | Remove git-specific tests |
-| 6 | `go.work` | Create workspace file linking root, diagnose, diagnose/git |
-| 7 | `flake.nix` | Update build for multi-module workspace |
-| 8 | Test | `go test ./...` in all modules |
-| 9 | Lint | `golangci-lint run` in all modules |
-| 10 | Commit | "feat(diagnose/git): extract GitRule to submodule with go-git" |
+| Step | File                             | Action                                                                        |
+| ---- | -------------------------------- | ----------------------------------------------------------------------------- |
+| 1    | `diagnose/git/go.mod`            | Create with module path `github.com/larsartmann/go-error-family/diagnose/git` |
+| 2    | `diagnose/git/rules_git.go`      | Move GitRule from `diagnose/`. Replace `exec.Command` calls with `go-git`     |
+| 3    | `diagnose/git/rules_git_test.go` | Move git tests from `diagnose/diagnose_test.go`                               |
+| 4    | `diagnose/diagnose.go`           | Remove GitRule from `DefaultRunner()`                                         |
+| 5    | `diagnose/diagnose_test.go`      | Remove git-specific tests                                                     |
+| 6    | `go.work`                        | Create workspace file linking root, diagnose, diagnose/git                    |
+| 7    | `flake.nix`                      | Update build for multi-module workspace                                       |
+| 8    | Test                             | `go test ./...` in all modules                                                |
+| 9    | Lint                             | `golangci-lint run` in all modules                                            |
+| 10   | Commit                           | "feat(diagnose/git): extract GitRule to submodule with go-git"                |
 
 ### Phase 2: Documentation & Release
 
-| Step | File | Action |
-|------|------|--------|
-| 11 | `README.md` | Document new import path for GitRule |
-| 12 | `SKILL.md` | Update diagnostic rules section |
-| 13 | `CHANGELOG.md` | Add v0.2.0 entry with breaking change notice |
-| 14 | `AGENTS.md` | Update module structure docs |
-| 15 | Tag | `git tag v0.2.0` |
+| Step | File           | Action                                       |
+| ---- | -------------- | -------------------------------------------- |
+| 11   | `README.md`    | Document new import path for GitRule         |
+| 12   | `SKILL.md`     | Update diagnostic rules section              |
+| 13   | `CHANGELOG.md` | Add v0.2.0 entry with breaking change notice |
+| 14   | `AGENTS.md`    | Update module structure docs                 |
+| 15   | Tag            | `git tag v0.2.0`                             |
 
 ### Phase 3: Typed Context Keys (future)
 
-| Step | File | Action |
-|------|------|--------|
-| 16 | `diagnose/diagnose.go` | Add `ContextKey` type and constants |
-| 17 | All rule files | Replace string literals with constants |
-| 18 | Test | Verify no functional change |
-| 19 | Commit | "refactor(diagnose): typed context keys" |
+| Step | File                   | Action                                   |
+| ---- | ---------------------- | ---------------------------------------- |
+| 16   | `diagnose/diagnose.go` | Add `ContextKey` type and constants      |
+| 17   | All rule files         | Replace string literals with constants   |
+| 18   | Test                   | Verify no functional change              |
+| 19   | Commit                 | "refactor(diagnose): typed context keys" |
 
 ---
 
@@ -175,9 +178,9 @@ var filesystemSpec = ruleSpec{
 
 ## Risks
 
-| Risk | Likelihood | Impact | Mitigation |
-|------|-----------|--------|------------|
-| Breaking existing consumers | High | Medium | Clear CHANGELOG, version bump, README migration guide |
-| go-git dependency bloat | Medium | Low | Only affects consumers who import `diagnose/git` |
-| Multi-module build complexity | Medium | Medium | Test in CI, document workspace setup |
-| Coverage drops further | Medium | Low | Expected — extracted code is integration-test territory |
+| Risk                          | Likelihood | Impact | Mitigation                                              |
+| ----------------------------- | ---------- | ------ | ------------------------------------------------------- |
+| Breaking existing consumers   | High       | Medium | Clear CHANGELOG, version bump, README migration guide   |
+| go-git dependency bloat       | Medium     | Low    | Only affects consumers who import `diagnose/git`        |
+| Multi-module build complexity | Medium     | Medium | Test in CI, document workspace setup                    |
+| Coverage drops further        | Medium     | Low    | Expected — extracted code is integration-test territory |

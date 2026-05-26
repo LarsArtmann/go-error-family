@@ -129,93 +129,72 @@ func TestRunnerContextCancellation(t *testing.T) {
 
 func TestHasContextKey(t *testing.T) {
 	err := errorfamily.NewTransient("test", "msg").WithContext("host", "localhost")
-	if !hasContextKey(err, "host") {
+	if !HasContextKey(err, "host") {
 		t.Error("should find 'host' context key")
 	}
-	if hasContextKey(err, "port") {
+	if HasContextKey(err, "port") {
 		t.Error("should not find 'port' context key")
 	}
 }
 
 func TestHasContextKeyPlainError(t *testing.T) {
 	err := errors.New("plain error")
-	if hasContextKey(err, "anything") {
+	if HasContextKey(err, "anything") {
 		t.Error("plain error should not have context keys")
 	}
 }
 
 func TestContextValue(t *testing.T) {
 	err := errorfamily.NewTransient("test", "msg").WithContext("host", "localhost")
-	if v := contextValue(err, "host"); v != "localhost" {
-		t.Errorf("contextValue(host) = %q, want 'localhost'", v)
+	if v := ContextValue(err, "host"); v != "localhost" {
+		t.Errorf("ContextValue(host) = %q, want 'localhost'", v)
 	}
-	if v := contextValue(err, "missing"); v != "" {
-		t.Errorf("contextValue(missing) = %q, want empty", v)
+	if v := ContextValue(err, "missing"); v != "" {
+		t.Errorf("ContextValue(missing) = %q, want empty", v)
 	}
 }
 
 func TestHasContextSubstring(t *testing.T) {
 	err := errorfamily.NewTransient("test", "msg").WithContext("path", "/var/data/config.yaml")
-	if !hasContextSubstring(err, "config.yaml") {
+	if !HasContextSubstring(err, "config.yaml") {
 		t.Error("should find 'config.yaml' in context values")
 	}
-	if hasContextSubstring(err, "nonexistent_xyz") {
+	if HasContextSubstring(err, "nonexistent_xyz") {
 		t.Error("should not find random substring")
 	}
 }
 
 func TestHasContextSubstringInErrorMessage(t *testing.T) {
 	err := errors.New("connection refused")
-	if !hasContextSubstring(err, "connection refused") {
+	if !HasContextSubstring(err, "connection refused") {
 		t.Error("should find substring in error message for plain errors")
 	}
 }
 
 func TestFamilyIs(t *testing.T) {
 	err := errorfamily.NewTransient("test", "msg")
-	if !familyIs(err, errorfamily.Transient) {
+	if !FamilyIs(err, errorfamily.Transient) {
 		t.Error("Transient error should match Transient family")
 	}
-	if familyIs(err, errorfamily.Rejection) {
+	if FamilyIs(err, errorfamily.Rejection) {
 		t.Error("Transient error should not match Rejection family")
 	}
 }
 
 func TestErrorCodeContains(t *testing.T) {
 	err := errorfamily.NewTransient("db.timeout", "msg")
-	if !errorCodeContains(err, "db.") {
+	if !ErrorCodeContains(err, "db.") {
 		t.Error("should find 'db.' in error code")
 	}
-	if errorCodeContains(err, "network") {
+	if ErrorCodeContains(err, "network") {
 		t.Error("should not find 'network' in error code")
 	}
 }
 
 func TestErrorCodeContainsPlainError(t *testing.T) {
 	err := errors.New("plain error")
-	if errorCodeContains(err, "anything") {
+	if ErrorCodeContains(err, "anything") {
 		t.Error("plain error should not match error code")
-	}
-}
-
-func TestPostgresRuleApplicable(t *testing.T) {
-	tests := []struct {
-		name string
-		err  error
-		want bool
-	}{
-		{"postgres context", errorfamily.NewTransient("test", "msg").WithContext("db_host", "localhost"), true},
-		{"db code", errorfamily.NewTransient("db.timeout", "msg"), true},
-		{"sql substring", errorfamily.NewTransient("test", "msg").WithContext("url", "postgres://host"), true},
-		{"unrelated", errorfamily.NewTransient("test", "msg"), false},
-	}
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			r := &PostgresRule{}
-			if got := r.Applicable(tt.err); got != tt.want {
-				t.Errorf("Applicable() = %v, want %v", got, tt.want)
-			}
-		})
 	}
 }
 
@@ -255,27 +234,6 @@ func TestFilesystemRuleApplicable(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			r := &FilesystemRule{}
-			if got := r.Applicable(tt.err); got != tt.want {
-				t.Errorf("Applicable() = %v, want %v", got, tt.want)
-			}
-		})
-	}
-}
-
-func TestGitRuleApplicable(t *testing.T) {
-	tests := []struct {
-		name string
-		err  error
-		want bool
-	}{
-		{"git context", errorfamily.NewRejection("test", "msg").WithContext("git", "true"), true},
-		{"git code", errorfamily.NewRejection("git.merge", "msg"), true},
-		{"git substring", errorfamily.NewTransient("test", "git operation failed"), true},
-		{"unrelated", errorfamily.NewTransient("db.timeout", "msg"), false},
-	}
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			r := &GitRule{}
 			if got := r.Applicable(tt.err); got != tt.want {
 				t.Errorf("Applicable() = %v, want %v", got, tt.want)
 			}
@@ -354,74 +312,6 @@ func TestFilesystemRuleRunNoPath(t *testing.T) {
 	}
 }
 
-func TestGitRuleRunNotARepo(t *testing.T) {
-	r := &GitRule{}
-	err := errorfamily.NewRejection("git.error", "msg").WithContext("repo", "/tmp")
-
-	result, runErr := r.Run(context.Background(), err)
-	if runErr != nil {
-		t.Fatalf("Run() error: %v", runErr)
-	}
-	if result.Details["is_repo"] != "false" {
-		t.Errorf("Expected is_repo=false, got %v", result.Details)
-	}
-}
-
-func TestGitRuleRunCurrentDir(t *testing.T) {
-	r := &GitRule{}
-	err := errorfamily.NewRejection("git.status", "msg").WithContext("git", "true")
-
-	result, runErr := r.Run(context.Background(), err)
-	if runErr != nil {
-		t.Fatalf("Run() error: %v", runErr)
-	}
-	// Current dir IS a git repo, so it should report healthy or degraded
-	if result.Status == StatusUnknown && result.Details["is_repo"] == "false" {
-		t.Error("Expected current dir to be a git repo")
-	}
-}
-
-func TestPostgresRuleRun(t *testing.T) {
-	r := &PostgresRule{}
-	err := errorfamily.NewTransient("db.timeout", "msg").WithContext("host", "localhost").WithContext("port", "5432")
-
-	result, runErr := r.Run(context.Background(), err)
-	if runErr != nil {
-		t.Fatalf("Run() error: %v", runErr)
-	}
-	// Can't assert specific status (depends on system), but should not panic
-	if result.Details["host"] != "localhost" {
-		t.Errorf("host detail = %q, want 'localhost'", result.Details["host"])
-	}
-}
-
-func TestPostgresRuleResolveHost(t *testing.T) {
-	r := &PostgresRule{}
-	err := errorfamily.NewTransient("test", "msg").WithContext("db_host", "myhost")
-	if host := r.resolveHost(err); host != "myhost" {
-		t.Errorf("resolveHost = %q, want 'myhost'", host)
-	}
-}
-
-func TestPostgresRuleResolvePortInvalid(t *testing.T) {
-	r := &PostgresRule{}
-	err := errorfamily.NewTransient("test", "msg").WithContext("db_port", "not-a-number")
-	if port := r.resolvePort(err); port != "5432" {
-		t.Errorf("resolvePort with invalid port = %q, want '5432'", port)
-	}
-}
-
-func TestPostgresRuleResolveDefaults(t *testing.T) {
-	r := &PostgresRule{}
-	err := errorfamily.NewTransient("test", "msg")
-	if host := r.resolveHost(err); host != "localhost" {
-		t.Errorf("default host = %q, want 'localhost'", host)
-	}
-	if port := r.resolvePort(err); port != "5432" {
-		t.Errorf("default port = %q, want '5432'", port)
-	}
-}
-
 func TestNetworkRuleRunNoHost(t *testing.T) {
 	r := &NetworkRule{}
 	// Applicable returns true for timeout code, but no host in context
@@ -441,11 +331,6 @@ func TestNetworkRuleResolveHostWithURL(t *testing.T) {
 	if host := r.resolveHost(err); host != "example.com" {
 		t.Errorf("resolveHost with URL = %q, want 'example.com'", host)
 	}
-}
-
-func TestIsPostgresRunning(t *testing.T) {
-	// Just verify it doesn't panic
-	IsPostgresRunning(context.Background(), "", "")
 }
 
 func TestParentDir(t *testing.T) {

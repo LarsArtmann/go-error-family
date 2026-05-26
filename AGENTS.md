@@ -30,7 +30,9 @@ The `DebugAgent` interface has a single method: `Analyze`. It produces root caus
 
 ## Diagnostic Rule Pattern
 
-When adding a new `DiagnosticRule`, use the matching helpers in `diagnose/diagnose.go` (not `context.go`): `hasContextKey`, `contextValue`, `resolveContextKey`, `hasContextSubstring`, `familyIs`, `errorCodeContains`. Rules run concurrently via `Runner.Run` and results sort by confidence descending.
+When adding a new `DiagnosticRule`, use the matching helpers from the `diagnose` package: `HasContextKey`, `ContextValue`, `ResolveContextKey`, `HasContextSubstring`, `FamilyIs`, `ErrorCodeContains`. Use execution helpers `RunCommand` and `CommandExists` for system checks. Rules run concurrently via `Runner.Run` and results sort by confidence descending.
+
+**Submodules:** `GitRule` lives in `github.com/larsartmann/go-error-family/diagnose/git`, `PostgresRule` in `github.com/larsartmann/go-error-family/diagnose/postgres`. `DefaultRunner()` only includes zero-dep rules (`FilesystemRule`, `NetworkRule`).
 
 ## Partial Success
 
@@ -38,12 +40,14 @@ Not a library type — partial success is a consumption pattern, not a classific
 
 ## Test Coverage
 
-**Updated:** 2026-05-21
+**Updated:** 2026-05-26
 
 | Package              | Coverage |
 | -------------------- | -------- |
 | root (`errorfamily`) | 97.1%    |
 | `agent`              | 100%     |
-| `diagnose`           | 60.6%    |
+| `diagnose` (core)    | 60.6%    |
+| `diagnose/git`       | ~85%     |
+| `diagnose/postgres`  | ~85%     |
 
 Diagnose rules that shell out to system commands are integration-test territory.

@@ -200,10 +200,8 @@ func RunAuto(ctx context.Context, err error) []*DiagnosticResult {
 // DefaultRunner returns a runner with all built-in diagnostic rules registered.
 func DefaultRunner() *Runner {
 	return NewRunner(
-		&PostgresRule{},
 		&FilesystemRule{},
 		&NetworkRule{},
-		&GitRule{},
 	)
 }
 
@@ -227,7 +225,7 @@ const (
 
 // Helper functions for rule matching.
 
-func hasContextKey(err error, keys ...string) bool {
+func HasContextKey(err error, keys ...string) bool {
 	if ctx, ok := errors.AsType[errorfamily.Contextual](err); ok {
 		ctxMap := ctx.ErrorContext()
 		for _, key := range keys {
@@ -239,25 +237,25 @@ func hasContextKey(err error, keys ...string) bool {
 	return false
 }
 
-func contextValue(err error, key string) string {
+func ContextValue(err error, key string) string {
 	if ctx, ok := errors.AsType[errorfamily.Contextual](err); ok {
 		return ctx.ErrorContext()[key]
 	}
 	return ""
 }
 
-// resolveContextKey searches the error's context for the first non-empty value
+// ResolveContextKey searches the error's context for the first non-empty value
 // among the given keys, returning defaultVal if none match.
-func resolveContextKey(err error, keys []string, defaultVal string) string {
+func ResolveContextKey(err error, keys []string, defaultVal string) string {
 	for _, key := range keys {
-		if v := contextValue(err, key); v != "" {
+		if v := ContextValue(err, key); v != "" {
 			return v
 		}
 	}
 	return defaultVal
 }
 
-func hasContextSubstring(err error, substr string) bool {
+func HasContextSubstring(err error, substr string) bool {
 	lower := strings.ToLower(substr)
 	if ctx, ok := errors.AsType[errorfamily.Contextual](err); ok {
 		for _, v := range ctx.ErrorContext() {
@@ -269,37 +267,37 @@ func hasContextSubstring(err error, substr string) bool {
 	return strings.Contains(strings.ToLower(err.Error()), lower)
 }
 
-func familyIs(err error, family errorfamily.Family) bool {
+func FamilyIs(err error, family errorfamily.Family) bool {
 	return errorfamily.Classify(err) == family
 }
 
-func errorCodeContains(err error, substr string) bool {
+func ErrorCodeContains(err error, substr string) bool {
 	if coded, ok := errors.AsType[errorfamily.Coded](err); ok {
 		return strings.Contains(strings.ToLower(coded.ErrorCode()), strings.ToLower(substr))
 	}
 	return false
 }
 
-// ruleSpec declares the matching criteria for a diagnostic rule.
-type ruleSpec struct {
+// RuleSpec declares the matching criteria for a diagnostic rule.
+type RuleSpec struct {
 	ContextKeys   []string
 	CodeContains  []string
 	ContextSubstr []string
 	Extra         func(error) bool
 }
 
-// matches reports whether the error matches this spec's criteria.
-func (s ruleSpec) matches(err error) bool {
-	if len(s.ContextKeys) > 0 && hasContextKey(err, s.ContextKeys...) {
+// Matches reports whether the error matches this spec's criteria.
+func (s RuleSpec) Matches(err error) bool {
+	if len(s.ContextKeys) > 0 && HasContextKey(err, s.ContextKeys...) {
 		return true
 	}
 	for _, substr := range s.CodeContains {
-		if errorCodeContains(err, substr) {
+		if ErrorCodeContains(err, substr) {
 			return true
 		}
 	}
 	for _, substr := range s.ContextSubstr {
-		if hasContextSubstring(err, substr) {
+		if HasContextSubstring(err, substr) {
 			return true
 		}
 	}
