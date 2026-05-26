@@ -584,8 +584,23 @@ func TestErrorContextEmptyOrNil(t *testing.T) {
 	}
 }
 
+func testFamilyProperty[T comparable](t *testing.T, name string, cases []struct {
+	family Family
+	want   T
+}, get func(Family) T,
+) {
+	t.Helper()
+	for _, tt := range cases {
+		t.Run(tt.family.String(), func(t *testing.T) {
+			if got := get(tt.family); got != tt.want {
+				t.Errorf("%s() = %v, want %v", name, got, tt.want)
+			}
+		})
+	}
+}
+
 func TestFamilyDefaultMessageAll(t *testing.T) {
-	tests := []struct {
+	testFamilyProperty(t, "DefaultMessage", []struct {
 		family Family
 		want   string
 	}{
@@ -595,18 +610,11 @@ func TestFamilyDefaultMessageAll(t *testing.T) {
 		{Corruption, "Data appears to be corrupted. This requires manual intervention."},
 		{Infrastructure, "The service is currently unavailable. Please try again later."},
 		{Family(99), "An unexpected error occurred."},
-	}
-	for _, tt := range tests {
-		t.Run(tt.family.String(), func(t *testing.T) {
-			if got := tt.family.DefaultMessage(); got != tt.want {
-				t.Errorf("DefaultMessage() = %q, want %q", got, tt.want)
-			}
-		})
-	}
+	}, Family.DefaultMessage)
 }
 
 func TestFamilyDefaultWhyAll(t *testing.T) {
-	tests := []struct {
+	testFamilyProperty(t, "DefaultWhy", []struct {
 		family Family
 		want   string
 	}{
@@ -616,18 +624,11 @@ func TestFamilyDefaultWhyAll(t *testing.T) {
 		{Corruption, "Some data appears to be damaged. This requires attention."},
 		{Infrastructure, "This is a system issue, not something you caused."},
 		{Family(99), ""},
-	}
-	for _, tt := range tests {
-		t.Run(tt.family.String(), func(t *testing.T) {
-			if got := tt.family.DefaultWhy(); got != tt.want {
-				t.Errorf("DefaultWhy() = %q, want %q", got, tt.want)
-			}
-		})
-	}
+	}, Family.DefaultWhy)
 }
 
 func TestFamilyDefaultFixAll(t *testing.T) {
-	tests := []struct {
+	testFamilyProperty(t, "DefaultFix", []struct {
 		family Family
 		want   string
 	}{
@@ -637,18 +638,11 @@ func TestFamilyDefaultFixAll(t *testing.T) {
 		{Corruption, "This may require manual intervention. Check the logs for details."},
 		{Infrastructure, "The service may be temporarily unavailable. Try again later."},
 		{Family(99), "Try again or contact support."},
-	}
-	for _, tt := range tests {
-		t.Run(tt.family.String(), func(t *testing.T) {
-			if got := tt.family.DefaultFix(); got != tt.want {
-				t.Errorf("DefaultFix() = %q, want %q", got, tt.want)
-			}
-		})
-	}
+	}, Family.DefaultFix)
 }
 
 func TestFamilyToneAll(t *testing.T) {
-	tests := []struct {
+	testFamilyProperty(t, "Tone", []struct {
 		family Family
 		want   Tone
 	}{
@@ -658,14 +652,7 @@ func TestFamilyToneAll(t *testing.T) {
 		{Corruption, ToneUrgent},
 		{Infrastructure, ToneApologetic},
 		{Family(99), ToneApologetic},
-	}
-	for _, tt := range tests {
-		t.Run(tt.family.String(), func(t *testing.T) {
-			if got := tt.family.Tone(); got != tt.want {
-				t.Errorf("Tone() = %q, want %q", got, tt.want)
-			}
-		})
-	}
+	}, Family.Tone)
 }
 
 func TestAudienceString(t *testing.T) {
