@@ -28,6 +28,16 @@ import (
 	errorfamily "github.com/larsartmann/go-error-family"
 )
 
+// Common string constants for diagnostic result details to satisfy goconst.
+const (
+	strTrue      = "true"
+	strFalse     = "false"
+	strHost      = "host"
+	strPort      = "port"
+	strLocalhost = "localhost"
+	strUnknown   = "unknown"
+)
+
 // Status represents the result of a diagnostic check.
 type Status int
 
@@ -51,9 +61,9 @@ func (s Status) String() string {
 	case StatusFailed:
 		return "failed"
 	case StatusUnknown:
-		return "unknown"
+		return strUnknown
 	default:
-		return "unknown"
+		return strUnknown
 	}
 }
 

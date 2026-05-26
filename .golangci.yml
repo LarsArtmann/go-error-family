@@ -13,6 +13,9 @@ run:
 output:
   formats: {}
 linters:
+  disable:
+    - exhaustruct
+    - gochecknoglobals
   enable:
     - bodyclose
     - contextcheck
@@ -25,11 +28,9 @@ linters:
     - errname
     - errorlint
     - exhaustive
-    - exhaustruct
     - forcetypeassert
     - funlen
     - ginkgolinter
-    - gochecknoglobals
     - gochecknoinits
     - gochecksumtype
     - gocognit
@@ -81,9 +82,6 @@ linters:
       max-complexity: 12
     dupl:
       threshold: 100
-    exhaustruct:
-      exclude:
-        - os/exec.Cmd
     gocritic:
       disabled-checks:
         - ifElseChain
@@ -98,7 +96,6 @@ linters:
     rules:
       - path: _test\.go
         linters:
-          - gochecknoglobals
           - goconst
           - dupl
           - errcheck

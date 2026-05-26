@@ -4,6 +4,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"io"
 	"os/exec"
 	"strings"
 	"time"
@@ -15,18 +16,18 @@ func runCommand(
 	timeout time.Duration,
 	name string,
 	args ...string,
-) (stdout, stderr string, exitCode int, err error) {
+) (stdout string, exitCode int, err error) {
 	ctx, cancel := context.WithTimeout(ctx, timeout)
 	defer cancel()
 
+	//nolint:gosec // Intentional: diagnostic rules run user-provided commands from error context.
 	cmd := exec.CommandContext(ctx, name, args...)
-	var outBuf, errBuf strings.Builder
+	var outBuf strings.Builder
 	cmd.Stdout = &outBuf
-	cmd.Stderr = &errBuf
+	cmd.Stderr = io.Discard
 
 	err = cmd.Run()
 	stdout = strings.TrimSpace(outBuf.String())
-	stderr = strings.TrimSpace(errBuf.String())
 
 	if err != nil {
 		exitErr := &exec.ExitError{}
@@ -39,7 +40,7 @@ func runCommand(
 		}
 	}
 
-	return stdout, stderr, exitCode, err
+	return stdout, exitCode, err
 }
 
 // commandExists checks if a command is available on the system PATH.

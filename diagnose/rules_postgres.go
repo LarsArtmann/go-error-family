@@ -36,14 +36,14 @@ func (r *PostgresRule) Run(ctx context.Context, err error) (*DiagnosticResult, e
 
 	result := &DiagnosticResult{
 		Details: map[string]string{
-			"host": host,
-			"port": port,
+			strHost: host,
+			strPort: port,
 		},
 	}
 
 	// Check 1: pg_isready
 	if commandExists("pg_isready") {
-		stdout, _, exitCode, _ := runCommand(ctx, 5*time.Second, "pg_isready", "-h", host, "-p", port)
+		stdout, exitCode, _ := runCommand(ctx, 5*time.Second, "pg_isready", "-h", host, "-p", port)
 		result.Details["pg_isready"] = stdout
 		if exitCode == 0 {
 			result.Status = StatusHealthy
@@ -85,11 +85,11 @@ func (r *PostgresRule) Run(ctx context.Context, err error) (*DiagnosticResult, e
 }
 
 func (r *PostgresRule) resolveHost(err error) string {
-	return resolveContextKey(err, []string{"db_host", "postgres_host", "host", "PGHOST"}, "localhost")
+	return resolveContextKey(err, []string{"db_host", "postgres_host", strHost, "PGHOST"}, strLocalhost)
 }
 
 func (r *PostgresRule) resolvePort(err error) string {
-	for _, key := range []string{"db_port", "postgres_port", "port", "PGPORT"} {
+	for _, key := range []string{"db_port", "postgres_port", strPort, "PGPORT"} {
 		if v := contextValue(err, key); v != "" {
 			if _, err := strconv.Atoi(v); err == nil {
 				return v
@@ -116,14 +116,14 @@ func (r *PostgresRule) suggestStartFix() string {
 // Useful for health checks and startup validation.
 func IsPostgresRunning(ctx context.Context, host, port string) bool {
 	if host == "" {
-		host = "localhost"
+		host = strLocalhost
 	}
 	if port == "" {
 		port = "5432"
 	}
 
 	if commandExists("pg_isready") {
-		_, _, exitCode, _ := runCommand(ctx, 5*time.Second, "pg_isready", "-h", host, "-p", port)
+		_, exitCode, _ := runCommand(ctx, 5*time.Second, "pg_isready", "-h", host, "-p", port)
 		return exitCode == 0
 	}
 

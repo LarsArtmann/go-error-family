@@ -2,6 +2,18 @@ package errorfamily
 
 import "strings"
 
+// Common string constants to satisfy goconst linter.
+const (
+	strRejection      = "rejection"
+	strConflict       = "conflict"
+	strTransient      = "transient"
+	strCorruption     = "corruption"
+	strInfrastructure = "infrastructure"
+	strUnknown        = "unknown"
+	msgCheckInput     = "Check your input and try again."
+	msgRefreshData    = "Refresh your data and try the operation again."
+)
+
 // Family classifies an error's behavioral profile for automated handling.
 //
 // One concept serving three audiences:
@@ -45,21 +57,21 @@ type familyInfo struct {
 
 var familyData = [...]familyInfo{
 	Rejection: {
-		Name:    "rejection",
+		Name:    strRejection,
 		Exit:    1,
 		Tone:    ToneInstructional,
 		Message: "The request was invalid. Check your input and try again.",
-		Fix:     "Check your input and try again.",
+		Fix:     msgCheckInput,
 	},
 	Conflict: {
-		Name:    "conflict",
+		Name:    strConflict,
 		Exit:    1,
 		Tone:    ToneExplanatory,
 		Message: "A conflict was detected. Refresh and try again.",
-		Fix:     "Refresh your data and try the operation again.",
+		Fix:     msgRefreshData,
 	},
 	Transient: {
-		Name:    "transient",
+		Name:    strTransient,
 		Exit:    75,
 		Tone:    ToneReassuring,
 		Message: "A temporary error occurred. Please try again in a few moments.",
@@ -67,7 +79,7 @@ var familyData = [...]familyInfo{
 		Fix:     "Wait a moment and try again.",
 	},
 	Corruption: {
-		Name:    "corruption",
+		Name:    strCorruption,
 		Exit:    65,
 		Tone:    ToneUrgent,
 		Message: "Data appears to be corrupted. This requires manual intervention.",
@@ -75,7 +87,7 @@ var familyData = [...]familyInfo{
 		Fix:     "This may require manual intervention. Check the logs for details.",
 	},
 	Infrastructure: {
-		Name:    "infrastructure",
+		Name:    strInfrastructure,
 		Exit:    69,
 		Tone:    ToneApologetic,
 		Message: "The service is currently unavailable. Please try again later.",
@@ -88,7 +100,7 @@ func (f Family) String() string {
 	if f.IsValid() {
 		return familyData[f].Name
 	}
-	return "unknown"
+	return strUnknown
 }
 
 // ParseFamily parses a family string, case-insensitive.
@@ -166,7 +178,7 @@ func (a Audience) String() string {
 	case AudienceAll:
 		return "all"
 	default:
-		return "unknown"
+		return strUnknown
 	}
 }
 

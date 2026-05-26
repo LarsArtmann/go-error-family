@@ -17,7 +17,7 @@ import (
 // or error codes containing "git".
 type GitRule struct{}
 
-func (r *GitRule) Name() string { return "git" }
+func (r *GitRule) Name() string { return "git" } //nolint:goconst // Rule name, not worth extracting
 
 func (r *GitRule) Applicable(err error) bool {
 	return gitSpec.matches(err)
@@ -29,6 +29,7 @@ var gitSpec = ruleSpec{
 	ContextSubstr: []string{"git"},
 }
 
+//nolint:nilerr // Diagnostic rules return results, not errors; local stat errors are expected.
 func (r *GitRule) Run(ctx context.Context, err error) (*DiagnosticResult, error) {
 	repoPath := r.resolveRepoPath(err)
 
@@ -39,14 +40,15 @@ func (r *GitRule) Run(ctx context.Context, err error) (*DiagnosticResult, error)
 
 	// Check 1: Is this a git repo?
 	gitDir := filepath.Join(repoPath, ".git")
-	if info, err := os.Stat(gitDir); err != nil || !info.IsDir() {
+	info, gitDirErr := os.Stat(gitDir)
+	if gitDirErr != nil || !info.IsDir() {
 		result.Status = StatusFailed
 		result.Summary = "Not a git repository: " + repoPath
-		result.Details["is_repo"] = "false"
+		result.Details["is_repo"] = strFalse
 		result.SuggestedFix = fmt.Sprintf("Initialize a git repository:\n  cd %s && git init", repoPath)
 		return result, nil
 	}
-	result.Details["is_repo"] = "true"
+	result.Details["is_repo"] = strTrue
 
 	if !commandExists("git") {
 		result.Status = StatusUnknown
@@ -55,63 +57,76 @@ func (r *GitRule) Run(ctx context.Context, err error) (*DiagnosticResult, error)
 	}
 
 	// Check 2: Is the working tree clean?
-	stdout, _, exitCode, _ := runCommand(ctx, 5*time.Second, "git", "-C", repoPath, "status", "--porcelain")
-	if exitCode != 0 {
-		result.Status = StatusUnknown
-		result.Summary = "git status failed in " + repoPath
-		return result, nil
-	}
-
-	if strings.TrimSpace(stdout) == "" {
-		result.Details["clean"] = "true"
-	} else {
-		result.Details["clean"] = "false"
-		lineCount := len(strings.Split(strings.TrimSpace(stdout), "\n"))
-		result.Details["dirty_files"] = strconv.Itoa(lineCount)
-
-		// Check for merge conflicts.
-		if strings.Contains(stdout, "UU") || strings.Contains(stdout, "AA") || strings.Contains(stdout, "DU") {
-			result.Status = StatusFailed
-			result.Summary = fmt.Sprintf(
-				"Merge conflicts in %s (%d unmerged files)",
-				repoPath,
-				strings.Count(stdout, "UU")+strings.Count(stdout, "AA"),
-			)
-			result.Details["merge_conflicts"] = "true"
-			result.SuggestedFix = "Resolve merge conflicts:\n  git mergetool\n  git add <resolved files>\n  git commit"
-			return result, nil
-		}
-
-		result.Status = StatusDegraded
-		result.Summary = fmt.Sprintf("Working tree has uncommitted changes (%d files)", lineCount)
-		result.SuggestedFix = "Commit or stash changes:\n  git add . && git commit -m \"wip\"\nOr: git stash"
+	if r.checkWorkingTree(ctx, result, repoPath) {
 		return result, nil
 	}
 
 	// Check 3: Can we reach the remote?
-	remotesStdout, _, _, _ := runCommand(ctx, 3*time.Second, "git", "-C", repoPath, "remote")
+	r.checkRemote(ctx, result, repoPath)
+
+	return result, nil
+}
+
+// checkWorkingTree returns true if the result has been set (either dirty or conflicts found).
+func (r *GitRule) checkWorkingTree(ctx context.Context, result *DiagnosticResult, repoPath string) bool {
+	stdout, exitCode, _ := runCommand(ctx, 5*time.Second, "git", "-C", repoPath, "status", "--porcelain")
+	if exitCode != 0 {
+		result.Status = StatusUnknown
+		result.Summary = "git status failed in " + repoPath
+		return true
+	}
+
+	trimmed := strings.TrimSpace(stdout)
+	if trimmed == "" {
+		result.Details["clean"] = strTrue
+		return false
+	}
+
+	result.Details["clean"] = strFalse
+	lineCount := len(strings.Split(trimmed, "\n"))
+	result.Details["dirty_files"] = strconv.Itoa(lineCount)
+
+	// Check for merge conflicts.
+	if strings.Contains(trimmed, "UU") || strings.Contains(trimmed, "AA") || strings.Contains(trimmed, "DU") {
+		result.Status = StatusFailed
+		result.Summary = fmt.Sprintf(
+			"Merge conflicts in %s (%d unmerged files)",
+			repoPath,
+			strings.Count(trimmed, "UU")+strings.Count(trimmed, "AA"),
+		)
+		result.Details["merge_conflicts"] = strTrue
+		result.SuggestedFix = "Resolve merge conflicts:\n  git mergetool\n  git add <resolved files>\n  git commit"
+		return true
+	}
+
+	result.Status = StatusDegraded
+	result.Summary = fmt.Sprintf("Working tree has uncommitted changes (%d files)", lineCount)
+	result.SuggestedFix = "Commit or stash changes:\n  git add . && git commit -m \"wip\"\nOr: git stash"
+	return true
+}
+
+func (r *GitRule) checkRemote(ctx context.Context, result *DiagnosticResult, repoPath string) {
+	remotesStdout, _, _ := runCommand(ctx, 3*time.Second, "git", "-C", repoPath, "remote")
 	if strings.TrimSpace(remotesStdout) == "" {
 		result.Status = StatusHealthy
 		result.Summary = "Git repo is clean, no remotes configured: " + repoPath
 		result.Confidence = ConfidenceNotCause
-		return result, nil
+		return
 	}
 
-	_, _, remoteExitCode, _ := runCommand(ctx, 10*time.Second, "git", "-C", repoPath, "ls-remote", "--heads", "origin")
+	_, remoteExitCode, _ := runCommand(ctx, 10*time.Second, "git", "-C", repoPath, "ls-remote", "--heads", "origin")
 	if remoteExitCode != 0 {
 		result.Status = StatusDegraded
 		result.Summary = "Git repo is clean but remote is unreachable: " + repoPath
-		result.Details["remote_reachable"] = "false"
+		result.Details["remote_reachable"] = strFalse
 		result.SuggestedFix = "Check network connectivity and remote URL:\n  git remote -v\n  git ls-remote origin"
-		return result, nil
+		return
 	}
 
 	result.Status = StatusHealthy
 	result.Summary = "Git repo is clean and remote is reachable: " + repoPath
-	result.Details["remote_reachable"] = "true"
+	result.Details["remote_reachable"] = strTrue
 	result.Confidence = ConfidenceNotCause
-
-	return result, nil
 }
 
 func (r *GitRule) resolveRepoPath(err error) string {

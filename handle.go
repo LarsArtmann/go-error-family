@@ -10,6 +10,22 @@ import (
 	"sync"
 )
 
+// Error code constants to satisfy goconst linter.
+const (
+	codeFileNotFound      = "file.not_found"
+	codePermissionDenied  = "permission.denied"
+	codeDBTimeout         = "db.timeout"
+	codeDBConnection      = "db.connection"
+	codeDBError           = "db.error"
+	codeConfigInvalid     = "config.invalid"
+	codeConfigNotFound    = "config.not_found"
+	codeConflict          = "conflict"
+	codeValidation        = "validation"
+	codeTimeout           = "timeout"
+	codeConnectionRefused = "connection.refused"
+	codeGitError          = "git.error"
+)
+
 // HandleResult contains the full output of handling an error at the CLI boundary.
 type HandleResult struct {
 	ExitCode     int
@@ -225,33 +241,36 @@ func lookupDefault(code string) (MessageTemplate, bool) {
 // defaultMessages maps error codes (lowercase) to human-readable messages.
 // Codes are matched exactly — no substring matching.
 var defaultMessages = map[string]MessageTemplate{
-	"file.not_found": {
+	codeFileNotFound: {
 		What: "A required resource was not found.",
 		Fix:  "Check that the path and resource name are correct.",
 	},
-	"permission.denied": {
+	codePermissionDenied: {
 		What: "Permission was denied.",
 		Fix:  "Check file permissions or run with appropriate privileges.",
 	},
-	"db.timeout": {
+	codeDBTimeout: {
 		What: "The database operation timed out.",
 		Fix:  "Increase the timeout or check system resources.",
 	},
-	"db.connection": {
+	codeDBConnection: {
 		What: "Could not establish a database connection.",
 		Fix:  "Check that the database is running and reachable.",
 	},
-	"db.error":       {What: "A database operation failed.", Fix: "Check the database logs for details."},
-	"config.invalid": {What: "There is a configuration issue.", Fix: "Review your configuration file for errors."},
-	"config.not_found": {
+	codeDBError:       {What: "A database operation failed.", Fix: "Check the database logs for details."},
+	codeConfigInvalid: {What: "There is a configuration issue.", Fix: "Review your configuration file for errors."},
+	codeConfigNotFound: {
 		What: "A configuration file was not found.",
 		Fix:  "Check that the config file path is correct.",
 	},
-	"conflict":           {What: "A conflict was detected.", Fix: "Refresh your data and try the operation again."},
-	"validation":         {What: "Validation failed.", Fix: "Check your input and try again."},
-	"timeout":            {What: "The operation timed out.", Fix: "Increase the timeout or check system resources."},
-	"connection.refused": {What: "Could not establish a connection.", Fix: "Check that the target service is running."},
-	"git.error":          {What: "A git operation failed.", Fix: "Check the git repository state."},
+	codeConflict:   {What: "A conflict was detected.", Fix: msgRefreshData},
+	codeValidation: {What: "Validation failed.", Fix: msgCheckInput},
+	codeTimeout:    {What: "The operation timed out.", Fix: "Increase the timeout or check system resources."},
+	codeConnectionRefused: {
+		What: "Could not establish a connection.",
+		Fix:  "Check that the target service is running.",
+	},
+	codeGitError: {What: "A git operation failed.", Fix: "Check the git repository state."},
 }
 
 // RegisterTemplate adds a MessageTemplate for a specific error code.

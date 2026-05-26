@@ -162,7 +162,7 @@ func TestHandleErrorDetailedWithCode(t *testing.T) {
 }
 
 func TestHandleErrorDetailedPlainError(t *testing.T) {
-	result := HandleErrorDetailed(plainErr("something went wrong"))
+	result := HandleErrorDetailed(plainError("something went wrong"))
 
 	if result.ExitCode != 75 {
 		t.Errorf("plain error should default to Transient (exit 75), got %d", result.ExitCode)
@@ -170,7 +170,7 @@ func TestHandleErrorDetailedPlainError(t *testing.T) {
 }
 
 func TestHandleErrorPlainError(t *testing.T) {
-	code := HandleError(plainErr("unknown"))
+	code := HandleError(plainError("unknown"))
 	if code != 75 {
 		t.Errorf("HandleError(plain) = %d, want 75", code)
 	}
@@ -208,9 +208,9 @@ func TestMessageTemplateApply(t *testing.T) {
 	}
 }
 
-type plainErr string
+type plainError string
 
-func (e plainErr) Error() string { return string(e) }
+func (e plainError) Error() string { return string(e) }
 
 func TestRegisterTemplateAndLookup(t *testing.T) {
 	RegisterTemplate("test.registered", MessageTemplate{

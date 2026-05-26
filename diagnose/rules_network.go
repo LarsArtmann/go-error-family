@@ -22,7 +22,7 @@ func (r *NetworkRule) Applicable(err error) bool {
 }
 
 var networkSpec = ruleSpec{
-	ContextKeys:   []string{"host", "port", "url", "endpoint", "address", "remote"},
+	ContextKeys:   []string{strHost, strPort, "url", "endpoint", "address", "remote"},
 	CodeContains:  []string{"network", "connect", "dial", "timeout"},
 	ContextSubstr: []string{"connection refused", "no such host", "i/o timeout"},
 }
@@ -32,7 +32,7 @@ func (r *NetworkRule) Run(ctx context.Context, err error) (*DiagnosticResult, er
 	port := r.resolvePort(err)
 
 	result := &DiagnosticResult{
-		Details:    map[string]string{"host": host, "port": port},
+		Details:    map[string]string{strHost: host, strPort: port},
 		Confidence: ConfidenceLikely,
 	}
 
@@ -59,7 +59,7 @@ func (r *NetworkRule) Run(ctx context.Context, err error) (*DiagnosticResult, er
 			result.Status = StatusFailed
 			result.Summary = fmt.Sprintf("Cannot connect to %s: %v", addr, dialErr)
 			result.Details["tcp_error"] = dialErr.Error()
-			result.Details["tcp_reachable"] = "false"
+			result.Details["tcp_reachable"] = strFalse
 			result.SuggestedFix = fmt.Sprintf(
 				"Check connectivity:\n  nc -zv %s %s\n\nCheck firewall rules and service status.",
 				host,
@@ -68,7 +68,7 @@ func (r *NetworkRule) Run(ctx context.Context, err error) (*DiagnosticResult, er
 			return result, nil
 		}
 		_ = conn.Close()
-		result.Details["tcp_reachable"] = "true"
+		result.Details["tcp_reachable"] = strTrue
 	}
 
 	result.Status = StatusHealthy
@@ -79,7 +79,7 @@ func (r *NetworkRule) Run(ctx context.Context, err error) (*DiagnosticResult, er
 }
 
 func (r *NetworkRule) resolveHost(err error) string {
-	v := resolveContextKey(err, []string{"host", "remote", "endpoint"}, "")
+	v := resolveContextKey(err, []string{strHost, "remote", "endpoint"}, "")
 	if v == "" {
 		return ""
 	}
@@ -95,5 +95,5 @@ func (r *NetworkRule) resolveHost(err error) string {
 }
 
 func (r *NetworkRule) resolvePort(err error) string {
-	return resolveContextKey(err, []string{"port"}, "")
+	return resolveContextKey(err, []string{strPort}, "")
 }
