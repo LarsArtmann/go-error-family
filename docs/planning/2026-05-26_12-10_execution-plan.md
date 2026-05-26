@@ -12,19 +12,24 @@
 ## Execution Plan (Pareto-sorted)
 
 ### P1: Benchmarks (Low effort, High value)
+
 1. Add `benchmark_test.go`: `BenchmarkClassify`, `BenchmarkClassifyMultiError`, `BenchmarkHandleError`, `BenchmarkRunnerRun`
 
 ### P2: Correctness fixes (Medium effort, High value)
+
 2. Check `ctx.Done()` in `RunCommand` — respect cancellation mid-execution
 3. Add `Duration` assertion to `TestDiagnosticResultDuration` in diagnose_test.go
 
 ### P3: Type safety (Low effort, Medium value)
+
 4. Add `ContextKey` type + constants in `diagnose/diagnose.go`
 
 ### P4: Documentation / Examples (Medium effort, Medium value)
+
 5. Add `examples/` with CLI, HTTP handler, custom rule examples
 
 ### P5: Nice-to-have (Low effort, Low value)
+
 6. Extract `partsBuilder` helper from handle.go duplication
 
 ## Design Decisions

@@ -13,3 +13,5 @@ node_modules/
 
 # Override global ignore: go.work is required for multi-module workspace
 !go.work
+# Copy/paste detection report
+/report/jscpd-report.json
