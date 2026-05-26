@@ -346,12 +346,12 @@ func (r *MyRule) Applicable(err error) bool { return mySpec.matches(err) }
 
 ### Built-in Rules
 
-| Rule             | Matches On                                                                                                         | Checks                      |
-| ---------------- | ------------------------------------------------------------------------------------------------------------------- | ---------------------------- |
-| `PostgresRule`   | Keys: `db_host`, `db_port`, `db_name`, `database_url`, `postgres_host`. Codes: `db.`, `database`. Substr: `postgres`, `postgresql`, `database`, `sql` + Transient family | pg_isready, TCP, start cmd   |
-| `FilesystemRule` | Keys: `path`, `file`, `dir`, `directory`, `config_path`, `output_path`. Codes: `file`, `dir`, `path`, `config`, `permission` | Existence, permissions, write |
-| `NetworkRule`    | Keys: `host`, `port`, `url`, `endpoint`, `address`, `remote`. Codes: `network`, `connect`, `dial`, `timeout`. Substr: `connection refused`, `no such host`, `i/o timeout` | DNS, TCP, port reachability  |
-| `GitRule`        | Keys: `git`, `repository`, `repo`, `branch`, `git_dir`. Codes: `git`. Substr: `git`                               | Repo, tree, merge, remote    |
+| Rule             | Matches On                                                                                                                                                                | Checks                        |
+| ---------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------- |
+| `PostgresRule`   | Keys: `db_host`, `db_port`, `db_name`, `database_url`, `postgres_host`. Codes: `db.`, `database`. Substr: `postgres`, `postgresql`, `database`, `sql` + Transient family  | pg_isready, TCP, start cmd    |
+| `FilesystemRule` | Keys: `path`, `file`, `dir`, `directory`, `config_path`, `output_path`. Codes: `file`, `dir`, `path`, `config`, `permission`                                              | Existence, permissions, write |
+| `NetworkRule`    | Keys: `host`, `port`, `url`, `endpoint`, `address`, `remote`. Codes: `network`, `connect`, `dial`, `timeout`. Substr: `connection refused`, `no such host`, `i/o timeout` | DNS, TCP, port reachability   |
+| `GitRule`        | Keys: `git`, `repository`, `repo`, `branch`, `git_dir`. Codes: `git`. Substr: `git`                                                                                       | Repo, tree, merge, remote     |
 
 ---
 

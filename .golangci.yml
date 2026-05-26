@@ -1,7 +1,7 @@
 version: "2"
 run:
   timeout: 5m
-  go: "1.26.3"
+  go: 1.26.3
   build-tags:
     - goexperiment.arenas
     - goexperiment.goroutineleakprofile
@@ -9,6 +9,9 @@ run:
     - goexperiment.runtimesecret
     - goexperiment.simd
   allow-parallel-runners: true
+  allow-serial-runners: true
+output:
+  formats: {}
 linters:
   enable:
     - bodyclose
@@ -22,6 +25,7 @@ linters:
     - errname
     - errorlint
     - exhaustive
+    - exhaustruct
     - forcetypeassert
     - funlen
     - ginkgolinter
@@ -33,10 +37,14 @@ linters:
     - gocritic
     - gocyclo
     - gosec
+    - gosmopolitan
     - govet
     - ineffassign
+    - interfacebloat
     - intrange
+    - loggercheck
     - maintidx
+    - mirror
     - misspell
     - musttag
     - nakedret
@@ -50,10 +58,16 @@ linters:
     - perfsprint
     - prealloc
     - predeclared
+    - protogetter
     - reassign
     - recvcheck
     - revive
+    - rowserrcheck
+    - sloglint
+    - spancheck
+    - sqlclosecheck
     - staticcheck
+    - testifylint
     - thelper
     - unconvert
     - unparam
@@ -61,14 +75,24 @@ linters:
     - usetesting
     - wastedassign
     - wrapcheck
+    - zerologlint
   settings:
     cyclop:
       max-complexity: 12
     dupl:
       threshold: 100
+    exhaustruct:
+      exclude:
+        - os/exec.Cmd
     gocritic:
       disabled-checks:
         - ifElseChain
+    revive:
+      rules:
+        - disabled: true
+          name: exported
+        - disabled: true
+          name: package-comments
   exclusions:
     generated: lax
     rules:
@@ -87,9 +111,25 @@ linters:
       - path: agent/
         linters:
           - wrapcheck
+      - path: _test\.go
+        text: unused
+        linters:
+          - unused
+    paths:
+      - \.gen\.go$
+      - _templ\.go$
+      - vendor/
 formatters:
   enable:
     - gci
+    - goimports
     - gofumpt
+    - golines
+  settings:
+    golines:
+      max-len: 120
   exclusions:
     generated: lax
+    paths:
+      - _templ\.go$
+issues: {}

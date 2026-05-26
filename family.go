@@ -44,11 +44,44 @@ type familyInfo struct {
 }
 
 var familyData = [...]familyInfo{
-	Rejection:      {Name: "rejection", Exit: 1, Tone: ToneInstructional, Message: "The request was invalid. Check your input and try again.", Fix: "Check your input and try again."},
-	Conflict:       {Name: "conflict", Exit: 1, Tone: ToneExplanatory, Message: "A conflict was detected. Refresh and try again.", Fix: "Refresh your data and try the operation again."},
-	Transient:      {Name: "transient", Exit: 75, Tone: ToneReassuring, Message: "A temporary error occurred. Please try again in a few moments.", Why: "This is a temporary issue. No data was lost.", Fix: "Wait a moment and try again."},
-	Corruption:     {Name: "corruption", Exit: 65, Tone: ToneUrgent, Message: "Data appears to be corrupted. This requires manual intervention.", Why: "Some data appears to be damaged. This requires attention.", Fix: "This may require manual intervention. Check the logs for details."},
-	Infrastructure: {Name: "infrastructure", Exit: 69, Tone: ToneApologetic, Message: "The service is currently unavailable. Please try again later.", Why: "This is a system issue, not something you caused.", Fix: "The service may be temporarily unavailable. Try again later."},
+	Rejection: {
+		Name:    "rejection",
+		Exit:    1,
+		Tone:    ToneInstructional,
+		Message: "The request was invalid. Check your input and try again.",
+		Fix:     "Check your input and try again.",
+	},
+	Conflict: {
+		Name:    "conflict",
+		Exit:    1,
+		Tone:    ToneExplanatory,
+		Message: "A conflict was detected. Refresh and try again.",
+		Fix:     "Refresh your data and try the operation again.",
+	},
+	Transient: {
+		Name:    "transient",
+		Exit:    75,
+		Tone:    ToneReassuring,
+		Message: "A temporary error occurred. Please try again in a few moments.",
+		Why:     "This is a temporary issue. No data was lost.",
+		Fix:     "Wait a moment and try again.",
+	},
+	Corruption: {
+		Name:    "corruption",
+		Exit:    65,
+		Tone:    ToneUrgent,
+		Message: "Data appears to be corrupted. This requires manual intervention.",
+		Why:     "Some data appears to be damaged. This requires attention.",
+		Fix:     "This may require manual intervention. Check the logs for details.",
+	},
+	Infrastructure: {
+		Name:    "infrastructure",
+		Exit:    69,
+		Tone:    ToneApologetic,
+		Message: "The service is currently unavailable. Please try again later.",
+		Why:     "This is a system issue, not something you caused.",
+		Fix:     "The service may be temporarily unavailable. Try again later.",
+	},
 }
 
 func (f Family) String() string {

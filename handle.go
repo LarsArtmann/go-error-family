@@ -180,7 +180,7 @@ func renderMessage(code string, context map[string]string, family Family) string
 
 	// Family fallback with code as header.
 	var parts []string
-	parts = append(parts, fmt.Sprintf("Error: %s", code))
+	parts = append(parts, "Error: "+code)
 	if why := family.DefaultWhy(); why != "" {
 		parts = append(parts, why)
 	}
@@ -225,13 +225,28 @@ func lookupDefault(code string) (MessageTemplate, bool) {
 // defaultMessages maps error codes (lowercase) to human-readable messages.
 // Codes are matched exactly — no substring matching.
 var defaultMessages = map[string]MessageTemplate{
-	"file.not_found":     {What: "A required resource was not found.", Fix: "Check that the path and resource name are correct."},
-	"permission.denied":  {What: "Permission was denied.", Fix: "Check file permissions or run with appropriate privileges."},
-	"db.timeout":         {What: "The database operation timed out.", Fix: "Increase the timeout or check system resources."},
-	"db.connection":      {What: "Could not establish a database connection.", Fix: "Check that the database is running and reachable."},
-	"db.error":           {What: "A database operation failed.", Fix: "Check the database logs for details."},
-	"config.invalid":     {What: "There is a configuration issue.", Fix: "Review your configuration file for errors."},
-	"config.not_found":   {What: "A configuration file was not found.", Fix: "Check that the config file path is correct."},
+	"file.not_found": {
+		What: "A required resource was not found.",
+		Fix:  "Check that the path and resource name are correct.",
+	},
+	"permission.denied": {
+		What: "Permission was denied.",
+		Fix:  "Check file permissions or run with appropriate privileges.",
+	},
+	"db.timeout": {
+		What: "The database operation timed out.",
+		Fix:  "Increase the timeout or check system resources.",
+	},
+	"db.connection": {
+		What: "Could not establish a database connection.",
+		Fix:  "Check that the database is running and reachable.",
+	},
+	"db.error":       {What: "A database operation failed.", Fix: "Check the database logs for details."},
+	"config.invalid": {What: "There is a configuration issue.", Fix: "Review your configuration file for errors."},
+	"config.not_found": {
+		What: "A configuration file was not found.",
+		Fix:  "Check that the config file path is correct.",
+	},
 	"conflict":           {What: "A conflict was detected.", Fix: "Refresh your data and try the operation again."},
 	"validation":         {What: "Validation failed.", Fix: "Check your input and try again."},
 	"timeout":            {What: "The operation timed out.", Fix: "Increase the timeout or check system resources."},

@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
+	"strconv"
 	"strings"
 	"time"
 )
@@ -40,7 +41,7 @@ func (r *GitRule) Run(ctx context.Context, err error) (*DiagnosticResult, error)
 	gitDir := filepath.Join(repoPath, ".git")
 	if info, err := os.Stat(gitDir); err != nil || !info.IsDir() {
 		result.Status = StatusFailed
-		result.Summary = fmt.Sprintf("Not a git repository: %s", repoPath)
+		result.Summary = "Not a git repository: " + repoPath
 		result.Details["is_repo"] = "false"
 		result.SuggestedFix = fmt.Sprintf("Initialize a git repository:\n  cd %s && git init", repoPath)
 		return result, nil
@@ -57,7 +58,7 @@ func (r *GitRule) Run(ctx context.Context, err error) (*DiagnosticResult, error)
 	stdout, _, exitCode, _ := runCommand(ctx, 5*time.Second, "git", "-C", repoPath, "status", "--porcelain")
 	if exitCode != 0 {
 		result.Status = StatusUnknown
-		result.Summary = fmt.Sprintf("git status failed in %s", repoPath)
+		result.Summary = "git status failed in " + repoPath
 		return result, nil
 	}
 
@@ -66,12 +67,16 @@ func (r *GitRule) Run(ctx context.Context, err error) (*DiagnosticResult, error)
 	} else {
 		result.Details["clean"] = "false"
 		lineCount := len(strings.Split(strings.TrimSpace(stdout), "\n"))
-		result.Details["dirty_files"] = fmt.Sprintf("%d", lineCount)
+		result.Details["dirty_files"] = strconv.Itoa(lineCount)
 
 		// Check for merge conflicts.
 		if strings.Contains(stdout, "UU") || strings.Contains(stdout, "AA") || strings.Contains(stdout, "DU") {
 			result.Status = StatusFailed
-			result.Summary = fmt.Sprintf("Merge conflicts in %s (%d unmerged files)", repoPath, strings.Count(stdout, "UU")+strings.Count(stdout, "AA"))
+			result.Summary = fmt.Sprintf(
+				"Merge conflicts in %s (%d unmerged files)",
+				repoPath,
+				strings.Count(stdout, "UU")+strings.Count(stdout, "AA"),
+			)
 			result.Details["merge_conflicts"] = "true"
 			result.SuggestedFix = "Resolve merge conflicts:\n  git mergetool\n  git add <resolved files>\n  git commit"
 			return result, nil
@@ -87,7 +92,7 @@ func (r *GitRule) Run(ctx context.Context, err error) (*DiagnosticResult, error)
 	remotesStdout, _, _, _ := runCommand(ctx, 3*time.Second, "git", "-C", repoPath, "remote")
 	if strings.TrimSpace(remotesStdout) == "" {
 		result.Status = StatusHealthy
-		result.Summary = fmt.Sprintf("Git repo is clean, no remotes configured: %s", repoPath)
+		result.Summary = "Git repo is clean, no remotes configured: " + repoPath
 		result.Confidence = ConfidenceNotCause
 		return result, nil
 	}
@@ -95,14 +100,14 @@ func (r *GitRule) Run(ctx context.Context, err error) (*DiagnosticResult, error)
 	_, _, remoteExitCode, _ := runCommand(ctx, 10*time.Second, "git", "-C", repoPath, "ls-remote", "--heads", "origin")
 	if remoteExitCode != 0 {
 		result.Status = StatusDegraded
-		result.Summary = fmt.Sprintf("Git repo is clean but remote is unreachable: %s", repoPath)
+		result.Summary = "Git repo is clean but remote is unreachable: " + repoPath
 		result.Details["remote_reachable"] = "false"
 		result.SuggestedFix = "Check network connectivity and remote URL:\n  git remote -v\n  git ls-remote origin"
 		return result, nil
 	}
 
 	result.Status = StatusHealthy
-	result.Summary = fmt.Sprintf("Git repo is clean and remote is reachable: %s", repoPath)
+	result.Summary = "Git repo is clean and remote is reachable: " + repoPath
 	result.Details["remote_reachable"] = "true"
 	result.Confidence = ConfidenceNotCause
 

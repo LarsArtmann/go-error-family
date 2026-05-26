@@ -8,3 +8,5 @@
 node_modules/
 # Sensitive files
 *.db
+# Nix build output
+/result

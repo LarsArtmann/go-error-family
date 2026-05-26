@@ -48,7 +48,7 @@ func (r *FilesystemRule) Run(ctx context.Context, err error) (*DiagnosticResult,
 	if statErr != nil {
 		if os.IsNotExist(statErr) {
 			result.Status = StatusFailed
-			result.Summary = fmt.Sprintf("Path does not exist: %s", path)
+			result.Summary = "Path does not exist: " + path
 			result.Details["exists"] = "false"
 
 			// Check parent directory.
@@ -56,14 +56,14 @@ func (r *FilesystemRule) Run(ctx context.Context, err error) (*DiagnosticResult,
 			parentInfo, parentErr := os.Stat(parent)
 			if parentErr != nil {
 				result.Details["parent_exists"] = "false"
-				result.SuggestedFix = fmt.Sprintf("Create parent directory and path:\n  mkdir -p %s", parent)
+				result.SuggestedFix = "Create parent directory and path:\n  mkdir -p " + parent
 			} else {
 				result.Details["parent_exists"] = "true"
 				result.Details["parent_permissions"] = parentInfo.Mode().Perm().String()
 				if strings.Contains(path, ".") {
-					result.SuggestedFix = fmt.Sprintf("Create the file: %s", path)
+					result.SuggestedFix = "Create the file: " + path
 				} else {
-					result.SuggestedFix = fmt.Sprintf("Create directory: mkdir -p %s", path)
+					result.SuggestedFix = "Create directory: mkdir -p " + path
 				}
 			}
 			return result, nil
@@ -71,10 +71,13 @@ func (r *FilesystemRule) Run(ctx context.Context, err error) (*DiagnosticResult,
 
 		if os.IsPermission(statErr) {
 			result.Status = StatusFailed
-			result.Summary = fmt.Sprintf("Permission denied: %s", path)
+			result.Summary = "Permission denied: " + path
 			result.Details["exists"] = "true"
 			result.Details["permissions"] = "denied"
-			result.SuggestedFix = fmt.Sprintf("Fix permissions:\n  chmod 755 %s\nOr run with appropriate privileges.", path)
+			result.SuggestedFix = fmt.Sprintf(
+				"Fix permissions:\n  chmod 755 %s\nOr run with appropriate privileges.",
+				path,
+			)
 
 			return result, nil
 		}
@@ -99,14 +102,14 @@ func (r *FilesystemRule) Run(ctx context.Context, err error) (*DiagnosticResult,
 		if f, err := os.Create(testFile); err != nil {
 			result.Details["writable"] = "false"
 			result.Status = StatusDegraded
-			result.Summary = fmt.Sprintf("Directory exists but is not writable: %s", path)
-			result.SuggestedFix = fmt.Sprintf("Fix write permissions:\n  chmod 755 %s", path)
+			result.Summary = "Directory exists but is not writable: " + path
+			result.SuggestedFix = "Fix write permissions:\n  chmod 755 " + path
 		} else {
 			_ = f.Close()
 			_ = os.Remove(testFile)
 			result.Details["writable"] = "true"
 			result.Status = StatusHealthy
-			result.Summary = fmt.Sprintf("Path exists and is writable: %s", path)
+			result.Summary = "Path exists and is writable: " + path
 			result.Confidence = ConfidenceNotCause // Path is fine — probably not the root cause
 		}
 	} else {
@@ -114,8 +117,8 @@ func (r *FilesystemRule) Run(ctx context.Context, err error) (*DiagnosticResult,
 		if f, err := os.Open(path); err != nil {
 			result.Details["readable"] = "false"
 			result.Status = StatusDegraded
-			result.Summary = fmt.Sprintf("File exists but is not readable: %s", path)
-			result.SuggestedFix = fmt.Sprintf("Fix read permissions:\n  chmod 644 %s", path)
+			result.Summary = "File exists but is not readable: " + path
+			result.SuggestedFix = "Fix read permissions:\n  chmod 644 " + path
 		} else {
 			_ = f.Close()
 			result.Details["readable"] = "true"

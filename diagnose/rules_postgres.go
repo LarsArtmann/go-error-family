@@ -73,7 +73,12 @@ func (r *PostgresRule) Run(ctx context.Context, err error) (*DiagnosticResult, e
 	result.Status = StatusFailed
 	result.Summary = fmt.Sprintf("Cannot connect to %s: %v", addr, dialErr)
 	result.Details["tcp_error"] = dialErr.Error()
-	result.SuggestedFix = fmt.Sprintf("Check if PostgreSQL is running:\n  pg_isready -h %s -p %s\n\nStart if needed:\n  %s", host, port, r.suggestStartFix())
+	result.SuggestedFix = fmt.Sprintf(
+		"Check if PostgreSQL is running:\n  pg_isready -h %s -p %s\n\nStart if needed:\n  %s",
+		host,
+		port,
+		r.suggestStartFix(),
+	)
 	result.Confidence = ConfidenceVeryHigh
 
 	return result, nil

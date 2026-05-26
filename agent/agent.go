@@ -95,7 +95,11 @@ func (a *agent) Analyze(ctx context.Context, err error, diagnosis []*diagnose.Di
 	return a.deterministicAnalyze(ctx, err, diagnosis)
 }
 
-func (a *agent) deterministicAnalyze(ctx context.Context, err error, diagnosis []*diagnose.DiagnosticResult) (*AgentResult, error) {
+func (a *agent) deterministicAnalyze(
+	ctx context.Context,
+	err error,
+	diagnosis []*diagnose.DiagnosticResult,
+) (*AgentResult, error) {
 	if ctx.Err() != nil {
 		return nil, ctx.Err()
 	}
@@ -124,7 +128,10 @@ func (a *agent) deterministicAnalyze(ctx context.Context, err error, diagnosis [
 		result.Explanation = strings.Join(parts, "; ")
 	} else {
 		result.RootCause = "no specific root cause identified"
-		result.Explanation = fmt.Sprintf("Error classified as %s. No diagnostic failures found.", errorfamily.Classify(err))
+		result.Explanation = fmt.Sprintf(
+			"Error classified as %s. No diagnostic failures found.",
+			errorfamily.Classify(err),
+		)
 	}
 
 	return result, nil

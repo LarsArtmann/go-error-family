@@ -64,9 +64,21 @@ func TestRunnerFiltersInapplicable(t *testing.T) {
 }
 
 func TestRunnerSortsByConfidence(t *testing.T) {
-	rule1 := &staticRule{name: "low", applicable: true, result: &DiagnosticResult{Status: StatusHealthy, Confidence: 0.3}}
-	rule2 := &staticRule{name: "high", applicable: true, result: &DiagnosticResult{Status: StatusFailed, Confidence: 0.9}}
-	rule3 := &staticRule{name: "mid", applicable: true, result: &DiagnosticResult{Status: StatusDegraded, Confidence: 0.6}}
+	rule1 := &staticRule{
+		name:       "low",
+		applicable: true,
+		result:     &DiagnosticResult{Status: StatusHealthy, Confidence: 0.3},
+	}
+	rule2 := &staticRule{
+		name:       "high",
+		applicable: true,
+		result:     &DiagnosticResult{Status: StatusFailed, Confidence: 0.9},
+	}
+	rule3 := &staticRule{
+		name:       "mid",
+		applicable: true,
+		result:     &DiagnosticResult{Status: StatusDegraded, Confidence: 0.6},
+	}
 
 	runner := NewRunner(rule1, rule2, rule3)
 	err := errorfamily.NewTransient("test", "msg")
@@ -313,7 +325,8 @@ func TestFilesystemRuleRunExistingFile(t *testing.T) {
 
 func TestFilesystemRuleRunNonexistentPath(t *testing.T) {
 	r := &FilesystemRule{}
-	err := errorfamily.NewRejection("file.not_found", "msg").WithContext("path", "/nonexistent/path/that/does/not/exist")
+	err := errorfamily.NewRejection("file.not_found", "msg").
+		WithContext("path", "/nonexistent/path/that/does/not/exist")
 
 	result, runErr := r.Run(context.Background(), err)
 	if runErr != nil {

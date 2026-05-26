@@ -118,13 +118,13 @@ func TestErrorBasic(t *testing.T) {
 }
 
 func TestErrorWithCause(t *testing.T) {
-	cause := fmt.Errorf("root cause")
+	cause := errors.New("root cause")
 	err := Wrap(cause, Transient, "db.timeout", "database timed out")
 
-	if err.Cause() != cause {
+	if !errors.Is(err.Cause(), cause) {
 		t.Error("Cause() should return the wrapped error")
 	}
-	if err.Unwrap() != cause {
+	if !errors.Is(err.Unwrap(), cause) {
 		t.Error("Unwrap() should return the wrapped error")
 	}
 	if !strings.Contains(err.Error(), "root cause") {
@@ -241,7 +241,7 @@ func TestConstructors(t *testing.T) {
 }
 
 func TestWrapConstructors(t *testing.T) {
-	cause := fmt.Errorf("root")
+	cause := errors.New("root")
 
 	tests := []struct {
 		name   string
@@ -259,7 +259,7 @@ func TestWrapConstructors(t *testing.T) {
 			if tt.err.ErrorFamily() != tt.family {
 				t.Errorf("family = %v, want %v", tt.err.ErrorFamily(), tt.family)
 			}
-			if tt.err.Unwrap() != cause {
+			if !errors.Is(tt.err.Unwrap(), cause) {
 				t.Error("should wrap cause")
 			}
 		})
@@ -280,7 +280,7 @@ func TestNewf(t *testing.T) {
 }
 
 func TestWrapf(t *testing.T) {
-	cause := fmt.Errorf("root")
+	cause := errors.New("root")
 	err := Wrapf(cause, Transient, "code", "failed: %s", "reason")
 	if !strings.Contains(err.Message(), "failed: reason") {
 		t.Errorf("Wrapf message = %q", err.Message())
@@ -300,13 +300,13 @@ func TestClassify(t *testing.T) {
 	}
 
 	// Plain error → default Transient
-	if Classify(fmt.Errorf("unknown")) != Transient {
+	if Classify(errors.New("unknown")) != Transient {
 		t.Error("unknown error should default to Transient")
 	}
 }
 
 func TestClassifyWithRegisteredSentinel(t *testing.T) {
-	sentinel := fmt.Errorf("test.sentinel")
+	sentinel := errors.New("test.sentinel")
 
 	RegisterClassification(sentinel, Corruption)
 
@@ -366,8 +366,8 @@ func TestExitCode(t *testing.T) {
 }
 
 func TestRegisterClassifications(t *testing.T) {
-	s1 := fmt.Errorf("sentinel.batch.1")
-	s2 := fmt.Errorf("sentinel.batch.2")
+	s1 := errors.New("sentinel.batch.1")
+	s2 := errors.New("sentinel.batch.2")
 
 	RegisterClassifications(map[error]Family{
 		s1: Conflict,
@@ -432,7 +432,7 @@ func (e *externalError) ErrorFamily() Family             { return e.family }
 func (e *externalError) ErrorContext() map[string]string { return e.context }
 
 func TestErrorChain(t *testing.T) {
-	root := fmt.Errorf("root cause")
+	root := errors.New("root cause")
 	mid := Wrap(root, Transient, "db.error", "database failed")
 	top := fmt.Errorf("handler: %w", mid)
 
@@ -490,20 +490,20 @@ func TestErrorAudience(t *testing.T) {
 }
 
 func TestErrorWithCauseBuilder(t *testing.T) {
-	cause := fmt.Errorf("root")
+	cause := errors.New("root")
 	err := NewRejection("test", "msg").WithCause(cause)
 
-	if err.Cause() != cause {
+	if !errors.Is(err.Cause(), cause) {
 		t.Error("WithCause should set the cause")
 	}
-	if err.Unwrap() != cause {
+	if !errors.Is(err.Unwrap(), cause) {
 		t.Error("Unwrap should return cause set by WithCause")
 	}
 }
 
 func TestErrorIsNonErrorTarget(t *testing.T) {
 	err := NewRejection("test", "msg")
-	target := fmt.Errorf("plain error")
+	target := errors.New("plain error")
 	if errors.Is(err, target) {
 		t.Error("errors.Is should not match non-*Error target")
 	}
@@ -523,7 +523,7 @@ func TestErrorFormatVerboseWithCause(t *testing.T) {
 }
 
 func TestErrorSummaryWithCause(t *testing.T) {
-	cause := fmt.Errorf("root")
+	cause := errors.New("root")
 	err := WrapRejection(cause, "test.code", "something failed")
 
 	summary := err.Summary()

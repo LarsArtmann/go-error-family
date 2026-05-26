@@ -2,6 +2,7 @@ package diagnose
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"os/exec"
 	"strings"
@@ -9,7 +10,12 @@ import (
 )
 
 // runCommand executes a command with timeout and returns its output.
-func runCommand(ctx context.Context, timeout time.Duration, name string, args ...string) (stdout, stderr string, exitCode int, err error) {
+func runCommand(
+	ctx context.Context,
+	timeout time.Duration,
+	name string,
+	args ...string,
+) (stdout, stderr string, exitCode int, err error) {
 	ctx, cancel := context.WithTimeout(ctx, timeout)
 	defer cancel()
 
@@ -23,7 +29,8 @@ func runCommand(ctx context.Context, timeout time.Duration, name string, args ..
 	stderr = strings.TrimSpace(errBuf.String())
 
 	if err != nil {
-		if exitErr, ok := err.(*exec.ExitError); ok {
+		exitErr := &exec.ExitError{}
+		if errors.As(err, &exitErr) {
 			exitCode = exitErr.ExitCode()
 			err = nil
 		} else {
