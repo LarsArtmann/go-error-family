@@ -1,0 +1,95 @@
+version: "2"
+run:
+  timeout: 5m
+  go: "1.26.3"
+  build-tags:
+    - goexperiment.arenas
+    - goexperiment.goroutineleakprofile
+    - goexperiment.jsonv2
+    - goexperiment.runtimesecret
+    - goexperiment.simd
+  allow-parallel-runners: true
+linters:
+  enable:
+    - bodyclose
+    - contextcheck
+    - copyloopvar
+    - cyclop
+    - dupl
+    - durationcheck
+    - errcheck
+    - errchkjson
+    - errname
+    - errorlint
+    - exhaustive
+    - forcetypeassert
+    - funlen
+    - ginkgolinter
+    - gochecknoglobals
+    - gochecknoinits
+    - gochecksumtype
+    - gocognit
+    - goconst
+    - gocritic
+    - gocyclo
+    - gosec
+    - govet
+    - ineffassign
+    - intrange
+    - maintidx
+    - misspell
+    - musttag
+    - nakedret
+    - nestif
+    - nilerr
+    - nilnesserr
+    - nilnil
+    - noctx
+    - nolintlint
+    - paralleltest
+    - perfsprint
+    - prealloc
+    - predeclared
+    - reassign
+    - recvcheck
+    - revive
+    - staticcheck
+    - thelper
+    - unconvert
+    - unparam
+    - unused
+    - usetesting
+    - wastedassign
+    - wrapcheck
+  settings:
+    cyclop:
+      max-complexity: 12
+    dupl:
+      threshold: 100
+    gocritic:
+      disabled-checks:
+        - ifElseChain
+  exclusions:
+    generated: lax
+    rules:
+      - path: _test\.go
+        linters:
+          - gochecknoglobals
+          - goconst
+          - dupl
+          - errcheck
+          - paralleltest
+          - revive
+      - path: diagnose/
+        linters:
+          - wrapcheck
+          - noctx
+      - path: agent/
+        linters:
+          - wrapcheck
+formatters:
+  enable:
+    - gci
+    - gofumpt
+  exclusions:
+    generated: lax
