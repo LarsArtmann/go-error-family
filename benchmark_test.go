@@ -29,7 +29,7 @@ func BenchmarkClassifyRegistered(b *testing.B) {
 }
 
 func BenchmarkClassifyRetryable(b *testing.B) {
-	e := &retryablePlain{retryable: true}
+	e := &retryablePlainError{retryable: true}
 	for b.Loop() {
 		_ = Classify(e)
 	}
@@ -109,9 +109,9 @@ func BenchmarkFamilyString(b *testing.B) {
 	}
 }
 
-type retryablePlain struct {
+type retryablePlainError struct {
 	retryable bool
 }
 
-func (r *retryablePlain) Error() string        { return "retryable plain error" }
-func (r *retryablePlain) IsRetryable() bool    { return r.retryable }
+func (r *retryablePlainError) Error() string     { return "retryable plain error" }
+func (r *retryablePlainError) IsRetryable() bool { return r.retryable }
