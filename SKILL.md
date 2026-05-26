@@ -164,6 +164,8 @@ family := errorfamily.Classify(err)     // always returns a Family (never panics
 retryable := errorfamily.IsRetryable(err)
 exitCode := errorfamily.ExitCode(err)
 
+family := errorfamily.ParseFamily("transient")  // parse from string (case-insensitive, defaults to Transient if unrecognized)
+
 // Register third-party sentinels (call from init())
 errorfamily.RegisterClassification(sql.ErrConnDone, errorfamily.Transient)
 errorfamily.RegisterClassifications(map[error]errorfamily.Family{...})
@@ -268,8 +270,9 @@ for _, f := range failures {
     }
 }
 
-// 4. If you need a single exit code, pick the worst family.
-// Severity: Corruption > Infrastructure > Conflict > Rejection > Transient.
+// 4. If you need a single exit code, pick the one with the highest ExitCode().
+// Exit codes map: Transient(75) > Infrastructure(69) > Corruption(65) > Conflict(1) = Rejection(1).
+// Note: exit codes ≠ severity. Transient is retryable (not "worst"); Corruption is severe but low exit code.
 worst := errorfamily.Transient
 for _, f := range failures {
     if errorfamily.Classify(f.err).ExitCode() > worst.ExitCode() {
@@ -343,12 +346,12 @@ func (r *MyRule) Applicable(err error) bool { return mySpec.matches(err) }
 
 ### Built-in Rules
 
-| Rule             | Matches On                                                                                                                                                                                           | Checks                                                                         |
-| ---------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------ |
-| `PostgresRule`   | Context keys: `db_host/db_port/db_name/database_url/postgres_host`. Codes: `db.`, `database`. Context substr: `postgres/postgresql/database/sql`. Extra: `Transient` family + context contains `sql` | pg_isready, TCP connectivity, suggests start command                           |
-| `FilesystemRule` | Context keys: `path/file/dir/directory/config_path/output_path`. Codes: `file/dir/path/config/permission`                                                                                            | File existence, permissions, writability, parent dir                           |
-| `NetworkRule`    | Context keys: `host/port/url/endpoint/address/remote`. Codes: `network/connect/dial/timeout`. Context substr: `connection refused/no such host/i/o timeout`                                          | DNS resolution, TCP connectivity, port reachability                            |
-| `GitRule`        | Context keys: `git/repository/repo/branch/git_dir`. Codes: `git`. Context substr: `git`                                                                                                              | Repo existence, working tree cleanliness, merge conflicts, remote reachability |
+| Rule             | Matches On                                                                                                         | Checks                      |
+| ---------------- | ------------------------------------------------------------------------------------------------------------------- | ---------------------------- |
+| `PostgresRule`   | Keys: `db_host`, `db_port`, `db_name`, `database_url`, `postgres_host`. Codes: `db.`, `database`. Substr: `postgres`, `postgresql`, `database`, `sql` + Transient family | pg_isready, TCP, start cmd   |
+| `FilesystemRule` | Keys: `path`, `file`, `dir`, `directory`, `config_path`, `output_path`. Codes: `file`, `dir`, `path`, `config`, `permission` | Existence, permissions, write |
+| `NetworkRule`    | Keys: `host`, `port`, `url`, `endpoint`, `address`, `remote`. Codes: `network`, `connect`, `dial`, `timeout`. Substr: `connection refused`, `no such host`, `i/o timeout` | DNS, TCP, port reachability  |
+| `GitRule`        | Keys: `git`, `repository`, `repo`, `branch`, `git_dir`. Codes: `git`. Substr: `git`                               | Repo, tree, merge, remote    |
 
 ---
 
