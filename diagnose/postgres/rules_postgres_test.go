@@ -21,15 +21,31 @@ func TestPostgresRuleApplicable(t *testing.T) {
 		err  error
 		want bool
 	}{
-		{"db_host context", errorfamily.NewTransient("test", "msg").WithContext("db_host", "localhost"), true},
-		{"db_port context", errorfamily.NewTransient("test", "msg").WithContext("db_port", "5432"), true},
-		{"db_name context", errorfamily.NewTransient("test", "msg").WithContext("db_name", "mydb"), true},
+		{
+			"db_host context",
+			errorfamily.NewTransient("test", "msg").WithContext("db_host", "localhost"),
+			true,
+		},
+		{
+			"db_port context",
+			errorfamily.NewTransient("test", "msg").WithContext("db_port", "5432"),
+			true,
+		},
+		{
+			"db_name context",
+			errorfamily.NewTransient("test", "msg").WithContext("db_name", "mydb"),
+			true,
+		},
 		{
 			"database_url context",
 			errorfamily.NewTransient("test", "msg").WithContext("database_url", "postgres://..."),
 			true,
 		},
-		{"postgres_host context", errorfamily.NewTransient("test", "msg").WithContext("postgres_host", "db"), true},
+		{
+			"postgres_host context",
+			errorfamily.NewTransient("test", "msg").WithContext("postgres_host", "db"),
+			true,
+		},
 		{"db code", errorfamily.NewTransient("db.timeout", "msg"), true},
 		{"database code", errorfamily.NewTransient("database.error", "msg"), true},
 		{
@@ -43,15 +59,27 @@ func TestPostgresRuleApplicable(t *testing.T) {
 				WithContext("info", "postgresql connection failed"),
 			true,
 		},
-		{"transient + sql message", errorfamily.NewTransient("test", "sql error during query"), true},
+		{
+			"transient + sql message",
+			errorfamily.NewTransient("test", "sql error during query"),
+			true,
+		},
 		{
 			"database substring in context",
 			errorfamily.NewTransient("test", "msg").WithContext("info", "database unavailable"),
 			true,
 		},
 		{"unrelated code", errorfamily.NewTransient("file.not_found", "msg"), false},
-		{"unrelated context", errorfamily.NewTransient("test", "msg").WithContext("path", "/tmp"), false},
-		{"rejection + no db context", errorfamily.NewRejection("config.invalid", "bad config"), false},
+		{
+			"unrelated context",
+			errorfamily.NewTransient("test", "msg").WithContext("path", "/tmp"),
+			false,
+		},
+		{
+			"rejection + no db context",
+			errorfamily.NewRejection("config.invalid", "bad config"),
+			false,
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
@@ -128,7 +156,11 @@ func TestPostgresRuleResolveHost(t *testing.T) {
 		want string
 	}{
 		{"db_host", errorfamily.NewTransient("test", "msg").WithContext("db_host", "db1"), "db1"},
-		{"postgres_host", errorfamily.NewTransient("test", "msg").WithContext("postgres_host", "db2"), "db2"},
+		{
+			"postgres_host",
+			errorfamily.NewTransient("test", "msg").WithContext("postgres_host", "db2"),
+			"db2",
+		},
 		{"host", errorfamily.NewTransient("test", "msg").WithContext("host", "db3"), "db3"},
 		{"PGHOST", errorfamily.NewTransient("test", "msg").WithContext("PGHOST", "db4"), "db4"},
 		{"default", errorfamily.NewTransient("test", "msg"), "localhost"},
@@ -149,9 +181,21 @@ func TestPostgresRuleResolvePort(t *testing.T) {
 		err  error
 		want string
 	}{
-		{"db_port valid", errorfamily.NewTransient("test", "msg").WithContext("db_port", "5433"), "5433"},
-		{"db_port invalid", errorfamily.NewTransient("test", "msg").WithContext("db_port", "abc"), "5432"},
-		{"postgres_port", errorfamily.NewTransient("test", "msg").WithContext("postgres_port", "5434"), "5434"},
+		{
+			"db_port valid",
+			errorfamily.NewTransient("test", "msg").WithContext("db_port", "5433"),
+			"5433",
+		},
+		{
+			"db_port invalid",
+			errorfamily.NewTransient("test", "msg").WithContext("db_port", "abc"),
+			"5432",
+		},
+		{
+			"postgres_port",
+			errorfamily.NewTransient("test", "msg").WithContext("postgres_port", "5434"),
+			"5434",
+		},
 		{"port key", errorfamily.NewTransient("test", "msg").WithContext("port", "5435"), "5435"},
 		{"PGPORT", errorfamily.NewTransient("test", "msg").WithContext("PGPORT", "5436"), "5436"},
 		{"default", errorfamily.NewTransient("test", "msg"), "5432"},

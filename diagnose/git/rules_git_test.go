@@ -25,14 +25,38 @@ func TestGitRuleApplicable(t *testing.T) {
 		want bool
 	}{
 		{"git context", errorfamily.NewRejection("test", "msg").WithContext("git", "true"), true},
-		{"repository context", errorfamily.NewTransient("test", "msg").WithContext("repository", "/repo"), true},
-		{"repo context", errorfamily.NewTransient("test", "msg").WithContext("repo", "/repo"), true},
-		{"branch context", errorfamily.NewTransient("test", "msg").WithContext("branch", "main"), true},
-		{"git_dir context", errorfamily.NewTransient("test", "msg").WithContext("git_dir", "/.git"), true},
+		{
+			"repository context",
+			errorfamily.NewTransient("test", "msg").WithContext("repository", "/repo"),
+			true,
+		},
+		{
+			"repo context",
+			errorfamily.NewTransient("test", "msg").WithContext("repo", "/repo"),
+			true,
+		},
+		{
+			"branch context",
+			errorfamily.NewTransient("test", "msg").WithContext("branch", "main"),
+			true,
+		},
+		{
+			"git_dir context",
+			errorfamily.NewTransient("test", "msg").WithContext("git_dir", "/.git"),
+			true,
+		},
 		{"git code", errorfamily.NewRejection("git.merge", "msg"), true},
-		{"git substring in message", errorfamily.NewTransient("test", "git operation failed"), true},
+		{
+			"git substring in message",
+			errorfamily.NewTransient("test", "git operation failed"),
+			true,
+		},
 		{"unrelated code", errorfamily.NewTransient("db.timeout", "msg"), false},
-		{"unrelated context", errorfamily.NewTransient("test", "msg").WithContext("host", "db"), false},
+		{
+			"unrelated context",
+			errorfamily.NewTransient("test", "msg").WithContext("host", "db"),
+			false,
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
