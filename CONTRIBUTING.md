@@ -61,12 +61,12 @@ nix flake check                       # all checks (build + lint)
 
 ### Naming
 
-| Kind       | Convention              | Example                   |
-| ---------- | ----------------------- | ------------------------- |
-| Packages   | lowercase, single word  | `diagnose`, `agent`       |
-| Interfaces | behavioral              | `DiagnosticRule`, `Coded` |
-| Functions  | PascalCase              | `HandleError`, `Classify` |
-| Constants  | PascalCase              | `KeyHost`, `KeyPort`      |
+| Kind       | Convention             | Example                   |
+| ---------- | ---------------------- | ------------------------- |
+| Packages   | lowercase, single word | `diagnose`, `agent`       |
+| Interfaces | behavioral             | `DiagnosticRule`, `Coded` |
+| Functions  | PascalCase             | `HandleError`, `Classify` |
+| Constants  | PascalCase             | `KeyHost`, `KeyPort`      |
 
 ### Error Construction
 

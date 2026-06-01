@@ -151,33 +151,33 @@
 
 Sorted by impact × effort (highest first):
 
-| # | Task | Impact | Effort | Category |
-|---|------|--------|--------|----------|
-| 1 | Fix `Compose` doc comment (it's a lie) | Critical | 2min | Bug |
-| 2 | Fix `extractCommand` to match actual fix formats | Critical | 10min | Bug |
-| 3 | Add `t.Cleanup()` for test registry pollution | High | 15min | Bug |
-| 4 | Fix `FilesystemRule.suggestCreate` file/dir detection | High | 10min | Bug |
-| 5 | Fix `NetworkRule.resolveHost` with `net/url.Parse` | Medium | 15min | Bug |
-| 6 | Use `net.Dialer` + `DialContext` in NetworkRule | Medium | 10min | Bug |
-| 7 | Rename `diagnose/context.go` → `diagnose/command.go` | Low | 1min | Cleanup |
-| 8 | Deduplicate mock runners to shared helper | Low | 20min | Cleanup |
-| 9 | Use `diagnose.KeyGit` in git spec instead of raw string | Low | 2min | Cleanup |
-| 10 | Add missing `ContextKey` constants for postgres_port, PGHOST, PGPORT | Low | 5min | Feature |
-| 11 | Use ContextKey constants in PostgresRule.resolvePort | Low | 5min | Cleanup |
-| 12 | Update SKILL.md for v0.3.0 APIs | High | 30min | Docs |
-| 13 | Remove dead `var _ = fmt.Sprintf` from postgres tests | Low | 1min | Cleanup |
-| 14 | Add `Runner.Run` context cancellation enforcement | Medium | 20min | Feature |
-| 15 | Add concurrent safety tests for registries | Medium | 15min | Test |
-| 16 | Add `applyContext` unit tests | Low | 10min | Test |
-| 17 | Add family-specific format constructors | Low | 15min | Feature |
-| 18 | Consolidate `DiagnosticFinding` vs `DiagnosticResult` types | High | 60min | Architecture |
-| 19 | Consider renaming `DebugAgent` → `Agent` interface | Low | 10min | API |
-| 20 | Remove unused `IsPostgresRunning` or add real tests | Low | 10min | Cleanup |
-| 21 | Add `HandleErrorWithContext` direct tests | Medium | 10min | Test |
-| 22 | Add `Error.Is` tests through wrapped error chains | Low | 5min | Test |
-| 23 | Add godoc examples for diagnose package helpers | Low | 20min | Docs |
-| 24 | Consider removing `KeyDirectory` alias (just use `KeyDir`) | Low | 5min | Cleanup |
-| 25 | Remove unused `KeyRepoPath` or document why it exists | Low | 5min | Cleanup |
+| #   | Task                                                                 | Impact   | Effort | Category     |
+| --- | -------------------------------------------------------------------- | -------- | ------ | ------------ |
+| 1   | Fix `Compose` doc comment (it's a lie)                               | Critical | 2min   | Bug          |
+| 2   | Fix `extractCommand` to match actual fix formats                     | Critical | 10min  | Bug          |
+| 3   | Add `t.Cleanup()` for test registry pollution                        | High     | 15min  | Bug          |
+| 4   | Fix `FilesystemRule.suggestCreate` file/dir detection                | High     | 10min  | Bug          |
+| 5   | Fix `NetworkRule.resolveHost` with `net/url.Parse`                   | Medium   | 15min  | Bug          |
+| 6   | Use `net.Dialer` + `DialContext` in NetworkRule                      | Medium   | 10min  | Bug          |
+| 7   | Rename `diagnose/context.go` → `diagnose/command.go`                 | Low      | 1min   | Cleanup      |
+| 8   | Deduplicate mock runners to shared helper                            | Low      | 20min  | Cleanup      |
+| 9   | Use `diagnose.KeyGit` in git spec instead of raw string              | Low      | 2min   | Cleanup      |
+| 10  | Add missing `ContextKey` constants for postgres_port, PGHOST, PGPORT | Low      | 5min   | Feature      |
+| 11  | Use ContextKey constants in PostgresRule.resolvePort                 | Low      | 5min   | Cleanup      |
+| 12  | Update SKILL.md for v0.3.0 APIs                                      | High     | 30min  | Docs         |
+| 13  | Remove dead `var _ = fmt.Sprintf` from postgres tests                | Low      | 1min   | Cleanup      |
+| 14  | Add `Runner.Run` context cancellation enforcement                    | Medium   | 20min  | Feature      |
+| 15  | Add concurrent safety tests for registries                           | Medium   | 15min  | Test         |
+| 16  | Add `applyContext` unit tests                                        | Low      | 10min  | Test         |
+| 17  | Add family-specific format constructors                              | Low      | 15min  | Feature      |
+| 18  | Consolidate `DiagnosticFinding` vs `DiagnosticResult` types          | High     | 60min  | Architecture |
+| 19  | Consider renaming `DebugAgent` → `Agent` interface                   | Low      | 10min  | API          |
+| 20  | Remove unused `IsPostgresRunning` or add real tests                  | Low      | 10min  | Cleanup      |
+| 21  | Add `HandleErrorWithContext` direct tests                            | Medium   | 10min  | Test         |
+| 22  | Add `Error.Is` tests through wrapped error chains                    | Low      | 5min   | Test         |
+| 23  | Add godoc examples for diagnose package helpers                      | Low      | 20min  | Docs         |
+| 24  | Consider removing `KeyDirectory` alias (just use `KeyDir`)           | Low      | 5min   | Cleanup      |
+| 25  | Remove unused `KeyRepoPath` or document why it exists                | Low      | 5min   | Cleanup      |
 
 ---
 
@@ -188,6 +188,7 @@ Sorted by impact × effort (highest first):
 The doc comment says it returns the "worst Family among them (highest exit code)." But the body is just `errors.Join(errs...)`, which does no classification at all. The classification happens in `Classify()` which already handles `errors.Join` multi-errors correctly (first non-Transient wins). So `Compose` as currently documented is redundant — you can just use `errors.Join` directly and then `Classify`/`ExitCode` on the result.
 
 Two options:
+
 1. **Delete `Compose`** — `errors.Join` + `Classify` already does everything. No new API needed.
 2. **Make `Compose` useful** — Have it actually return the worst Family/exit code alongside the joined error, like `func Compose(errs ...error) (error, Family)`.
 
@@ -197,19 +198,19 @@ I lean toward option 1 (delete) because Go already has `errors.Join` and our `Cl
 
 ## Coverage Summary
 
-| Package | Before (v0.2.0) | After (v0.3.0-dev) |
-|---------|-----------------|---------------------|
-| root | 97.2% | 95.9% |
-| agent | 100% | 100% |
-| diagnose (core) | 66.8% | 67.1% |
-| diagnose/git | 69.2% | **98.5%** |
-| diagnose/postgres | 58.6% | **81.0%** |
+| Package           | Before (v0.2.0) | After (v0.3.0-dev) |
+| ----------------- | --------------- | ------------------ |
+| root              | 97.2%           | 95.9%              |
+| agent             | 100%            | 100%               |
+| diagnose (core)   | 66.8%           | 67.1%              |
+| diagnose/git      | 69.2%           | **98.5%**          |
+| diagnose/postgres | 58.6%           | **81.0%**          |
 
 ## Build Status
 
-| Check | Result |
-|-------|--------|
-| `go build ./...` | ✅ Clean |
-| `go test ./... -race` | ✅ All pass |
-| `golangci-lint run ./...` (all modules) | ✅ 0 issues |
-| Benchmarks | ✅ All pass, no regressions |
+| Check                                   | Result                      |
+| --------------------------------------- | --------------------------- |
+| `go build ./...`                        | ✅ Clean                    |
+| `go test ./... -race`                   | ✅ All pass                 |
+| `golangci-lint run ./...` (all modules) | ✅ 0 issues                 |
+| Benchmarks                              | ✅ All pass, no regressions |

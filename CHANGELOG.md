@@ -37,6 +37,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 - `HandleErrorWithConfig` now passes caller context to `DiagnosticFunc` instead of `context.Background()`
 - `HandleError` benchmark no longer writes ~1M lines to stderr during benchmark runs
+- `NetworkRule.resolveHost` uses `net/url.Parse` and `net.Dialer` for TCP dial instead of raw string splitting
+- `FilesystemRule` uses `filepath.Ext` instead of `strings.Contains(".")` for file vs directory detection
 
 ## [0.2.0] - 2026-05-26
 

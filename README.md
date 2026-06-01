@@ -12,14 +12,14 @@ Structured error protocol for Go — behavioral classification, exit codes, and 
 
 ## The Problem
 
-Every Go program has `if err != nil`. But what do you *do* with that error?
+Every Go program has `if err != nil`. But what do you _do_ with that error?
 
-| Question | Before | After |
-| -------- | ------ | ----- |
-| Should the caller retry? | `if strings.Contains(err.Error(), "timeout")` | `errorfamily.IsRetryable(err)` |
-| What exit code? | `os.Exit(1)` for everything | `errorfamily.ExitCode(err)` — context-aware |
-| What message for the user? | `fmt.Println(err)` — often internal jargon | Structured What/Why/Fix/WayOut |
-| Is it the user's fault or the system's? | Guess from the string | `errorfamily.Classify(err).Audience()` |
+| Question                                | Before                                        | After                                       |
+| --------------------------------------- | --------------------------------------------- | ------------------------------------------- |
+| Should the caller retry?                | `if strings.Contains(err.Error(), "timeout")` | `errorfamily.IsRetryable(err)`              |
+| What exit code?                         | `os.Exit(1)` for everything                   | `errorfamily.ExitCode(err)` — context-aware |
+| What message for the user?              | `fmt.Println(err)` — often internal jargon    | Structured What/Why/Fix/WayOut              |
+| Is it the user's fault or the system's? | Guess from the string                         | `errorfamily.Classify(err).Audience()`      |
 
 go-error-family answers all of these with a single concept: **Family**.
 
@@ -365,16 +365,16 @@ The agent produces analysis but does **not** execute fixes — the consumer deci
 
 Zero-allocation hot paths. Benchmarks on AMD Ryzen 9 7950X:
 
-| Operation | Time | Allocs |
-| --------- | ---- | ------ |
-| `Classify` (built-in Error) | ~9 ns | 0 |
-| `Classify` (plain error) | ~30 ns | 0 |
-| `IsRetryable` | ~9 ns | 0 |
-| `ExitCode` | ~9 ns | 0 |
-| `WithContext` | ~8 ns | 0 |
-| `ParseFamily` | ~12 ns | 0 |
-| `HandleError` (with context) | ~450 ns | 5 |
-| `Runner.Run` (1 rule) | ~420 ns | 5 |
+| Operation                    | Time    | Allocs |
+| ---------------------------- | ------- | ------ |
+| `Classify` (built-in Error)  | ~9 ns   | 0      |
+| `Classify` (plain error)     | ~30 ns  | 0      |
+| `IsRetryable`                | ~9 ns   | 0      |
+| `ExitCode`                   | ~9 ns   | 0      |
+| `WithContext`                | ~8 ns   | 0      |
+| `ParseFamily`                | ~12 ns  | 0      |
+| `HandleError` (with context) | ~450 ns | 5      |
+| `Runner.Run` (1 rule)        | ~420 ns | 5      |
 
 `HandleError` includes template resolution and stderr write. Use `HandleErrorDetailed` when you only need the structured result.
 
@@ -407,7 +407,7 @@ go-error-family/
 
 **Use this when** you need behavior derived from errors: retry decisions, exit codes, user-facing messages, or diagnostic investigation — especially at program boundaries (CLI top-level, HTTP handlers, gRPC interceptors).
 
-**Don't use this when** a simple `fmt.Errorf("...: %w", err)` is enough. If you only need to wrap and propagate, the standard library is fine. This library shines when errors need to *drive behavior*.
+**Don't use this when** a simple `fmt.Errorf("...: %w", err)` is enough. If you only need to wrap and propagate, the standard library is fine. This library shines when errors need to _drive behavior_.
 
 ## Philosophy
 

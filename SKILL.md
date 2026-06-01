@@ -17,12 +17,12 @@ errorfamily/          ← root package: types, constructors, classification, CLI
   family.go             Family enum + Audience/Tone metadata
   interfaces.go         Coded, Classified, Contextual, Retryable
   constructors.go       New/Wrap + family shortcuts
-  classify.go           Classify(), RegisterClassification()
-  handle.go             HandleError(), HandleErrorDetailed(), template system
+  classify.go           Classify(), IsRetryable, ExitCode, RegisterClassification(s), Compose
+  handle.go             HandleError(), HandleErrorWithContext(), HandleErrorDetailed(), template system
 
 diagnose/             ← concurrent diagnostic rules (zero-dep core)
-  diagnose.go           Runner, DiagnosticRule interface, RuleSpec, exported helpers
-  context.go            RunCommand, CommandExists (exported for rule authors)
+  diagnose.go           Runner, DiagnosticRule, RuleSpec, CommandRunner, ContextKey, ErrorContext
+  context.go            RunCommand, CommandExists, DefaultCommandRunner
   rules_filesystem.go   FilesystemRule
   rules_network.go      NetworkRule
 
@@ -126,6 +126,7 @@ err.Timestamp() time.Time               // when the error was created
 // Mutators (chainable)
 err.WithContext(key, value string) *Error
 err.WithCause(cause error) *Error
+err.WithTimestamp(ts time.Time) *Error   // deterministic timestamp for tests
 
 // Helpers
 err.HasContext(key string) bool
@@ -173,6 +174,9 @@ family := errorfamily.ParseFamily("transient")  // parse from string (case-insen
 // Register third-party sentinels (call from init())
 errorfamily.RegisterClassification(sql.ErrConnDone, errorfamily.Transient)
 errorfamily.RegisterClassifications(map[error]errorfamily.Family{...})
+
+// Combine errors for partial-success patterns
+combined := errorfamily.Compose(err1, err2)  // errors.Join wrapper
 ```
 
 **Classification precedence** (first match wins):
@@ -193,11 +197,22 @@ func main() {
 }
 ```
 
+**Canonical entry point when you have a `context.Context`:**
+
+```go
+exitCode := errorfamily.HandleErrorWithContext(ctx, err, errorfamily.HandleConfig{})
+```
+
+`HandleError` and `HandleErrorWithConfig` both delegate to `HandleErrorWithContext`.
+
 ### Structured Result (HTTP/gRPC)
 
 ```go
 result := errorfamily.HandleErrorDetailed(err)
 // result.ExitCode, result.Message, result.SuggestedFix
+
+// Template-aware structured result
+result := errorfamily.HandleErrorDetailedWithConfig(err, cfg)
 ```
 
 ### Configurable Handler
@@ -232,7 +247,7 @@ results := runner.Run(ctx, err)
 // results sorted by confidence desc; nil if no rules applicable
 ```
 
-**DiagnosticResult fields:** `RuleName`, `Status` (Healthy/Degraded/Failed/Unknown), `Summary`, `Details` (map[string]string), `SuggestedFix`, `Confidence` (0.0–1.0), `Duration`.
+**DiagnosticResult fields:** `RuleName`, `Status` (Healthy/Degraded/Failed/Unknown), `Summary`, `Details` (map[string]string), `SuggestedFix`, `Confidence` (0.0–1.0), `Duration`, `Context` (the error context that triggered the rule, `map[string]string`).
 
 **Standalone helpers (postgres submodule):**
 
@@ -340,10 +355,10 @@ Built-in codes: `file.not_found`, `permission.denied`, `db.timeout`, `db.connect
 
 ```go
 var mySpec = diagnose.RuleSpec{
-    ContextKeys:   []string{"my_key"},          // matches if error context has any of these keys
-    CodeContains:  []string{"my."},              // matches if error code contains substring
-    ContextSubstr: []string{"my_thing"},         // matches if any context value contains substring
-    Extra:         func(err error) bool { ... }, // custom logic
+    ContextKeys:   []diagnose.ContextKey{diagnose.KeyHost}, // typed string constants
+    CodeContains:  []string{"my."},                          // matches if error code contains substring
+    ContextSubstr: []string{"my_thing"},                     // matches if any context value contains substring
+    Extra:         func(err error) bool { ... },             // custom logic
 }
 
 func (r *MyRule) Applicable(err error) bool { return mySpec.Matches(err) }
@@ -351,7 +366,18 @@ func (r *MyRule) Applicable(err error) bool { return mySpec.Matches(err) }
 
 3. Use matching helpers from `diagnose` package: `HasContextKey`, `ContextValue`, `ResolveContextKey`, `HasContextSubstring`, `FamilyIs`, `ErrorCodeContains`
 4. Use execution helpers: `diagnose.RunCommand`, `diagnose.CommandExists`
-5. Rules run concurrently via `Runner.Run`; results sorted by confidence descending
+5. Extract context from any error: `diagnose.ErrorContext(err)` → `map[string]string`
+6. Rules run concurrently via `Runner.Run`; results sorted by confidence descending
+
+### Testability: CommandRunner
+
+Rules that shell out should accept a `CommandRunner` for mock injection:
+
+```go
+type MyRule struct {
+    Runner diagnose.CommandRunner // nil → DefaultCommandRunner{}
+}
+```
 
 ### Built-in Rules
 
@@ -378,15 +404,16 @@ Test files and scope:
 
 - `errorfamily_test.go` — Family, ParseFamily, Error, constructors, Classify, RegisterClassification, errors.Is/As integration
 - `benchmark_test.go` — Performance baselines for Classify, HandleError, ExitCode, ParseFamily, etc.
-- `handle_test.go` — HandleError, HandleErrorWithConfig, HandleErrorDetailed, template overrides, diagnostics wiring
+- `handle_test.go` — HandleError, HandleErrorWithConfig, HandleErrorWithContext, HandleErrorDetailed, HandleErrorDetailedWithConfig, template overrides, diagnostics wiring
+- `fuzz_test.go` — FuzzParseFamily, FuzzClassify, FuzzErrorFormatting
 - `diagnose/diagnose_test.go` — Runner, rule matching helpers, Applicable, Run for FilesystemRule/NetworkRule
 - `diagnose/benchmark_test.go` — Benchmarks for Runner.Run, RuleSpec.Matches, DefaultRunner
 - `diagnose/git/rules_git_test.go` — GitRule Applicable, Run
 - `diagnose/postgres/rules_postgres_test.go` — PostgresRule Applicable, Run, resolveHost, resolvePort, IsPostgresRunning
 - `agent/agent_test.go` — Analyze (enabled/disabled/with diagnosis/empty/timeout), extractCommand
 
-**Coverage:** root 97.2% | agent 100% | diagnose core 66.8% | git ~23% | postgres ~45%
-(rules that shell out to system commands are integration-test territory; coverage for git/postgres submodules can be improved with RunCommand mocking)
+**Coverage:** root 95.9% | agent 100% | diagnose core 67.1% | git 98.5% | postgres 81.0%
+(rules that shell out to system commands are tested via `CommandRunner` mocks in git/postgres; diagnose core coverage reflects shell-out rules tested via integration)
 
 ### Test Style
 
