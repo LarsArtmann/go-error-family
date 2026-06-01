@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
-	"strings"
 	"time"
 )
 
@@ -117,7 +116,7 @@ func (r *FilesystemRule) suggestCreate(result *DiagnosticResult, path string) {
 	}
 	result.Details["parent_exists"] = strTrue
 	result.Details["parent_permissions"] = parentInfo.Mode().Perm().String()
-	if strings.Contains(path, ".") {
+	if filepath.Ext(path) != "" {
 		result.SuggestedFix = "Create the file: " + path
 	} else {
 		result.SuggestedFix = "Create directory: mkdir -p " + path
