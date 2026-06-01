@@ -8,6 +8,21 @@ Structured error protocol for Go — behavioral classification, exit codes, and 
 
 **Share the protocol, not the implementation.**
 
+---
+
+## The Problem
+
+Every Go program has `if err != nil`. But what do you *do* with that error?
+
+| Question | Before | After |
+| -------- | ------ | ----- |
+| Should the caller retry? | `if strings.Contains(err.Error(), "timeout")` | `errorfamily.IsRetryable(err)` |
+| What exit code? | `os.Exit(1)` for everything | `errorfamily.ExitCode(err)` — context-aware |
+| What message for the user? | `fmt.Println(err)` — often internal jargon | Structured What/Why/Fix/WayOut |
+| Is it the user's fault or the system's? | Guess from the string | `errorfamily.Classify(err).Audience()` |
+
+go-error-family answers all of these with a single concept: **Family**.
+
 ## Installation
 
 ```bash
@@ -15,6 +30,48 @@ go get github.com/larsartmann/go-error-family
 ```
 
 Requires Go 1.26+ (uses `errors.AsType`).
+
+This is a Go workspace. The root module provides core types and classification. Diagnostic submodules (`diagnose/git`, `diagnose/postgres`) require separate imports.
+
+## Quick Start
+
+```go
+package main
+
+import (
+    "errors"
+    "os"
+
+    "github.com/larsartmann/go-error-family"
+)
+
+func main() {
+    err := errors.New("connection refused")
+
+    family := errorfamily.Classify(err)
+    // → Transient (default: unknown errors are retryable)
+
+    if errorfamily.IsRetryable(err) {
+        // yes — schedule a retry with backoff
+    }
+
+    os.Exit(errorfamily.ExitCode(err))
+    // → 75 (EX_TEMPFAIL: temporary failure)
+}
+```
+
+For your own errors, attach a Family at creation time:
+
+```go
+err := errorfamily.NewRejection("config.invalid", "port must be a number").
+    WithContext("port", portStr)
+
+os.Exit(errorfamily.HandleError(err))
+// stderr: "Check that the port value is a valid number."
+// exit: 1
+```
+
+See [examples/](examples/) for runnable CLI, HTTP, and custom diagnostic rule demos.
 
 ## What It Gives You
 
@@ -27,38 +84,6 @@ Requires Go 1.26+ (uses `errors.AsType`).
 - **Diagnostic rules** — deterministic checks (PostgreSQL, filesystem, network, git) that auto-discover why an error occurred
 - **AI debug agent** — root cause analysis and `FixStep` suggestions from diagnostic context
 
-## Quick Start
-
-```go
-package main
-
-import (
-    "os"
-
-    "github.com/larsartmann/go-error-family"
-)
-
-func run() error {
-    return errorfamily.NewRejection("file.not_found", "config file missing").
-        WithContext("path", "/etc/app/config.yaml")
-}
-
-func main() {
-    if err := run(); err != nil {
-        os.Exit(errorfamily.HandleError(err))
-    }
-}
-```
-
-Output:
-
-```
-A required resource was not found.
-Check that the path and resource name are correct.
-```
-
-Exit code: `1` (Rejection → user's fault)
-
 ## The Five Families
 
 | Family             | Retryable | Exit Code | Whose Fault             | Tone          |
@@ -69,7 +94,7 @@ Exit code: `1` (Rejection → user's fault)
 | **Corruption**     | no        | 65        | Data damage             | Urgent        |
 | **Infrastructure** | no        | 69        | System                  | Apologetic    |
 
-Each family also exposes `Audience()` (User / Ops / All) and `Tone()` for presentation-layer decisions.
+Each family exposes `Audience()` (User / Ops / All) and `Tone()` for presentation-layer decisions.
 
 ## Constructors
 
@@ -142,6 +167,14 @@ func init() {
 You don't have to use the built-in `Error` struct. Implement the interfaces you need:
 
 ```go
+package mypkg
+
+import (
+    "fmt"
+
+    "github.com/larsartmann/go-error-family"
+)
+
 type FindingError struct {
     Category string
     Message  string
@@ -222,6 +255,16 @@ Messages are resolved in this order (first match wins):
 
 All lookups are exact code matches (case-insensitive). No substring matching.
 
+Register templates globally for reusable error codes:
+
+```go
+errorfamily.RegisterTemplate("db.timeout", errorfamily.MessageTemplate{
+    What: "Database connection timed out.",
+    Why:  "The database server did not respond within the deadline.",
+    Fix:  "Check database health and network connectivity.",
+})
+```
+
 ## Diagnostic Rules
 
 Auto-discover why an error occurred:
@@ -261,23 +304,29 @@ Results include `Confidence` (0.0–1.0) and are sorted by confidence descending
 
 ### Writing Custom Rules
 
-Implement the `DiagnosticRule` interface:
+Use `RuleSpec` for data-driven matching — the simplest and most common pattern:
 
 ```go
-type MyRule struct{}
+type RateLimitRule struct{}
 
-func (r *MyRule) Name() string { return "my_rule" }
-func (r *MyRule) Applicable(err error) bool {
-    return diagnose.HasContextKey(err, "host") || diagnose.ErrorCodeContains(err, "db.")
+const keyRetryAfter diagnose.ContextKey = "retry_after"
+
+var rateLimitSpec = diagnose.RuleSpec{
+    ContextKeys:  []diagnose.ContextKey{keyRetryAfter},
+    CodeContains: []string{"rate.limit", "too_many_requests"},
 }
-func (r *MyRule) Run(ctx context.Context, err error) (*diagnose.DiagnosticResult, error) {
-    host := diagnose.ResolveContextKey(err, []string{"host", "db_host"}, "localhost")
+
+func (r *RateLimitRule) Name() string              { return "rate_limit" }
+func (r *RateLimitRule) Applicable(err error) bool { return rateLimitSpec.Matches(err) }
+
+func (r *RateLimitRule) Run(ctx context.Context, err error) (*diagnose.DiagnosticResult, error) {
+    retryAfter := diagnose.ResolveContextKey(err, []string{"retry_after"}, "unknown")
     // ... check system state ...
     return &diagnose.DiagnosticResult{
-        Status:       diagnose.StatusFailed,
-        Confidence:   0.8,
-        Summary:      "host unreachable: " + host,
-        SuggestedFix: "Check that the host is running and accessible",
+        Status:       diagnose.StatusDegraded,
+        Confidence:   diagnose.ConfidenceHigh,
+        Summary:      "Rate limited — retry after " + retryAfter,
+        SuggestedFix: "Wait for the duration specified in the Retry-After header",
     }, nil
 }
 ```
@@ -286,7 +335,7 @@ For testable rules that shell out, accept a `CommandRunner`:
 
 ```go
 type MyRule struct {
-    Runner diagnose.CommandRunner // inject mock in tests
+    Runner diagnose.CommandRunner // inject mock in tests; defaults to DefaultCommandRunner{}
 }
 ```
 
@@ -310,6 +359,23 @@ for _, step := range result.FixSteps {
 The agent produces analysis but does **not** execute fixes — the consumer decides what to do with `FixStep.Command`.
 
 `AgentResult` fields: `RootCause`, `Confidence`, `Explanation`, `FixSteps`.
+
+## Performance
+
+Zero-allocation hot paths. Benchmarks on AMD Ryzen 9 7950X:
+
+| Operation | Time | Allocs |
+| --------- | ---- | ------ |
+| `Classify` (built-in Error) | ~9 ns | 0 |
+| `Classify` (plain error) | ~30 ns | 0 |
+| `IsRetryable` | ~9 ns | 0 |
+| `ExitCode` | ~9 ns | 0 |
+| `WithContext` | ~8 ns | 0 |
+| `ParseFamily` | ~12 ns | 0 |
+| `HandleError` (with context) | ~450 ns | 5 |
+| `Runner.Run` (1 rule) | ~420 ns | 5 |
+
+`HandleError` includes template resolution and stderr write. Use `HandleErrorDetailed` when you only need the structured result.
 
 ## Architecture
 
@@ -335,6 +401,12 @@ go-error-family/
     ├── cmd/http            — HTTP middleware with status code mapping
     └── cmd/custom_rule     — Writing your own DiagnosticRule
 ```
+
+## When to Use / When Not To
+
+**Use this when** you need behavior derived from errors: retry decisions, exit codes, user-facing messages, or diagnostic investigation — especially at program boundaries (CLI top-level, HTTP handlers, gRPC interceptors).
+
+**Don't use this when** a simple `fmt.Errorf("...: %w", err)` is enough. If you only need to wrap and propagate, the standard library is fine. This library shines when errors need to *drive behavior*.
 
 ## Philosophy
 

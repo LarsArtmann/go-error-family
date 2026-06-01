@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"net"
+	"net/url"
 	"strings"
 	"time"
 )
@@ -55,7 +56,8 @@ func (r *NetworkRule) Run(ctx context.Context, err error) (*DiagnosticResult, er
 	// Check 2: TCP connectivity.
 	if port != "" {
 		addr := net.JoinHostPort(host, port)
-		conn, dialErr := net.DialTimeout("tcp", addr, 3*time.Second)
+		dialer := net.Dialer{Timeout: 3 * time.Second}
+		conn, dialErr := dialer.DialContext(ctx, "tcp", addr)
 		if dialErr != nil {
 			result.Status = StatusFailed
 			result.Summary = fmt.Sprintf("Cannot connect to %s: %v", addr, dialErr)
@@ -87,15 +89,27 @@ func (r *NetworkRule) resolveHost(err error) string {
 	if v == "" {
 		return ""
 	}
-	v = strings.TrimPrefix(v, "http://")
-	v = strings.TrimPrefix(v, "https://")
-	if idx := strings.Index(v, ":"); idx > 0 {
-		v = v[:idx]
+	return stripHost(v)
+}
+
+// stripHost extracts the hostname from a raw host string or URL.
+func stripHost(raw string) string {
+	// Try parsing as URL if it has a scheme.
+	if strings.Contains(raw, "://") {
+		if u, err := url.Parse(raw); err == nil && u.Hostname() != "" {
+			return u.Hostname()
+		}
 	}
-	if idx := strings.Index(v, "/"); idx > 0 {
-		v = v[:idx]
+	// Strip port manually for bare host:port strings.
+	host := raw
+	if idx := strings.LastIndex(host, ":"); idx > 0 {
+		host = host[:idx]
 	}
-	return v
+	// Strip path.
+	if idx := strings.Index(host, "/"); idx > 0 {
+		host = host[:idx]
+	}
+	return host
 }
 
 func (r *NetworkRule) resolvePort(err error) string {
