@@ -4,7 +4,7 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
-## [0.3.0] - 2026-05-31
+## [0.3.0] - 2026-06-01
 
 ### Added
 
@@ -20,6 +20,12 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 - Package-level `Example` functions: `ExampleNewTransient`, `ExampleClassify`, `ExampleHandleError`, `ExampleWrapRejection`, `ExampleParseFamily`
 - Expanded git tests with mock CommandRunner: dirty tree, merge conflicts, unreachable remote, no git binary (coverage 98.5%)
 - Expanded postgres tests with mock CommandRunner: pg_isready success/failure, suggestStartFix variants (coverage 81.0%)
+- `UnregisterClassification` — removes a previously registered sentinel classification (for test cleanup)
+- `UnregisterTemplate` — removes a previously registered message template (for test cleanup)
+- `diagnose.MockCommandRunner` — shared, deterministic mock for diagnostic rule tests
+- `diagnose.NewMockCommandRunner()` — constructor for `MockCommandRunner`
+- `diagnose.ResolveRunner(r)` — helper that returns `r` if non-nil, otherwise `DefaultCommandRunner{}`
+- `TestRunnerContextCancelledMidRun` — verifies early return when context is cancelled mid-run
 
 ### Changed
 
@@ -32,6 +38,10 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 - `HandleError` benchmark uses `io.Discard` to suppress stderr output (532ns/op vs 1095ns/op before)
 - Improved godoc on `Family`, `Tone`, `Audience`, `HandleResult`, `MessageTemplate`, `DiagnosticFinding`
 - Updated `diagnose` package doc comment with custom rule pattern and CommandRunner usage
+- `Runner.Run` refactored into three focused methods (`applicableRules`, `runRules`, `sortByConfidence`) for lower cyclomatic complexity
+- `Runner.Run` now respects context cancellation via buffered channels with `select` on `ctx.Done()` (previously could hang on slow rules)
+- Git and postgres test packages migrated from local mock types to shared `diagnose.MockCommandRunner` (~115 lines of duplicated mock code removed)
+- Git and postgres `cmdRunner()` methods consolidated via `diagnose.ResolveRunner()`
 
 ### Fixed
 
@@ -39,6 +49,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 - `HandleError` benchmark no longer writes ~1M lines to stderr during benchmark runs
 - `NetworkRule.resolveHost` uses `net/url.Parse` and `net.Dialer` for TCP dial instead of raw string splitting
 - `FilesystemRule` uses `filepath.Ext` instead of `strings.Contains(".")` for file vs directory detection
+- `Compose` doc comment corrected; `extractCommand` updated to match diagnostic fix formats
 
 ## [0.2.0] - 2026-05-26
 

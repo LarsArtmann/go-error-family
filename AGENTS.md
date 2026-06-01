@@ -2,8 +2,8 @@
 
 Structured error protocol library. Library only — no `main`, no build system, no external deps. Full API reference: `SKILL.md`.
 
-**Last Updated:** 2026-05-31
-**Version:** v0.3.0-dev
+**Last Updated:** 2026-06-01
+**Version:** v0.3.0
 **Status:** All tests pass, 0 lint issues, 0 race conditions
 
 ## Quick Start
