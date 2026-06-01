@@ -2,6 +2,7 @@
 
 [![Go Reference](https://pkg.go.dev/badge/github.com/larsartmann/go-error-family.svg)](https://pkg.go.dev/github.com/larsartmann/go-error-family)
 [![Go Report Card](https://goreportcard.com/badge/github.com/larsartmann/go-error-family)](https://goreportcard.com/report/github.com/larsartmann/go-error-family)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
 Structured error protocol for Go — behavioral classification, exit codes, and diagnostic rules.
 
@@ -19,9 +20,10 @@ Requires Go 1.26+ (uses `errors.AsType`).
 
 - **`Family`** — behavioral classification (Rejection, Conflict, Transient, Corruption, Infrastructure) that maps to retry decisions, exit codes, and user-facing tone
 - **Small interfaces** — `Coded`, `Classified`, `Contextual`, `Retryable` — each error type implements what it needs
-- **`Classify(err)`** — universal classification for any error (interface → registered sentinels → default)
+- **`Classify(err)`** — universal classification for any error (multi-error → interface → registered sentinels → default)
 - **`ExitCode(err)`** — BSD sysexits.h exit codes derived from Family
 - **`HandleError(err)`** — CLI boundary handler with structured messages (What / Why / Fix / WayOut)
+- **`Compose(errs...)`** — combine errors via `errors.Join` for partial-success patterns
 - **Diagnostic rules** — deterministic checks (PostgreSQL, filesystem, network, git) that auto-discover why an error occurred
 - **AI debug agent** — root cause analysis and `FixStep` suggestions from diagnostic context
 
@@ -85,6 +87,9 @@ err := errorfamily.NewRejection("file.not_found", "config missing").
 
 // Formatted
 err := errorfamily.Newf(errorfamily.Rejection, "file.not_found", "missing: %s", path)
+
+// Multi-error (partial success)
+err := errorfamily.Compose(err1, err2, err3)
 ```
 
 Family-specific constructors: `NewRejection`, `NewConflict`, `NewTransient`, `NewCorruption`, `NewInfrastructure`. Wrap variants: `WrapRejection`, `WrapConflict`, `WrapTransient`, `WrapCorruption`, `WrapInfrastructure`.
@@ -109,10 +114,11 @@ family := errorfamily.ParseFamily("transient") // defaults to Transient for unkn
 
 Classification precedence — first match wins:
 
-1. `Classified` interface → `ErrorFamily()`
-2. `Retryable` interface → infer Transient (true) or Rejection (false)
-3. Registered sentinels via `errors.Is` chain walk
-4. Default → Transient (fail-open for retry)
+1. **Multi-error** (`errors.Join`) → classify each sub-error, first non-Transient wins
+2. `Classified` interface → `ErrorFamily()`
+3. `Retryable` interface → infer Transient (true) or Rejection (false)
+4. Registered sentinels via `errors.Is` chain walk
+5. Default → Transient (fail-open for retry)
 
 ## Registering Third-Party Errors
 
@@ -183,8 +189,11 @@ For more control:
 result := errorfamily.HandleErrorDetailed(err)
 fmt.Printf("exit=%d msg=%q fix=%q\n", result.ExitCode, result.Message, result.SuggestedFix)
 
-// Custom config — diagnostics, template overrides, custom output
-exitCode := errorfamily.HandleErrorWithConfig(err, errorfamily.HandleConfig{
+// Template-aware structured result
+result := errorfamily.HandleErrorDetailedWithConfig(err, cfg)
+
+// Context-propagating handler — preferred when you have a context.Context
+exitCode := errorfamily.HandleErrorWithContext(ctx, err, errorfamily.HandleConfig{
     Diagnose:    true,
     Output:      myWriter,
     DiagnosticFunc: myDiagnoseFunc,
@@ -250,6 +259,39 @@ runner := diagnose.NewRunner(&git.GitRule{}, &postgres.PostgresRule{}, &diagnose
 
 Results include `Confidence` (0.0–1.0) and are sorted by confidence descending.
 
+### Writing Custom Rules
+
+Implement the `DiagnosticRule` interface:
+
+```go
+type MyRule struct{}
+
+func (r *MyRule) Name() string { return "my_rule" }
+func (r *MyRule) Applicable(err error) bool {
+    return diagnose.HasContextKey(err, "host") || diagnose.ErrorCodeContains(err, "db.")
+}
+func (r *MyRule) Run(ctx context.Context, err error) (*diagnose.DiagnosticResult, error) {
+    host := diagnose.ResolveContextKey(err, []string{"host", "db_host"}, "localhost")
+    // ... check system state ...
+    return &diagnose.DiagnosticResult{
+        Status:       diagnose.StatusFailed,
+        Confidence:   0.8,
+        Summary:      "host unreachable: " + host,
+        SuggestedFix: "Check that the host is running and accessible",
+    }, nil
+}
+```
+
+For testable rules that shell out, accept a `CommandRunner`:
+
+```go
+type MyRule struct {
+    Runner diagnose.CommandRunner // inject mock in tests
+}
+```
+
+See the [custom rule example](examples/README.md) for a complete working example.
+
 ## AI Debug Agent
 
 Root cause analysis and fix suggestions from diagnostic context:
@@ -273,14 +315,14 @@ The agent produces analysis but does **not** execute fixes — the consumer deci
 
 ```
 go-error-family/
-├── family.go               — Family enum + data-driven familyData (Name, Exit, Tone, Message, Why, Fix)
+├── family.go               — Family enum + data-driven familyData
 ├── interfaces.go           — Coded, Classified, Contextual, Retryable (each embeds error)
 ├── error.go                — Reference Error struct (Is, Unwrap, Format, WithContext, accessors)
 ├── classify.go             — Classify, IsRetryable, ExitCode, RegisterClassification(s)
 ├── constructors.go         — New, Wrap, Newf, Wrapf + family-specific shortcuts
-├── handle.go               — HandleError, HandleErrorDetailed, template system, defaultMessages
+├── handle.go               — HandleError, HandleErrorWithContext, template system
 ├── diagnose/
-│   ├── diagnose.go         — Runner, DiagnosticRule interface, RuleSpec (data-driven matching), helpers
+│   ├── diagnose.go         — Runner, DiagnosticRule, RuleSpec, CommandRunner, ContextKey
 │   ├── context.go          — RunCommand, CommandExists (exported for rule authors)
 │   ├── rules_filesystem.go — FilesystemRule
 │   ├── rules_network.go    — NetworkRule
@@ -288,10 +330,10 @@ go-error-family/
 │   └── postgres/           — submodule: PostgresRule
 ├── agent/
 │   └── agent.go            — DebugAgent interface, Config, AgentResult, FixStep
-├── examples/
-│   ├── cmd/cli             — CLI boundary handler example
-│   ├── cmd/http            — HTTP middleware with status code mapping
-│   └── cmd/custom_rule     — Writing your own DiagnosticRule
+└── examples/
+    ├── cmd/cli             — CLI boundary handler example
+    ├── cmd/http            — HTTP middleware with status code mapping
+    └── cmd/custom_rule     — Writing your own DiagnosticRule
 ```
 
 ## Philosophy
@@ -301,3 +343,7 @@ go-error-family/
 3. **Presentation is separate from the error** — the CLI layer formats for humans
 4. **Family = exit code = retry decision = tone** — one concept, many audiences
 5. **Generic errors are structurally impossible** — Code + Family + Context guarantee specificity
+
+## License
+
+[MIT](LICENSE) — Copyright (c) 2026 Lars Artmann
