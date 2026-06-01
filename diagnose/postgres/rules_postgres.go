@@ -135,13 +135,23 @@ const strLocalhost = "localhost"
 func (r *PostgresRule) resolveHost(err error) string {
 	return diagnose.ResolveContextKey(
 		err,
-		[]string{string(diagnose.KeyDBHost), string(diagnose.KeyPostgresHost), string(diagnose.KeyHost), "PGHOST"},
+		[]string{
+			string(diagnose.KeyDBHost),
+			string(diagnose.KeyPostgresHost),
+			string(diagnose.KeyHost),
+			string(diagnose.KeyPGHOST),
+		},
 		strLocalhost,
 	)
 }
 
 func (r *PostgresRule) resolvePort(err error) string {
-	for _, key := range []string{"db_port", "postgres_port", "port", "PGPORT"} {
+	for _, key := range []string{
+		string(diagnose.KeyDBPort),
+		string(diagnose.KeyPostgresPort),
+		string(diagnose.KeyPort),
+		string(diagnose.KeyPGPORT),
+	} {
 		if v := diagnose.ContextValue(err, key); v != "" {
 			if _, err := strconv.Atoi(v); err == nil {
 				return v

@@ -39,7 +39,7 @@ func (r *GitRule) Applicable(err error) bool {
 
 var gitSpec = diagnose.RuleSpec{
 	ContextKeys: []diagnose.ContextKey{
-		"git",
+		diagnose.KeyGit,
 		diagnose.KeyRepository,
 		diagnose.KeyRepo,
 		diagnose.KeyBranch,

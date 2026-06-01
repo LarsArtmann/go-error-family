@@ -27,9 +27,9 @@ Maps error families to HTTP status codes with structured JSON responses and retr
 
 ```bash
 # After starting the server:
-curl http://localhost:8080/user              # 400 {"code":"user.missing_id","retryable":false}
-curl http://localhost:8080/user?id=notfound  # 400 {"code":"user.not_found","retryable":false}
-curl http://localhost:8080/user?id=dbfail    # 503 {"code":"db.timeout","retryable":true}
+curl http://localhost:8080/user              # 400 {"code":"user.missing_id","message":"id query parameter is required","retryable":false}
+curl http://localhost:8080/user?id=notfound  # 400 {"code":"user.not_found","message":"user not found","retryable":false}
+curl http://localhost:8080/user?id=dbfail    # 503 {"code":"db.timeout","message":"database connection timed out","retryable":true}
 ```
 
 ## Custom Diagnostic Rule

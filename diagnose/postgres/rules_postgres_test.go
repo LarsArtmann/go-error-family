@@ -2,7 +2,6 @@ package postgres
 
 import (
 	"context"
-	"fmt"
 	"strings"
 	"sync"
 	"testing"
@@ -396,6 +395,3 @@ func TestIsPostgresRunningDefaults(t *testing.T) {
 	running := IsPostgresRunning(context.Background(), "localhost", "5432")
 	_ = running
 }
-
-// Suppress fmt import if unused.
-var _ = fmt.Sprintf

@@ -105,6 +105,12 @@ const (
 	KeyGitDir ContextKey = "git_dir"
 	// KeyRepoPath is the context key for a full repository path.
 	KeyRepoPath ContextKey = "repo_path"
+	// KeyPostgresPort is the context key for a PostgreSQL port.
+	KeyPostgresPort ContextKey = "postgres_port"
+	// KeyPGHOST is the context key for the PGHOST environment variable.
+	KeyPGHOST ContextKey = "PGHOST"
+	// KeyPGPORT is the context key for the PGPORT environment variable.
+	KeyPGPORT ContextKey = "PGPORT"
 )
 
 // Status represents the result of a diagnostic check.
