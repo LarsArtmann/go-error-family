@@ -210,49 +210,78 @@ func (r *Runner) Register(rule DiagnosticRule) {
 }
 
 // Run executes all applicable diagnostic rules for the given error.
+// Run executes all applicable diagnostic rules for the given error.
 // Rules are run concurrently for speed. Results are ordered by confidence (highest first).
-// Context cancellation is respected.
+// Context cancellation is respected: if ctx is cancelled, Run returns early with
+// whatever results have been collected so far.
 func (r *Runner) Run(ctx context.Context, err error) []*DiagnosticResult {
+	rules := r.applicableRules(err)
+	if len(rules) == 0 {
+		return nil
+	}
+
+	results := r.runRules(ctx, err, rules)
+	return sortByConfidence(results)
+}
+
+// applicableRules returns a snapshot of rules that match the given error.
+func (r *Runner) applicableRules(err error) []DiagnosticRule {
 	r.mu.RLock()
+	defer r.mu.RUnlock()
 	rules := make([]DiagnosticRule, 0, len(r.rules))
 	for _, rule := range r.rules {
 		if rule.Applicable(err) {
 			rules = append(rules, rule)
 		}
 	}
-	r.mu.RUnlock()
+	return rules
+}
 
-	if len(rules) == 0 {
-		return nil
+// runRules executes rules concurrently and collects results, respecting context cancellation.
+func (r *Runner) runRules(ctx context.Context, err error, rules []DiagnosticRule) []*DiagnosticResult {
+	type ruleResult struct {
+		idx    int
+		result *DiagnosticResult
 	}
 
-	results := make([]*DiagnosticResult, len(rules))
-	var wg sync.WaitGroup
-
+	ch := make(chan ruleResult, len(rules))
 	for i, rule := range rules {
-		wg.Add(1)
 		go func(idx int, rl DiagnosticRule) {
-			defer wg.Done()
 			start := time.Now()
 			result, runErr := rl.Run(ctx, err)
 			if runErr != nil {
-				results[idx] = &DiagnosticResult{
+				ch <- ruleResult{idx: idx, result: &DiagnosticResult{
 					RuleName: rl.Name(),
 					Status:   StatusUnknown,
 					Summary:  fmt.Sprintf("diagnostic failed: %v", runErr),
 					Details:  map[string]string{"error": runErr.Error()},
-				}
+				}}
 			} else if result != nil {
 				result.RuleName = rl.Name()
 				result.Duration = time.Since(start)
-				results[idx] = result
+				ch <- ruleResult{idx: idx, result: result}
+			} else {
+				ch <- ruleResult{idx: idx}
 			}
 		}(i, rule)
 	}
 
-	wg.Wait()
+	results := make([]*DiagnosticResult, len(rules))
+	collected := 0
+	for collected < len(rules) {
+		select {
+		case rr := <-ch:
+			results[rr.idx] = rr.result
+			collected++
+		case <-ctx.Done():
+			return results
+		}
+	}
+	return results
+}
 
-	// Filter nils and sort by confidence descending.
+// sortByConfidence filters nils and sorts results by confidence descending (insertion sort, small N).
+func sortByConfidence(results []*DiagnosticResult) []*DiagnosticResult {
 	filtered := make([]*DiagnosticResult, 0, len(results))
 	for _, res := range results {
 		if res != nil {
@@ -260,7 +289,6 @@ func (r *Runner) Run(ctx context.Context, err error) []*DiagnosticResult {
 		}
 	}
 
-	// Simple insertion sort by confidence (small N).
 	for i := 1; i < len(filtered); i++ {
 		for j := i; j > 0 && filtered[j].Confidence > filtered[j-1].Confidence; j-- {
 			filtered[j], filtered[j-1] = filtered[j-1], filtered[j]

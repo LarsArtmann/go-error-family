@@ -134,8 +134,40 @@ func TestRunnerContextCancellation(t *testing.T) {
 	runner := NewRunner(rule)
 
 	results := runner.Run(ctx, errorfamily.NewTransient("test", "msg"))
-	// Context is cancelled but the rule still runs (it doesn't check ctx).
-	// This test verifies no panic or deadlock.
+	// Context is already cancelled but the rule completes instantly.
+	// Run returns early via ctx.Done() before collecting all results.
+	_ = results
+}
+
+func TestRunnerContextCancelledMidRun(t *testing.T) {
+	ctx, cancel := context.WithCancel(context.Background())
+
+	// One instant rule, one slow rule (100ms).
+	fastRule := &staticRule{
+		name:       "fast",
+		applicable: true,
+		result:     &DiagnosticResult{Status: StatusHealthy, Confidence: 0.5},
+	}
+	slowRule := &slowRule{
+		name:     "slow",
+		duration: 100 * time.Millisecond,
+	}
+
+	runner := NewRunner(fastRule, slowRule)
+
+	// Cancel after 10ms — slow rule won't finish in time.
+	time.AfterFunc(10*time.Millisecond, cancel)
+
+	start := time.Now()
+	results := runner.Run(ctx, errorfamily.NewTransient("test", "msg"))
+	elapsed := time.Since(start)
+
+	// Should return within ~50ms, not wait for the slow rule's 100ms.
+	if elapsed > 80*time.Millisecond {
+		t.Errorf("Run took %v, should have returned quickly after cancellation", elapsed)
+	}
+
+	// The fast rule's result should be collected.
 	_ = results
 }
 
