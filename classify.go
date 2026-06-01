@@ -95,6 +95,14 @@ func RegisterClassification(sentinel error, family Family) {
 	registry.entries[sentinel] = family
 }
 
+// UnregisterClassification removes a previously registered sentinel mapping.
+// Thread-safe. No-op if the sentinel has no registered classification.
+func UnregisterClassification(sentinel error) {
+	registry.mu.Lock()
+	defer registry.mu.Unlock()
+	delete(registry.entries, sentinel)
+}
+
 // RegisterClassifications registers multiple sentinel-to-Family mappings at once.
 // Thread-safe. Call from init() in external packages.
 func RegisterClassifications(classifications map[error]Family) {

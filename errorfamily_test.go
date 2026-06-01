@@ -309,6 +309,7 @@ func TestClassifyWithRegisteredSentinel(t *testing.T) {
 	sentinel := errors.New("test.sentinel")
 
 	RegisterClassification(sentinel, Corruption)
+	t.Cleanup(func() { UnregisterClassification(sentinel) })
 
 	if Classify(sentinel) != Corruption {
 		t.Error("registered sentinel should classify correctly")
@@ -403,6 +404,10 @@ func TestRegisterClassifications(t *testing.T) {
 	RegisterClassifications(map[error]Family{
 		s1: Conflict,
 		s2: Infrastructure,
+	})
+	t.Cleanup(func() {
+		UnregisterClassification(s1)
+		UnregisterClassification(s2)
 	})
 
 	if Classify(s1) != Conflict {

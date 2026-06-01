@@ -219,6 +219,7 @@ func TestRegisterTemplateAndLookup(t *testing.T) {
 		What: "Custom message for {{.key}}",
 		Fix:  "Do the thing",
 	})
+	t.Cleanup(func() { UnregisterTemplate("test.registered") })
 
 	var buf bytes.Buffer
 	err := NewRejection("test.registered", "msg").WithContext("key", "value")
@@ -239,6 +240,7 @@ func TestRegisterTemplateCaseInsensitive(t *testing.T) {
 	RegisterTemplate("Test.CASE_Code", MessageTemplate{
 		What: "Case insensitive template",
 	})
+	t.Cleanup(func() { UnregisterTemplate("Test.CASE_Code") })
 
 	var buf bytes.Buffer
 	err := NewRejection("test.case_code", "msg")
@@ -354,6 +356,7 @@ func TestHandleErrorDetailedWithRegisteredTemplate(t *testing.T) {
 		What: "Registered template for detailed",
 		Fix:  "Fix from registered",
 	})
+	t.Cleanup(func() { UnregisterTemplate("test.detailed.registered") })
 
 	err := NewRejection("test.detailed.registered", "msg")
 	result := HandleErrorDetailed(err)
