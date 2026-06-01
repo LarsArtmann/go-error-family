@@ -319,6 +319,14 @@ func RegisterTemplate(code string, tmpl MessageTemplate) {
 	templateRegistry.entries[strings.ToLower(code)] = tmpl
 }
 
+// UnregisterTemplate removes a previously registered template.
+// Thread-safe. No-op if the code has no registered template.
+func UnregisterTemplate(code string) {
+	templateRegistry.mu.Lock()
+	defer templateRegistry.mu.Unlock()
+	delete(templateRegistry.entries, strings.ToLower(code))
+}
+
 var templateRegistry = struct {
 	mu      sync.RWMutex
 	entries map[string]MessageTemplate
