@@ -28,8 +28,11 @@ const (
 
 // HandleResult contains the full output of handling an error at the CLI boundary.
 type HandleResult struct {
-	ExitCode     int
-	Message      string
+	// ExitCode is the process exit code derived from the error's Family.
+	ExitCode int
+	// Message is the human-readable error message.
+	Message string
+	// SuggestedFix is an actionable suggestion for resolving the error.
 	SuggestedFix string
 }
 
@@ -60,20 +63,29 @@ type DiagnosticFunc func(ctx context.Context, err error) []DiagnosticFinding
 // DiagnosticFinding is a minimal result type for the CLI boundary.
 // Avoids importing diagnose while preserving type safety.
 type DiagnosticFinding struct {
-	RuleName     string
-	Status       string // "healthy", "degraded", "failed", "unknown"
-	Summary      string
+	// RuleName identifies which diagnostic rule produced this finding.
+	RuleName string
+	// Status is the check outcome: "healthy", "degraded", "failed", or "unknown".
+	Status string
+	// Summary is a human-readable explanation of the finding.
+	Summary string
+	// SuggestedFix is an actionable resolution suggested by the rule.
 	SuggestedFix string
-	Confidence   float64
+	// Confidence is 0.0–1.0 indicating how likely this explains the error.
+	Confidence float64
 }
 
 // MessageTemplate defines the Wix-style presentation for an error code.
 // Based on the Wix UX framework: What / Why / Fix / WayOut.
 type MessageTemplate struct {
-	What   string // "Could not find {{.path}}"
-	Why    string // "The file doesn't exist at the expected location."
-	Fix    string // "Check that {{.path}} exists and is readable."
-	WayOut string // "Run with --verbose for more details."
+	// What describes what happened. Supports {{.key}} placeholders from error context.
+	What string
+	// Why explains why it happened. Supports {{.key}} placeholders.
+	Why string
+	// Fix suggests how to resolve the error. Supports {{.key}} placeholders.
+	Fix string
+	// WayOut provides an escape hatch or alternative action. Supports {{.key}} placeholders.
+	WayOut string
 }
 
 // HandleError is the CLI boundary handler — the meta service.
@@ -98,6 +110,15 @@ func HandleError(err error) int {
 
 // HandleErrorWithConfig is the configurable version of HandleError.
 func HandleErrorWithConfig(err error, cfg HandleConfig) int {
+	return HandleErrorWithContext(context.Background(), err, cfg)
+}
+
+// HandleErrorWithContext handles an error with caller-provided context for
+// cancellation and diagnostic propagation. This is the preferred entry point
+// when the caller has a context.Context available.
+//
+// All other HandleError variants delegate to this function.
+func HandleErrorWithContext(ctx context.Context, err error, cfg HandleConfig) int {
 	if err == nil {
 		return 0
 	}
@@ -110,16 +131,16 @@ func HandleErrorWithConfig(err error, cfg HandleConfig) int {
 	exitCode := family.ExitCode()
 
 	code := extractCode(err)
-	ctx := extractContext(err)
+	errCtx := extractContext(err)
 
 	if cfg.Diagnose && cfg.DiagnosticFunc != nil {
-		findings := cfg.DiagnosticFunc(context.Background(), err)
+		findings := cfg.DiagnosticFunc(ctx, err)
 		if cfg.OnDiagnosed != nil {
 			cfg.OnDiagnosed(err, findings)
 		}
 	}
 
-	message := renderCLI(code, ctx, family, cfg)
+	message := renderCLI(code, errCtx, family, cfg)
 
 	_, _ = fmt.Fprintln(cfg.Output, message)
 
@@ -128,23 +149,31 @@ func HandleErrorWithConfig(err error, cfg HandleConfig) int {
 
 // HandleErrorDetailed returns a structured result without writing output.
 // Useful for HTTP handlers, gRPC interceptors, and programmatic consumers.
+//
+// Uses the same template resolution chain as HandleError: registered templates,
+// built-in defaults, and family fallbacks.
 func HandleErrorDetailed(err error) *HandleResult {
+	return HandleErrorDetailedWithConfig(err, HandleConfig{})
+}
+
+// HandleErrorDetailedWithConfig returns a structured result with template overrides.
+func HandleErrorDetailedWithConfig(err error, cfg HandleConfig) *HandleResult {
 	if err == nil {
 		return &HandleResult{ExitCode: 0}
 	}
 
 	family := Classify(err)
 	code := extractCode(err)
-	context := extractContext(err)
+	errCtx := extractContext(err)
 
 	result := &HandleResult{
 		ExitCode: family.ExitCode(),
-		Message:  renderMessage(code, context, family),
+		Message:  renderCLI(code, errCtx, family, cfg),
 	}
 
 	if !IsRetryable(err) {
 		if tmpl, ok := lookupDefault(code); ok && tmpl.Fix != "" {
-			result.SuggestedFix = applyContext(tmpl.Fix, context)
+			result.SuggestedFix = applyContext(tmpl.Fix, errCtx)
 		} else {
 			result.SuggestedFix = family.DefaultFix()
 		}

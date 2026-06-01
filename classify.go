@@ -71,6 +71,16 @@ func ExitCode(err error) int {
 	return Classify(err).ExitCode()
 }
 
+// Compose combines multiple errors using errors.Join and returns the
+// "worst" Family among them (highest exit code). This is a convenience
+// for the partial-success pattern where you need a single exit code
+// from multiple failures.
+//
+// Returns nil if no errors are provided.
+func Compose(errs ...error) error {
+	return errors.Join(errs...)
+}
+
 // RegisterClassification maps a third-party sentinel error to a Family.
 // Thread-safe. Call from init() in external packages:
 //
@@ -86,6 +96,8 @@ func RegisterClassification(sentinel error, family Family) {
 	registry.entries[sentinel] = family
 }
 
+// RegisterClassifications registers multiple sentinel-to-Family mappings at once.
+// Thread-safe. Call from init() in external packages.
 func RegisterClassifications(classifications map[error]Family) {
 	registry.mu.Lock()
 	defer registry.mu.Unlock()

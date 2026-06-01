@@ -2,6 +2,7 @@ package errorfamily
 
 import (
 	"errors"
+	"io"
 	"testing"
 )
 
@@ -50,7 +51,7 @@ func BenchmarkHandleError(b *testing.B) {
 		WithContext("host", "localhost").
 		WithContext("port", "5432")
 	for b.Loop() {
-		_ = HandleError(e)
+		_ = HandleErrorWithConfig(e, HandleConfig{Output: io.Discard})
 	}
 }
 

@@ -2,6 +2,18 @@
 
 Structured error protocol library. Library only — no `main`, no build system, no external deps. Full API reference: `SKILL.md`.
 
+**Last Updated:** 2026-05-31
+**Version:** v0.3.0-dev
+**Status:** All tests pass, 0 lint issues, 0 race conditions
+
+## Quick Start
+
+```bash
+go test ./... -count=1 -timeout 120s -race   # all tests
+golangci-lint run ./...                        # lint (all modules)
+go build ./...                                 # build check
+```
+
 ## Surprising Behaviors
 
 - **`Classify(nil)` returns `Rejection`**, not a zero value. Intentional: nil error = caller's fault.
@@ -9,6 +21,22 @@ Structured error protocol library. Library only — no `main`, no build system, 
 - **`errors.Is` matches on `code + family` only**, ignoring message. Two `*Error`s with different messages but same code and family will match.
 - **`Wrap(nil, ...)` returns `nil`** — nil-safe, but means you can't construct an error wrapping nil.
 - **Consumer interfaces (`Coded`, `Classified`, `Contextual`, `Retryable`) embed `error`** — required for Go 1.26's `errors.AsType[T]()`. Don't remove the embedding.
+- **`HandleErrorWithContext` is the canonical entry point** — `HandleError` and `HandleErrorWithConfig` delegate to it. Always prefer the context-accepting variant when you have a `context.Context`.
+- **`CommandRunner` defaults to `DefaultCommandRunner{}`** — rules with a nil `Runner` field use the real system commands. Tests inject mocks.
+
+## New APIs (v0.3.0)
+
+| API                                       | Purpose                                                    |
+| ----------------------------------------- | ---------------------------------------------------------- |
+| `HandleErrorWithContext(ctx, err, cfg)`   | Context-propagating CLI boundary handler                   |
+| `HandleErrorDetailedWithConfig(err, cfg)` | Template-aware structured result                           |
+| `Compose(errs...)`                        | `errors.Join` wrapper for partial-success                  |
+| `Error.WithTimestamp(ts)`                 | Deterministic timestamp for testing                        |
+| `diagnose.CommandRunner`                  | Injectable command execution interface                     |
+| `diagnose.DefaultCommandRunner{}`         | Default implementation using `RunCommand`/`CommandExists`  |
+| `diagnose.ContextKey`                     | Typed string for context keys (`KeyHost`, `KeyPort`, etc.) |
+| `diagnose.ErrorContext(err)`              | Extract context from any error                             |
+| `DiagnosticResult.Context`                | Error context that triggered the rule                      |
 
 ## Classification Precedence
 
@@ -40,17 +68,17 @@ Not a library type — partial success is a consumption pattern, not a classific
 
 ## Test Coverage
 
-**Updated:** 2026-05-26
+**Updated:** 2026-05-31
 
 | Package              | Coverage |
 | -------------------- | -------- |
 | root (`errorfamily`) | 97.2%    |
 | `agent`              | 100%     |
 | `diagnose` (core)    | 66.8%    |
-| `diagnose/git`       | 69.2%    |
-| `diagnose/postgres`  | 58.6%    |
+| `diagnose/git`       | 98.5%    |
+| `diagnose/postgres`  | 81.0%    |
 
-Diagnose rules that shell out to system commands are integration-test territory. Git and postgres rules use temp git repos for real integration tests where possible.
+Git and postgres coverage improved with mock `CommandRunner` injection. Diagnose core coverage reflects shell-out rules that are tested via integration.
 
 ## Fuzz Tests
 
@@ -58,8 +86,9 @@ Diagnose rules that shell out to system commands are integration-test territory.
 
 ## Lint Configuration
 
-**Updated:** 2026-05-26
+**Updated:** 2026-05-31
 
 - G304 (gosec file inclusion) is excluded for `diagnose/rules_filesystem.go` via `.golangci.yml` path-based exclusion — `os.Open(path)` and `os.Create(testFile)` are intentional in diagnostic rules.
 - Do NOT use `//nolint:gosec` directives for G304 in the diagnose package — the `.golangci.yml` exclusion handles it. Inline nolint directives break when `golines` wraps lines.
-- The postgres submodule uses extracted string constants (e.g., `strPostgres`, `strDBHost`) to satisfy goconst.
+- `ContextKey` type replaces raw strings in rule specs. `CodeContains` fields still use raw strings (different semantic — substring matching on error codes, not context keys).
+- `CommandRunner` interface allows mock injection; `DefaultCommandRunner` wraps real system calls.

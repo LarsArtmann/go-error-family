@@ -403,3 +403,38 @@ func (r *slowRule) Run(ctx context.Context, _ error) (*DiagnosticResult, error) 
 	}
 	return &DiagnosticResult{Status: StatusHealthy, Confidence: 0.5}, nil
 }
+
+func TestContextKeyStringValues(t *testing.T) {
+	tests := []struct {
+		key  ContextKey
+		want string
+	}{
+		{KeyHost, "host"},
+		{KeyPort, "port"},
+		{KeyPath, "path"},
+		{KeyDBHost, "db_host"},
+		{KeyDBPort, "db_port"},
+		{KeyDBName, "db_name"},
+		{KeyDatabaseURL, "database_url"},
+		{KeyPostgresHost, "postgres_host"},
+		{KeyRepository, "repository"},
+		{KeyRepo, "repo"},
+		{KeyGitDir, "git_dir"},
+	}
+	for _, tt := range tests {
+		if string(tt.key) != tt.want {
+			t.Errorf("ContextKey(%q).String() = %q, want %q", tt.key, string(tt.key), tt.want)
+		}
+	}
+}
+
+func TestContextKeyWithRuleSpec(t *testing.T) {
+	spec := RuleSpec{
+		ContextKeys: []ContextKey{KeyHost, KeyPort},
+	}
+	err := errorfamily.NewTransient("test", "msg").
+		WithContext("host", "localhost")
+	if !spec.Matches(err) {
+		t.Error("RuleSpec with typed ContextKey should match error with 'host' context")
+	}
+}

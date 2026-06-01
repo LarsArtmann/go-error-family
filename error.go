@@ -133,6 +133,13 @@ func (e *Error) WithCause(cause error) *Error {
 	return e
 }
 
+// WithTimestamp sets the error timestamp and returns the error for chaining.
+// Useful for testing and deterministic construction.
+func (e *Error) WithTimestamp(ts time.Time) *Error {
+	e.timestamp = ts
+	return e
+}
+
 // Summary returns a one-line human-readable summary suitable for logs and CLI output.
 // Format: "code: message" without family prefix.
 func (e *Error) Summary() string {

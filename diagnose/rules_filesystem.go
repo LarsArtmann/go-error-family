@@ -22,33 +22,36 @@ func (r *FilesystemRule) Applicable(err error) bool {
 	return filesystemSpec.Matches(err)
 }
 
-//nolint:goconst // Spec keys are descriptive literals, not worth extracting.
 var filesystemSpec = RuleSpec{
-	ContextKeys: []string{
-		"path",
-		"file",
-		"dir",
-		"directory",
-		"config_path",
-		"output_path",
+	ContextKeys: []ContextKey{
+		KeyPath,
+		KeyFile,
+		KeyDir,
+		KeyDirectory,
+		KeyConfigPath,
+		KeyOutputPath,
 	},
-	CodeContains: []string{"file", "dir", "path", "config", "permission"},
+	// CodeContains matches on error code substrings (different from context keys).
+	CodeContains: []string{"file", "dir", "path", "config", "permission"}, //nolint:goconst
 }
 
 func (r *FilesystemRule) Run(ctx context.Context, err error) (*DiagnosticResult, error) {
 	path := r.resolvePath(err)
+	errCtx := ErrorContext(err)
 	if path == "" {
 		return &DiagnosticResult{
 			Status:     StatusUnknown,
 			Summary:    "No file path found in error context",
 			Confidence: ConfidenceNone,
 			Details:    map[string]string{},
+			Context:    errCtx,
 		}, nil
 	}
 
 	result := &DiagnosticResult{
 		Details:    map[string]string{"path": path},
 		Confidence: ConfidenceHigh,
+		Context:    errCtx,
 	}
 
 	info, statErr := os.Stat(path)
@@ -160,9 +163,13 @@ func (r *FilesystemRule) checkFileReadable(result *DiagnosticResult, path string
 }
 
 func (r *FilesystemRule) resolvePath(err error) string {
-	return ResolveContextKey(
-		err,
-		[]string{"path", "file", "dir", "directory", "config_path", "output_path"},
-		"",
-	)
+	keys := []string{
+		string(KeyPath),
+		string(KeyFile),
+		string(KeyDir),
+		string(KeyDirectory),
+		string(KeyConfigPath),
+		string(KeyOutputPath),
+	}
+	return ResolveContextKey(err, keys, "")
 }

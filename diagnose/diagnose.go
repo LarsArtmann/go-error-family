@@ -1,19 +1,35 @@
-// Package diagnose provides automatic error context discovery and deterministic
-// diagnostic rules. When an error occurs, the diagnostic system can:
+// Package diagnose provides deterministic diagnostic rules that investigate errors
+// by checking the live system state. Rules are matched by error codes, context keys,
+// and message patterns, then run concurrent checks to produce actionable findings.
 //
-//  1. Auto-discover system context (OS, disk, memory, network state)
-//  2. Run deterministic diagnostic rules matching the error
-//  3. Suggest specific fixes or auto-fix when possible
-//  4. Feed results to an AI agent for deeper analysis
+// The package ships with zero-dependency rules (FilesystemRule, NetworkRule) in
+// DefaultRunner. Additional rules live in submodules:
+//   - diagnose/git: GitRule (checks repo state, working tree, remotes)
+//   - diagnose/postgres: PostgresRule (checks pg_isready, TCP connectivity)
 //
 // Usage:
 //
-//	diagnosis := diagnose.Run(ctx, err)
-//	for _, result := range diagnosis {
-//	    fmt.Println(result.Summary)
-//	    if result.SuggestedFix != "" {
-//	        fmt.Println("  Fix:", result.SuggestedFix)
+//	runner := diagnose.DefaultRunner()
+//	results := runner.Run(ctx, err)
+//	for _, r := range results {
+//	    fmt.Println(r.Summary)
+//	    if r.SuggestedFix != "" {
+//	        fmt.Println("  Fix:", r.SuggestedFix)
 //	    }
+//	}
+//
+// Custom rules implement the DiagnosticRule interface:
+//
+//	type MyRule struct{}
+//	func (r *MyRule) Name() string { return "my_rule" }
+//	func (r *MyRule) Applicable(err error) bool { ... }
+//	func (r *MyRule) Run(ctx context.Context, err error) (*diagnose.DiagnosticResult, error) { ... }
+//
+// For testability, rules that shell out to system commands should accept a
+// CommandRunner interface instead of calling RunCommand directly:
+//
+//	type MyRule struct {
+//	    Runner diagnose.CommandRunner  // defaults to diagnose.DefaultCommandRunner{}
 //	}
 package diagnose
 
@@ -36,6 +52,59 @@ const (
 	strPort      = "port"
 	strLocalhost = "localhost"
 	strUnknown   = "unknown"
+)
+
+// ContextKey is a typed string for error context keys used by diagnostic rules.
+// Use these constants instead of raw strings to prevent typos and enable IDE autocompletion.
+type ContextKey string
+
+const (
+	// KeyHost is the context key for a hostname or IP address.
+	KeyHost ContextKey = "host"
+	// KeyPort is the context key for a port number.
+	KeyPort ContextKey = "port"
+	// KeyPath is the context key for a filesystem path.
+	KeyPath ContextKey = "path"
+	// KeyFile is the context key for a file path.
+	KeyFile ContextKey = "file"
+	// KeyDir is the context key for a directory path.
+	KeyDir ContextKey = "dir"
+	// KeyURL is the context key for a URL.
+	KeyURL ContextKey = "url"
+	// KeyEndpoint is the context key for a service endpoint.
+	KeyEndpoint ContextKey = "endpoint"
+	// KeyAddress is the context key for a network address.
+	KeyAddress ContextKey = "address"
+	// KeyRemote is the context key for a remote host.
+	KeyRemote ContextKey = "remote"
+	// KeyDBHost is the context key for a database host.
+	KeyDBHost ContextKey = "db_host"
+	// KeyDBPort is the context key for a database port.
+	KeyDBPort ContextKey = "db_port"
+	// KeyDBName is the context key for a database name.
+	KeyDBName ContextKey = "db_name"
+	// KeyDatabaseURL is the context key for a database connection URL.
+	KeyDatabaseURL ContextKey = "database_url"
+	// KeyPostgresHost is the context key for a PostgreSQL host.
+	KeyPostgresHost ContextKey = "postgres_host"
+	// KeyConfigPath is the context key for a configuration file path.
+	KeyConfigPath ContextKey = "config_path"
+	// KeyOutputPath is the context key for an output file path.
+	KeyOutputPath ContextKey = "output_path"
+	// KeyDirectory is an alias for directory paths.
+	KeyDirectory ContextKey = "directory"
+	// KeyGit is the context key for git-related context.
+	KeyGit ContextKey = "git"
+	// KeyRepository is the context key for a repository path.
+	KeyRepository ContextKey = "repository"
+	// KeyRepo is the context key for a repo path (short form).
+	KeyRepo ContextKey = "repo"
+	// KeyBranch is the context key for a git branch name.
+	KeyBranch ContextKey = "branch"
+	// KeyGitDir is the context key for a .git directory path.
+	KeyGitDir ContextKey = "git_dir"
+	// KeyRepoPath is the context key for a full repository path.
+	KeyRepoPath ContextKey = "repo_path"
 )
 
 // Status represents the result of a diagnostic check.
@@ -82,6 +151,10 @@ type DiagnosticResult struct {
 	// Details contains structured data about the finding.
 	// e.g., {"host": "localhost", "port": "5432", "pg_isready": "no response"}
 	Details map[string]string
+
+	// Context holds the error context that triggered this rule.
+	// Populated from the error's ErrorContext() for programmatic consumers.
+	Context map[string]string
 
 	// SuggestedFix is a specific, actionable fix the user can apply.
 	// e.g., "Start PostgreSQL: brew services start postgresql"
@@ -223,7 +296,44 @@ const (
 	ConfidenceCertain float64 = 0.9
 )
 
+// CommandRunner abstracts command execution for diagnostic rules.
+// Rules that shell out to system commands should use this interface
+// instead of calling RunCommand/CommandExists directly, enabling
+// mock-based testing without system dependencies.
+type CommandRunner interface {
+	// Run executes a command with timeout and returns stdout, exit code, and error.
+	Run(ctx context.Context, timeout time.Duration, name string, args ...string) (string, int, error)
+	// Exists checks if a command is available on the system PATH.
+	Exists(name string) bool
+}
+
+// DefaultCommandRunner uses the package-level RunCommand and CommandExists functions.
+// This is the zero-value-safe default for all rules.
+type DefaultCommandRunner struct{}
+
+func (DefaultCommandRunner) Run(
+	ctx context.Context,
+	timeout time.Duration,
+	name string,
+	args ...string,
+) (string, int, error) {
+	return RunCommand(ctx, timeout, name, args...)
+}
+
+func (DefaultCommandRunner) Exists(name string) bool {
+	return CommandExists(name)
+}
+
 // Helper functions for rule matching.
+
+// ErrorContext extracts the context map from an error, if it implements Contextual.
+// Returns an empty map for errors without context.
+func ErrorContext(err error) map[string]string {
+	if ctx, ok := errors.AsType[errorfamily.Contextual](err); ok {
+		return ctx.ErrorContext()
+	}
+	return map[string]string{}
+}
 
 func HasContextKey(err error, keys ...string) bool {
 	if ctx, ok := errors.AsType[errorfamily.Contextual](err); ok {
@@ -280,7 +390,7 @@ func ErrorCodeContains(err error, substr string) bool {
 
 // RuleSpec declares the matching criteria for a diagnostic rule.
 type RuleSpec struct {
-	ContextKeys   []string
+	ContextKeys   []ContextKey
 	CodeContains  []string
 	ContextSubstr []string
 	Extra         func(error) bool
@@ -288,8 +398,14 @@ type RuleSpec struct {
 
 // Matches reports whether the error matches this spec's criteria.
 func (s RuleSpec) Matches(err error) bool {
-	if len(s.ContextKeys) > 0 && HasContextKey(err, s.ContextKeys...) {
-		return true
+	if len(s.ContextKeys) > 0 {
+		keys := make([]string, len(s.ContextKeys))
+		for i, k := range s.ContextKeys {
+			keys[i] = string(k)
+		}
+		if HasContextKey(err, keys...) {
+			return true
+		}
 	}
 	for _, substr := range s.CodeContains {
 		if ErrorCodeContains(err, substr) {

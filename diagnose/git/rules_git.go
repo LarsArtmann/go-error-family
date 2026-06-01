@@ -17,7 +17,19 @@ import (
 //
 // Matches errors with context containing: git, repository, repo, branch,
 // or error codes containing "git".
-type GitRule struct{}
+type GitRule struct {
+	// Runner is the command runner used to execute system commands.
+	// Defaults to diagnose.DefaultCommandRunner{}.
+	Runner diagnose.CommandRunner
+}
+
+// cmdRunner returns the configured command runner or the default.
+func (r *GitRule) cmdRunner() diagnose.CommandRunner {
+	if r.Runner != nil {
+		return r.Runner
+	}
+	return diagnose.DefaultCommandRunner{}
+}
 
 func (r *GitRule) Name() string { return "git" } //nolint:goconst // Rule name, not worth extracting
 
@@ -26,7 +38,13 @@ func (r *GitRule) Applicable(err error) bool {
 }
 
 var gitSpec = diagnose.RuleSpec{
-	ContextKeys:   []string{"git", "repository", "repo", "branch", "git_dir"},
+	ContextKeys: []diagnose.ContextKey{
+		"git",
+		diagnose.KeyRepository,
+		diagnose.KeyRepo,
+		diagnose.KeyBranch,
+		diagnose.KeyGitDir,
+	},
 	CodeContains:  []string{"git"},
 	ContextSubstr: []string{"git"},
 }
@@ -38,6 +56,7 @@ func (r *GitRule) Run(ctx context.Context, err error) (*diagnose.DiagnosticResul
 	result := &diagnose.DiagnosticResult{
 		Details:    map[string]string{"repo_path": repoPath},
 		Confidence: diagnose.ConfidenceLikely,
+		Context:    diagnose.ErrorContext(err),
 	}
 
 	// Check 1: Is this a git repo?
@@ -55,7 +74,7 @@ func (r *GitRule) Run(ctx context.Context, err error) (*diagnose.DiagnosticResul
 	}
 	result.Details["is_repo"] = strTrue
 
-	if !diagnose.CommandExists("git") {
+	if !r.cmdRunner().Exists("git") {
 		result.Status = diagnose.StatusUnknown
 		result.Summary = "git command not found on PATH"
 		return result, nil
@@ -78,7 +97,7 @@ func (r *GitRule) checkWorkingTree(
 	result *diagnose.DiagnosticResult,
 	repoPath string,
 ) bool {
-	stdout, exitCode, _ := diagnose.RunCommand(
+	stdout, exitCode, _ := r.cmdRunner().Run(
 		ctx,
 		5*time.Second,
 		"git",
@@ -128,7 +147,7 @@ func (r *GitRule) checkRemote(
 	result *diagnose.DiagnosticResult,
 	repoPath string,
 ) {
-	remotesStdout, _, _ := diagnose.RunCommand(ctx, 3*time.Second, "git", "-C", repoPath, "remote")
+	remotesStdout, _, _ := r.cmdRunner().Run(ctx, 3*time.Second, "git", "-C", repoPath, "remote")
 	if strings.TrimSpace(remotesStdout) == "" {
 		result.Status = diagnose.StatusHealthy
 		result.Summary = "Git repo is clean, no remotes configured: " + repoPath
@@ -136,7 +155,7 @@ func (r *GitRule) checkRemote(
 		return
 	}
 
-	_, remoteExitCode, _ := diagnose.RunCommand(
+	_, remoteExitCode, _ := r.cmdRunner().Run(
 		ctx,
 		10*time.Second,
 		"git",
@@ -168,7 +187,12 @@ const (
 func (r *GitRule) resolveRepoPath(err error) string {
 	if v := diagnose.ResolveContextKey(
 		err,
-		[]string{"git_dir", "repository", "repo", "repo_path"},
+		[]string{
+			string(diagnose.KeyGitDir),
+			string(diagnose.KeyRepository),
+			string(diagnose.KeyRepo),
+			string(diagnose.KeyRepoPath),
+		},
 		"",
 	); v != "" {
 		return v

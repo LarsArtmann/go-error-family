@@ -22,7 +22,7 @@ func (r *NetworkRule) Applicable(err error) bool {
 }
 
 var networkSpec = RuleSpec{
-	ContextKeys:   []string{strHost, strPort, "url", "endpoint", "address", "remote"},
+	ContextKeys:   []ContextKey{KeyHost, KeyPort, KeyURL, KeyEndpoint, KeyAddress, KeyRemote},
 	CodeContains:  []string{"network", "connect", "dial", "timeout"},
 	ContextSubstr: []string{"connection refused", "no such host", "i/o timeout"},
 }
@@ -34,6 +34,7 @@ func (r *NetworkRule) Run(ctx context.Context, err error) (*DiagnosticResult, er
 	result := &DiagnosticResult{
 		Details:    map[string]string{strHost: host, strPort: port},
 		Confidence: ConfidenceLikely,
+		Context:    ErrorContext(err),
 	}
 
 	// Check 1: DNS resolution.
@@ -82,7 +83,7 @@ func (r *NetworkRule) Run(ctx context.Context, err error) (*DiagnosticResult, er
 }
 
 func (r *NetworkRule) resolveHost(err error) string {
-	v := ResolveContextKey(err, []string{strHost, "remote", "endpoint"}, "")
+	v := ResolveContextKey(err, []string{string(KeyHost), string(KeyRemote), string(KeyEndpoint)}, "")
 	if v == "" {
 		return ""
 	}
@@ -98,5 +99,5 @@ func (r *NetworkRule) resolveHost(err error) string {
 }
 
 func (r *NetworkRule) resolvePort(err error) string {
-	return ResolveContextKey(err, []string{strPort}, "")
+	return ResolveContextKey(err, []string{string(KeyPort)}, "")
 }

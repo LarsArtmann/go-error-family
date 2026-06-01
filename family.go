@@ -96,6 +96,7 @@ var familyData = [...]familyInfo{
 	},
 }
 
+// String returns the lowercase name of the Family (e.g. "transient", "rejection").
 func (f Family) String() string {
 	if f.IsValid() {
 		return familyData[f].Name
@@ -169,6 +170,7 @@ const (
 	AudienceAll
 )
 
+// String returns the lowercase name of the Audience (e.g. "user", "ops").
 func (a Audience) String() string {
 	switch a {
 	case AudienceUser:
@@ -196,18 +198,24 @@ func (f Family) Audience() Audience {
 	}
 }
 
-// Tone returns a presentation tone hint for this family.
+// Tone is a presentation tone hint for error messages.
 // Used by the presentation layer to choose appropriate language.
 type Tone string
 
 const (
+	// ToneInstructional guides the user on how to fix their input.
 	ToneInstructional Tone = "instructional"
-	ToneExplanatory   Tone = "explanatory"
-	ToneReassuring    Tone = "reassuring"
-	ToneUrgent        Tone = "urgent"
-	ToneApologetic    Tone = "apologetic"
+	// ToneExplanatory explains what happened and why.
+	ToneExplanatory Tone = "explanatory"
+	// ToneReassuring reassures the user that the issue is temporary.
+	ToneReassuring Tone = "reassuring"
+	// ToneUrgent signals that immediate action is required.
+	ToneUrgent Tone = "urgent"
+	// ToneApologetic indicates the system is at fault.
+	ToneApologetic Tone = "apologetic"
 )
 
+// Tone returns the presentation tone hint for this family.
 func (f Family) Tone() Tone {
 	if f.IsValid() {
 		return familyData[f].Tone

@@ -4,6 +4,40 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
+## [0.3.0] - 2026-05-31
+
+### Added
+
+- `HandleErrorWithContext(ctx, err, cfg)` — new entry point that propagates caller context to diagnostic functions (fixes context.Background() hardcode)
+- `HandleErrorDetailedWithConfig(err, cfg)` — template-aware structured result for HTTP/gRPC consumers
+- `CommandRunner` interface in `diagnose` package — injectable command execution for testable diagnostic rules
+- `DefaultCommandRunner` struct — zero-value default wrapping `RunCommand`/`CommandExists`
+- `ContextKey` typed string with exported constants (`KeyHost`, `KeyPort`, `KeyPath`, `KeyDBHost`, etc.)
+- `DiagnosticResult.Context` field — surfaces the error context that triggered the rule
+- `ErrorContext(err)` helper in `diagnose` package — extracts context from any error
+- `Error.WithTimestamp(ts)` mutator — for testing and deterministic construction
+- `Compose(errs...)` helper — combines errors via `errors.Join` for partial-success patterns
+- Package-level `Example` functions: `ExampleNewTransient`, `ExampleClassify`, `ExampleHandleError`, `ExampleWrapRejection`, `ExampleParseFamily`
+- Expanded git tests with mock CommandRunner: dirty tree, merge conflicts, unreachable remote, no git binary (coverage 98.5%)
+- Expanded postgres tests with mock CommandRunner: pg_isready success/failure, suggestStartFix variants (coverage 81.0%)
+
+### Changed
+
+- `HandleErrorWithConfig` now delegates to `HandleErrorWithContext(context.Background(), ...)`
+- `HandleErrorDetailed` now uses the full template resolution chain (registered templates, consumer overrides, family fallbacks)
+- `RuleSpec.ContextKeys` field type changed from `[]string` to `[]ContextKey`
+- All diagnostic rules use typed `ContextKey` constants instead of raw strings
+- All diagnostic rules populate `DiagnosticResult.Context` from the error's `ErrorContext()`
+- `GitRule` and `PostgresRule` accept optional `Runner diagnose.CommandRunner` field (defaults to `DefaultCommandRunner`)
+- `HandleError` benchmark uses `io.Discard` to suppress stderr output (532ns/op vs 1095ns/op before)
+- Improved godoc on `Family`, `Tone`, `Audience`, `HandleResult`, `MessageTemplate`, `DiagnosticFinding`
+- Updated `diagnose` package doc comment with custom rule pattern and CommandRunner usage
+
+### Fixed
+
+- `HandleErrorWithConfig` now passes caller context to `DiagnosticFunc` instead of `context.Background()`
+- `HandleError` benchmark no longer writes ~1M lines to stderr during benchmark runs
+
 ## [0.2.0] - 2026-05-26
 
 ### Changed

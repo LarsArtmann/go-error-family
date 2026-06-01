@@ -58,7 +58,7 @@ func BenchmarkRunnerRunThreeRules(b *testing.B) {
 
 func BenchmarkRuleSpecMatches(b *testing.B) {
 	spec := RuleSpec{
-		ContextKeys:   []string{"host", "port"},
+		ContextKeys:   []ContextKey{KeyHost, KeyPort},
 		CodeContains:  []string{"db."},
 		ContextSubstr: []string{"postgres"},
 	}

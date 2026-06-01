@@ -13,13 +13,8 @@ import (
 
 // Common string constants to satisfy goconst linter.
 const (
-	strPostgres     = "postgres"
-	strDBHost       = "db_host"
-	strDBPort       = "db_port"
-	strDBName       = "db_name"
-	strDatabaseURL  = "database_url"
-	strPostgresHost = "postgres_host"
-	strHost         = "host"
+	strPostgres = "postgres"
+	strHost     = "host"
 )
 
 // PostgresRule diagnoses PostgreSQL-related errors.
@@ -27,7 +22,19 @@ const (
 //
 // Matches errors with context containing: postgres, postgresql, database, db_host, db_port,
 // or error codes containing "db" or "database", or Transient family errors with db-related context.
-type PostgresRule struct{}
+type PostgresRule struct {
+	// Runner is the command runner used to execute system commands.
+	// Defaults to diagnose.DefaultCommandRunner{}.
+	Runner diagnose.CommandRunner
+}
+
+// cmdRunner returns the configured command runner or the default.
+func (r *PostgresRule) cmdRunner() diagnose.CommandRunner {
+	if r.Runner != nil {
+		return r.Runner
+	}
+	return diagnose.DefaultCommandRunner{}
+}
 
 func (r *PostgresRule) Name() string { return strPostgres }
 
@@ -37,8 +44,14 @@ func (r *PostgresRule) Applicable(err error) bool {
 
 var postgresSpec = diagnose.RuleSpec{
 	ContextSubstr: []string{strPostgres, "postgresql", "database", "sql"},
-	ContextKeys:   []string{strDBHost, strDBPort, strDBName, strDatabaseURL, strPostgresHost},
-	CodeContains:  []string{"db.", "database"},
+	ContextKeys: []diagnose.ContextKey{
+		diagnose.KeyDBHost,
+		diagnose.KeyDBPort,
+		diagnose.KeyDBName,
+		diagnose.KeyDatabaseURL,
+		diagnose.KeyPostgresHost,
+	},
+	CodeContains: []string{"db.", "database"},
 	Extra: func(err error) bool {
 		return diagnose.FamilyIs(err, errorfamily.Transient) &&
 			diagnose.HasContextSubstring(err, "sql")
@@ -55,11 +68,12 @@ func (r *PostgresRule) Run(ctx context.Context, err error) (*diagnose.Diagnostic
 			strHost: host,
 			"port":  port,
 		},
+		Context: diagnose.ErrorContext(err),
 	}
 
 	// Check 1: pg_isready
-	if diagnose.CommandExists("pg_isready") {
-		stdout, exitCode, _ := diagnose.RunCommand(
+	if r.cmdRunner().Exists("pg_isready") {
+		stdout, exitCode, _ := r.cmdRunner().Run(
 			ctx,
 			5*time.Second,
 			"pg_isready",
@@ -121,7 +135,7 @@ const strLocalhost = "localhost"
 func (r *PostgresRule) resolveHost(err error) string {
 	return diagnose.ResolveContextKey(
 		err,
-		[]string{strDBHost, strPostgresHost, strHost, "PGHOST"},
+		[]string{string(diagnose.KeyDBHost), string(diagnose.KeyPostgresHost), string(diagnose.KeyHost), "PGHOST"},
 		strLocalhost,
 	)
 }
@@ -138,12 +152,13 @@ func (r *PostgresRule) resolvePort(err error) string {
 }
 
 func (r *PostgresRule) suggestStartFix() string {
+	runner := r.cmdRunner()
 	switch {
-	case diagnose.CommandExists("brew"):
+	case runner.Exists("brew"):
 		return "brew services start postgresql"
-	case diagnose.CommandExists("systemctl"):
+	case runner.Exists("systemctl"):
 		return "sudo systemctl start postgresql"
-	case diagnose.CommandExists("service"):
+	case runner.Exists("service"):
 		return "sudo service postgresql start"
 	default:
 		return "pg_ctl start"
@@ -160,8 +175,9 @@ func IsPostgresRunning(ctx context.Context, host, port string) bool {
 		port = "5432"
 	}
 
-	if diagnose.CommandExists("pg_isready") {
-		_, exitCode, _ := diagnose.RunCommand(
+	runner := diagnose.DefaultCommandRunner{}
+	if runner.Exists("pg_isready") {
+		_, exitCode, _ := runner.Run(
 			ctx,
 			5*time.Second,
 			"pg_isready",
