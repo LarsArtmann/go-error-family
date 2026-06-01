@@ -158,5 +158,43 @@ func extractCommand(suggest string) string {
 			return after
 		}
 	}
+
+	// Diagnostic rules produce suggestions like "Description:\n  command args".
+	// Look for the first indented line that looks like a shell command.
+	for line := range strings.SplitSeq(suggest, "\n") {
+		trimmed := strings.TrimSpace(line)
+		if trimmed == "" {
+			continue
+		}
+		// Indented lines (2+ spaces) in the middle of a suggestion are commands.
+		if strings.HasPrefix(line, "  ") && len(trimmed) > 0 {
+			// Skip lines that are just prose (contain ":" at end or are too wordy).
+			if strings.HasSuffix(trimmed, ":") || strings.Contains(trimmed, " ") && !looksLikeCommand(trimmed) {
+				continue
+			}
+			return trimmed
+		}
+	}
 	return ""
+}
+
+// looksLikeCommand reports whether a string looks like a shell command rather than prose.
+func looksLikeCommand(s string) bool {
+	// Commands typically start with a known command name or contain shell operators.
+	shellPrefixes := []string{
+		"git ", "mkdir ", "chmod ", "nc ", "dig ", "nslookup ",
+		"brew ", "systemctl ", "service ", "pg_", "cd ",
+		"docker ", "curl ", "ssh ", "cp ", "mv ", "rm ", "cat ",
+	}
+	lower := strings.ToLower(s)
+	for _, prefix := range shellPrefixes {
+		if strings.HasPrefix(lower, prefix) {
+			return true
+		}
+	}
+	// Lines containing && or | are almost certainly commands.
+	if strings.Contains(s, " && ") || strings.Contains(s, " | ") {
+		return true
+	}
+	return false
 }

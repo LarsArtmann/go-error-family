@@ -167,6 +167,30 @@ func TestExtractCommand(t *testing.T) {
 		{"Run: git status", "git status"},
 		{"Some text\n$ actual command", "actual command"},
 		{"no command here", ""},
+		{
+			"Initialize a git repository:\n  cd /tmp && git init",
+			"cd /tmp && git init",
+		},
+		{
+			"Start PostgreSQL:\n  brew services start postgresql",
+			"brew services start postgresql",
+		},
+		{
+			"Fix permissions:\n  chmod 755 /etc/config",
+			"chmod 755 /etc/config",
+		},
+		{
+			"Check connectivity:\n  nc -zv host 5432\n\nCheck firewall rules and service status.",
+			"nc -zv host 5432",
+		},
+		{
+			"Resolve merge conflicts:\n  git mergetool\n  git add <resolved files>\n  git commit",
+			"git mergetool",
+		},
+		{
+			"Commit or stash changes:\n  git add . && git commit -m \"wip\"\nOr: git stash",
+			"git add . && git commit -m \"wip\"",
+		},
 	}
 	for _, tt := range tests {
 		if got := extractCommand(tt.input); got != tt.want {

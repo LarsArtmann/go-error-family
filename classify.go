@@ -71,12 +71,11 @@ func ExitCode(err error) int {
 	return Classify(err).ExitCode()
 }
 
-// Compose combines multiple errors using errors.Join and returns the
-// "worst" Family among them (highest exit code). This is a convenience
-// for the partial-success pattern where you need a single exit code
-// from multiple failures.
+// Compose combines multiple errors using errors.Join. The result can be
+// passed to Classify to determine the worst Family (first non-Transient wins)
+// or to ExitCode for the appropriate exit code.
 //
-// Returns nil if no errors are provided.
+// Returns nil if no errors are provided or all are nil.
 func Compose(errs ...error) error {
 	return errors.Join(errs...)
 }
