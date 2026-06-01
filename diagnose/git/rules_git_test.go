@@ -6,7 +6,6 @@ import (
 	"os"
 	"path/filepath"
 	"strings"
-	"sync"
 	"testing"
 	"time"
 
@@ -71,62 +70,8 @@ func TestGitRuleApplicable(t *testing.T) {
 	}
 }
 
-// mockRunner implements diagnose.CommandRunner for deterministic testing.
-type mockRunner struct {
-	mu        sync.Mutex
-	responses map[string]mockResponse
-	exists    map[string]bool
-	calls     []string
-}
-
-type mockResponse struct {
-	stdout   string
-	exitCode int
-	err      error
-}
-
-func newMockRunner() *mockRunner {
-	return &mockRunner{
-		responses: make(map[string]mockResponse),
-		exists:    make(map[string]bool),
-	}
-}
-
-func (m *mockRunner) Run(_ context.Context, _ time.Duration, name string, args ...string) (string, int, error) {
-	key := name + " " + strings.Join(args, " ")
-	m.mu.Lock()
-	defer m.mu.Unlock()
-	m.calls = append(m.calls, key)
-	if resp, ok := m.responses[key]; ok {
-		return resp.stdout, resp.exitCode, resp.err
-	}
-	// Default: match by command name prefix for flexibility.
-	for k, resp := range m.responses {
-		if strings.HasPrefix(key, k) {
-			return resp.stdout, resp.exitCode, resp.err
-		}
-	}
-	return "", 0, nil
-}
-
-func (m *mockRunner) Exists(name string) bool {
-	m.mu.Lock()
-	defer m.mu.Unlock()
-	m.calls = append(m.calls, "exists:"+name)
-	return m.exists[name]
-}
-
-func (m *mockRunner) getCalls() []string {
-	m.mu.Lock()
-	defer m.mu.Unlock()
-	result := make([]string, len(m.calls))
-	copy(result, m.calls)
-	return result
-}
-
-func mockGitRule(mr *mockRunner) *GitRule {
-	mr.exists["git"] = true
-	return &GitRule{Runner: mr}
+func newMockRunner() *diagnose.MockCommandRunner {
+	return diagnose.NewMockCommandRunner()
 }
 
 func TestGitRuleMockNotARepo(t *testing.T) {
@@ -154,7 +99,7 @@ func TestGitRuleMockNoGitBinary(t *testing.T) {
 	initGitRepo(t, tmpDir)
 
 	mr := newMockRunner()
-	mr.exists["git"] = false
+	mr.Exists_["git"] = false
 	r := &GitRule{Runner: mr}
 	err := errorfamily.NewTransient("git.error", "msg").WithContext("repo", tmpDir)
 
@@ -175,9 +120,9 @@ func TestGitRuleMockCleanWorkingTree(t *testing.T) {
 	initGitRepo(t, tmpDir)
 
 	mr := newMockRunner()
-	mr.exists["git"] = true
-	mr.responses["git -C "+tmpDir+" status --porcelain"] = mockResponse{stdout: "", exitCode: 0}
-	mr.responses["git -C "+tmpDir+" remote"] = mockResponse{stdout: "", exitCode: 0}
+	mr.Exists_["git"] = true
+	mr.Responses["git -C "+tmpDir+" status --porcelain"] = diagnose.MockResponse{Stdout: "", ExitCode: 0}
+	mr.Responses["git -C "+tmpDir+" remote"] = diagnose.MockResponse{Stdout: "", ExitCode: 0}
 
 	r := &GitRule{Runner: mr}
 	err := errorfamily.NewTransient("git.error", "msg").WithContext("repo", tmpDir)
@@ -202,10 +147,10 @@ func TestGitRuleMockDirtyWorkingTree(t *testing.T) {
 	initGitRepo(t, tmpDir)
 
 	mr := newMockRunner()
-	mr.exists["git"] = true
-	mr.responses["git -C "+tmpDir+" status --porcelain"] = mockResponse{
-		stdout:   "?? untracked.txt\n M modified.txt",
-		exitCode: 0,
+	mr.Exists_["git"] = true
+	mr.Responses["git -C "+tmpDir+" status --porcelain"] = diagnose.MockResponse{
+		Stdout:   "?? untracked.txt\n M modified.txt",
+		ExitCode: 0,
 	}
 
 	r := &GitRule{Runner: mr}
@@ -234,10 +179,10 @@ func TestGitRuleMockMergeConflicts(t *testing.T) {
 	initGitRepo(t, tmpDir)
 
 	mr := newMockRunner()
-	mr.exists["git"] = true
-	mr.responses["git -C "+tmpDir+" status --porcelain"] = mockResponse{
-		stdout:   "UU file1.txt\nUU file2.txt\nAA file3.txt",
-		exitCode: 0,
+	mr.Exists_["git"] = true
+	mr.Responses["git -C "+tmpDir+" status --porcelain"] = diagnose.MockResponse{
+		Stdout:   "UU file1.txt\nUU file2.txt\nAA file3.txt",
+		ExitCode: 0,
 	}
 
 	r := &GitRule{Runner: mr}
@@ -263,10 +208,10 @@ func TestGitRuleMockGitStatusFails(t *testing.T) {
 	initGitRepo(t, tmpDir)
 
 	mr := newMockRunner()
-	mr.exists["git"] = true
-	mr.responses["git -C "+tmpDir+" status --porcelain"] = mockResponse{
-		stdout:   "fatal: not a git object",
-		exitCode: 128,
+	mr.Exists_["git"] = true
+	mr.Responses["git -C "+tmpDir+" status --porcelain"] = diagnose.MockResponse{
+		Stdout:   "fatal: not a git object",
+		ExitCode: 128,
 	}
 
 	r := &GitRule{Runner: mr}
@@ -286,12 +231,12 @@ func TestGitRuleMockUnreachableRemote(t *testing.T) {
 	initGitRepo(t, tmpDir)
 
 	mr := newMockRunner()
-	mr.exists["git"] = true
-	mr.responses["git -C "+tmpDir+" status --porcelain"] = mockResponse{stdout: "", exitCode: 0}
-	mr.responses["git -C "+tmpDir+" remote"] = mockResponse{stdout: "origin", exitCode: 0}
-	mr.responses["git -C "+tmpDir+" ls-remote --heads origin"] = mockResponse{
-		stdout:   "fatal: could not resolve",
-		exitCode: 128,
+	mr.Exists_["git"] = true
+	mr.Responses["git -C "+tmpDir+" status --porcelain"] = diagnose.MockResponse{Stdout: "", ExitCode: 0}
+	mr.Responses["git -C "+tmpDir+" remote"] = diagnose.MockResponse{Stdout: "origin", ExitCode: 0}
+	mr.Responses["git -C "+tmpDir+" ls-remote --heads origin"] = diagnose.MockResponse{
+		Stdout:   "fatal: could not resolve",
+		ExitCode: 128,
 	}
 
 	r := &GitRule{Runner: mr}
@@ -314,12 +259,12 @@ func TestGitRuleMockReachableRemote(t *testing.T) {
 	initGitRepo(t, tmpDir)
 
 	mr := newMockRunner()
-	mr.exists["git"] = true
-	mr.responses["git -C "+tmpDir+" status --porcelain"] = mockResponse{stdout: "", exitCode: 0}
-	mr.responses["git -C "+tmpDir+" remote"] = mockResponse{stdout: "origin", exitCode: 0}
-	mr.responses["git -C "+tmpDir+" ls-remote --heads origin"] = mockResponse{
-		stdout:   "abc123\trefs/heads/main",
-		exitCode: 0,
+	mr.Exists_["git"] = true
+	mr.Responses["git -C "+tmpDir+" status --porcelain"] = diagnose.MockResponse{Stdout: "", ExitCode: 0}
+	mr.Responses["git -C "+tmpDir+" remote"] = diagnose.MockResponse{Stdout: "origin", ExitCode: 0}
+	mr.Responses["git -C "+tmpDir+" ls-remote --heads origin"] = diagnose.MockResponse{
+		Stdout:   "abc123\trefs/heads/main",
+		ExitCode: 0,
 	}
 
 	r := &GitRule{Runner: mr}
@@ -511,16 +456,16 @@ func TestGitRuleMockCallsCommandRunner(t *testing.T) {
 	initGitRepo(t, tmpDir)
 
 	mr := newMockRunner()
-	mr.exists["git"] = true
-	mr.responses["git -C "+tmpDir+" status --porcelain"] = mockResponse{stdout: "", exitCode: 0}
-	mr.responses["git -C "+tmpDir+" remote"] = mockResponse{stdout: "", exitCode: 0}
+	mr.Exists_["git"] = true
+	mr.Responses["git -C "+tmpDir+" status --porcelain"] = diagnose.MockResponse{Stdout: "", ExitCode: 0}
+	mr.Responses["git -C "+tmpDir+" remote"] = diagnose.MockResponse{Stdout: "", ExitCode: 0}
 
 	r := &GitRule{Runner: mr}
 	err := errorfamily.NewTransient("git.error", "msg").WithContext("repo", tmpDir)
 
 	_, _ = r.Run(context.Background(), err)
 
-	calls := mr.getCalls()
+	calls := mr.Calls()
 	if len(calls) == 0 {
 		t.Error("Expected command runner calls, got none")
 	}
@@ -567,5 +512,4 @@ func runGit(t *testing.T, dir string, args ...string) {
 
 const testTimeout = 5 * time.Second
 
-// Suppress fmt import if unused — it's used in mockResponse struct.
 var _ = fmt.Sprintf

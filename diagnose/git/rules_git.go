@@ -25,10 +25,7 @@ type GitRule struct {
 
 // cmdRunner returns the configured command runner or the default.
 func (r *GitRule) cmdRunner() diagnose.CommandRunner {
-	if r.Runner != nil {
-		return r.Runner
-	}
-	return diagnose.DefaultCommandRunner{}
+	return diagnose.ResolveRunner(r.Runner)
 }
 
 func (r *GitRule) Name() string { return "git" } //nolint:goconst // Rule name, not worth extracting

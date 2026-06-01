@@ -43,6 +43,14 @@ func RunCommand(
 	return stdout, exitCode, err
 }
 
+// ResolveRunner returns the provided runner, or DefaultCommandRunner if nil.
+func ResolveRunner(r CommandRunner) CommandRunner {
+	if r != nil {
+		return r
+	}
+	return DefaultCommandRunner{}
+}
+
 // CommandExists checks if a command is available on the system PATH.
 func CommandExists(name string) bool {
 	_, err := exec.LookPath(name)

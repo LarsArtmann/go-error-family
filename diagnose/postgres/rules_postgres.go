@@ -30,10 +30,7 @@ type PostgresRule struct {
 
 // cmdRunner returns the configured command runner or the default.
 func (r *PostgresRule) cmdRunner() diagnose.CommandRunner {
-	if r.Runner != nil {
-		return r.Runner
-	}
-	return diagnose.DefaultCommandRunner{}
+	return diagnose.ResolveRunner(r.Runner)
 }
 
 func (r *PostgresRule) Name() string { return strPostgres }
