@@ -86,8 +86,12 @@ err := errorfamily.New(errorfamily.Rejection, "file.not_found", "config missing"
 ### Commands
 
 ```bash
-# All tests (race-detector enabled)
+# All tests (race-detector enabled) — root package only
 go test ./... -count=1 -timeout 120s -race
+
+# Submodule tests (must run from within the submodule)
+cd diagnose/git && go test -race ./...
+cd diagnose/postgres && go test -race ./...
 
 # Single package
 go test ./diagnose/git/ -v -run TestGitRule
@@ -145,6 +149,57 @@ agent/                — analysis-only debug agent
 - **Agent is analysis-only** — the library never executes `FixStep.Command`
 - **Diagnostic submodules are opt-in** — `DefaultRunner()` includes only zero-dep rules
 - **`Classify(nil)` returns Rejection** — nil error is the caller's fault
+
+## Adding a Diagnostic Submodule
+
+If you want to add a new diagnostic rule that depends on external tools (e.g. `docker`, `kubectl`, `redis-cli`), create a submodule instead of adding it to the core `diagnose` package.
+
+### Steps
+
+1. Create a new directory under `diagnose/<name>/`
+2. Add a `go.mod` with `module github.com/larsartmann/go-error-family/diagnose/<name>`
+3. Add a `go.sum` via `go mod tidy`
+4. Register the submodule in `go.work`
+5. Implement the rule with an optional `CommandRunner` field for testability
+6. Add table-driven tests with a mock `CommandRunner`
+7. Update `README.md` and `AGENTS.md`
+
+### Template
+
+```go
+package mytool
+
+import (
+    "context"
+
+    "github.com/larsartmann/go-error-family/diagnose"
+)
+
+type MyToolRule struct {
+    Runner diagnose.CommandRunner // defaults to DefaultCommandRunner{}
+}
+
+var myToolSpec = diagnose.RuleSpec{
+    ContextKeys:  []diagnose.ContextKey{"mytool_host"},
+    CodeContains: []string{"mytool."},
+}
+
+func (r *MyToolRule) Name() string              { return "mytool" }
+func (r *MyToolRule) Applicable(err error) bool { return myToolSpec.Matches(err) }
+
+func (r *MyToolRule) Run(ctx context.Context, err error) (*diagnose.DiagnosticResult, error) {
+    runner := r.Runner
+    if runner == nil {
+        runner = diagnose.DefaultCommandRunner{}
+    }
+    // ... run checks via runner.RunCommand ...
+    return &diagnose.DiagnosticResult{
+        Status:     diagnose.StatusHealthy,
+        Confidence: diagnose.ConfidenceHigh,
+        Summary:    "MyTool is reachable",
+    }, nil
+}
+```
 
 ## Pull Request Process
 

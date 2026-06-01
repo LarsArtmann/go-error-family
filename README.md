@@ -63,11 +63,12 @@ func main() {
 For your own errors, attach a Family at creation time:
 
 ```go
-err := errorfamily.NewRejection("config.invalid", "port must be a number").
-    WithContext("port", portStr)
+err := errorfamily.NewRejection("file.not_found", "config file missing").
+    WithContext("path", "/etc/app/config.yaml")
 
 os.Exit(errorfamily.HandleError(err))
-// stderr: "Check that the port value is a valid number."
+// stderr: "A required resource was not found."
+// stderr: "Check that the path and resource name are correct."
 // exit: 1
 ```
 
