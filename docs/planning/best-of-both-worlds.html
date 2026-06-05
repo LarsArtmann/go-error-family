@@ -1,0 +1,1240 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Best of Both Worlds — Integration Blueprint</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Archivo+Black&family=Work+Sans:wght@300;400;500;600;700&family=Fira+Code:wght@400;500;600&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #F4F0E6;
+      --fg: #1B2A3B;
+      --muted: #6B7280;
+      --accent: #C0392B;
+      --blue: #1B3A4B;
+      --teal: #0D7377;
+      --amber: #D4870E;
+      --card: #FDFBF5;
+      --border: #D4CFC4;
+      --grid: rgba(27, 58, 75, 0.06);
+      --serif: 'Archivo Black', sans-serif;
+      --sans: 'Work Sans', sans-serif;
+      --mono: 'Fira Code', monospace;
+    }
+
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      font-family: var(--sans);
+      color: var(--fg);
+      background: var(--bg);
+      line-height: 1.65;
+      -webkit-font-smoothing: antialiased;
+      background-image:
+        linear-gradient(var(--grid) 1px, transparent 1px),
+        linear-gradient(90deg, var(--grid) 1px, transparent 1px);
+      background-size: 24px 24px;
+    }
+
+    ::selection { background: rgba(192, 57, 43, 0.15); }
+
+    .page {
+      max-width: 1100px;
+      margin: 0 auto;
+      padding: 0 2rem;
+    }
+
+    /* ─── HEADER ─── */
+    header {
+      padding: 5rem 0 4rem;
+      position: relative;
+    }
+
+    header::after {
+      content: '';
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      height: 3px;
+      background: repeating-linear-gradient(
+        90deg,
+        var(--accent) 0,
+        var(--accent) 12px,
+        transparent 12px,
+        transparent 18px
+      );
+    }
+
+    .header-top {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: 2rem;
+    }
+
+    .doc-id {
+      font-family: var(--mono);
+      font-size: 0.65rem;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--muted);
+      padding: 0.3rem 0.6rem;
+      border: 1px solid var(--border);
+      display: inline-block;
+      margin-bottom: 1.5rem;
+    }
+
+    h1 {
+      font-family: var(--serif);
+      font-size: clamp(2.8rem, 5.5vw, 4.2rem);
+      line-height: 1.05;
+      letter-spacing: -0.01em;
+      max-width: 650px;
+      margin-bottom: 1.5rem;
+    }
+
+    h1 span {
+      color: var(--accent);
+    }
+
+    .header-meta {
+      text-align: right;
+      font-family: var(--mono);
+      font-size: 0.72rem;
+      color: var(--muted);
+      line-height: 2;
+      padding-top: 2rem;
+    }
+
+    .header-meta strong { color: var(--fg); }
+
+    .lead {
+      font-size: 1.1rem;
+      line-height: 1.75;
+      color: var(--muted);
+      max-width: 620px;
+      margin-top: 1.5rem;
+    }
+
+    .lead strong { color: var(--fg); }
+
+    /* ─── SECTIONS ─── */
+    section {
+      padding: 4rem 0;
+      position: relative;
+    }
+
+    section + section {
+      border-top: 1px solid var(--border);
+    }
+
+    .section-num {
+      font-family: var(--serif);
+      font-size: 5rem;
+      color: rgba(192, 57, 43, 0.08);
+      position: absolute;
+      top: 3rem;
+      right: 0;
+      line-height: 1;
+      pointer-events: none;
+      user-select: none;
+    }
+
+    .section-label {
+      font-family: var(--mono);
+      font-size: 0.65rem;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--accent);
+      margin-bottom: 0.75rem;
+    }
+
+    h2 {
+      font-family: var(--serif);
+      font-size: clamp(1.8rem, 3vw, 2.4rem);
+      line-height: 1.15;
+      margin-bottom: 1.5rem;
+      max-width: 550px;
+    }
+
+    h3 {
+      font-family: var(--serif);
+      font-size: 1.2rem;
+      margin-bottom: 0.75rem;
+    }
+
+    /* ─── PRINCIPLE CARDS ─── */
+    .principle-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1.5rem;
+      margin-top: 2rem;
+    }
+
+    .principle-card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-left: 4px solid;
+      padding: 1.8rem;
+      position: relative;
+    }
+
+    .principle-card.red { border-left-color: var(--accent); }
+    .principle-card.blue { border-left-color: var(--blue); }
+    .principle-card.teal { border-left-color: var(--teal); }
+    .principle-card.amber { border-left-color: var(--amber); }
+
+    .principle-card .icon {
+      font-family: var(--mono);
+      font-size: 0.6rem;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--muted);
+      margin-bottom: 0.75rem;
+    }
+
+    .principle-card h4 {
+      font-family: var(--serif);
+      font-size: 1rem;
+      margin-bottom: 0.5rem;
+    }
+
+    .principle-card p {
+      font-size: 0.85rem;
+      color: var(--muted);
+      line-height: 1.7;
+    }
+
+    /* ─── PHASE TIMELINE ─── */
+    .phases {
+      margin-top: 2.5rem;
+      position: relative;
+    }
+
+    .phases::before {
+      content: '';
+      position: absolute;
+      left: 32px;
+      top: 0;
+      bottom: 0;
+      width: 2px;
+      background: repeating-linear-gradient(
+        180deg,
+        var(--accent) 0,
+        var(--accent) 8px,
+        transparent 8px,
+        transparent 14px
+      );
+    }
+
+    .phase {
+      display: grid;
+      grid-template-columns: 64px 1fr;
+      gap: 1.5rem;
+      margin-bottom: 3rem;
+      position: relative;
+    }
+
+    .phase-marker {
+      width: 64px;
+      height: 64px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-family: var(--serif);
+      font-size: 1.4rem;
+      color: var(--card);
+      position: relative;
+      z-index: 1;
+    }
+
+    .phase-marker.l1 { background: var(--teal); }
+    .phase-marker.l2 { background: var(--blue); }
+    .phase-marker.l3 { background: var(--accent); }
+
+    .phase-body {
+      background: var(--card);
+      border: 1px solid var(--border);
+      padding: 2rem;
+    }
+
+    .phase-tag {
+      font-family: var(--mono);
+      font-size: 0.6rem;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      padding: 0.2rem 0.5rem;
+      border-radius: 2px;
+      display: inline-block;
+      margin-bottom: 0.75rem;
+    }
+
+    .phase-tag.today { background: #E8F5E9; color: #2E7D32; }
+    .phase-tag.next { background: #E3F2FD; color: #1565C0; }
+    .phase-tag.vision { background: #FFF3E0; color: #E65100; }
+
+    .phase-body h3 {
+      font-family: var(--serif);
+      margin-bottom: 0.5rem;
+    }
+
+    .phase-body .subtitle {
+      font-style: italic;
+      color: var(--muted);
+      font-size: 0.9rem;
+      margin-bottom: 1rem;
+    }
+
+    .phase-body p {
+      font-size: 0.88rem;
+      line-height: 1.7;
+      color: #444;
+      margin-bottom: 1rem;
+    }
+
+    .phase-body p:last-child { margin-bottom: 0; }
+
+    /* ─── CODE ─── */
+    .code-window {
+      background: #1C2333;
+      border-radius: 4px;
+      overflow: hidden;
+      margin: 1.5rem 0;
+    }
+
+    .code-bar {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      padding: 0.5rem 1rem;
+      background: rgba(255,255,255,0.03);
+      border-bottom: 1px solid rgba(255,255,255,0.06);
+    }
+
+    .code-dot {
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+    }
+
+    .code-dot.r { background: #E5534B; }
+    .code-dot.y { background: #DABC17; }
+    .code-dot.g { background: #57AB5A; }
+
+    .code-filename {
+      font-family: var(--mono);
+      font-size: 0.65rem;
+      color: rgba(255,255,255,0.4);
+      margin-left: 0.5rem;
+    }
+
+    .code-window pre {
+      padding: 1.2rem 1.5rem;
+      font-family: var(--mono);
+      font-size: 0.78rem;
+      line-height: 1.8;
+      color: #CDD6E4;
+      overflow-x: auto;
+    }
+
+    .kw { color: #D2A8FF; }
+    .fn { color: #7EE787; }
+    .ty { color: #79C0FF; }
+    .str { color: #FFA657; }
+    .cm { color: #546478; font-style: italic; }
+    .num { color: #DABC17; }
+
+    /* ─── FLOW DIAGRAM ─── */
+    .flow-container {
+      background: var(--card);
+      border: 1px solid var(--border);
+      padding: 2.5rem;
+      margin: 2rem 0;
+      overflow-x: auto;
+    }
+
+    .flow-title {
+      font-family: var(--mono);
+      font-size: 0.6rem;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--muted);
+      margin-bottom: 1.5rem;
+    }
+
+    .flow {
+      display: flex;
+      align-items: stretch;
+      gap: 0;
+      min-width: 800px;
+    }
+
+    .flow-step {
+      flex: 1;
+      padding: 1.2rem;
+      border: 2px solid var(--border);
+      position: relative;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+    }
+
+    .flow-step.enrich { border-color: var(--teal); background: rgba(13, 115, 119, 0.04); }
+    .flow-step.classify { border-color: var(--accent); background: rgba(192, 57, 43, 0.04); }
+    .flow-step.diagnose { border-color: var(--blue); background: rgba(27, 58, 75, 0.04); }
+    .flow-step.analyze { border-color: var(--amber); background: rgba(212, 135, 14, 0.04); }
+    .flow-step.emit { border-color: #5B6ABF; background: rgba(91, 106, 191, 0.04); }
+
+    .flow-step .step-num {
+      font-family: var(--mono);
+      font-size: 0.55rem;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      opacity: 0.5;
+      margin-bottom: 0.4rem;
+    }
+
+    .flow-step h5 {
+      font-family: var(--serif);
+      font-size: 0.85rem;
+      margin-bottom: 0.3rem;
+    }
+
+    .flow-step .step-lib {
+      font-family: var(--mono);
+      font-size: 0.6rem;
+      padding: 0.15rem 0.4rem;
+      border-radius: 2px;
+      display: inline-block;
+      margin-top: 0.4rem;
+    }
+
+    .flow-step.enrich .step-lib { background: rgba(13, 115, 119, 0.12); color: var(--teal); }
+    .flow-step.classify .step-lib { background: rgba(192, 57, 43, 0.12); color: var(--accent); }
+    .flow-step.diagnose .step-lib { background: rgba(27, 58, 75, 0.12); color: var(--blue); }
+    .flow-step.analyze .step-lib { background: rgba(212, 135, 14, 0.12); color: var(--amber); }
+    .flow-step.emit .step-lib { background: rgba(91, 106, 191, 0.12); color: #5B6ABF; }
+
+    .flow-arrow {
+      display: flex;
+      align-items: center;
+      padding: 0 0.3rem;
+      color: var(--border);
+      font-family: var(--mono);
+      font-size: 1.2rem;
+      flex-shrink: 0;
+    }
+
+    /* ─── ANNOTATION ─── */
+    .annotation {
+      display: flex;
+      gap: 1rem;
+      margin: 1.5rem 0;
+      padding: 1.2rem 1.5rem;
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-left: 3px solid var(--amber);
+    }
+
+    .annotation-icon {
+      font-family: var(--mono);
+      font-size: 0.6rem;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--amber);
+      flex-shrink: 0;
+      padding-top: 0.15rem;
+    }
+
+    .annotation p {
+      font-size: 0.88rem;
+      line-height: 1.7;
+      color: #444;
+    }
+
+    .annotation code {
+      font-family: var(--mono);
+      font-size: 0.78rem;
+      background: rgba(0,0,0,0.04);
+      padding: 0.1rem 0.35rem;
+      border-radius: 2px;
+    }
+
+    /* ─── TWO-COL ─── */
+    .two-col {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 2rem;
+    }
+
+    .col-card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      padding: 1.8rem;
+    }
+
+    .col-card h4 {
+      font-family: var(--serif);
+      font-size: 1rem;
+      margin-bottom: 0.75rem;
+    }
+
+    .col-card .card-label {
+      font-family: var(--mono);
+      font-size: 0.6rem;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--muted);
+      margin-bottom: 0.5rem;
+    }
+
+    .col-card p, .col-card li {
+      font-size: 0.85rem;
+      line-height: 1.7;
+      color: #444;
+    }
+
+    .col-card ul {
+      list-style: none;
+      margin-top: 0.5rem;
+    }
+
+    .col-card li {
+      padding: 0.4rem 0;
+      padding-left: 1.2rem;
+      position: relative;
+    }
+
+    .col-card li::before {
+      content: '→';
+      position: absolute;
+      left: 0;
+      color: var(--muted);
+    }
+
+    /* ─── DECISION TABLE ─── */
+    .decision-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.85rem;
+    }
+
+    .decision-table thead th {
+      font-family: var(--mono);
+      font-size: 0.6rem;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--muted);
+      text-align: left;
+      padding: 0.75rem 1rem;
+      border-bottom: 2px solid var(--fg);
+    }
+
+    .decision-table tbody td {
+      padding: 0.75rem 1rem;
+      border-bottom: 1px solid var(--border);
+      vertical-align: top;
+      line-height: 1.6;
+    }
+
+    .decision-table tbody td:first-child {
+      font-weight: 500;
+    }
+
+    .decision-table code {
+      font-family: var(--mono);
+      font-size: 0.75rem;
+      background: rgba(0,0,0,0.04);
+      padding: 0.1rem 0.35rem;
+      border-radius: 2px;
+    }
+
+    .tag {
+      font-family: var(--mono);
+      font-size: 0.58rem;
+      letter-spacing: 0.05em;
+      padding: 0.12rem 0.4rem;
+      border-radius: 2px;
+      display: inline-block;
+    }
+
+    .tag.do { background: #E8F5E9; color: #2E7D32; }
+    .tag.dont { background: #FFEBEE; color: #C62828; }
+    .tag.maybe { background: #FFF8E1; color: #F57F17; }
+
+    /* ─── BRIDGE CODE ─── */
+    .bridge-section {
+      margin-top: 1.5rem;
+    }
+
+    /* ─── FOOTER ─── */
+    footer {
+      padding: 3rem 0;
+      border-top: 1px solid var(--border);
+      margin-top: 2rem;
+    }
+
+    .footer-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr;
+      gap: 2rem;
+    }
+
+    .footer-col {
+      font-size: 0.75rem;
+      color: var(--muted);
+      font-family: var(--mono);
+      line-height: 2;
+    }
+
+    .footer-col strong { color: var(--fg); }
+
+    .footer-bottom {
+      margin-top: 2rem;
+      text-align: center;
+      font-family: var(--mono);
+      font-size: 0.65rem;
+      color: var(--muted);
+      letter-spacing: 0.05em;
+    }
+
+    /* ─── RESPONSIVE ─── */
+    @media (max-width: 768px) {
+      .page { padding: 0 1rem; }
+      header { padding: 3rem 0 2.5rem; }
+      .header-top { flex-direction: column; }
+      .header-meta { text-align: left; }
+      .principle-grid, .two-col { grid-template-columns: 1fr; }
+      .phase { grid-template-columns: 48px 1fr; gap: 1rem; }
+      .phase-marker { width: 48px; height: 48px; font-size: 1.1rem; }
+      .phases::before { left: 23px; }
+      .flow { flex-direction: column; min-width: auto; }
+      .flow-arrow { justify-content: center; padding: 0.3rem 0; }
+      .flow-arrow::after { content: '↓'; }
+      .flow-arrow span { display: none; }
+      .footer-grid { grid-template-columns: 1fr; }
+      .section-num { display: none; }
+    }
+
+    /* ─── ANIMATIONS ─── */
+    @keyframes slideUp {
+      from { opacity: 0; transform: translateY(16px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    section, header { animation: slideUp 0.45s ease-out both; }
+    .phase:nth-child(2) { animation-delay: 0.08s; }
+    .phase:nth-child(3) { animation-delay: 0.16s; }
+  </style>
+</head>
+<body>
+  <div class="page">
+
+    <!-- ═══════ HEADER ═══════ -->
+    <header>
+      <div class="header-top">
+        <div>
+          <div class="doc-id">PLN-2026-INT-001 · Integration Blueprint</div>
+          <h1>Best of<br><span>Both Worlds</span></h1>
+          <p class="lead">
+            A three-phase integration plan for combining <strong>go-error-family</strong>'s
+            behavioral classification with <strong>samber/oops</strong>'s context enrichment.
+            One owns <em>what happened</em>. The other owns <em>what to do about it</em>.
+          </p>
+        </div>
+        <div class="header-meta">
+          <strong>go-error-family</strong> v0.3.0<br>
+          <strong>samber/oops</strong> v1.22.0<br>
+          Date: 2026-06-05<br>
+          Status: <strong>Planning</strong>
+        </div>
+      </div>
+    </header>
+
+    <!-- ═══════ AXIOMS ═══════ -->
+    <section>
+      <span class="section-num">00</span>
+      <div class="section-label">Foundations</div>
+      <h2>Design Axioms</h2>
+      <p style="color: var(--muted); max-width: 600px; margin-bottom: 2rem;">
+        These constraints shape every decision below. Violating any axiom weakens the integration.
+      </p>
+      <div class="principle-grid">
+        <div class="principle-card teal">
+          <div class="icon">Axiom 01</div>
+          <h4>Thin Bridge, Never a Fork</h4>
+          <p>The integration layer is an adapter — a few dozen lines that connect interfaces. Never embed, never fork, never vendor. Both libraries update independently.</p>
+        </div>
+        <div class="principle-card red">
+          <div class="icon">Axiom 02</div>
+          <h4>Own Different Things</h4>
+          <p>Oops owns <em>context</em> (what happened, where, who, when). Error-family owns <em>behavior</em> (retry? exit? whose fault?). No overlap, no ambiguity about who owns what.</p>
+        </div>
+        <div class="principle-card blue">
+          <div class="icon">Axiom 03</div>
+          <h4>Interface, Not Inheritance</h4>
+          <p>Go composition over inheritance. The bridge uses interfaces both libraries already expose. No shared base type, no type coupling. Either library can be swapped without the other noticing.</p>
+        </div>
+        <div class="principle-card amber">
+          <div class="icon">Axiom 04</div>
+          <h4>Both Optional, Either First</h4>
+          <p>Use error-family alone. Use oops alone. Use both. The integration is additive — it never requires both to function, and it never degrades either when used solo.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- ═══════ PHASE 1: BRIDGE ADAPTER ═══════ -->
+    <section>
+      <span class="section-num">01</span>
+      <div class="section-label">Phase 1 · Immediate</div>
+      <h2>Bridge Adapter</h2>
+
+      <div class="phases">
+        <div class="phase">
+          <div class="phase-marker l1">L1</div>
+          <div class="phase-body">
+            <span class="phase-tag today">Ship Today · ~30 lines</span>
+            <h3>ClassifiedOops — A Thin Wrapper</h3>
+            <p class="subtitle">Make OopsError satisfy error-family's Classified and Retryable interfaces.</p>
+            <p>
+              The simplest possible integration: a wrapper struct that carries an <code>OopsError</code>
+              and a <code>Family</code>. It delegates <code>Error()</code>, <code>Unwrap()</code>, and
+              <code>ErrorContext()</code> to oops while exposing <code>ErrorFamily()</code> and
+              <code>IsRetryable()</code> for error-family's classification cascade.
+            </p>
+          </div>
+        </div>
+      </div>
+
+      <div class="code-window">
+        <div class="code-bar">
+          <span class="code-dot r"></span><span class="code-dot y"></span><span class="code-dot g"></span>
+          <span class="code-filename">bridge.go</span>
+        </div>
+        <pre><span class="kw">package</span> bridge
+
+<span class="kw">import</span> (
+    <span class="str">"github.com/larsartmann/go-error-family"</span>
+    <span class="str">"github.com/samber/oops"</span>
+)
+
+<span class="cm">// ClassifiedOops wraps an OopsError with a behavioral Family.</span>
+<span class="cm">// Implements Classified + Retryable + Contextual for error-family's Classify().</span>
+<span class="kw">type</span> <span class="ty">ClassifiedOops</span> <span class="kw">struct</span> {
+    *oops.<span class="ty">OopsError</span>
+    family errorfamily.<span class="ty">Family</span>
+}
+
+<span class="kw">func</span> <span class="fn">Wrap</span>(err *oops.<span class="ty">OopsError</span>, f errorfamily.<span class="ty">Family</span>) *<span class="ty">ClassifiedOops</span> {
+    <span class="kw">return</span> &<span class="ty">ClassifiedOops</span>{OopsError: err, family: f}
+}
+
+<span class="kw">func</span> (c *<span class="ty">ClassifiedOops</span>) <span class="fn">ErrorFamily</span>() errorfamily.<span class="ty">Family</span> { <span class="kw">return</span> c.family }
+<span class="kw">func</span> (c *<span class="ty">ClassifiedOops</span>) <span class="fn">IsRetryable</span>() <span class="ty">bool</span>               { <span class="kw">return</span> c.family.<span class="fn">IsRetryable</span>() }
+
+<span class="cm">// ErrorContext bridges oops.Context() → map[string]string for the Contextual interface.</span>
+<span class="kw">func</span> (c *<span class="ty">ClassifiedOops</span>) <span class="fn">ErrorContext</span>() <span class="kw">map</span>[<span class="ty">string</span>]<span class="ty">string</span> {
+    raw := c.<span class="fn">Context</span>()
+    out := <span class="fn">make</span>(<span class="kw">map</span>[<span class="ty">string</span>]<span class="ty">string</span>, <span class="fn">len</span>(raw))
+    <span class="kw">for</span> k, v := <span class="kw">range</span> raw {
+        <span class="kw">if</span> s, ok := v.(<span class="ty">string</span>); ok {
+            out[k] = s
+        }
+    }
+    <span class="kw">return</span> out
+}</pre>
+      </div>
+
+      <div class="annotation">
+        <span class="annotation-icon">Note</span>
+        <p>
+          <code>Classify()</code> checks the <code>Classified</code> interface <strong>before</strong> the
+          <code>Retryable</code> interface in its cascade (step 2 vs step 3). This means <code>ClassifiedOops</code>
+          is picked up immediately — no sentinel registration needed, no ambiguity.
+        </p>
+      </div>
+
+      <div class="code-window">
+        <div class="code-bar">
+          <span class="code-dot r"></span><span class="code-dot y"></span><span class="code-dot g"></span>
+          <span class="code-filename">usage.go — CLI boundary with both libraries</span>
+        </div>
+        <pre><span class="cm">// Enrich with oops</span>
+rich := oops.<span class="fn">In</span>(<span class="str">"database"</span>).
+    <span class="fn">Tags</span>(<span class="str">"connection"</span>, <span class="str">"timeout"</span>).
+    <span class="fn">With</span>(<span class="str">"host"</span>, <span class="str">"db1.example.com"</span>).
+    <span class="fn">Trace</span>(<span class="str">"req-abc-123"</span>).
+    <span class="fn">Wrap</span>(dbErr)
+
+<span class="cm">// Attach family</span>
+classified := bridge.<span class="fn">Wrap</span>(oopsErr, errorfamily.Transient)
+
+<span class="cm">// Now both systems work:</span>
+errorfamily.<span class="fn">IsRetryable</span>(classified) <span class="cm">// → true (from Family)</span>
+errorfamily.<span class="fn">ExitCode</span>(classified)   <span class="cm">// → 75 (EX_TEMPFAIL)</span>
+classified.<span class="fn">Stacktrace</span>()              <span class="cm">// → full oops stacktrace</span>
+classified.<span class="fn">Trace</span>()                    <span class="cm">// → "req-abc-123"</span></pre>
+      </div>
+    </section>
+
+    <!-- ═══════ PHASE 2: CONTEXT-DRIVEN CLASSIFICATION ═══════ -->
+    <section>
+      <span class="section-num">02</span>
+      <div class="section-label">Phase 2 · Next Iteration</div>
+      <h2>Context-Driven Classification</h2>
+
+      <div class="phases">
+        <div class="phase">
+          <div class="phase-marker l2">L2</div>
+          <div class="phase-body">
+            <span class="phase-tag next">Next Iteration · ~80 lines</span>
+            <h3>Derive Family from Oops Metadata</h3>
+            <p class="subtitle">Replace manual family assignment with inference from oops' domain, tags, and context.</p>
+            <p>
+              Instead of hard-coding <code>errorfamily.Transient</code> at every call site, build a
+              classification function that reads oops' structured metadata — domain, tags, error codes,
+              hints — and derives the family. This makes the mapping centralized, testable, and evolveable
+              without touching call sites.
+            </p>
+          </div>
+        </div>
+      </div>
+
+      <div class="code-window">
+        <div class="code-bar">
+          <span class="code-dot r"></span><span class="code-dot y"></span><span class="code-dot g"></span>
+          <span class="code-filename">classify.go — Infer family from oops metadata</span>
+        </div>
+        <pre><span class="kw">package</span> bridge
+
+<span class="kw">func</span> <span class="fn">InferFamily</span>(err *oops.<span class="ty">OopsError</span>) errorfamily.<span class="ty">Family</span> {
+    <span class="cm">// 1. Explicit tag wins</span>
+    <span class="kw">for</span> _, tag := <span class="kw">range</span> err.<span class="fn">Tags</span>() {
+        <span class="kw">switch</span> tag {
+        <span class="kw">case</span> <span class="str">"retryable"</span>:  <span class="kw">return</span> errorfamily.Transient
+        <span class="kw">case</span> <span class="str">"conflict"</span>:   <span class="kw">return</span> errorfamily.Conflict
+        <span class="kw">case</span> <span class="str">"corruption"</span>: <span class="kw">return</span> errorfamily.Corruption
+        <span class="kw">case</span> <span class="str">"rejection"</span>:  <span class="kw">return</span> errorfamily.Rejection
+        }
+    }
+
+    <span class="cm">// 2. Domain-based defaults</span>
+    <span class="kw">switch</span> err.<span class="fn">Domain</span>() {
+    <span class="kw">case</span> <span class="str">"validation"</span>, <span class="str">"auth"</span>:
+        <span class="kw">return</span> errorfamily.Rejection
+    <span class="kw">case</span> <span class="str">"database"</span>, <span class="str">"network"</span>, <span class="str">"cache"</span>:
+        <span class="kw">return</span> errorfamily.Transient
+    <span class="kw">case</span> <span class="str">"storage"</span>:
+        <span class="kw">return</span> errorfamily.Infrastructure
+    }
+
+    <span class="cm">// 3. Fail-open: unknown → retryable</span>
+    <span class="kw">return</span> errorfamily.Transient
+}
+
+<span class="cm">// AutoWrap infers family and creates a ClassifiedOops in one step.</span>
+<span class="kw">func</span> <span class="fn">AutoWrap</span>(err *oops.<span class="ty">OopsError</span>) *<span class="ty">ClassifiedOops</span> {
+    <span class="kw">return</span> <span class="fn">Wrap</span>(err, <span class="fn">InferFamily</span>(err))
+}</pre>
+      </div>
+
+      <div class="annotation">
+        <span class="annotation-icon">Note</span>
+        <p>
+          The inference cascade mirrors error-family's own: explicit → structural → default.
+          Tags are the most intentional signal (developer chose them), domain is structural,
+          and the default is <code>Transient</code> — consistent with error-family's fail-open philosophy.
+        </p>
+      </div>
+
+      <div class="two-col">
+        <div class="col-card">
+          <div class="card-label">Mapping Table</div>
+          <h4>Domain → Family Defaults</h4>
+          <ul>
+            <li><code>validation</code>, <code>auth</code> → Rejection</li>
+            <li><code>database</code>, <code>network</code>, <code>cache</code> → Transient</li>
+            <li><code>storage</code>, <code>infra</code> → Infrastructure</li>
+            <li><code>data</code>, <code>schema</code> → Corruption</li>
+            <li><em>anything else</em> → Transient (fail-open)</li>
+          </ul>
+        </div>
+        <div class="col-card">
+          <div class="card-label">Override Mechanism</div>
+          <h4>Tag-Based Override</h4>
+          <ul>
+            <li>Tags are developer-intentional — checked first</li>
+            <li>Any oops tag matching a family name overrides the domain default</li>
+            <li><code>.Tags("retryable")</code> forces Transient regardless of domain</li>
+            <li>Zero-cost when unused — no tags means pure domain inference</li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <!-- ═══════ PHASE 3: UNIFIED BOUNDARY HANDLER ═══════ -->
+    <section>
+      <span class="section-num">03</span>
+      <div class="section-label">Phase 3 · Ecosystem</div>
+      <h2>Unified Boundary Handler</h2>
+
+      <div class="phases">
+        <div class="phase">
+          <div class="phase-marker l3">L3</div>
+          <div class="phase-body">
+            <span class="phase-tag vision">Ecosystem Vision · ~200 lines</span>
+            <h3>The Handle Package — Orchestrate Both</h3>
+            <p class="subtitle">A single entry point that enriches, classifies, diagnoses, analyzes, and emits.</p>
+            <p>
+              The architectural sweet spot. A <code>handle</code> package that sits at the program boundary —
+              <code>main()</code>, HTTP middleware, gRPC interceptor — and orchestrates all five steps in sequence.
+              Each step is optional. Each step uses the best tool for its job. The result: one function call
+              that produces a complete error response with behavioral decisions, forensic context, diagnostic
+              findings, and structured logging.
+            </p>
+          </div>
+        </div>
+      </div>
+
+      <div class="flow-container">
+        <div class="flow-title">Pipeline — Error enters, decision exits</div>
+        <div class="flow">
+          <div class="flow-step enrich">
+            <div class="step-num">Step 1</div>
+            <h5>Enrich</h5>
+            <div style="font-size:0.78rem;color:var(--muted);">Stack trace, source code, trace ID, user/tenant, HTTP context</div>
+            <span class="step-lib">samber/oops</span>
+          </div>
+          <div class="flow-arrow"><span>→</span></div>
+          <div class="flow-step classify">
+            <div class="step-num">Step 2</div>
+            <h5>Classify</h5>
+            <div style="font-size:0.78rem;color:var(--muted);">Family, retry decision, exit code, audience, tone</div>
+            <span class="step-lib">go-error-family</span>
+          </div>
+          <div class="flow-arrow"><span>→</span></div>
+          <div class="flow-step diagnose">
+            <div class="step-num">Step 3</div>
+            <h5>Diagnose</h5>
+            <div style="font-size:0.78rem;color:var(--muted);">Concurrent system checks, confidence-scored findings</div>
+            <span class="step-lib">diagnose rules</span>
+          </div>
+          <div class="flow-arrow"><span>→</span></div>
+          <div class="flow-step analyze">
+            <div class="step-num">Step 4</div>
+            <h5>Analyze</h5>
+            <div style="font-size:0.78rem;color:var(--muted);">Root cause analysis, FixStep suggestions</div>
+            <span class="step-lib">debug agent</span>
+          </div>
+          <div class="flow-arrow"><span>→</span></div>
+          <div class="flow-step emit">
+            <div class="step-num">Step 5</div>
+            <h5>Emit</h5>
+            <div style="font-size:0.78rem;color:var(--muted);">Structured log, user message, exit code</div>
+            <span class="step-lib">slog / stderr</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="code-window">
+        <div class="code-bar">
+          <span class="code-dot r"></span><span class="code-dot y"></span><span class="code-dot g"></span>
+          <span class="code-filename">handle.go — The unified handler</span>
+        </div>
+        <pre><span class="kw">package</span> handle
+
+<span class="kw">type</span> <span class="ty">Config</span> <span class="kw">struct</span> {
+    Enrich    <span class="ty">bool</span>            <span class="cm">// attach oops context (stack, trace, user)</span>
+    Classify  <span class="ty">bool</span>            <span class="cm">// derive family + exit code</span>
+    Diagnose  <span class="ty">bool</span>            <span class="cm">// run diagnostic rules</span>
+    Analyze   <span class="ty">bool</span>            <span class="cm">// run debug agent for root cause</span>
+    Logger    *slog.<span class="ty">Logger</span>     <span class="cm">// structured log destination</span>
+    Output    io.<span class="ty">Writer</span>       <span class="cm">// user-facing message output (stderr)</span>
+    Rules     []diagnose.<span class="ty">DiagnosticRule</span>
+}
+
+<span class="kw">type</span> <span class="ty">Result</span> <span class="kw">struct</span> {
+    ExitCode    <span class="ty">int</span>
+    Family      errorfamily.<span class="ty">Family</span>
+    Message     <span class="ty">string</span>           <span class="cm">// user-facing (What/Why/Fix/WayOut)</span>
+    FixSteps    []agent.<span class="ty">FixStep</span>
+    Findings    []diagnose.<span class="ty">DiagnosticResult</span>
+    Enriched    *oops.<span class="ty">OopsError</span>   <span class="cm">// full forensic context</span>
+}
+
+<span class="kw">func</span> <span class="fn">Error</span>(ctx context.<span class="ty">Context</span>, err <span class="ty">error</span>, cfg <span class="ty">Config</span>) *<span class="ty">Result</span> {
+    r := &<span class="ty">Result</span>{}
+
+    <span class="cm">// 1. Enrich — attach forensic context</span>
+    <span class="kw">if</span> cfg.Enrich {
+        r.Enriched = oops.<span class="fn">In</span>(<span class="fn">domain</span>(err)).
+            <span class="fn">TraceFromContext</span>(ctx).
+            <span class="fn">Wrap</span>(err)
+    }
+
+    <span class="cm">// 2. Classify — behavioral decision</span>
+    <span class="kw">if</span> cfg.Classify {
+        classified := bridge.<span class="fn">AutoWrap</span>(r.Enriched)
+        r.Family   = errorfamily.<span class="fn">Classify</span>(classified)
+        r.ExitCode = r.Family.<span class="fn">ExitCode</span>()
+    }
+
+    <span class="cm">// 3. Diagnose — check live system state</span>
+    <span class="kw">if</span> cfg.Diagnose && <span class="fn">len</span>(cfg.Rules) > <span class="num">0</span> {
+        runner := diagnose.<span class="fn">NewRunner</span>(cfg.Rules...)
+        r.Findings, _ = runner.<span class="fn">Run</span>(ctx, err)
+    }
+
+    <span class="cm">// 4. Analyze — root cause + fix suggestions</span>
+    <span class="kw">if</span> cfg.Analyze && <span class="fn">len</span>(r.Findings) > <span class="num">0</span> {
+        ag := agent.<span class="fn">New</span>(agent.<span class="ty">Config</span>{Enabled: <span class="kw">true</span>})
+        result, _ := ag.<span class="fn">Analyze</span>(ctx, err, r.Findings)
+        r.FixSteps = result.FixSteps
+    }
+
+    <span class="cm">// 5. Emit — structured log + user message</span>
+    <span class="kw">if</span> cfg.Logger != <span class="kw">nil</span> && r.Enriched != <span class="kw">nil</span> {
+        cfg.Logger.<span class="fn">ErrorContext</span>(ctx, <span class="str">"request failed"</span>,
+            <span class="str">"error"</span>, r.Enriched,
+            <span class="str">"family"</span>, r.Family,
+            <span class="str">"exit_code"</span>, r.ExitCode)
+    }
+
+    <span class="kw">return</span> r
+}</pre>
+      </div>
+
+      <div class="code-window">
+        <div class="code-bar">
+          <span class="code-dot r"></span><span class="code-dot y"></span><span class="code-dot g"></span>
+          <span class="code-filename">main.go — One-line boundary</span>
+        </div>
+        <pre><span class="kw">func</span> <span class="fn">main</span>() {
+    <span class="kw">if</span> err := <span class="fn">run</span>(); err != <span class="kw">nil</span> {
+        result := handle.<span class="fn">Error</span>(ctx, err, handle.<span class="ty">Config</span>{
+            Enrich:   <span class="kw">true</span>,
+            Classify: <span class="kw">true</span>,
+            Diagnose: <span class="kw">true</span>,
+            Analyze:  <span class="kw">true</span>,
+            Logger:   logger,
+            Output:   os.Stderr,
+            Rules:    <span class="fn">myRules</span>(),
+        })
+
+        fmt.<span class="fn">Fprintln</span>(os.Stderr, result.Message)
+        os.<span class="fn">Exit</span>(result.ExitCode)
+    }
+}</pre>
+      </div>
+    </section>
+
+    <!-- ═══════ ANTI-PATTERNS ═══════ -->
+    <section>
+      <span class="section-num">04</span>
+      <div class="section-label">Guard Rails</div>
+      <h2>What Not to Do</h2>
+
+      <table class="decision-table">
+        <thead>
+          <tr>
+            <th>Anti-Pattern</th>
+            <th>Why It's Wrong</th>
+            <th>Instead</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><span class="tag dont">Don't</span> Fork oops into error-family</td>
+            <td>Different authors, release cadences, and audiences. Forking creates a maintenance monster that drifts from both upstreams.</td>
+            <td>Keep them separate. Connect via a thin bridge package.</td>
+          </tr>
+          <tr>
+            <td><span class="tag dont">Don't</span> Build a unified error type</td>
+            <td>A mega-struct with all fields from both libraries is the worst of both worlds: bloated, opinionated, and impossible to evolve.</td>
+            <td>Use composition. OopsError carries context, Error carries family. Bridge via interface.</td>
+          </tr>
+          <tr>
+            <td><span class="tag dont">Don't</span> Couple at the type level</td>
+            <td>If error-family imports oops (or vice versa), you can't use one without the other. Zero-optional becomes zero-mandatory.</td>
+            <td>The bridge package is the only place that imports both. Everything else imports one or the other.</td>
+          </tr>
+          <tr>
+            <td><span class="tag dont">Don't</span> Duplicate context in both</td>
+            <td>Setting <code>WithContext("host", "db1")</code> on both oops and error-family is redundant and creates sync bugs.</td>
+            <td>Oops owns context. Error-family reads it via the bridge. Single source of truth.</td>
+          </tr>
+          <tr>
+            <td><span class="tag dont">Don't</span> Use oops for retry decisions</td>
+            <td>Oops has no classification model. Tag-checking <code>if hasTag("retryable")</code> is ad-hoc and doesn't compose with third-party errors.</td>
+            <td>Use <code>errorfamily.Classify()</code> — it handles multi-error, sentinels, interfaces, and defaults.</td>
+          </tr>
+          <tr>
+            <td><span class="tag maybe">Consider</span> Bridge as separate module</td>
+            <td>If the bridge gains weight, it becomes a coupling point. But for ~30–200 lines, a sub-package is fine.</td>
+            <td>Start as <code>bridge/</code> in your app. Extract to a library only if multiple services need it.</td>
+          </tr>
+        </tbody>
+      </table>
+    </section>
+
+    <!-- ═══════ OWNERSHIP MAP ═══════ -->
+    <section>
+      <span class="section-num">05</span>
+      <div class="section-label">Boundaries</div>
+      <h2>Who Owns What</h2>
+
+      <div class="two-col">
+        <div class="col-card">
+          <div class="card-label" style="color: var(--teal);">samber/oops owns</div>
+          <h4>Context &amp; Observability</h4>
+          <ul>
+            <li>Stack traces and source code fragments</li>
+            <li>Trace ID, span ID, correlation IDs</li>
+            <li>User and tenant identity</li>
+            <li>HTTP request/response capture</li>
+            <li>Structured attribute storage</li>
+            <li>Logger integration (slog, zap, logrus)</li>
+            <li>JSON serialization</li>
+            <li>Panic recovery</li>
+            <li>Domain tags and ownership</li>
+            <li>Timestamps and durations</li>
+          </ul>
+        </div>
+        <div class="col-card">
+          <div class="card-label" style="color: var(--accent);">go-error-family owns</div>
+          <h4>Behavior &amp; Decisions</h4>
+          <ul>
+            <li>Error family classification</li>
+            <li>Retry decision (<code>IsRetryable</code>)</li>
+            <li>Exit code mapping (BSD sysexits.h)</li>
+            <li>CLI boundary handler (<code>HandleError</code>)</li>
+            <li>User-facing messaging (What/Why/Fix/WayOut)</li>
+            <li>Audience targeting (User/Ops/All)</li>
+            <li>Tone selection (instructional, reassuring, urgent...)</li>
+            <li>Third-party sentinel registration</li>
+            <li>Diagnostic rules (filesystem, network, git, postgres)</li>
+            <li>AI debug agent and FixSteps</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="annotation">
+        <span class="annotation-icon">Bridge</span>
+        <p>
+          The bridge package owns <strong>one thing</strong>: mapping between the two domains.
+          <code>InferFamily()</code> converts oops metadata → error-family classification.
+          <code>ClassifiedOops</code> satisfies error-family interfaces using oops data.
+          That's the entire contract. No more, no less.
+        </p>
+      </div>
+    </section>
+
+    <!-- ═══════ IMPLEMENTATION ROADMAP ═══════ -->
+    <section>
+      <span class="section-num">06</span>
+      <div class="section-label">Roadmap</div>
+      <h2>Implementation Sequence</h2>
+
+      <table class="decision-table">
+        <thead>
+          <tr>
+            <th>Step</th>
+            <th>What</th>
+            <th>Lines</th>
+            <th>Depends On</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><strong>1</strong></td>
+            <td>Create <code>bridge/</code> package with <code>ClassifiedOops</code> wrapper</td>
+            <td>~30</td>
+            <td>Both libraries imported</td>
+          </tr>
+          <tr>
+            <td><strong>2</strong></td>
+            <td>Write tests: Classify(ClassifiedOops) returns correct family</td>
+            <td>~50</td>
+            <td>Step 1</td>
+          </tr>
+          <tr>
+            <td><strong>3</strong></td>
+            <td>Add <code>InferFamily()</code> with domain → family mapping table</td>
+            <td>~40</td>
+            <td>Step 1</td>
+          </tr>
+          <tr>
+            <td><strong>4</strong></td>
+            <td>Add tag-based override in <code>InferFamily()</code></td>
+            <td>~15</td>
+            <td>Step 3</td>
+          </tr>
+          <tr>
+            <td><strong>5</strong></td>
+            <td>Write tests for every domain + tag combination</td>
+            <td>~80</td>
+            <td>Steps 3–4</td>
+          </tr>
+          <tr>
+            <td><strong>6</strong></td>
+            <td>Build <code>handle</code> package with pipeline config</td>
+            <td>~100</td>
+            <td>Steps 1–5</td>
+          </tr>
+          <tr>
+            <td><strong>7</strong></td>
+            <td>Integrate diagnostic rules and agent into pipeline</td>
+            <td>~50</td>
+            <td>Step 6</td>
+          </tr>
+          <tr>
+            <td><strong>8</strong></td>
+            <td>Integration tests: full pipeline with mock errors</td>
+            <td>~100</td>
+            <td>Steps 6–7</td>
+          </tr>
+          <tr>
+            <td><strong>9</strong></td>
+            <td>Document bridge API and update AGENTS.md</td>
+            <td>—</td>
+            <td>Steps 1–8</td>
+          </tr>
+        </tbody>
+      </table>
+    </section>
+
+    <!-- ═══════ FOOTER ═══════ -->
+    <footer>
+      <div class="footer-grid">
+        <div class="footer-col">
+          <strong>go-error-family</strong><br>
+          Behavioral classification<br>
+          Exit codes, retry, diagnostics<br>
+          <strong>Zero dependencies</strong>
+        </div>
+        <div class="footer-col">
+          <strong>samber/oops</strong><br>
+          Context enrichment<br>
+          Stack traces, tracing, logging<br>
+          <strong>3 dependencies</strong>
+        </div>
+        <div class="footer-col">
+          <strong>bridge package</strong><br>
+          Interface adapter<br>
+          Domain → Family mapping<br>
+          <strong>Connects both</strong>
+        </div>
+      </div>
+      <div class="footer-bottom">
+        Integration Blueprint · PLN-2026-INT-001 · 2026-06-05
+      </div>
+    </footer>
+  </div>
+</body>
+</html>
