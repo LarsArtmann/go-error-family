@@ -11,48 +11,48 @@
 Started from 3 clone groups (43 total clones) at the original threshold 15 report. Eliminated ALL meaningful duplication:
 
 | Threshold | Clone Groups Before | Clone Groups After |
-|-----------|-------------------|-------------------|
-| 50        | 1                 | **0**             |
-| 30        | 3                 | **0**             |
-| 15        | 3 (from report)   | 45 (incidental)   |
+| --------- | ------------------- | ------------------ |
+| 50        | 1                   | **0**              |
+| 30        | 3                   | **0**              |
+| 15        | 3 (from report)     | 45 (incidental)    |
 
 The 45 remaining groups at threshold 15 are all 2-3 item groups of 1-3 line snippets — idiomatic Go patterns (table-driven test struct shapes, `errors.Is` checks, `t.Fatalf` patterns). Per SKILL.md guidance: "Accept when idiomatic."
 
 ### Helpers extracted
 
-| Package | Helper | Purpose |
-|---------|--------|---------|
-| `diagnose` | `assertDetail(t, result, key, want)` | Assert `result.Details[key] == want` |
-| `diagnose/git` | `assertDetail` + `assertStatus` | Detail and status assertions for git tests |
-| `diagnose/postgres` | `pgAssertDetail` + `pgAssertStatus` | Detail and status assertions for postgres tests |
-| `diagnose` | `setAccessFailure(result, key, summary, fix)` | Extracted from `checkDirWritable`/`checkFileReadable` |
+| Package             | Helper                                        | Purpose                                               |
+| ------------------- | --------------------------------------------- | ----------------------------------------------------- |
+| `diagnose`          | `assertDetail(t, result, key, want)`          | Assert `result.Details[key] == want`                  |
+| `diagnose/git`      | `assertDetail` + `assertStatus`               | Detail and status assertions for git tests            |
+| `diagnose/postgres` | `pgAssertDetail` + `pgAssertStatus`           | Detail and status assertions for postgres tests       |
+| `diagnose`          | `setAccessFailure(result, key, summary, fix)` | Extracted from `checkDirWritable`/`checkFileReadable` |
 
 ### Tests merged
 
-| File | Before | After |
-|------|--------|-------|
-| `bridge/wrap_test.go` | 4 separate `errors.Is` tests | 1 table-driven `TestWrap_UnwrapChain` |
-| `bridge/wrap_test.go` | 5 subtests in `TestWrap_Format` | 1 table-driven test |
-| `family_test.go` | `TestFamilyString` standalone + 3 `testFamilyProperty` calls | All use `testFamilyProperty` with named `familyStringCase` type alias |
+| File                  | Before                                                       | After                                                                 |
+| --------------------- | ------------------------------------------------------------ | --------------------------------------------------------------------- |
+| `bridge/wrap_test.go` | 4 separate `errors.Is` tests                                 | 1 table-driven `TestWrap_UnwrapChain`                                 |
+| `bridge/wrap_test.go` | 5 subtests in `TestWrap_Format`                              | 1 table-driven test                                                   |
+| `family_test.go`      | `TestFamilyString` standalone + 3 `testFamilyProperty` calls | All use `testFamilyProperty` with named `familyStringCase` type alias |
 
 ### Quality metrics
 
-| Metric | Value |
-|--------|-------|
-| All tests (root + bridge + submodules) | **PASS** with `-race` |
-| Lint issues (changed files) | **0** |
-| Clone groups at threshold 30 | **0** |
-| Clone groups at threshold 50 | **0** |
-| Production files over 350 lines | **0** (max: `handle.go` at 342) |
-| Test files over 350 lines | **1** (`diagnose/postgres/rules_postgres_test.go` at 337) |
+| Metric                                 | Value                                                     |
+| -------------------------------------- | --------------------------------------------------------- |
+| All tests (root + bridge + submodules) | **PASS** with `-race`                                     |
+| Lint issues (changed files)            | **0**                                                     |
+| Clone groups at threshold 30           | **0**                                                     |
+| Clone groups at threshold 50           | **0**                                                     |
+| Production files over 350 lines        | **0** (max: `handle.go` at 342)                           |
+| Test files over 350 lines              | **1** (`diagnose/postgres/rules_postgres_test.go` at 337) |
 
 ### Test coverage
 
-| Package | Coverage |
-|---------|----------|
-| Root (`errorfamily`) | 96.0% |
-| `agent` | 89.4% |
-| `diagnose` | 59.8% |
+| Package              | Coverage |
+| -------------------- | -------- |
+| Root (`errorfamily`) | 96.0%    |
+| `agent`              | 89.4%    |
+| `diagnose`           | 59.8%    |
 
 ---
 
@@ -65,6 +65,7 @@ The diagnose package has low coverage because its core rules (`FilesystemRule`, 
 ### File-split compliance
 
 All files are under 350 lines. The closest to the limit:
+
 - `handle.go`: 342 lines (8 lines under)
 - `diagnose/postgres/rules_postgres_test.go`: 337 lines
 
@@ -166,18 +167,18 @@ The current design intentionally shells out to real filesystem operations. Mocki
 
 ## Project State Summary
 
-| Metric | Value |
-|--------|-------|
-| Version | v0.3.0 |
-| Go version | 1.26.3 |
-| Branch | master |
-| Last commit | `d71792c` — docs(status): file-split compliance report |
-| Production files | 19 |
-| Test files | 19 |
-| Production LOC | 2,888 |
-| Test LOC | 3,613 |
-| Clone groups (t≥30) | **0** |
-| Clone groups (t≥50) | **0** |
-| Lint issues | **0** (1 pre-existing gci in unmodified `diagnose.go`) |
-| Test result | **ALL PASS** with `-race` |
-| Race conditions | **0** |
+| Metric              | Value                                                  |
+| ------------------- | ------------------------------------------------------ |
+| Version             | v0.3.0                                                 |
+| Go version          | 1.26.3                                                 |
+| Branch              | master                                                 |
+| Last commit         | `d71792c` — docs(status): file-split compliance report |
+| Production files    | 19                                                     |
+| Test files          | 19                                                     |
+| Production LOC      | 2,888                                                  |
+| Test LOC            | 3,613                                                  |
+| Clone groups (t≥30) | **0**                                                  |
+| Clone groups (t≥50) | **0**                                                  |
+| Lint issues         | **0** (1 pre-existing gci in unmodified `diagnose.go`) |
+| Test result         | **ALL PASS** with `-race`                              |
+| Race conditions     | **0**                                                  |

@@ -10,14 +10,14 @@
 
 All 6 files that exceeded the 350-line limit have been split into focused, logically grouped files:
 
-| Original File | Lines | Split Into | Max Result |
-|---|---|---|---|
-| `errorfamily_test.go` | 713 | `family_test.go` (152), `error_test.go` (333), `classify_test.go` (178), `example_test.go` (41) | 333 |
-| `bridge/bridge_test.go` | 593 | `wrap_test.go` (281), `infer_test.go` (123), `autowrap_test.go` (172) | 281 |
-| `diagnose/diagnose.go` | 458 | `diagnose.go` (260), `helpers.go` (108) | 260 |
-| `diagnose/diagnose_test.go` | 472 | `runner_test.go` (187), `helpers_test.go` (128), `rules_test.go` (145) | 187 |
-| `diagnose/git/rules_git_test.go` | 515 | `mock_test.go` (147), `scenario_test.go` (216), `integration_test.go` (132) | 216 |
-| `handle_test.go` | 374 | `handle_test.go` (127), `handle_context_test.go` (155), `template_test.go` (108) | 155 |
+| Original File                    | Lines | Split Into                                                                                      | Max Result |
+| -------------------------------- | ----- | ----------------------------------------------------------------------------------------------- | ---------- |
+| `errorfamily_test.go`            | 713   | `family_test.go` (152), `error_test.go` (333), `classify_test.go` (178), `example_test.go` (41) | 333        |
+| `bridge/bridge_test.go`          | 593   | `wrap_test.go` (281), `infer_test.go` (123), `autowrap_test.go` (172)                           | 281        |
+| `diagnose/diagnose.go`           | 458   | `diagnose.go` (260), `helpers.go` (108)                                                         | 260        |
+| `diagnose/diagnose_test.go`      | 472   | `runner_test.go` (187), `helpers_test.go` (128), `rules_test.go` (145)                          | 187        |
+| `diagnose/git/rules_git_test.go` | 515   | `mock_test.go` (147), `scenario_test.go` (216), `integration_test.go` (132)                     | 216        |
+| `handle_test.go`                 | 374   | `handle_test.go` (127), `handle_context_test.go` (155), `template_test.go` (108)                | 155        |
 
 ### Quality Gates
 
@@ -68,7 +68,7 @@ Nothing is fucked up. All changes are clean, tested, and linted.
 
 1. **`diagnose` coverage is 59.8%** — The lowest coverage in the project. Shell-out rules (FilesystemRule, NetworkRule) need mock injection like git/postgres already have. The `RunCommand`/`CommandExists` functions are tested via integration, not unit tests.
 
-2. **`handle.go` at 342 lines** — Largest production file. The HandleError* family of functions share a lot of template logic that could be extracted into a `template.go` file.
+2. **`handle.go` at 342 lines** — Largest production file. The HandleError\* family of functions share a lot of template logic that could be extracted into a `template.go` file.
 
 3. **Test file naming inconsistency** — Root package uses `family_test.go`, `error_test.go`, etc. (domain-based). Bridge uses `wrap_test.go`, `infer_test.go` (API-based). Diagnose uses `runner_test.go`, `helpers_test.go` (component-based). Should pick one convention.
 
@@ -122,7 +122,8 @@ Nothing is fucked up. All changes are clean, tested, and linted.
 
 **Is `handle.go` (342 lines) acceptable as-is, or should we split it now?**
 
-It's the largest production file and under the 350 limit, but it's 97.7% of the limit. The HandleError* family contains:
+It's the largest production file and under the 350 limit, but it's 97.7% of the limit. The HandleError\* family contains:
+
 - `HandleError` (1-line wrapper)
 - `HandleErrorWithConfig` (template resolution + output formatting)
 - `HandleErrorWithContext` (context propagation + diagnostics)
@@ -185,15 +186,15 @@ go-error-family/
 
 ## Metrics Summary
 
-| Metric | Value |
-|---|---|
-| Total Go files | 38 |
-| Total lines | ~6,289 |
-| Largest file | `handle.go` (342) |
-| Tests passing | 110 |
-| Tests failing | 0 |
-| Lint issues | 0 |
-| Files over 350 lines | 0 ✅ |
-| Root coverage | 96.0% |
-| Agent coverage | 89.4% |
-| Diagnose coverage | 59.8% |
+| Metric               | Value             |
+| -------------------- | ----------------- |
+| Total Go files       | 38                |
+| Total lines          | ~6,289            |
+| Largest file         | `handle.go` (342) |
+| Tests passing        | 110               |
+| Tests failing        | 0                 |
+| Lint issues          | 0                 |
+| Files over 350 lines | 0 ✅              |
+| Root coverage        | 96.0%             |
+| Agent coverage       | 89.4%             |
+| Diagnose coverage    | 59.8%             |
