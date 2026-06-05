@@ -2,9 +2,10 @@
 
 Structured error protocol library. Library only — no `main`, no build system, no external deps. Full API reference: `SKILL.md`.
 
-**Last Updated:** 2026-06-01
+**Last Updated:** 2026-06-05
 **Version:** v0.3.0
-**Status:** All tests pass, 0 lint issues, 0 race conditions
+**Status:** All tests pass (root + bridge + submodules), 0 lint issues, 0 race conditions
+**Workspace modules:** root (zero-dep), `bridge` (oops integration), `diagnose/git`, `diagnose/postgres`
 
 ## Quick Start
 
@@ -83,6 +84,22 @@ Git and postgres coverage improved with mock `CommandRunner` injection. Diagnose
 ## Fuzz Tests
 
 `fuzz_test.go` contains: `FuzzParseFamily`, `FuzzParseFamilyRoundTrip`, `FuzzClassify`, `FuzzClassifyPlainError`, `FuzzErrorFormatting`.
+
+## Bridge Submodule (`bridge/`)
+
+Connects go-error-family with `samber/oops`. Separate module with its own `go.mod` (depends on both libraries). The root package remains zero-dependency.
+
+| API                          | Purpose                                                      |
+| ---------------------------- | ------------------------------------------------------------ |
+| `bridge.Wrap(err, family)`   | Attach a Family to any error, preserving OopsError context   |
+| `bridge.AutoWrap(err)`       | Infer Family from oops metadata (tags + domain), then wrap   |
+| `bridge.InferFamily(err)`    | Derive Family from oops tags (explicit) → domain (structural) → Transient (fail-open) |
+| `ClassifiedOops`             | Embeds `oops.OopsError`; satisfies `Classified`, `Retryable`, `Contextual` |
+
+**Tag overrides** (checked first): `retryable`, `transient`, `conflict`, `corruption`/`corrupted`, `rejection`/`rejected`, `infrastructure`/`infra`.
+**Domain defaults** (checked second): `validation`/`auth` → Rejection, `database`/`network`/`cache`/`queue` → Transient, `storage`/`infra`/`startup` → Infrastructure, `data`/`schema`/`migration` → Corruption.
+
+**Surprising:** `Wrap(nil, family)` returns a ClassifiedOops with zero OopsError — `Error()` returns `[family]`, `Unwrap()` returns nil. This is intentional: nil is still classifiable.
 
 ## Lint Configuration
 

@@ -34,6 +34,10 @@ diagnose/postgres/    ← submodule: PostgresRule (opt-in)
 
 agent/                ← analysis-only debug agent
   agent.go              DebugAgent interface, deterministic analyzer
+
+bridge/               ← submodule: samber/oops integration (opt-in, depends on both libraries)
+  bridge.go             ClassifiedOops (satisfies Classified, Coded, Retryable, Contextual), Wrap
+  classify.go           InferFamily, AutoWrap (tag/domain → Family mapping)
 ```
 
 ---
@@ -390,6 +394,58 @@ type MyRule struct {
 
 ---
 
+## Bridge Submodule (samber/oops integration)
+
+`bridge/` is a separate Go module that connects go-error-family with samber/oops. It has its own `go.mod` with both libraries as dependencies. The root package remains zero-dependency.
+
+### ClassifiedOops
+
+```go
+// Wraps any error with a behavioral Family + oops context
+type ClassifiedOops struct {
+    oops.OopsError           // preserves all oops methods (Stacktrace, Sources, etc.)
+    // satisfies: Classified, Coded, Retryable, Contextual, fmt.Formatter
+}
+
+// Manual family assignment
+classified := bridge.Wrap(err, errorfamily.Transient)
+
+// Automatic inference from oops metadata
+classified := bridge.AutoWrap(err)          // tags -> domain -> Transient (fail-open)
+family := bridge.InferFamily(err)           // just the Family, no wrapping
+```
+
+### InferFamily cascade
+
+1. **Tags** (developer-intentional) — `retryable`, `transient`, `conflict`, `corruption`/`corrupted`, `rejection`/`rejected`, `infrastructure`/`infra`
+2. **Domain** (structural) — `validation`/`auth` -> Rejection, `database`/`network`/`cache`/`queue` -> Transient, `storage`/`infra`/`startup` -> Infrastructure, `data`/`schema`/`migration` -> Corruption
+3. **Default** — `Transient` (fail-open, consistent with root Classify)
+
+### What ClassifiedOops bridges
+
+| oops method | error-family interface | Notes |
+|---|---|---|
+| `.Code()` | `ErrorCode() string` (Coded) | Converts `any` to string via fmt.Sprint |
+| `.Context()` | `ErrorContext() map[string]string` (Contextual) | Non-strings converted via fmt.Sprint |
+| `.Domain()` | Included in `ErrorContext()["domain"]` | |
+| `.Tags()` | Included in `ErrorContext()["tags"]` | |
+| — | `ErrorFamily() Family` (Classified) | From the attached Family |
+| — | `IsRetryable() bool` (Retryable) | Derived from Family |
+| `.Is()` | `Is(target error) bool` | Delegates to OopsError.Is + original error |
+| `Format()` | `fmt.Formatter` | `%+v` shows oops stacktrace when present |
+
+### Original error preservation
+
+`Wrap(err, family)` always preserves the original error in the `Unwrap()` chain, even when `err` is not an OopsError. `errors.Is(classified, originalErr)` always works.
+
+### Import
+
+```go
+import "github.com/larsartmann/go-error-family/bridge"
+```
+
+---
+
 ## Testing
 
 ```bash
@@ -411,6 +467,8 @@ Test files and scope:
 - `diagnose/git/rules_git_test.go` — GitRule Applicable, Run
 - `diagnose/postgres/rules_postgres_test.go` — PostgresRule Applicable, Run, resolveHost, resolvePort, IsPostgresRunning
 - `agent/agent_test.go` — Analyze (enabled/disabled/with diagnosis/empty/timeout), extractCommand
+- `bridge/bridge_test.go` — Wrap, AutoWrap, InferFamily, Coded interface, errors.Is, fmt.Formatter, ErrorContext bridging, examples
+- `bridge/fuzz_test.go` — FuzzInferFamily, FuzzAutoWrap, FuzzWrapRoundTrip, FuzzWrapOopsRoundTrip, FuzzFormat
 
 **Coverage:** root 95.9% | agent 100% | diagnose core 67.1% | git 98.5% | postgres 81.0%
 (rules that shell out to system commands are tested via `CommandRunner` mocks in git/postgres; diagnose core coverage reflects shell-out rules tested via integration)
