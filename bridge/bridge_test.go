@@ -2,7 +2,6 @@ package bridge
 
 import (
 	"errors"
-	errors2 "errors"
 	"fmt"
 	"testing"
 
@@ -224,7 +223,7 @@ func TestWrap_CodedInterface(t *testing.T) {
 		t.Errorf("ErrorCode() = %q, want %q", classified.ErrorCode(), "db.timeout")
 	}
 
-	coded, ok := errors2.AsType[errorfamily.Coded](classified)
+	coded, ok := errors.AsType[errorfamily.Coded](classified)
 	if !ok {
 		t.Error("AsType[Coded](classified) = false, want true")
 	}

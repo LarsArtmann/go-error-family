@@ -112,6 +112,9 @@ linters:
       - path: agent/
         linters:
           - wrapcheck
+      - path: bridge/
+        linters:
+          - wrapcheck
       - path: examples/
         linters:
           - gosec

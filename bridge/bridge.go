@@ -25,14 +25,14 @@ import (
 	"github.com/samber/oops"
 )
 
-// ClassifiedOops wraps an error with a behavioral Family and optional oops context.
+// ClassifiedError wraps an error with a behavioral Family and optional oops context.
 // It satisfies error-family's Classified, Coded, Retryable, and Contextual interfaces,
 // so Classify() picks it up at step 2 of the classification cascade.
 //
 // Embeds oops.OopsError to preserve all oops methods (Stacktrace, Trace, Sources, etc.).
 // The original error is always preserved in the Unwrap chain, even when it is not
 // an OopsError — Wrap never discards the input.
-type ClassifiedOops struct {
+type ClassifiedError struct {
 	oops.OopsError
 	original error
 	family   errorfamily.Family
@@ -44,15 +44,15 @@ type ClassifiedOops struct {
 //
 // The returned value satisfies Classified, Coded, Retryable, and Contextual
 // from error-family, and retains all oops methods when the input is an OopsError.
-func Wrap(err error, f errorfamily.Family) *ClassifiedOops {
+func Wrap(err error, f errorfamily.Family) *ClassifiedError {
 	oopsErr, _ := oops.AsOops(err)
-	return &ClassifiedOops{OopsError: oopsErr, original: err, family: f}
+	return &ClassifiedError{OopsError: oopsErr, original: err, family: f}
 }
 
 // Error implements the error interface.
 // Delegates to the embedded OopsError when it has content, otherwise returns
 // the original error's message with a family prefix.
-func (c *ClassifiedOops) Error() string {
+func (c *ClassifiedError) Error() string {
 	if msg := c.OopsError.Error(); msg != "" {
 		return msg
 	}
@@ -65,7 +65,7 @@ func (c *ClassifiedOops) Error() string {
 // Unwrap returns the underlying error for chain traversal.
 // Returns the OopsError's wrapped error when present, otherwise returns
 // the original error. This ensures errors.Is always reaches the root cause.
-func (c *ClassifiedOops) Unwrap() error {
+func (c *ClassifiedError) Unwrap() error {
 	if inner := c.OopsError.Unwrap(); inner != nil {
 		return inner
 	}
@@ -74,7 +74,7 @@ func (c *ClassifiedOops) Unwrap() error {
 
 // Is supports errors.Is by delegating to OopsError.Is() when the OopsError
 // is populated, and falling back to comparing against the original error.
-func (c *ClassifiedOops) Is(target error) bool {
+func (c *ClassifiedError) Is(target error) bool {
 	if c.OopsError.Error() != "" {
 		if c.OopsError.Is(target) {
 			return true
@@ -88,12 +88,12 @@ func (c *ClassifiedOops) Is(target error) bool {
 
 // ErrorFamily returns the behavioral classification.
 // This is step 2 in error-family's Classify() cascade.
-func (c *ClassifiedOops) ErrorFamily() errorfamily.Family { return c.family }
+func (c *ClassifiedError) ErrorFamily() errorfamily.Family { return c.family }
 
 // ErrorCode returns a machine-readable error code.
 // Bridges oops.Code() to error-family's Coded interface.
 // Returns empty string when no code is set.
-func (c *ClassifiedOops) ErrorCode() string {
+func (c *ClassifiedError) ErrorCode() string {
 	code := c.Code()
 	if code == nil {
 		return ""
@@ -106,12 +106,12 @@ func (c *ClassifiedOops) ErrorCode() string {
 
 // IsRetryable reports whether the error is worth retrying.
 // Derived from the Family: only Transient is retryable.
-func (c *ClassifiedOops) IsRetryable() bool { return c.family.IsRetryable() }
+func (c *ClassifiedError) IsRetryable() bool { return c.family.IsRetryable() }
 
 // ErrorContext bridges oops context to map[string]string for error-family's
 // Contextual interface. Includes oops attributes, domain, and tags.
 // Non-string values are converted via fmt.Sprint.
-func (c *ClassifiedOops) ErrorContext() map[string]string {
+func (c *ClassifiedError) ErrorContext() map[string]string {
 	raw := c.Context()
 	entries := len(raw)
 	if domain := c.Domain(); domain != "" {
@@ -143,14 +143,14 @@ func (c *ClassifiedOops) ErrorContext() map[string]string {
 
 // Family returns the attached Family directly.
 // Convenience accessor without interface assertion.
-func (c *ClassifiedOops) Family() errorfamily.Family { return c.family }
+func (c *ClassifiedError) Family() errorfamily.Family { return c.family }
 
 // Format implements fmt.Formatter.
 //
 //	%v    → OopsError format or [family] original_message
 //	%+v   → OopsError verbose (stacktrace) or family + original verbose
 //	%s    → message only
-func (c *ClassifiedOops) Format(f fmt.State, verb rune) {
+func (c *ClassifiedError) Format(f fmt.State, verb rune) {
 	switch verb {
 	case 's':
 		if c.OopsError.Error() != "" {
