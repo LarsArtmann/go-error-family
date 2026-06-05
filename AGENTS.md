@@ -89,12 +89,12 @@ Git and postgres coverage improved with mock `CommandRunner` injection. Diagnose
 
 Connects go-error-family with `samber/oops`. Separate module with its own `go.mod` (depends on both libraries). The root package remains zero-dependency.
 
-| API                          | Purpose                                                      |
-| ---------------------------- | ------------------------------------------------------------ |
-| `bridge.Wrap(err, family)`   | Attach a Family to any error, preserving OopsError context   |
-| `bridge.AutoWrap(err)`       | Infer Family from oops metadata (tags + domain), then wrap   |
-| `bridge.InferFamily(err)`    | Derive Family from oops tags (explicit) → domain (structural) → Transient (fail-open) |
-| `ClassifiedOops`             | Embeds `oops.OopsError`; satisfies `Classified`, `Retryable`, `Contextual` |
+| API                        | Purpose                                                                               |
+| -------------------------- | ------------------------------------------------------------------------------------- |
+| `bridge.Wrap(err, family)` | Attach a Family to any error, preserving OopsError context                            |
+| `bridge.AutoWrap(err)`     | Infer Family from oops metadata (tags + domain), then wrap                            |
+| `bridge.InferFamily(err)`  | Derive Family from oops tags (explicit) → domain (structural) → Transient (fail-open) |
+| `ClassifiedOops`           | Embeds `oops.OopsError`; satisfies `Classified`, `Retryable`, `Contextual`            |
 
 **Tag overrides** (checked first): `retryable`, `transient`, `conflict`, `corruption`/`corrupted`, `rejection`/`rejected`, `infrastructure`/`infra`.
 **Domain defaults** (checked second): `validation`/`auth` → Rejection, `database`/`network`/`cache`/`queue` → Transient, `storage`/`infra`/`startup` → Infrastructure, `data`/`schema`/`migration` → Corruption.

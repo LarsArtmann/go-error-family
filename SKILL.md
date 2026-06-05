@@ -423,16 +423,16 @@ family := bridge.InferFamily(err)           // just the Family, no wrapping
 
 ### What ClassifiedOops bridges
 
-| oops method | error-family interface | Notes |
-|---|---|---|
-| `.Code()` | `ErrorCode() string` (Coded) | Converts `any` to string via fmt.Sprint |
-| `.Context()` | `ErrorContext() map[string]string` (Contextual) | Non-strings converted via fmt.Sprint |
-| `.Domain()` | Included in `ErrorContext()["domain"]` | |
-| `.Tags()` | Included in `ErrorContext()["tags"]` | |
-| — | `ErrorFamily() Family` (Classified) | From the attached Family |
-| — | `IsRetryable() bool` (Retryable) | Derived from Family |
-| `.Is()` | `Is(target error) bool` | Delegates to OopsError.Is + original error |
-| `Format()` | `fmt.Formatter` | `%+v` shows oops stacktrace when present |
+| oops method  | error-family interface                          | Notes                                      |
+| ------------ | ----------------------------------------------- | ------------------------------------------ |
+| `.Code()`    | `ErrorCode() string` (Coded)                    | Converts `any` to string via fmt.Sprint    |
+| `.Context()` | `ErrorContext() map[string]string` (Contextual) | Non-strings converted via fmt.Sprint       |
+| `.Domain()`  | Included in `ErrorContext()["domain"]`          |                                            |
+| `.Tags()`    | Included in `ErrorContext()["tags"]`            |                                            |
+| —            | `ErrorFamily() Family` (Classified)             | From the attached Family                   |
+| —            | `IsRetryable() bool` (Retryable)                | Derived from Family                        |
+| `.Is()`      | `Is(target error) bool`                         | Delegates to OopsError.Is + original error |
+| `Format()`   | `fmt.Formatter`                                 | `%+v` shows oops stacktrace when present   |
 
 ### Original error preservation
 
