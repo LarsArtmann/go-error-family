@@ -1,0 +1,1107 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>go-error-family vs samber/oops — Comparative Analysis</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Geist+Mono:wght@300;400;500&family=Geist:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #fafaf8;
+      --fg: #1a1a1a;
+      --muted: #6b6b6b;
+      --accent-a: #c23a22;
+      --accent-b: #1a5c3a;
+      --border: #d4d4d0;
+      --card: #ffffff;
+      --code-bg: #f0f0ec;
+      --highlight: #fff3cd;
+      --serif: 'Instrument Serif', Georgia, serif;
+      --sans: 'Geist', -apple-system, sans-serif;
+      --mono: 'Geist Mono', 'SF Mono', monospace;
+    }
+
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      font-family: var(--sans);
+      color: var(--fg);
+      background: var(--bg);
+      line-height: 1.6;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    ::selection { background: var(--highlight); }
+
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 0 2rem;
+    }
+
+    /* ─── HERO ─── */
+    header {
+      padding: 6rem 0 4rem;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .hero-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 4rem;
+      align-items: end;
+    }
+
+    .hero-title {
+      font-family: var(--serif);
+      font-size: clamp(3rem, 6vw, 5rem);
+      line-height: 1.05;
+      letter-spacing: -0.02em;
+    }
+
+    .hero-title em {
+      font-style: italic;
+      color: var(--muted);
+    }
+
+    .hero-meta {
+      text-align: right;
+      font-size: 0.85rem;
+      color: var(--muted);
+      line-height: 1.8;
+    }
+
+    .hero-meta strong { color: var(--fg); font-weight: 500; }
+
+    .hero-subtitle {
+      grid-column: 1 / -1;
+      margin-top: 2rem;
+      font-size: 1.15rem;
+      color: var(--muted);
+      max-width: 700px;
+      line-height: 1.7;
+    }
+
+    .hero-tag {
+      display: inline-block;
+      font-family: var(--mono);
+      font-size: 0.7rem;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      padding: 0.25rem 0.6rem;
+      border: 1px solid var(--border);
+      border-radius: 3px;
+      margin-bottom: 1rem;
+      color: var(--muted);
+    }
+
+    /* ─── SECTION HEADERS ─── */
+    section {
+      padding: 4rem 0;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .section-label {
+      font-family: var(--mono);
+      font-size: 0.7rem;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--muted);
+      margin-bottom: 1.5rem;
+    }
+
+    .section-title {
+      font-family: var(--serif);
+      font-size: clamp(2rem, 3.5vw, 2.8rem);
+      line-height: 1.15;
+      margin-bottom: 2rem;
+      max-width: 600px;
+    }
+
+    /* ─── PHILOSOPHY CARDS ─── */
+    .philosophy-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 2rem;
+    }
+
+    .phil-card {
+      padding: 2.5rem;
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      background: var(--card);
+      position: relative;
+    }
+
+    .phil-card::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 3px;
+    }
+
+    .phil-card.a::before { background: var(--accent-a); }
+    .phil-card.b::before { background: var(--accent-b); }
+
+    .phil-card h3 {
+      font-family: var(--mono);
+      font-size: 0.75rem;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      margin-bottom: 0.5rem;
+    }
+
+    .phil-card.a h3 { color: var(--accent-a); }
+    .phil-card.b h3 { color: var(--accent-b); }
+
+    .phil-card .name {
+      font-family: var(--serif);
+      font-size: 1.6rem;
+      margin-bottom: 1rem;
+      line-height: 1.2;
+    }
+
+    .phil-card .tagline {
+      font-size: 1.05rem;
+      line-height: 1.7;
+      color: var(--muted);
+      margin-bottom: 1.5rem;
+      font-style: italic;
+    }
+
+    .phil-card p {
+      font-size: 0.9rem;
+      line-height: 1.75;
+      color: #444;
+    }
+
+    .stat-row {
+      display: flex;
+      gap: 2rem;
+      margin-top: 1.5rem;
+      padding-top: 1.5rem;
+      border-top: 1px solid var(--border);
+    }
+
+    .stat-item {
+      display: flex;
+      flex-direction: column;
+    }
+
+    .stat-value {
+      font-family: var(--mono);
+      font-size: 1.3rem;
+      font-weight: 500;
+    }
+
+    .stat-label {
+      font-size: 0.7rem;
+      color: var(--muted);
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+
+    /* ─── COMPARISON TABLE ─── */
+    .comparison-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.88rem;
+    }
+
+    .comparison-table thead th {
+      font-family: var(--mono);
+      font-size: 0.7rem;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--muted);
+      padding: 1rem 1.2rem;
+      text-align: left;
+      border-bottom: 2px solid var(--fg);
+      position: sticky;
+      top: 0;
+      background: var(--bg);
+    }
+
+    .comparison-table thead th:nth-child(2) { color: var(--accent-a); }
+    .comparison-table thead th:nth-child(3) { color: var(--accent-b); }
+
+    .comparison-table tbody td {
+      padding: 1rem 1.2rem;
+      border-bottom: 1px solid var(--border);
+      vertical-align: top;
+      line-height: 1.6;
+    }
+
+    .comparison-table tbody tr:hover {
+      background: rgba(0,0,0,0.015);
+    }
+
+    .comparison-table tbody td:first-child {
+      font-weight: 500;
+      white-space: nowrap;
+      width: 20%;
+    }
+
+    .comparison-table tbody td:nth-child(2),
+    .comparison-table tbody td:nth-child(3) {
+      width: 40%;
+    }
+
+    .comparison-table code {
+      font-family: var(--mono);
+      font-size: 0.78rem;
+      background: var(--code-bg);
+      padding: 0.15rem 0.4rem;
+      border-radius: 3px;
+    }
+
+    .pill {
+      display: inline-block;
+      font-family: var(--mono);
+      font-size: 0.65rem;
+      letter-spacing: 0.03em;
+      padding: 0.15rem 0.5rem;
+      border-radius: 2px;
+      font-weight: 500;
+    }
+
+    .pill.yes { background: #e8f5e9; color: #2e7d32; }
+    .pill.no { background: #fce4ec; color: #c62828; }
+    .pill.partial { background: #fff8e1; color: #f57f17; }
+
+    /* ─── FEATURE MATRIX ─── */
+    .matrix-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.88rem;
+    }
+
+    .matrix-table th, .matrix-table td {
+      padding: 0.75rem 1rem;
+      border-bottom: 1px solid var(--border);
+      text-align: left;
+    }
+
+    .matrix-table thead th {
+      font-family: var(--mono);
+      font-size: 0.7rem;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--muted);
+      border-bottom: 2px solid var(--fg);
+      position: sticky;
+      top: 0;
+      background: var(--bg);
+    }
+
+    .matrix-table thead th:nth-child(2) { color: var(--accent-a); }
+    .matrix-table thead th:nth-child(3) { color: var(--accent-b); }
+
+    .matrix-table tbody td:first-child {
+      font-weight: 500;
+    }
+
+    .check { color: #2e7d32; font-weight: 600; }
+    .cross { color: #c62828; }
+    .partial-mark { color: #f57f17; }
+
+    /* ─── CODE BLOCKS ─── */
+    .code-comparison {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1.5rem;
+      margin-top: 2rem;
+    }
+
+    .code-block {
+      background: #1e1e1e;
+      border-radius: 6px;
+      overflow: hidden;
+    }
+
+    .code-block-header {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      padding: 0.6rem 1rem;
+      background: rgba(255,255,255,0.05);
+      border-bottom: 1px solid rgba(255,255,255,0.08);
+      font-family: var(--mono);
+      font-size: 0.7rem;
+      color: rgba(255,255,255,0.5);
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+
+    .code-block-header .dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+    }
+
+    .code-block.a .dot { background: var(--accent-a); }
+    .code-block.b .dot { background: var(--accent-b); }
+
+    .code-block pre {
+      padding: 1.2rem;
+      font-family: var(--mono);
+      font-size: 0.8rem;
+      line-height: 1.7;
+      color: #d4d4d4;
+      overflow-x: auto;
+    }
+
+    .code-block .kw { color: #c586c0; }
+    .code-block .fn { color: #dcdcaa; }
+    .code-block .str { color: #ce9178; }
+    .code-block .cm { color: #6a9955; }
+    .code-block .ty { color: #4ec9b0; }
+    .code-block .num { color: #b5cea8; }
+
+    /* ─── VERDICT ─── */
+    .verdict-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 2rem;
+    }
+
+    .verdict-card {
+      padding: 2.5rem;
+      border-radius: 4px;
+      position: relative;
+    }
+
+    .verdict-card.a {
+      background: #fdf5f4;
+      border: 1px solid #e8c4c0;
+    }
+
+    .verdict-card.b {
+      background: #f2f9f5;
+      border: 1px solid #c0ddd0;
+    }
+
+    .verdict-card h3 {
+      font-family: var(--serif);
+      font-size: 1.4rem;
+      margin-bottom: 0.75rem;
+    }
+
+    .verdict-card .use-for {
+      font-family: var(--mono);
+      font-size: 0.7rem;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      color: var(--muted);
+      margin-bottom: 1rem;
+    }
+
+    .verdict-card ul {
+      list-style: none;
+      font-size: 0.9rem;
+      line-height: 1.8;
+    }
+
+    .verdict-card ul li::before {
+      content: '→';
+      margin-right: 0.5rem;
+      opacity: 0.5;
+    }
+
+    /* ─── DEEP DIVE ─── */
+    .deep-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 3rem;
+    }
+
+    .deep-col h4 {
+      font-family: var(--mono);
+      font-size: 0.72rem;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      color: var(--accent-a);
+      margin-bottom: 1.5rem;
+      padding-bottom: 0.5rem;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .deep-col:nth-child(2) h4 { color: var(--accent-b); }
+
+    .deep-item {
+      margin-bottom: 1.5rem;
+    }
+
+    .deep-item strong {
+      display: block;
+      font-size: 0.85rem;
+      margin-bottom: 0.25rem;
+    }
+
+    .deep-item p {
+      font-size: 0.85rem;
+      color: var(--muted);
+      line-height: 1.65;
+    }
+
+    /* ─── QUOTE ─── */
+    .pull-quote {
+      font-family: var(--serif);
+      font-size: 1.5rem;
+      line-height: 1.5;
+      color: var(--muted);
+      max-width: 700px;
+      margin: 2rem 0;
+      padding-left: 1.5rem;
+      border-left: 3px solid var(--fg);
+    }
+
+    /* ─── FOOTER ─── */
+    footer {
+      padding: 3rem 0;
+      text-align: center;
+      font-size: 0.75rem;
+      color: var(--muted);
+      font-family: var(--mono);
+      letter-spacing: 0.03em;
+    }
+
+    footer a { color: var(--fg); text-decoration: none; border-bottom: 1px solid var(--border); }
+    footer a:hover { border-bottom-color: var(--fg); }
+
+    /* ─── RESPONSIVE ─── */
+    @media (max-width: 768px) {
+      .container { padding: 0 1.2rem; }
+      header { padding: 3rem 0 2rem; }
+      .hero-grid { grid-template-columns: 1fr; gap: 1.5rem; }
+      .hero-meta { text-align: left; }
+      .hero-subtitle { grid-column: 1; }
+      .philosophy-grid, .code-comparison, .verdict-grid, .deep-grid { grid-template-columns: 1fr; }
+      section { padding: 2.5rem 0; }
+      .comparison-table, .matrix-table { font-size: 0.78rem; }
+      .comparison-table thead th, .comparison-table tbody td,
+      .matrix-table thead th, .matrix-table tbody td { padding: 0.6rem 0.5rem; }
+    }
+
+    /* ─── ANIMATIONS ─── */
+    @keyframes fadeInUp {
+      from { opacity: 0; transform: translateY(12px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    section, header, .phil-card, .code-comparison {
+      animation: fadeInUp 0.5s ease-out both;
+    }
+
+    .phil-card:nth-child(2) { animation-delay: 0.1s; }
+  </style>
+</head>
+<body>
+  <div class="container">
+
+    <!-- ═══════ HERO ═══════ -->
+    <header>
+      <div class="hero-grid">
+        <h1 class="hero-title">
+          Error Family<br>
+          <em>vs.</em> Oops
+        </h1>
+        <div class="hero-meta">
+          <strong>go-error-family</strong> v0.3.0 — larsartmann<br>
+          <strong>samber/oops</strong> v1.22.0 — samber<br><br>
+          June 2026 · Comparative Analysis
+        </div>
+        <p class="hero-subtitle">
+          Two Go libraries that ask the same question — <em>"what do you do with an error?"</em> —
+          and arrive at radically different answers. One classifies behavior. The other enriches context.
+          Here is how they differ, where each excels, and when to choose which.
+        </p>
+      </div>
+    </header>
+
+    <!-- ═══════ DESIGN PHILOSOPHY ═══════ -->
+    <section>
+      <div class="section-label">01 — Philosophy</div>
+      <h2 class="section-title">Different answers to the same question</h2>
+      <div class="philosophy-grid">
+        <div class="phil-card a">
+          <h3>go-error-family</h3>
+          <div class="name">Share the protocol,<br>not the implementation.</div>
+          <div class="tagline">"What should the system <em>do</em> with this error?"</div>
+          <p>
+            Behavioral classification first. Every error gets a <strong>Family</strong> — Rejection,
+            Conflict, Transient, Corruption, or Infrastructure — which directly answers: should we retry?
+            what exit code? whose fault? what tone for the user? The library provides small interfaces
+            (<code>Coded</code>, <code>Classified</code>, <code>Contextual</code>, <code>Retryable</code>)
+            that any error type can implement. It is a <strong>classification protocol</strong>, not a
+            structured error wrapper.
+          </p>
+          <div class="stat-row">
+            <div class="stat-item">
+              <span class="stat-value">0</span>
+              <span class="stat-label">Dependencies</span>
+            </div>
+            <div class="stat-item">
+              <span class="stat-value">5,404</span>
+              <span class="stat-label">Lines of Code</span>
+            </div>
+            <div class="stat-item">
+              <span class="stat-value">1.26+</span>
+              <span class="stat-label">Go Version</span>
+            </div>
+            <div class="stat-item">
+              <span class="stat-value">97.2%</span>
+              <span class="stat-label">Core Coverage</span>
+            </div>
+          </div>
+        </div>
+        <div class="phil-card b">
+          <h3>samber/oops</h3>
+          <div class="name">Rich context for<br>every error.</div>
+          <div class="tagline">"What do I <em>know</em> about this error?"</div>
+          <p>
+            Observability and debugging first. Every error carries a rich payload — stack traces,
+            source code fragments, structured attributes, trace/span IDs, user/tenant context,
+            HTTP request/response bodies, timing data, ownership tags, and domain labels. It is a
+            <strong>context enrichment layer</strong> that wraps any error into an
+            <code>OopsError</code> with a fluent builder API. Designed to make production debugging
+            dramatically easier.
+          </p>
+          <div class="stat-row">
+            <div class="stat-item">
+              <span class="stat-value">3</span>
+              <span class="stat-label">Dependencies</span>
+            </div>
+            <div class="stat-item">
+              <span class="stat-value">956</span>
+              <span class="stat-label">GitHub Stars</span>
+            </div>
+            <div class="stat-item">
+              <span class="stat-value">1.21+</span>
+              <span class="stat-label">Go Version</span>
+            </div>
+            <div class="stat-item">
+              <span class="stat-value">41</span>
+              <span class="stat-label">Releases</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ═══════ ERROR MODEL ═══════ -->
+    <section>
+      <div class="section-label">02 — Error Model</div>
+      <h2 class="section-title">How each library structures an error</h2>
+      <div class="code-comparison">
+        <div class="code-block a">
+          <div class="code-block-header"><span class="dot"></span> go-error-family · Error struct</div>
+          <pre><span class="kw">type</span> <span class="ty">Error</span> <span class="kw">struct</span> {
+    code      <span class="ty">string</span>            <span class="cm">// "db.timeout"</span>
+    message   <span class="ty">string</span>            <span class="cm">// "query took too long"</span>
+    family    <span class="ty">Family</span>            <span class="cm">// Transient</span>
+    context   <span class="kw">map</span>[<span class="ty">string</span>]<span class="ty">string</span> <span class="cm">// {"host":"db1"}</span>
+    cause     <span class="ty">error</span>             <span class="cm">// underlying error</span>
+    timestamp <span class="ty">time.Time</span>         <span class="cm">// when created</span>
+}</pre>
+        </div>
+        <div class="code-block b">
+          <div class="code-block-header"><span class="dot"></span> samber/oops · OopsError struct</div>
+          <pre><span class="kw">type</span> <span class="ty">OopsError</span> <span class="kw">struct</span> {
+    err      <span class="ty">error</span>            <span class="cm">// underlying error</span>
+    msg      <span class="ty">string</span>           <span class="cm">// message</span>
+    code     <span class="ty">any</span>              <span class="cm">// error code (any type)</span>
+    domain   <span class="ty">string</span>           <span class="cm">// "database"</span>
+    tags     []<span class="ty">string</span>          <span class="cm">// ["connection","timeout"]</span>
+    context  <span class="kw">map</span>[<span class="ty">string</span>]<span class="ty">any</span>   <span class="cm">// {"query":"SELECT..."}</span>
+    trace    <span class="ty">string</span>           <span class="cm">// ULID auto-generated</span>
+    span     <span class="ty">string</span>           <span class="cm">// span ID</span>
+    hint     <span class="ty">string</span>           <span class="cm">// debug hint</span>
+    public   <span class="ty">string</span>           <span class="cm">// user-safe message</span>
+    owner    <span class="ty">string</span>           <span class="cm">// responsible team</span>
+    userID   <span class="ty">string</span>           <span class="cm">// user identifier</span>
+    tenantID <span class="ty">string</span>           <span class="cm">// tenant identifier</span>
+    <span class="cm">// + stacktrace, HTTP req/res,</span>
+    <span class="cm">//   time, duration, source</span>
+    <span class="cm">//   code fragments...</span>
+}</pre>
+        </div>
+      </div>
+      <p class="pull-quote">
+        go-error-family asks <strong>"what kind of error is this?"</strong> and gives you a behavioral answer.
+        samber/oops asks <strong>"what do I know about this error?"</strong> and gives you a forensic answer.
+      </p>
+    </section>
+
+    <!-- ═══════ USAGE COMPARISON ═══════ -->
+    <section>
+      <div class="section-label">03 — Ergonomics</div>
+      <h2 class="section-title">Creating and handling errors</h2>
+      <div class="code-comparison">
+        <div class="code-block a">
+          <div class="code-block-header"><span class="dot"></span> go-error-family · CLI boundary</div>
+          <pre><span class="cm">// Create with explicit family</span>
+err := errorfamily.<span class="fn">NewTransient</span>(
+    <span class="str">"db.timeout"</span>,
+    <span class="str">"query took too long"</span>,
+).<span class="fn">WithContext</span>(<span class="str">"host"</span>, <span class="str">"db1.example.com"</span>)
+
+<span class="cm">// Classify any error — even stdlib</span>
+family := errorfamily.<span class="fn">Classify</span>(err)
+<span class="cm">// → Transient (retryable, exit 75)</span>
+
+<span class="cm">// CLI boundary: one line in main()</span>
+<span class="kw">func</span> <span class="fn">main</span>() {
+    <span class="kw">if</span> err := <span class="fn">run</span>(); err != <span class="kw">nil</span> {
+        os.<span class="fn">Exit</span>(errorfamily.<span class="fn">HandleError</span>(err))
+    }
+}
+<span class="cm">// stderr: "A temporary error occurred..."</span>
+<span class="cm">// exit: 75 (EX_TEMPFAIL)</span>
+
+<span class="cm">// Register third-party sentinels</span>
+errorfamily.<span class="fn">RegisterClassification</span>(
+    sql.ErrConnDone,
+    errorfamily.Transient,
+)</pre>
+        </div>
+        <div class="code-block b">
+          <div class="code-block-header"><span class="dot"></span> samber/oops · Builder pattern</div>
+          <pre><span class="cm">// Create with rich context</span>
+err := oops.<span class="fn">In</span>(<span class="str">"database"</span>).
+    <span class="fn">Tags</span>(<span class="str">"connection"</span>, <span class="str">"timeout"</span>).
+    <span class="fn">Code</span>(<span class="str">"DB_CONN_TIMEOUT"</span>).
+    <span class="fn">With</span>(<span class="str">"host"</span>, <span class="str">"db1.example.com"</span>).
+    <span class="fn">Trace</span>(<span class="str">"req-abc-123"</span>).
+    <span class="fn">User</span>(<span class="str">"user-456"</span>).
+    <span class="fn">Errorf</span>(<span class="str">"connection failed after %dms"</span>, <span class="num">5000</span>)
+
+<span class="cm">// Access rich metadata</span>
+oopsErr, ok := oops.<span class="fn">AsOops</span>(err)
+fmt.<span class="fn">Println</span>(oopsErr.<span class="fn">Stacktrace</span>())
+fmt.<span class="fn">Println</span>(oopsErr.<span class="fn">Sources</span>())  <span class="cm">// source code!</span>
+fmt.<span class="fn">Println</span>(oopsErr.<span class="fn">Code</span>())
+
+<span class="cm">// Logger integration (slog)</span>
+slog.<span class="fn">Error</span>(<span class="str">"request failed"</span>,
+    <span class="str">"error"</span>, err) <span class="cm">// auto-structured</span>
+
+<span class="cm">// Panic recovery</span>
+err = oops.<span class="fn">Recover</span>(<span class="kw">func</span>() {
+    <span class="kw">panic</span>(<span class="str">"something broke"</span>)
+})</pre>
+        </div>
+      </div>
+    </section>
+
+    <!-- ═══════ FEATURE MATRIX ═══════ -->
+    <section>
+      <div class="section-label">04 — Feature Matrix</div>
+      <h2 class="section-title">What each library provides</h2>
+      <table class="matrix-table">
+        <thead>
+          <tr>
+            <th>Capability</th>
+            <th>go-error-family</th>
+            <th>samber/oops</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>Error classification / taxonomy</td>
+            <td><span class="check">✓</span> 5 families with behavioral semantics</td>
+            <td><span class="cross">✗</span> No classification model</td>
+          </tr>
+          <tr>
+            <td>Retry decision</td>
+            <td><span class="check">✓</span> <code>IsRetryable()</code> — first-class concept</td>
+            <td><span class="cross">✗</span> No built-in retry semantics</td>
+          </tr>
+          <tr>
+            <td>Exit code mapping</td>
+            <td><span class="check">✓</span> BSD sysexits.h — <code>ExitCode(err)</code></td>
+            <td><span class="cross">✗</span> No exit code support</td>
+          </tr>
+          <tr>
+            <td>CLI boundary handler</td>
+            <td><span class="check">✓</span> <code>HandleError()</code> — stderr + exit code</td>
+            <td><span class="cross">✗</span> No CLI boundary concept</td>
+          </tr>
+          <tr>
+            <td>Stack traces</td>
+            <td><span class="cross">✗</span> Not included</td>
+            <td><span class="check">✓</span> Automatic capture with filtering</td>
+          </tr>
+          <tr>
+            <td>Source code fragments</td>
+            <td><span class="cross">✗</span> Not included</td>
+            <td><span class="check">✓</span> Shows code around error site</td>
+          </tr>
+          <tr>
+            <td>Structured attributes / context</td>
+            <td><span class="check">✓</span> <code>map[string]string</code></td>
+            <td><span class="check">✓</span> <code>map[string]any</code> — richer types</td>
+          </tr>
+          <tr>
+            <td>Trace / Span IDs</td>
+            <td><span class="cross">✗</span> No built-in tracing</td>
+            <td><span class="check">✓</span> Auto-generated ULID, OpenTelemetry</td>
+          </tr>
+          <tr>
+            <td>User / Tenant context</td>
+            <td><span class="cross">✗</span> Generic context only</td>
+            <td><span class="check">✓</span> First-class user/tenant with data</td>
+          </tr>
+          <tr>
+            <td>HTTP request/response capture</td>
+            <td><span class="cross">✗</span> Not included</td>
+            <td><span class="check">✓</span> With body inclusion flag</td>
+          </tr>
+          <tr>
+            <td>Error code</td>
+            <td><span class="check">✓</span> <code>string</code> — typed, consistent</td>
+            <td><span class="check">✓</span> <code>any</code> — flexible, untyped</td>
+          </tr>
+          <tr>
+            <td>Builder / fluent API</td>
+            <td><span class="partial-mark">◐</span> Chainable <code>WithContext()</code></td>
+            <td><span class="check">✓</span> Full builder with 20+ methods</td>
+          </tr>
+          <tr>
+            <td>Third-party error registration</td>
+            <td><span class="check">✓</span> <code>RegisterClassification(sentinel, family)</code></td>
+            <td><span class="cross">✗</span> Wrap only — no registry</td>
+          </tr>
+          <tr>
+            <td>Multi-error / partial success</td>
+            <td><span class="check">✓</span> <code>Compose()</code> with classification</td>
+            <td><span class="check">✓</span> <code>Join()</code> — standard errors.Join</td>
+          </tr>
+          <tr>
+            <td>Diagnostic rules</td>
+            <td><span class="check">✓</span> Concurrent, extensible (FS, net, git, pg)</td>
+            <td><span class="cross">✗</span> No diagnostic system</td>
+          </tr>
+          <tr>
+            <td>AI debug agent</td>
+            <td><span class="check">✓</span> Root cause analysis + FixSteps</td>
+            <td><span class="cross">✗</span> No agent concept</td>
+          </tr>
+          <tr>
+            <td>Panic recovery</td>
+            <td><span class="cross">✗</span> Not included</td>
+            <td><span class="check">✓</span> <code>Recover()</code> with context</td>
+          </tr>
+          <tr>
+            <td>Assertion helpers</td>
+            <td><span class="cross">✗</span> Not included</td>
+            <td><span class="check">✓</span> <code>Assert()</code>, <code>Assertf()</code></td>
+          </tr>
+          <tr>
+            <td>Logger integration</td>
+            <td><span class="cross">✗</span> Manual log extraction</td>
+            <td><span class="check">✓</span> slog, zap, logrus, zerolog</td>
+          </tr>
+          <tr>
+            <td>JSON serialization</td>
+            <td><span class="cross">✗</span> Not built-in</td>
+            <td><span class="check">✓</span> <code>MarshalJSON()</code>, <code>ToMap()</code></td>
+          </tr>
+          <tr>
+            <td>User-facing messaging</td>
+            <td><span class="check">✓</span> What/Why/Fix/WayOut templates</td>
+            <td><span class="check">✓</span> <code>Public()</code> field</td>
+          </tr>
+          <tr>
+            <td>Audience targeting</td>
+            <td><span class="check">✓</span> User / Ops / All — per family</td>
+            <td><span class="cross">✗</span> No audience concept</td>
+          </tr>
+          <tr>
+            <td>Interface-based extensibility</td>
+            <td><span class="check">✓</span> 4 small interfaces, any type can implement</td>
+            <td><span class="partial-mark">◐</span> OopsError is the type; layers via wrapping</td>
+          </tr>
+          <tr>
+            <td>Zero dependencies</td>
+            <td><span class="check">✓</span> True zero</td>
+            <td><span class="cross">✗</span> 3 deps (ulid, lo, otel/trace)</td>
+          </tr>
+        </tbody>
+      </table>
+    </section>
+
+    <!-- ═══════ ARCHITECTURAL DEEP DIVE ═══════ -->
+    <section>
+      <div class="section-label">05 — Architecture</div>
+      <h2 class="section-title">How they think about error handling</h2>
+      <div class="deep-grid">
+        <div class="deep-col">
+          <h4>go-error-family — Protocol-first</h4>
+          <div class="deep-item">
+            <strong>Interface-driven</strong>
+            <p>Four tiny interfaces (<code>Coded</code>, <code>Classified</code>, <code>Contextual</code>, <code>Retryable</code>) that any struct can implement. You never need to import the library's Error type — just satisfy the interface.</p>
+          </div>
+          <div class="deep-item">
+            <strong>Classification cascade</strong>
+            <p><code>Classify(err)</code> walks: multi-error → Classified interface → Retryable interface → registered sentinels → default Transient. First match wins. Thread-safe sentinel registry with lock-free snapshots.</p>
+          </div>
+          <div class="deep-item">
+            <strong>Boundary-oriented</strong>
+            <p>Designed for the moment errors leave the program. <code>HandleError()</code> is the canonical entry point — classifies, formats with templates, writes to stderr, returns exit code. One line in <code>main()</code>.</p>
+          </div>
+          <div class="deep-item">
+            <strong>Diagnostic engine</strong>
+            <p>Concurrent rule-based diagnostics (filesystem, network, git, postgres). Rules match on error codes/context, run targeted system checks, produce confidence-scored findings. Agent layer produces FixSteps without executing them.</p>
+          </div>
+          <div class="deep-item">
+            <strong>Fail-open design</strong>
+            <p>Unknown errors default to <code>Transient</code> (retryable). <code>Classify(nil)</code> returns <code>Rejection</code>. Every decision is deliberate about what happens at the boundary.</p>
+          </div>
+        </div>
+        <div class="deep-col">
+          <h4>samber/oops — Enrichment-first</h4>
+          <div class="deep-item">
+            <strong>Builder-driven</strong>
+            <p>Fluent API with 20+ methods. Each returns a new <code>OopsErrorBuilder</code>. Terminal methods (<code>New()</code>, <code>Wrap()</code>, <code>Errorf()</code>) materialize the error. Immutable builder — each call copies the context map.</p>
+          </div>
+          <div class="deep-item">
+            <strong>Observability-native</strong>
+            <p>Stack traces, source code fragments, trace/span IDs, OpenTelemetry integration, structured logging via <code>slog.LogValuer</code>. Every error is a rich telemetry event waiting to be emitted.</p>
+          </div>
+          <div class="deep-item">
+            <strong>Layer chain</strong>
+            <p>Wrapping creates layers accessible via <code>Layers()</code>. Context flattens across layers (later wins). Tags merge and deduplicate. Trace prefers explicit over auto-generated. "Deepest wins" for most scalar fields.</p>
+          </div>
+          <div class="deep-item">
+            <strong>Multi-domain context</strong>
+            <p>First-class support for HTTP req/res (with body capture), user/tenant identity (with attributes), ownership tagging, domain categorization, and timing data. Built for microservice and multi-tenant environments.</p>
+          </div>
+          <div class="deep-item">
+            <strong>Copy cost tradeoff</strong>
+            <p>The immutable builder copies the context map at each step — O(n) per builder call. Optimized for the common case: create error, rarely introspect. Benchmarks confirm allocation patterns scale with builder chain depth.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ═══════ DETAILED COMPARISON TABLE ═══════ -->
+    <section>
+      <div class="section-label">06 — Technical Dimensions</div>
+      <h2 class="section-title">Side-by-side technical comparison</h2>
+      <table class="comparison-table">
+        <thead>
+          <tr>
+            <th>Dimension</th>
+            <th>go-error-family</th>
+            <th>samber/oops</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>Core abstraction</td>
+            <td><code>Family</code> enum (5 values)</td>
+            <td><code>OopsError</code> struct (rich payload)</td>
+          </tr>
+          <tr>
+            <td>Extensibility model</td>
+            <td>Interfaces — implement on your own types</td>
+            <td>Builder — chain methods, wrap errors</td>
+          </tr>
+          <tr>
+            <td>Context type</td>
+            <td><code>map[string]string</code></td>
+            <td><code>map[string]any</code> (arbitrary values)</td>
+          </tr>
+          <tr>
+            <td>Error identity</td>
+            <td><code>code + family</code> for <code>errors.Is</code></td>
+            <td><code>span ID</code> for <code>errors.Is</code></td>
+          </tr>
+          <tr>
+            <td>Wrapping</td>
+            <td><code>Wrap(err, family, code, msg)</code></td>
+            <td><code>oops.Wrap(err)</code> + builder chain</td>
+          </tr>
+          <tr>
+            <td>Multi-error</td>
+            <td><code>Compose()</code> → classify each, first non-Transient wins</td>
+            <td><code>Join()</code> → standard <code>errors.Join</code></td>
+          </tr>
+          <tr>
+            <td>Timestamps</td>
+            <td>Auto-captured, <code>WithTimestamp()</code> for tests</td>
+            <td><code>.Time(t)</code> and <code>.Since(t)</code></td>
+          </tr>
+          <tr>
+            <td>Formatting</td>
+            <td><code>%v</code> = <code>[family:code] msg</code>, <code>%+v</code> = verbose</td>
+            <td><code>%v</code> = message, <code>%+v</code> = full stacktrace</td>
+          </tr>
+          <tr>
+            <td>Performance focus</td>
+            <td>Zero allocations in hot path, lock-free reads</td>
+            <td>Builder copy cost, optimized for "create rarely, inspect rarely"</td>
+          </tr>
+          <tr>
+            <td>Module structure</td>
+            <td>Go workspace: root + diagnose/git + diagnose/postgres</td>
+            <td>Single module</td>
+          </tr>
+          <tr>
+            <td>Logging</td>
+            <td>Manual context extraction</td>
+            <td>slog.LogValuer, zap, logrus, zerolog</td>
+          </tr>
+          <tr>
+            <td>Serialization</td>
+            <td>Manual <code>fmt.Sprintf</code></td>
+            <td>JSON marshal, <code>ToMap()</code></td>
+          </tr>
+          <tr>
+            <td>Testing story</td>
+            <td><code>WithTimestamp()</code>, <code>CommandRunner</code> mocks, fuzz tests</td>
+            <td>Standard Go testing</td>
+          </tr>
+          <tr>
+            <td>Go version</td>
+            <td>1.26+ (uses <code>errors.AsType</code>)</td>
+            <td>1.21+ (generics)</td>
+          </tr>
+        </tbody>
+      </table>
+    </section>
+
+    <!-- ═══════ WHEN TO USE WHICH ═══════ -->
+    <section>
+      <div class="section-label">07 — Verdict</div>
+      <h2 class="section-title">When to choose which</h2>
+
+      <p class="pull-quote">
+        These libraries are not competitors. They solve different problems and can even be <strong>used together</strong> —
+        wrap errors with oops for observability, then classify them with error-family for behavioral decisions.
+      </p>
+
+      <div class="verdict-grid">
+        <div class="verdict-card a">
+          <h3>Choose go-error-family when</h3>
+          <div class="use-for">Best for: CLI tools, services, API boundaries</div>
+          <ul>
+            <li>Your program needs to <strong>decide what to do</strong> with errors (retry, exit, alert)</li>
+            <li>You need consistent <strong>exit codes</strong> across CLI tools</li>
+            <li>You want <strong>automatic classification</strong> of third-party errors</li>
+            <li>Your error model is about <strong>behavior</strong> (retryable? user's fault?)</li>
+            <li>You need <strong>diagnostic rules</strong> that investigate system state</li>
+            <li>You want zero-dependency, protocol-first design</li>
+            <li>You need <strong>user-facing messaging</strong> with tone/audience targeting</li>
+            <li>You want to <strong>share a protocol</strong> across services without sharing implementations</li>
+          </ul>
+        </div>
+        <div class="verdict-card b">
+          <h3>Choose samber/oops when</h3>
+          <div class="use-for">Best for: HTTP services, microservices, observability</div>
+          <ul>
+            <li>You need <strong>rich debugging context</strong> in production (stack traces, source code)</li>
+            <li>Your errors flow through <strong>structured logging</strong> pipelines</li>
+            <li>You need <strong>distributed tracing</strong> with trace/span IDs</li>
+            <li>You want <strong>user/tenant context</strong> attached to errors</li>
+            <li>You need <strong>HTTP request/response</strong> capture for debugging</li>
+            <li>You want <strong>JSON serialization</strong> of error context</li>
+            <li>You value a <strong>fluent builder API</strong> for error construction</li>
+            <li>You need <strong>OpenTelemetry integration</strong> out of the box</li>
+          </ul>
+        </div>
+      </div>
+
+      <div style="margin-top: 3rem; padding: 2rem; border: 2px solid var(--fg); border-radius: 4px;">
+        <div style="font-family: var(--mono); font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.08em; color: var(--muted); margin-bottom: 1rem;">Complementary use</div>
+        <div class="code-comparison" style="margin-top: 0;">
+          <div class="code-block a" style="grid-column: 1 / -1;">
+            <div class="code-block-header"><span class="dot" style="background: var(--fg);"></span> Using both together</div>
+            <pre><span class="cm">// Enrich with oops for observability</span>
+richErr := oops.<span class="fn">In</span>(<span class="str">"database"</span>).
+    <span class="fn">Trace</span>(<span class="str">"req-123"</span>).
+    <span class="fn">With</span>(<span class="str">"host"</span>, <span class="str">"db1"</span>).
+    <span class="fn">Wrap</span>(dbErr)
+
+<span class="cm">// Classify with error-family for behavioral decisions</span>
+family := errorfamily.<span class="fn">Classify</span>(richErr)
+<span class="kw">if</span> family.<span class="fn">IsRetryable</span>() {
+    <span class="fn">scheduleRetry</span>(richErr)
+}</pre>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ═══════ TRADEOFF SUMMARY ═══════ -->
+    <section>
+      <div class="section-label">08 — Tradeoffs</div>
+      <h2 class="section-title">What you gain and what you give up</h2>
+      <table class="comparison-table">
+        <thead>
+          <tr>
+            <th>Tradeoff</th>
+            <th>go-error-family</th>
+            <th>samber/oops</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>Conceptual model</td>
+            <td>Simple: 5 families, clear semantics. Easy to explain to a team.</td>
+            <td>Rich: many dimensions. More to learn, more to configure.</td>
+          </tr>
+          <tr>
+            <td>Custom error types</td>
+            <td>Implement 1–4 interfaces on your own struct. Full control.</td>
+            <td>Wrap into OopsError. Your struct is hidden behind the wrapper.</td>
+          </tr>
+          <tr>
+            <td>Context value types</td>
+            <td>Strings only — simple, serializable, no reflection.</td>
+            <td><code>any</code> — flexible but requires serialization thought.</td>
+          </tr>
+          <tr>
+            <td>Production debugging</td>
+            <td>Diagnostic rules check live system state. No stack traces.</td>
+            <td>Stack traces + source fragments. Rich forensic data.</td>
+          </tr>
+          <tr>
+            <td>Operational decisions</td>
+            <td>First-class: retry, exit codes, audience, tone. The whole point.</td>
+            <td>Not provided. You build retry/exit logic yourself.</td>
+          </tr>
+          <tr>
+            <td>Dependency footprint</td>
+            <td>Zero. Only stdlib.vet</td>
+            <td>3 deps (ulid, lo, otel/trace). Larger binary impact.</td>
+          </tr>
+          <tr>
+            <td>Maturity / adoption</td>
+            <td>Young (v0.3.0, 80 commits). Niche but focused.</td>
+            <td>Mature (v1.22.0, 956 stars, 41 releases). Proven in production.</td>
+          </tr>
+          <tr>
+            <td>Go version gate</td>
+            <td>1.26+ only — <code>errors.AsType</code> requirement.</td>
+            <td>1.21+ — broader compatibility.</td>
+          </tr>
+        </tbody>
+      </table>
+    </section>
+
+    <footer>
+      <p>
+        Generated June 2026 ·
+        <a href="https://github.com/larsartmann/go-error-family">go-error-family</a> ·
+        <a href="https://github.com/samber/oops">samber/oops</a>
+      </p>
+    </footer>
+  </div>
+</body>
+</html>
