@@ -94,7 +94,7 @@ func (c *ClassifiedOops) ErrorFamily() errorfamily.Family { return c.family }
 // Bridges oops.Code() to error-family's Coded interface.
 // Returns empty string when no code is set.
 func (c *ClassifiedOops) ErrorCode() string {
-	code := c.OopsError.Code()
+	code := c.Code()
 	if code == nil {
 		return ""
 	}
@@ -112,12 +112,12 @@ func (c *ClassifiedOops) IsRetryable() bool { return c.family.IsRetryable() }
 // Contextual interface. Includes oops attributes, domain, and tags.
 // Non-string values are converted via fmt.Sprint.
 func (c *ClassifiedOops) ErrorContext() map[string]string {
-	raw := c.OopsError.Context()
+	raw := c.Context()
 	entries := len(raw)
-	if domain := c.OopsError.Domain(); domain != "" {
+	if domain := c.Domain(); domain != "" {
 		entries++
 	}
-	if tags := c.OopsError.Tags(); len(tags) > 0 {
+	if tags := c.Tags(); len(tags) > 0 {
 		entries++
 	}
 	if entries == 0 {
@@ -132,10 +132,10 @@ func (c *ClassifiedOops) ErrorContext() map[string]string {
 			out[k] = fmt.Sprint(v)
 		}
 	}
-	if domain := c.OopsError.Domain(); domain != "" {
+	if domain := c.Domain(); domain != "" {
 		out["domain"] = domain
 	}
-	if tags := c.OopsError.Tags(); len(tags) > 0 {
+	if tags := c.Tags(); len(tags) > 0 {
 		out["tags"] = fmt.Sprint(tags)
 	}
 	return out

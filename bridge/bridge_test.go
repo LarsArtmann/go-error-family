@@ -2,9 +2,9 @@ package bridge
 
 import (
 	"errors"
+	errors2 "errors"
 	"fmt"
 	"testing"
-	errors2 "errors"
 
 	errorfamily "github.com/larsartmann/go-error-family"
 	"github.com/samber/oops"
@@ -130,8 +130,8 @@ func TestWrap_PreservesOopsMethods(t *testing.T) {
 	base := oops.In("database").With("key", "value").Errorf("test")
 	classified := Wrap(base, errorfamily.Transient)
 
-	if classified.OopsError.Domain() != "database" {
-		t.Errorf("Domain() = %q, want %q", classified.OopsError.Domain(), "database")
+	if classified.Domain() != "database" {
+		t.Errorf("Domain() = %q, want %q", classified.Domain(), "database")
 	}
 }
 
@@ -506,8 +506,8 @@ func TestBridge_Integration_FullStack(t *testing.T) {
 		t.Error("database timeout should be retryable")
 	}
 
-	if classified.OopsError.Domain() != "database" {
-		t.Errorf("oops domain = %q, want %q", classified.OopsError.Domain(), "database")
+	if classified.Domain() != "database" {
+		t.Errorf("oops domain = %q, want %q", classified.Domain(), "database")
 	}
 
 	if classified.ErrorCode() != "db.timeout" {
@@ -518,7 +518,7 @@ func TestBridge_Integration_FullStack(t *testing.T) {
 func BenchmarkWrap(b *testing.B) {
 	base := oops.With("host", "db1").With("port", "5432").Errorf("test")
 	b.ResetTimer()
-	for i := 0; i < b.N; i++ {
+	for range b.N {
 		Wrap(base, errorfamily.Transient)
 	}
 }
@@ -526,7 +526,7 @@ func BenchmarkWrap(b *testing.B) {
 func BenchmarkInferFamily(b *testing.B) {
 	err := oops.In("database").Tags("timeout").With("host", "db1").Errorf("test")
 	b.ResetTimer()
-	for i := 0; i < b.N; i++ {
+	for range b.N {
 		InferFamily(err)
 	}
 }
@@ -534,7 +534,7 @@ func BenchmarkInferFamily(b *testing.B) {
 func BenchmarkAutoWrap(b *testing.B) {
 	err := oops.In("database").Tags("timeout").With("host", "db1").Errorf("test")
 	b.ResetTimer()
-	for i := 0; i < b.N; i++ {
+	for range b.N {
 		AutoWrap(err)
 	}
 }
@@ -547,7 +547,7 @@ func BenchmarkErrorContext(b *testing.B) {
 		Errorf("test")
 	classified := Wrap(base, errorfamily.Transient)
 	b.ResetTimer()
-	for i := 0; i < b.N; i++ {
+	for range b.N {
 		_ = classified.ErrorContext()
 	}
 }
