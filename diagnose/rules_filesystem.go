@@ -127,10 +127,12 @@ func (r *FilesystemRule) checkDirWritable(result *DiagnosticResult, path string)
 	testFile := fmt.Sprintf("%s/.write_test_%d", path, time.Now().UnixNano())
 	f, err := os.Create(testFile)
 	if err != nil {
-		result.Details["writable"] = strFalse
-		result.Status = StatusDegraded
-		result.Summary = "Directory exists but is not writable: " + path
-		result.SuggestedFix = "Fix write permissions:\n  chmod 755 " + path
+		setAccessFailure(
+			result,
+			"writable",
+			"Directory exists but is not writable: "+path,
+			"Fix write permissions:\n  chmod 755 "+path,
+		)
 		return
 	}
 	_ = f.Close()
@@ -144,10 +146,12 @@ func (r *FilesystemRule) checkDirWritable(result *DiagnosticResult, path string)
 func (r *FilesystemRule) checkFileReadable(result *DiagnosticResult, path string) {
 	f, err := os.Open(path)
 	if err != nil {
-		result.Details["readable"] = strFalse
-		result.Status = StatusDegraded
-		result.Summary = "File exists but is not readable: " + path
-		result.SuggestedFix = "Fix read permissions:\n  chmod 644 " + path
+		setAccessFailure(
+			result,
+			"readable",
+			"File exists but is not readable: "+path,
+			"Fix read permissions:\n  chmod 644 "+path,
+		)
 		return
 	}
 	_ = f.Close()
@@ -159,6 +163,13 @@ func (r *FilesystemRule) checkFileReadable(result *DiagnosticResult, path string
 		result.Details["permissions"],
 	)
 	result.Confidence = ConfidenceNotCause
+}
+
+func setAccessFailure(result *DiagnosticResult, key, summary, fix string) {
+	result.Details[key] = strFalse
+	result.Status = StatusDegraded
+	result.Summary = summary
+	result.SuggestedFix = fix
 }
 
 func (r *FilesystemRule) resolvePath(err error) string {

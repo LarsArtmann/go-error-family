@@ -66,6 +66,20 @@ func newPgMockRunner() *diagnose.MockCommandRunner {
 	return diagnose.NewMockCommandRunner()
 }
 
+func pgAssertDetail(t *testing.T, result *diagnose.DiagnosticResult, key, want string) {
+	t.Helper()
+	if result.Details[key] != want {
+		t.Errorf("Expected %s=%s, got %v", key, want, result.Details)
+	}
+}
+
+func pgAssertStatus(t *testing.T, result *diagnose.DiagnosticResult, want diagnose.Status) {
+	t.Helper()
+	if result.Status != want {
+		t.Errorf("Expected %v, got %v", want, result.Status)
+	}
+}
+
 func TestPostgresRuleMockPgIsreadyHealthy(t *testing.T) {
 	mr := newPgMockRunner()
 	mr.Exists_["pg_isready"] = true
@@ -86,15 +100,11 @@ func TestPostgresRuleMockPgIsreadyHealthy(t *testing.T) {
 	if runErr != nil {
 		t.Fatalf("Run() error: %v", runErr)
 	}
-	if result.Status != diagnose.StatusHealthy {
-		t.Errorf("Expected StatusHealthy, got %v", result.Status)
-	}
+	pgAssertStatus(t, result, diagnose.StatusHealthy)
 	if !strings.Contains(result.Summary, "running") {
 		t.Errorf("Expected 'running' in summary, got %q", result.Summary)
 	}
-	if result.Details["pg_isready"] != "localhost:5432 - accepting connections" {
-		t.Errorf("Expected pg_isready output, got %q", result.Details["pg_isready"])
-	}
+	pgAssertDetail(t, result, "pg_isready", "localhost:5432 - accepting connections")
 }
 
 func TestPostgresRuleMockPgIsreadyFailed(t *testing.T) {
@@ -115,9 +125,7 @@ func TestPostgresRuleMockPgIsreadyFailed(t *testing.T) {
 	if runErr != nil {
 		t.Fatalf("Run() error: %v", runErr)
 	}
-	if result.Status != diagnose.StatusFailed {
-		t.Errorf("Expected StatusFailed, got %v", result.Status)
-	}
+	pgAssertStatus(t, result, diagnose.StatusFailed)
 	if !strings.Contains(result.Summary, "NOT responding") {
 		t.Errorf("Expected 'NOT responding' in summary, got %q", result.Summary)
 	}
@@ -136,9 +144,7 @@ func TestPostgresRuleMockNoPgIsreadyTCPSuccess(t *testing.T) {
 	if runErr != nil {
 		t.Fatalf("Run() error: %v", runErr)
 	}
-	if result.Details["pg_isready"] != "not available" {
-		t.Errorf("Expected pg_isready=not available, got %q", result.Details["pg_isready"])
-	}
+	pgAssertDetail(t, result, "pg_isready", "not available")
 }
 
 func TestPostgresRuleMockSuggestStartFix(t *testing.T) {
@@ -185,12 +191,8 @@ func TestPostgresRuleMockCustomHostPort(t *testing.T) {
 	if runErr != nil {
 		t.Fatalf("Run() error: %v", runErr)
 	}
-	if result.Details[strHost] != "db.example.com" {
-		t.Errorf("host = %q, want 'db.example.com'", result.Details[strHost])
-	}
-	if result.Details["port"] != "5433" {
-		t.Errorf("port = %q, want '5433'", result.Details["port"])
-	}
+	pgAssertDetail(t, result, strHost, "db.example.com")
+	pgAssertDetail(t, result, "port", "5433")
 }
 
 func TestPostgresRuleMockUsesCommandRunner(t *testing.T) {
@@ -299,12 +301,8 @@ func TestPostgresRuleDefaultHostPort(t *testing.T) {
 	if runErr != nil {
 		t.Fatalf("Run() error: %v", runErr)
 	}
-	if result.Details[strHost] != "localhost" {
-		t.Errorf("default host = %q, want 'localhost'", result.Details[strHost])
-	}
-	if result.Details["port"] != "5432" {
-		t.Errorf("default port = %q, want '5432'", result.Details["port"])
-	}
+	pgAssertDetail(t, result, strHost, "localhost")
+	pgAssertDetail(t, result, "port", "5432")
 }
 
 func TestPostgresRuleRunWithNonLocalhost(t *testing.T) {
@@ -317,15 +315,9 @@ func TestPostgresRuleRunWithNonLocalhost(t *testing.T) {
 	if runErr != nil {
 		t.Fatalf("Run() error: %v", runErr)
 	}
-	if result.Details[strHost] != "192.0.2.1" {
-		t.Errorf("host = %q, want '192.0.2.1'", result.Details[strHost])
-	}
-	if result.Details["port"] != "5433" {
-		t.Errorf("port = %q, want '5433'", result.Details["port"])
-	}
-	if result.Status != diagnose.StatusFailed {
-		t.Errorf("Expected StatusFailed for unreachable host, got %v", result.Status)
-	}
+	pgAssertDetail(t, result, strHost, "192.0.2.1")
+	pgAssertDetail(t, result, "port", "5433")
+	pgAssertStatus(t, result, diagnose.StatusFailed)
 	if result.SuggestedFix == "" {
 		t.Error("Expected non-empty SuggestedFix")
 	}
