@@ -110,8 +110,8 @@ func TestWrap_ErrorContext_IncludesTags(t *testing.T) {
 	classified := Wrap(base, errorfamily.Transient)
 
 	ctx := classified.ErrorContext()
-	if ctx["tags"] == "" {
-		t.Error("ErrorContext()[tags] is empty, want tags present")
+	if ctx["tags"] != "timeout,connection" {
+		t.Errorf("ErrorContext()[tags] = %q, want %q", ctx["tags"], "timeout,connection")
 	}
 }
 

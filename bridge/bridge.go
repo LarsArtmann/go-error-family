@@ -20,6 +20,7 @@ package bridge
 import (
 	"errors"
 	"fmt"
+	"strings"
 
 	errorfamily "github.com/larsartmann/go-error-family"
 	"github.com/samber/oops"
@@ -136,7 +137,7 @@ func (c *ClassifiedError) ErrorContext() map[string]string {
 		out["domain"] = domain
 	}
 	if tags := c.Tags(); len(tags) > 0 {
-		out["tags"] = fmt.Sprint(tags)
+		out["tags"] = strings.Join(tags, ",")
 	}
 	return out
 }
