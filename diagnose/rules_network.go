@@ -38,6 +38,13 @@ func (r *NetworkRule) Run(ctx context.Context, err error) (*DiagnosticResult, er
 		Context:    ErrorContext(err),
 	}
 
+	if host == "" {
+		result.Status = StatusUnknown
+		result.Summary = "No host found in error context"
+		result.Confidence = ConfidenceNone
+		return result, nil
+	}
+
 	// Check 1: DNS resolution.
 	ips, dnsErr := net.DefaultResolver.LookupHost(ctx, host)
 	if dnsErr != nil {
