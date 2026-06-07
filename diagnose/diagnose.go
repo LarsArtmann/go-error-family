@@ -98,6 +98,11 @@ func (s Status) String() string {
 	}
 }
 
+// IsValid reports whether the Status value is one of the four defined constants.
+func (s Status) IsValid() bool {
+	return s >= StatusHealthy && s <= StatusUnknown
+}
+
 // DiagnosticResult holds the outcome of a single diagnostic check.
 type DiagnosticResult struct {
 	RuleName     string
