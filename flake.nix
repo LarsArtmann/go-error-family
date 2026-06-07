@@ -37,7 +37,7 @@
           ...
         }:
         let
-          goPkg = pkgs.go_1_26;
+          goPkg = goPkg;
 
           mkApp = name: runtimeInputs: text: {
             type = "app";
@@ -55,6 +55,7 @@
             };
           };
 
+          checks.format = config.treefmt.build.check self;
           devShells = {
             default = pkgs.mkShellNoCC {
               packages = [
@@ -74,8 +75,7 @@
                 goPkg
                 pkgs.golangci-lint
               ];
-            };
-          };
+            };          };
 
           checks = {
             build = pkgs.runCommand "go-error-family-build" { nativeBuildInputs = [ goPkg ]; } ''
