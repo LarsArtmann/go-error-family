@@ -55,17 +55,26 @@
             };
           };
 
-          devShells.default = pkgs.mkShellNoCC {
-            packages = [
-              goPkg
-              pkgs.golangci-lint
-              pkgs.gotools
-              pkgs.trash-cli
-            ];
+          devShells = {
+            default = pkgs.mkShellNoCC {
+              packages = [
+                goPkg
+                pkgs.golangci-lint
+                pkgs.gotools
+                pkgs.trash-cli
+              ];
 
-            shellHook = ''
-              echo "go-error-family dev shell — $(go version)"
-            '';
+              shellHook = ''
+                echo "go-error-family dev shell — $(go version)"
+              '';
+            };
+
+            ci = pkgs.mkShellNoCC {
+              packages = [
+                goPkg
+                pkgs.golangci-lint
+              ];
+            };
           };
 
           checks = {
