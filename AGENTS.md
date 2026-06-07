@@ -108,7 +108,7 @@ Connects go-error-family with `samber/oops`. Separate module with its own `go.mo
 - Do NOT use `//nolint:gosec` directives for G304 in the diagnose package — the `.golangci.yml` exclusion handles it. Inline nolint directives break when `golines` wraps lines.
 - `ContextKey` type replaces raw strings in rule specs. `CodeContains` fields still use raw strings (different semantic — substring matching on error codes, not context keys).
 - `CommandRunner` interface allows mock injection; `DefaultCommandRunner` wraps real system calls.
-- `gochecknoglobals` and `gochecknoinits` are NOT enabled — the library uses legitimate package-level vars (mutex-protected registries, lookup tables, rule specs).
+- `gochecknoglobals` is enabled but suppressed via `//nolint:gochecknoglobals` on each legitimate package-level var (mutex-protected registries, immutable lookup tables, rule specs) — the BuildFlow pre-commit auto-configure hook re-enables it if disabled in `.golangci.yml`.
 - `exhaustruct` is enabled but most project types are excluded via `.golangci.yml` because they have intentional optional fields (HandleConfig, MessageTemplate, DiagnosticResult, etc.). Test files also exclude exhaustruct.
 - `flake.nix` uses `pkgs.go_1_26` as `goPkg` — do NOT use `let goPkg = goPkg;` (infinite recursion).
 - `lookupRegistered` uses `RLock` with deferred unlock for iteration (no snapshot copy) — safe because write paths hold full `Lock`.
@@ -116,3 +116,5 @@ Connects go-error-family with `samber/oops`. Separate module with its own `go.mo
 - `diagnose.Status` has `IsValid()` matching `Family.IsValid()` pattern.
 - `diagnose.sortByConfidence` uses `slices.SortFunc` (Go 1.26 stdlib).
 - CI now has explicit `bridge/` test and lint steps.
+- `familyInfo` includes `Audience` field — adding a new Family truly requires only one entry in `familyData`.
+- `NetworkRule.Run` returns `StatusUnknown` when no host found in error context (prevents undefined DNS behavior).
