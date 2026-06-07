@@ -29,9 +29,6 @@ linters:
         - forcetypeassert
         - funlen
         - ginkgolinter
-        - gochecknoglobals
-        - gochecknoinits
-        - gochecksumtype
         - gocognit
         - goconst
         - gocritic
@@ -84,6 +81,21 @@ linters:
         exhaustruct:
             exclude:
                 - os/exec.Cmd
+                - os/exec.ExitError
+                - net.Dialer
+                - github.com/larsartmann/go-error-family.HandleConfig
+                - github.com/larsartmann/go-error-family.HandleResult
+                - github.com/larsartmann/go-error-family.MessageTemplate
+                - github.com/larsartmann/go-error-family.DiagnosticFinding
+                - github.com/larsartmann/go-error-family.familyInfo
+                - github.com/larsartmann/go-error-family/diagnose.DiagnosticResult
+                - github.com/larsartmann/go-error-family/diagnose.Runner
+                - github.com/larsartmann/go-error-family/diagnose.RuleSpec
+                - github.com/larsartmann/go-error-family/diagnose.MockCommandRunner
+                - github.com/larsartmann/go-error-family/diagnose.ruleResult
+                - github.com/larsartmann/go-error-family/diagnose.staticRule
+                - github.com/larsartmann/go-error-family/agent.AgentResult
+                - github.com/larsartmann/go-error-family/agent.Config
         gocritic:
             disabled-checks:
                 - ifElseChain
@@ -103,6 +115,7 @@ linters:
                 - errcheck
                 - paralleltest
                 - revive
+                - exhaustruct
             - path: diagnose/
               linters:
                 - wrapcheck
@@ -124,6 +137,14 @@ linters:
               text: unused
               linters:
                 - unused
+            - path: classify\.go
+              text: anonymous.*is missing field mu
+              linters:
+                - exhaustruct
+            - path: handle\.go
+              text: anonymous.*is missing field mu
+              linters:
+                - exhaustruct
         paths:
             - \.gen\.go$
             - _mock\.go$

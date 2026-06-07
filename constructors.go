@@ -11,6 +11,7 @@ func New(family Family, code, message string) *Error {
 		code:      code,
 		message:   message,
 		family:    family,
+		cause:     nil,
 		context:   make(map[string]string),
 		timestamp: time.Now().UTC(),
 	}

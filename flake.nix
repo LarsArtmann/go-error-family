@@ -37,7 +37,7 @@
           ...
         }:
         let
-          goPkg = goPkg;
+          goPkg = pkgs.go_1_26;
 
           mkApp = name: runtimeInputs: text: {
             type = "app";

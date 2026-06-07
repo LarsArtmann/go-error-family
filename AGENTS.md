@@ -94,12 +94,12 @@ Connects go-error-family with `samber/oops`. Separate module with its own `go.mo
 | `bridge.Wrap(err, family)` | Attach a Family to any error, preserving OopsError context                            |
 | `bridge.AutoWrap(err)`     | Infer Family from oops metadata (tags + domain), then wrap                            |
 | `bridge.InferFamily(err)`  | Derive Family from oops tags (explicit) → domain (structural) → Transient (fail-open) |
-| `ClassifiedOops`           | Embeds `oops.OopsError`; satisfies `Classified`, `Retryable`, `Contextual`            |
+| `ClassifiedError`          | Embeds `oops.OopsError`; satisfies `Classified`, `Coded`, `Retryable`, `Contextual`            |
 
 **Tag overrides** (checked first): `retryable`, `transient`, `conflict`, `corruption`/`corrupted`, `rejection`/`rejected`, `infrastructure`/`infra`.
 **Domain defaults** (checked second): `validation`/`auth` → Rejection, `database`/`network`/`cache`/`queue` → Transient, `storage`/`infra`/`startup` → Infrastructure, `data`/`schema`/`migration` → Corruption.
 
-**Surprising:** `Wrap(nil, family)` returns a ClassifiedOops with zero OopsError — `Error()` returns `[family]`, `Unwrap()` returns nil. This is intentional: nil is still classifiable.
+**Surprising:** `Wrap(nil, family)` returns a ClassifiedError with zero OopsError — `Error()` returns `[family]`, `Unwrap()` returns nil. This is intentional: nil is still classifiable.
 
 ## Lint Configuration
 
@@ -109,3 +109,7 @@ Connects go-error-family with `samber/oops`. Separate module with its own `go.mo
 - Do NOT use `//nolint:gosec` directives for G304 in the diagnose package — the `.golangci.yml` exclusion handles it. Inline nolint directives break when `golines` wraps lines.
 - `ContextKey` type replaces raw strings in rule specs. `CodeContains` fields still use raw strings (different semantic — substring matching on error codes, not context keys).
 - `CommandRunner` interface allows mock injection; `DefaultCommandRunner` wraps real system calls.
+- `gochecknoglobals` and `gochecknoinits` are NOT enabled — the library uses legitimate package-level vars (mutex-protected registries, lookup tables, rule specs).
+- `exhaustruct` is enabled but most project types are excluded via `.golangci.yml` because they have intentional optional fields (HandleConfig, MessageTemplate, DiagnosticResult, etc.). Test files also exclude exhaustruct.
+- `flake.nix` uses `pkgs.go_1_26` as `goPkg` — do NOT use `let goPkg = goPkg;` (infinite recursion).
+- `lookupRegistered` uses `RLock` with deferred unlock for iteration (no snapshot copy) — safe because write paths hold full `Lock`.

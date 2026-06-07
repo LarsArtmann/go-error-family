@@ -22,7 +22,7 @@ errorfamily/          ← root package: types, constructors, classification, CLI
 
 diagnose/             ← concurrent diagnostic rules (zero-dep core)
   diagnose.go           Runner, DiagnosticRule, RuleSpec, CommandRunner, ContextKey, ErrorContext
-  context.go            RunCommand, CommandExists, DefaultCommandRunner
+  command.go           RunCommand, CommandExists, DefaultCommandRunner
   rules_filesystem.go   FilesystemRule
   rules_network.go      NetworkRule
 
@@ -36,7 +36,7 @@ agent/                ← analysis-only debug agent
   agent.go              DebugAgent interface, deterministic analyzer
 
 bridge/               ← submodule: samber/oops integration (opt-in, depends on both libraries)
-  bridge.go             ClassifiedOops (satisfies Classified, Coded, Retryable, Contextual), Wrap
+  bridge.go             ClassifiedError (satisfies Classified, Coded, Retryable, Contextual), Wrap
   classify.go           InferFamily, AutoWrap (tag/domain → Family mapping)
 ```
 
@@ -398,11 +398,11 @@ type MyRule struct {
 
 `bridge/` is a separate Go module that connects go-error-family with samber/oops. It has its own `go.mod` with both libraries as dependencies. The root package remains zero-dependency.
 
-### ClassifiedOops
+### ClassifiedError
 
 ```go
 // Wraps any error with a behavioral Family + oops context
-type ClassifiedOops struct {
+type ClassifiedError struct {
     oops.OopsError           // preserves all oops methods (Stacktrace, Sources, etc.)
     // satisfies: Classified, Coded, Retryable, Contextual, fmt.Formatter
 }
@@ -421,7 +421,7 @@ family := bridge.InferFamily(err)           // just the Family, no wrapping
 2. **Domain** (structural) — `validation`/`auth` -> Rejection, `database`/`network`/`cache`/`queue` -> Transient, `storage`/`infra`/`startup` -> Infrastructure, `data`/`schema`/`migration` -> Corruption
 3. **Default** — `Transient` (fail-open, consistent with root Classify)
 
-### What ClassifiedOops bridges
+### What ClassifiedError bridges
 
 | oops method  | error-family interface                          | Notes                                      |
 | ------------ | ----------------------------------------------- | ------------------------------------------ |
