@@ -126,3 +126,24 @@ func TestDefaultRunner(t *testing.T) {
 		t.Fatal("DefaultRunner() returned nil")
 	}
 }
+
+func TestStatusIsValid(t *testing.T) {
+	tests := []struct {
+		status Status
+		want   bool
+	}{
+		{StatusHealthy, true},
+		{StatusDegraded, true},
+		{StatusFailed, true},
+		{StatusUnknown, true},
+		{Status(42), false},
+		{Status(-1), false},
+	}
+	for _, tt := range tests {
+		t.Run(tt.status.String(), func(t *testing.T) {
+			if got := tt.status.IsValid(); got != tt.want {
+				t.Errorf("Status(%d).IsValid() = %v, want %v", tt.status, got, tt.want)
+			}
+		})
+	}
+}
