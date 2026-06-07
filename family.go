@@ -47,52 +47,58 @@ const (
 // familyInfo holds all per-family data in one place.
 // Adding a new family requires exactly one entry here.
 type familyInfo struct {
-	Name    string
-	Exit    int
-	Tone    Tone
-	Message string
-	Why     string
-	Fix     string
+	Name     string
+	Exit     int
+	Tone     Tone
+	Audience Audience
+	Message  string
+	Why      string
+	Fix      string
 }
 
 var familyData = [...]familyInfo{ //nolint:gochecknoglobals // Immutable lookup table for Family metadata.
 	Rejection: {
-		Name:    strRejection,
-		Exit:    1,
-		Tone:    ToneInstructional,
-		Message: "The request was invalid. Check your input and try again.",
-		Fix:     msgCheckInput,
+		Name:     strRejection,
+		Exit:     1,
+		Tone:     ToneInstructional,
+		Audience: AudienceUser,
+		Message:  "The request was invalid. Check your input and try again.",
+		Fix:      msgCheckInput,
 	},
 	Conflict: {
-		Name:    strConflict,
-		Exit:    1,
-		Tone:    ToneExplanatory,
-		Message: "A conflict was detected. Refresh and try again.",
-		Fix:     msgRefreshData,
+		Name:     strConflict,
+		Exit:     1,
+		Tone:     ToneExplanatory,
+		Audience: AudienceUser,
+		Message:  "A conflict was detected. Refresh and try again.",
+		Fix:      msgRefreshData,
 	},
 	Transient: {
-		Name:    strTransient,
-		Exit:    75,
-		Tone:    ToneReassuring,
-		Message: "A temporary error occurred. Please try again in a few moments.",
-		Why:     "This is a temporary issue. No data was lost.",
-		Fix:     "Wait a moment and try again.",
+		Name:     strTransient,
+		Exit:     75,
+		Tone:     ToneReassuring,
+		Audience: AudienceAll,
+		Message:  "A temporary error occurred. Please try again in a few moments.",
+		Why:      "This is a temporary issue. No data was lost.",
+		Fix:      "Wait a moment and try again.",
 	},
 	Corruption: {
-		Name:    strCorruption,
-		Exit:    65,
-		Tone:    ToneUrgent,
-		Message: "Data appears to be corrupted. This requires manual intervention.",
-		Why:     "Some data appears to be damaged. This requires attention.",
-		Fix:     "This may require manual intervention. Check the logs for details.",
+		Name:     strCorruption,
+		Exit:     65,
+		Tone:     ToneUrgent,
+		Audience: AudienceOps,
+		Message:  "Data appears to be corrupted. This requires manual intervention.",
+		Why:      "Some data appears to be damaged. This requires attention.",
+		Fix:      "This may require manual intervention. Check the logs for details.",
 	},
 	Infrastructure: {
-		Name:    strInfrastructure,
-		Exit:    69,
-		Tone:    ToneApologetic,
-		Message: "The service is currently unavailable. Please try again later.",
-		Why:     "This is a system issue, not something you caused.",
-		Fix:     "The service may be temporarily unavailable. Try again later.",
+		Name:     strInfrastructure,
+		Exit:     69,
+		Tone:     ToneApologetic,
+		Audience: AudienceOps,
+		Message:  "The service is currently unavailable. Please try again later.",
+		Why:      "This is a system issue, not something you caused.",
+		Fix:      "The service may be temporarily unavailable. Try again later.",
 	},
 }
 
@@ -186,16 +192,10 @@ func (a Audience) String() string {
 
 // Audience returns who should be notified about errors of this family.
 func (f Family) Audience() Audience {
-	switch f {
-	case Rejection, Conflict:
-		return AudienceUser
-	case Corruption, Infrastructure:
-		return AudienceOps
-	case Transient:
-		return AudienceAll
-	default:
-		return AudienceOps
+	if f.IsValid() {
+		return familyData[f].Audience
 	}
+	return AudienceOps
 }
 
 // Tone is a presentation tone hint for error messages.
