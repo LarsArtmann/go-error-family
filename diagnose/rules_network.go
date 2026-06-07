@@ -22,7 +22,7 @@ func (r *NetworkRule) Applicable(err error) bool {
 	return networkSpec.Matches(err)
 }
 
-var networkSpec = RuleSpec{
+var networkSpec = RuleSpec{ //nolint:gochecknoglobals // Immutable rule matching spec.
 	ContextKeys:   []ContextKey{KeyHost, KeyPort, KeyURL, KeyEndpoint, KeyAddress, KeyRemote},
 	CodeContains:  []string{"network", "connect", "dial", "timeout"},
 	ContextSubstr: []string{"connection refused", "no such host", "i/o timeout"},

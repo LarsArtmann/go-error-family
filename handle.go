@@ -267,7 +267,7 @@ func lookupDefault(code string) (MessageTemplate, bool) {
 
 // defaultMessages maps error codes (lowercase) to human-readable messages.
 // Codes are matched exactly — no substring matching.
-var defaultMessages = map[string]MessageTemplate{
+var defaultMessages = map[string]MessageTemplate{ //nolint:gochecknoglobals // Immutable default message templates.
 	codeFileNotFound: {
 		What: "A required resource was not found.",
 		Fix:  "Check that the path and resource name are correct.",
@@ -325,7 +325,7 @@ func UnregisterTemplate(code string) {
 	delete(templateRegistry.entries, strings.ToLower(code))
 }
 
-var templateRegistry = struct {
+var templateRegistry = struct { //nolint:gochecknoglobals // Mutex-protected template registry, populated via RegisterTemplate.
 	mu      sync.RWMutex
 	entries map[string]MessageTemplate
 }{

@@ -112,7 +112,7 @@ func RegisterClassifications(classifications map[error]Family) {
 	maps.Copy(registry.entries, classifications)
 }
 
-var registry = struct {
+var registry = struct { //nolint:gochecknoglobals // Mutex-protected classification registry, populated via RegisterClassification.
 	mu      sync.RWMutex
 	entries map[error]Family
 }{

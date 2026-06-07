@@ -21,7 +21,7 @@ func (r *FilesystemRule) Applicable(err error) bool {
 	return filesystemSpec.Matches(err)
 }
 
-var filesystemSpec = RuleSpec{
+var filesystemSpec = RuleSpec{ //nolint:gochecknoglobals // Immutable rule matching spec.
 	ContextKeys: []ContextKey{
 		KeyPath,
 		KeyFile,

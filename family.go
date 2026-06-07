@@ -55,7 +55,7 @@ type familyInfo struct {
 	Fix     string
 }
 
-var familyData = [...]familyInfo{
+var familyData = [...]familyInfo{ //nolint:gochecknoglobals // Immutable lookup table for Family metadata.
 	Rejection: {
 		Name:    strRejection,
 		Exit:    1,
