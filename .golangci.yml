@@ -29,6 +29,9 @@ linters:
         - forcetypeassert
         - funlen
         - ginkgolinter
+        - gochecknoglobals
+        - gochecknoinits
+        - gochecksumtype
         - gocognit
         - goconst
         - gocritic
@@ -96,6 +99,9 @@ linters:
                 - github.com/larsartmann/go-error-family/diagnose.staticRule
                 - github.com/larsartmann/go-error-family/agent.AgentResult
                 - github.com/larsartmann/go-error-family/agent.Config
+        ginkgolinter:
+            forbid-focus-container: true
+            forbid-spec-pollution: true
         gocritic:
             disabled-checks:
                 - ifElseChain
@@ -105,6 +111,10 @@ linters:
                   name: exported
                 - disabled: true
                   name: package-comments
+        testifylint:
+            disable:
+                - go-require
+            enable-all: true
     exclusions:
         generated: lax
         rules:
