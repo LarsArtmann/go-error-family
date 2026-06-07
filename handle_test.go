@@ -91,7 +91,6 @@ func TestHandleErrorWithConfigDiagnostics(t *testing.T) {
 
 	code := HandleErrorWithConfig(err, HandleConfig{
 		Output:         &buf,
-		Diagnose:       true,
 		DiagnosticFunc: testDiagnosticFunc,
 		OnDiagnosed:    testOnDiagnosedPtr(&called),
 	})
@@ -103,19 +102,15 @@ func TestHandleErrorWithConfigDiagnostics(t *testing.T) {
 	}
 }
 
-func TestHandleErrorWithConfigNoDiagnoseWhenDisabled(t *testing.T) {
+func TestHandleErrorWithConfigNoDiagnoseWhenFuncNil(t *testing.T) {
 	var buf bytes.Buffer
-	called := false
 	err := NewTransient("test", "msg")
 
-	HandleErrorWithConfig(err, HandleConfig{
-		Output:         &buf,
-		Diagnose:       false,
-		DiagnosticFunc: testDiagnosticFunc,
-		OnDiagnosed:    testOnDiagnosedPtr(&called),
+	code := HandleErrorWithConfig(err, HandleConfig{
+		Output: &buf,
 	})
-	if called {
-		t.Error("OnDiagnosed should NOT be called when Diagnose is false")
+	if code != 75 {
+		t.Errorf("exit code = %d, want 75", code)
 	}
 }
 

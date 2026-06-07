@@ -77,7 +77,6 @@ func TestHandleErrorWithContextPropagatesContext(t *testing.T) {
 	var buf bytes.Buffer
 	code := HandleErrorWithContext(ctx, err, HandleConfig{
 		Output:         &buf,
-		Diagnose:       true,
 		DiagnosticFunc: diagFunc,
 	})
 	if code != 75 {
@@ -105,7 +104,6 @@ func TestHandleErrorWithContextCancelled(t *testing.T) {
 	var buf bytes.Buffer
 	_ = HandleErrorWithContext(ctx, err, HandleConfig{
 		Output:         &buf,
-		Diagnose:       true,
 		DiagnosticFunc: diagFunc,
 	})
 	if !called {

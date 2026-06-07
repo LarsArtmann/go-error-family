@@ -29,8 +29,6 @@ linters:
         - forcetypeassert
         - funlen
         - ginkgolinter
-        - gochecknoglobals
-        - gochecknoinits
         - gochecksumtype
         - gocognit
         - goconst

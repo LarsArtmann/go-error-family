@@ -41,14 +41,12 @@ type HandleConfig struct {
 	// Output is where human-readable messages are written. Defaults to os.Stderr.
 	Output io.Writer
 
-	// Diagnose controls whether automatic diagnostic rules are run.
-	Diagnose bool
-
 	// TemplateOverride overrides the default message template for a specific error code.
 	// map[errorCode]MessageTemplate
 	TemplateOverride map[string]MessageTemplate
 
 	// DiagnosticFunc runs diagnostics for the error. If nil, no diagnostics run.
+	// When set, diagnostics run automatically — no separate enable flag needed.
 	DiagnosticFunc DiagnosticFunc
 
 	// OnDiagnosed is called after diagnostics complete, before exit.
@@ -133,7 +131,7 @@ func HandleErrorWithContext(ctx context.Context, err error, cfg HandleConfig) in
 	code := extractCode(err)
 	errCtx := extractContext(err)
 
-	if cfg.Diagnose && cfg.DiagnosticFunc != nil {
+	if cfg.DiagnosticFunc != nil {
 		findings := cfg.DiagnosticFunc(ctx, err)
 		if cfg.OnDiagnosed != nil {
 			cfg.OnDiagnosed(err, findings)
