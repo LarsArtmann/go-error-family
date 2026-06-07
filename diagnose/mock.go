@@ -12,7 +12,7 @@ import (
 type MockCommandRunner struct {
 	mu        sync.Mutex
 	Responses map[string]MockResponse
-	Exists_   map[string]bool
+	ExistsMap map[string]bool
 	calls     []string
 }
 
@@ -27,7 +27,7 @@ type MockResponse struct {
 func NewMockCommandRunner() *MockCommandRunner {
 	return &MockCommandRunner{
 		Responses: make(map[string]MockResponse),
-		Exists_:   make(map[string]bool),
+		ExistsMap: make(map[string]bool),
 	}
 }
 
@@ -53,7 +53,7 @@ func (m *MockCommandRunner) Exists(name string) bool {
 	m.mu.Lock()
 	defer m.mu.Unlock()
 	m.calls = append(m.calls, "exists:"+name)
-	return m.Exists_[name]
+	return m.ExistsMap[name]
 }
 
 // Calls returns a copy of all recorded calls.

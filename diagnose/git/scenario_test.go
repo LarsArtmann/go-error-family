@@ -30,7 +30,7 @@ func TestGitRuleMockNoGitBinary(t *testing.T) {
 	initGitRepo(t, tmpDir)
 
 	mr := newMockRunner()
-	mr.Exists_["git"] = false
+	mr.ExistsMap["git"] = false
 	r := &GitRule{Runner: mr}
 	err := errorfamily.NewTransient("git.error", "msg").WithContext("repo", tmpDir)
 
@@ -49,7 +49,7 @@ func TestGitRuleMockCleanWorkingTree(t *testing.T) {
 	initGitRepo(t, tmpDir)
 
 	mr := newMockRunner()
-	mr.Exists_["git"] = true
+	mr.ExistsMap["git"] = true
 	mr.Responses["git -C "+tmpDir+" status --porcelain"] = diagnose.MockResponse{Stdout: "", ExitCode: 0}
 	mr.Responses["git -C "+tmpDir+" remote"] = diagnose.MockResponse{Stdout: "", ExitCode: 0}
 
@@ -70,7 +70,7 @@ func TestGitRuleMockDirtyWorkingTree(t *testing.T) {
 	initGitRepo(t, tmpDir)
 
 	mr := newMockRunner()
-	mr.Exists_["git"] = true
+	mr.ExistsMap["git"] = true
 	mr.Responses["git -C "+tmpDir+" status --porcelain"] = diagnose.MockResponse{
 		Stdout:   "?? untracked.txt\n M modified.txt",
 		ExitCode: 0,
@@ -96,7 +96,7 @@ func TestGitRuleMockMergeConflicts(t *testing.T) {
 	initGitRepo(t, tmpDir)
 
 	mr := newMockRunner()
-	mr.Exists_["git"] = true
+	mr.ExistsMap["git"] = true
 	mr.Responses["git -C "+tmpDir+" status --porcelain"] = diagnose.MockResponse{
 		Stdout:   "UU file1.txt\nUU file2.txt\nAA file3.txt",
 		ExitCode: 0,
@@ -121,7 +121,7 @@ func TestGitRuleMockGitStatusFails(t *testing.T) {
 	initGitRepo(t, tmpDir)
 
 	mr := newMockRunner()
-	mr.Exists_["git"] = true
+	mr.ExistsMap["git"] = true
 	mr.Responses["git -C "+tmpDir+" status --porcelain"] = diagnose.MockResponse{
 		Stdout:   "fatal: not a git object",
 		ExitCode: 128,
@@ -142,7 +142,7 @@ func TestGitRuleMockUnreachableRemote(t *testing.T) {
 	initGitRepo(t, tmpDir)
 
 	mr := newMockRunner()
-	mr.Exists_["git"] = true
+	mr.ExistsMap["git"] = true
 	mr.Responses["git -C "+tmpDir+" status --porcelain"] = diagnose.MockResponse{Stdout: "", ExitCode: 0}
 	mr.Responses["git -C "+tmpDir+" remote"] = diagnose.MockResponse{Stdout: "origin", ExitCode: 0}
 	mr.Responses["git -C "+tmpDir+" ls-remote --heads origin"] = diagnose.MockResponse{
@@ -166,7 +166,7 @@ func TestGitRuleMockReachableRemote(t *testing.T) {
 	initGitRepo(t, tmpDir)
 
 	mr := newMockRunner()
-	mr.Exists_["git"] = true
+	mr.ExistsMap["git"] = true
 	mr.Responses["git -C "+tmpDir+" status --porcelain"] = diagnose.MockResponse{Stdout: "", ExitCode: 0}
 	mr.Responses["git -C "+tmpDir+" remote"] = diagnose.MockResponse{Stdout: "origin", ExitCode: 0}
 	mr.Responses["git -C "+tmpDir+" ls-remote --heads origin"] = diagnose.MockResponse{
@@ -190,7 +190,7 @@ func TestGitRuleMockCallsCommandRunner(t *testing.T) {
 	initGitRepo(t, tmpDir)
 
 	mr := newMockRunner()
-	mr.Exists_["git"] = true
+	mr.ExistsMap["git"] = true
 	mr.Responses["git -C "+tmpDir+" status --porcelain"] = diagnose.MockResponse{Stdout: "", ExitCode: 0}
 	mr.Responses["git -C "+tmpDir+" remote"] = diagnose.MockResponse{Stdout: "", ExitCode: 0}
 
