@@ -2,7 +2,7 @@
 
 Structured error protocol library. Library only — no `main`, no build system, no external deps. Full API reference: `SKILL.md`.
 
-**Last Updated:** 2026-06-05
+**Last Updated:** 2026-06-08
 **Version:** v0.3.0
 **Status:** All tests pass (root + bridge + submodules), 0 lint issues, 0 race conditions
 **Workspace modules:** root (zero-dep), `bridge` (oops integration), `diagnose/git`, `diagnose/postgres`
@@ -31,7 +31,6 @@ go build ./...                                 # build check
 | ----------------------------------------- | ---------------------------------------------------------- |
 | `HandleErrorWithContext(ctx, err, cfg)`   | Context-propagating CLI boundary handler                   |
 | `HandleErrorDetailedWithConfig(err, cfg)` | Template-aware structured result                           |
-| `Compose(errs...)`                        | `errors.Join` wrapper for partial-success                  |
 | `Error.WithTimestamp(ts)`                 | Deterministic timestamp for testing                        |
 | `diagnose.CommandRunner`                  | Injectable command execution interface                     |
 | `diagnose.DefaultCommandRunner{}`         | Default implementation using `RunCommand`/`CommandExists`  |
@@ -103,7 +102,7 @@ Connects go-error-family with `samber/oops`. Separate module with its own `go.mo
 
 ## Lint Configuration
 
-**Updated:** 2026-05-31
+**Updated:** 2026-06-08
 
 - G304 (gosec file inclusion) is excluded for `diagnose/rules_filesystem.go` via `.golangci.yml` path-based exclusion — `os.Open(path)` and `os.Create(testFile)` are intentional in diagnostic rules.
 - Do NOT use `//nolint:gosec` directives for G304 in the diagnose package — the `.golangci.yml` exclusion handles it. Inline nolint directives break when `golines` wraps lines.
@@ -113,3 +112,7 @@ Connects go-error-family with `samber/oops`. Separate module with its own `go.mo
 - `exhaustruct` is enabled but most project types are excluded via `.golangci.yml` because they have intentional optional fields (HandleConfig, MessageTemplate, DiagnosticResult, etc.). Test files also exclude exhaustruct.
 - `flake.nix` uses `pkgs.go_1_26` as `goPkg` — do NOT use `let goPkg = goPkg;` (infinite recursion).
 - `lookupRegistered` uses `RLock` with deferred unlock for iteration (no snapshot copy) — safe because write paths hold full `Lock`.
+- `HandleConfig.Diagnose` bool was removed — diagnostics now run whenever `DiagnosticFunc` is set. No separate enable flag.
+- `diagnose.Status` has `IsValid()` matching `Family.IsValid()` pattern.
+- `diagnose.sortByConfidence` uses `slices.SortFunc` (Go 1.26 stdlib).
+- CI now has explicit `bridge/` test and lint steps.

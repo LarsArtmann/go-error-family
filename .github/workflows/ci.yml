@@ -24,6 +24,10 @@ jobs:
       - name: Run tests (workspace)
         run: go test -race -count=1 ./...
 
+      - name: Run tests (bridge submodule)
+        working-directory: ./bridge
+        run: go test -race -count=1 ./...
+
       - name: Run tests (git submodule)
         working-directory: ./diagnose/git
         run: go test -race -count=1 ./...
@@ -51,6 +55,13 @@ jobs:
         with:
           version: latest
           args: --timeout=5m
+
+      - name: Run golangci-lint (bridge submodule)
+        uses: golangci/golangci-lint-action@v6
+        with:
+          version: latest
+          args: --timeout=5m
+          working-directory: ./bridge
 
       - name: Run golangci-lint (git submodule)
         uses: golangci/golangci-lint-action@v6

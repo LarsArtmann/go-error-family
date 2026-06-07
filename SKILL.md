@@ -188,7 +188,7 @@ combined := errorfamily.Compose(err1, err2)  // errors.Join wrapper
 1. **Multi-error** (`errors.Join`) → classify each sub-error, first non-Transient wins
 2. `Classified` interface → `ErrorFamily()`
 3. `Retryable` interface → infer `Transient` (true) or `Rejection` (false)
-4. Registered sentinels via `errors.Is` chain walk (lock-free snapshot)
+4. Registered sentinels via `errors.Is` chain walk (RLock-protected iteration)
 5. Default → `Transient` (fail-open)
 
 ### CLI Boundary (main.go pattern)
@@ -224,7 +224,6 @@ result := errorfamily.HandleErrorDetailedWithConfig(err, cfg)
 ```go
 exitCode := errorfamily.HandleErrorWithConfig(err, errorfamily.HandleConfig{
     Output: os.Stderr,
-    Diagnose: true,
     DiagnosticFunc: func(ctx context.Context, err error) []errorfamily.DiagnosticFinding {
         return ... // adapt diagnose.Runner results
     },
@@ -460,14 +459,23 @@ Test files and scope:
 
 - `errorfamily_test.go` — Family, ParseFamily, Error, constructors, Classify, RegisterClassification, errors.Is/As integration
 - `benchmark_test.go` — Performance baselines for Classify, HandleError, ExitCode, ParseFamily, etc.
-- `handle_test.go` — HandleError, HandleErrorWithConfig, HandleErrorWithContext, HandleErrorDetailed, HandleErrorDetailedWithConfig, template overrides, diagnostics wiring
+- `handle_test.go` — HandleError, HandleErrorWithConfig, diagnostics wiring, template overrides
+- `handle_context_test.go` — HandleErrorWithContext, HandleErrorDetailed, context propagation, template overrides
+- `template_test.go` — MessageTemplate rendering, RegisterTemplate, case-insensitive matching
 - `fuzz_test.go` — FuzzParseFamily, FuzzClassify, FuzzErrorFormatting
-- `diagnose/diagnose_test.go` — Runner, rule matching helpers, Applicable, Run for FilesystemRule/NetworkRule
+- `example_test.go` — ExampleNewTransient, ExampleClassify, ExampleWrapRejection, ExampleParseFamily
+- `diagnose/helpers_test.go` — HasContextKey, ContextValue, HasContextSubstring, FamilyIs, ErrorCodeContains, RuleSpec
+- `diagnose/rules_test.go` — FilesystemRule and NetworkRule Applicable/Run
+- `diagnose/runner_test.go` — Runner, context cancellation, confidence sorting, error handling
 - `diagnose/benchmark_test.go` — Benchmarks for Runner.Run, RuleSpec.Matches, DefaultRunner
-- `diagnose/git/rules_git_test.go` — GitRule Applicable, Run
-- `diagnose/postgres/rules_postgres_test.go` — PostgresRule Applicable, Run, resolveHost, resolvePort, IsPostgresRunning
+- `diagnose/git/scenario_test.go` — GitRule with MockCommandRunner (repo, working tree, remote)
+- `diagnose/git/mock_test.go` — MockCommandRunner integration for git scenarios
+- `diagnose/git/integration_test.go` — GitRule against real git repos
+- `diagnose/postgres/rules_postgres_test.go` — PostgresRule Applicable, Run, resolveHost, IsPostgresRunning
 - `agent/agent_test.go` — Analyze (enabled/disabled/with diagnosis/empty/timeout), extractCommand
-- `bridge/bridge_test.go` — Wrap, AutoWrap, InferFamily, Coded interface, errors.Is, fmt.Formatter, ErrorContext bridging, examples
+- `bridge/wrap_test.go` — Wrap, family classification, Coded interface, errors.Is, fmt.Formatter, ErrorContext
+- `bridge/autowrap_test.go` — AutoWrap, tag overrides, domain defaults, integration, benchmarks, examples
+- `bridge/infer_test.go` — InferFamily, all tag overrides, all domain defaults, edge cases
 - `bridge/fuzz_test.go` — FuzzInferFamily, FuzzAutoWrap, FuzzWrapRoundTrip, FuzzWrapOopsRoundTrip, FuzzFormat
 
 **Coverage:** root 95.9% | agent 100% | diagnose core 67.1% | git 98.5% | postgres 81.0%
@@ -503,7 +511,7 @@ func TestExample(t *testing.T) {
 - **No external dependencies** — stdlib only
 - **Interfaces embed `error`** — for `errors.AsType[T]()` compatibility
 - **Data-driven patterns** — `familyData` array, `defaultMessages` map, `ruleSpec` structs
-- **Thread-safe registries** — `sync.RWMutex` for classification and template registries; snapshots for reads
+- **Thread-safe registries** — `sync.RWMutex` for classification and template registries; RLock iteration for reads
 - **Nil-safe** — `Wrap(nil, ...)` returns nil; `Classify(nil)` returns `Rejection`
 - **`maps.Clone`** for defensive copies in `ErrorContext()`
 - **Constructors set `timestamp: time.Now().UTC()`**
