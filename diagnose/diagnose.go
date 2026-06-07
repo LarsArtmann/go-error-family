@@ -36,6 +36,7 @@ package diagnose
 import (
 	"context"
 	"fmt"
+	"slices"
 	"sync"
 	"time"
 )
@@ -214,11 +215,16 @@ func sortByConfidence(results []*DiagnosticResult) []*DiagnosticResult {
 		}
 	}
 
-	for i := 1; i < len(filtered); i++ {
-		for j := i; j > 0 && filtered[j].Confidence > filtered[j-1].Confidence; j-- {
-			filtered[j], filtered[j-1] = filtered[j-1], filtered[j]
+	slices.SortFunc(filtered, func(a, b *DiagnosticResult) int {
+		switch {
+		case a.Confidence > b.Confidence:
+			return -1
+		case a.Confidence < b.Confidence:
+			return 1
+		default:
+			return 0
 		}
-	}
+	})
 
 	return filtered
 }
