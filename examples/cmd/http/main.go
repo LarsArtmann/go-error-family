@@ -6,6 +6,7 @@ package main
 
 import (
 	"encoding/json"
+	"errors"
 	"fmt"
 	"net/http"
 
@@ -40,14 +41,15 @@ func handleHTTPError(w http.ResponseWriter, err error) {
 	status := classifyToStatus(family)
 
 	var code string
-	var msg string
-	if c, ok := err.(interface{ ErrorCode() string }); ok {
+	if c, ok := errors.AsType[errorfamily.Coded](err); ok {
 		code = c.ErrorCode()
 	} else {
 		code = family.String()
 	}
-	if c, ok := err.(interface{ Message() string }); ok {
-		msg = c.Message()
+
+	var msg string
+	if e, ok := err.(*errorfamily.Error); ok {
+		msg = e.Message()
 	} else {
 		msg = err.Error()
 	}
