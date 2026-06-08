@@ -210,3 +210,64 @@ func TestParseAudience(t *testing.T) {
 		}
 	}
 }
+
+func TestFamilyMarshalText(t *testing.T) {
+	tests := []struct {
+		family Family
+		want   string
+	}{
+		{Rejection, "rejection"},
+		{Transient, "transient"},
+		{Infrastructure, "infrastructure"},
+	}
+	for _, tt := range tests {
+		got, err := tt.family.MarshalText()
+		if err != nil {
+			t.Fatalf("MarshalText() error: %v", err)
+		}
+		if string(got) != tt.want {
+			t.Errorf("MarshalText() = %q, want %q", got, tt.want)
+		}
+	}
+}
+
+func TestFamilyUnmarshalText(t *testing.T) {
+	tests := []struct {
+		input string
+		want  Family
+	}{
+		{"rejection", Rejection},
+		{"TRANSIENT", Transient},
+		{"unknown", Transient},
+		{"garbage", Transient},
+	}
+	for _, tt := range tests {
+		var f Family
+		if err := f.UnmarshalText([]byte(tt.input)); err != nil {
+			t.Fatalf("UnmarshalText(%q) error: %v", tt.input, err)
+		}
+		if f != tt.want {
+			t.Errorf("UnmarshalText(%q) = %v, want %v", tt.input, f, tt.want)
+		}
+	}
+}
+
+func TestAudienceMarshalText(t *testing.T) {
+	got, err := AudienceOps.MarshalText()
+	if err != nil {
+		t.Fatalf("MarshalText() error: %v", err)
+	}
+	if string(got) != "ops" {
+		t.Errorf("MarshalText() = %q, want %q", got, "ops")
+	}
+}
+
+func TestAudienceUnmarshalText(t *testing.T) {
+	var a Audience
+	if err := a.UnmarshalText([]byte("ALL")); err != nil {
+		t.Fatalf("UnmarshalText() error: %v", err)
+	}
+	if a != AudienceAll {
+		t.Errorf("UnmarshalText() = %v, want %v", a, AudienceAll)
+	}
+}

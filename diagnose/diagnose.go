@@ -110,7 +110,7 @@ func ParseStatus(s string) Status {
 }
 
 var statusNames = map[Status]string{ //nolint:gochecknoglobals // Immutable lookup table.
-	StatusHealthy: "healthy",
+	StatusHealthy:  "healthy",
 	StatusDegraded: "degraded",
 	StatusFailed:   "failed",
 	StatusUnknown:  strUnknown,

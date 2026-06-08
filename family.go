@@ -122,6 +122,18 @@ func ParseFamily(s string) Family {
 	return Transient
 }
 
+// MarshalText implements encoding.TextMarshaler for YAML/JSON config.
+func (f Family) MarshalText() ([]byte, error) {
+	return []byte(f.String()), nil
+}
+
+// UnmarshalText implements encoding.TextUnmarshaler for YAML/JSON config.
+// Unknown values are parsed as Transient (fail-open).
+func (f *Family) UnmarshalText(text []byte) error {
+	*f = ParseFamily(string(text))
+	return nil
+}
+
 // IsRetryable reports whether operations that encounter this error should be retried.
 func (f Family) IsRetryable() bool {
 	return f == Transient
@@ -199,6 +211,18 @@ func ParseAudience(s string) Audience {
 		}
 	}
 	return AudienceUser
+}
+
+// MarshalText implements encoding.TextMarshaler for YAML/JSON config.
+func (a Audience) MarshalText() ([]byte, error) {
+	return []byte(a.String()), nil
+}
+
+// UnmarshalText implements encoding.TextUnmarshaler for YAML/JSON config.
+// Unknown values are parsed as AudienceUser (safest default).
+func (a *Audience) UnmarshalText(text []byte) error {
+	*a = ParseAudience(string(text))
+	return nil
 }
 
 var audienceNames = map[Audience]string{ //nolint:gochecknoglobals // Immutable lookup table.
