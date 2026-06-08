@@ -76,6 +76,10 @@ func ExitCode(err error) int {
 // or to ExitCode for the appropriate exit code.
 //
 // Returns nil if no errors are provided or all are nil.
+//
+// This function exists for API discoverability: consumers find Compose via
+// the package API rather than needing to know about errors.Join. It delegates
+// directly with zero added logic.
 func Compose(errs ...error) error {
 	return errors.Join(errs...)
 }

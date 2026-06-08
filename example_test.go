@@ -39,3 +39,37 @@ func ExampleParseFamily() {
 	// Output: transient
 	// transient
 }
+
+func ExampleHandleErrorDetailed() {
+	err := NewRejection("file.not_found", "config missing").
+		WithContext("path", "/etc/app/config.yaml")
+	result := HandleErrorDetailed(err)
+	fmt.Println("exit:", result.ExitCode)
+	fmt.Println("fix:", result.SuggestedFix)
+	// Output:
+	// exit: 1
+	// fix: Check that the path and resource name are correct.
+}
+
+func ExampleRegisterClassification() {
+	sentinel := errors.New("connection pool exhausted")
+	RegisterClassification(sentinel, Transient)
+
+	family := Classify(sentinel)
+	fmt.Println(family)
+	// Output: transient
+}
+
+func ExampleFamily_MarshalText() {
+	f := Transient
+	text, _ := f.MarshalText()
+	fmt.Println(string(text))
+	// Output: transient
+}
+
+func ExampleFamily_UnmarshalText() {
+	var f Family
+	_ = f.UnmarshalText([]byte("rejection"))
+	fmt.Println(f)
+	// Output: rejection
+}
