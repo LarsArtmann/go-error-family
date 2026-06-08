@@ -39,6 +39,9 @@ jobs:
       - name: Verify root builds without workspace
         run: GOWORK=off go build ./...
 
+      - name: Verify examples compile
+        run: go build ./examples/...
+
   lint:
     runs-on: ubuntu-latest
     steps:
