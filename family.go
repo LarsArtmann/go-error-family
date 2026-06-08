@@ -176,6 +176,11 @@ const (
 	AudienceAll
 )
 
+// IsValid reports whether the Audience value is one of the three defined constants.
+func (a Audience) IsValid() bool {
+	return a >= AudienceUser && a <= AudienceAll
+}
+
 // String returns the lowercase name of the Audience (e.g. "user", "ops").
 func (a Audience) String() string {
 	switch a {

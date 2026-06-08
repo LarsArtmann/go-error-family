@@ -150,3 +150,44 @@ func TestAudienceString(t *testing.T) {
 		}
 	}
 }
+
+func TestAudienceIsValid(t *testing.T) {
+	tests := []struct {
+		a    Audience
+		want bool
+	}{
+		{AudienceUser, true},
+		{AudienceOps, true},
+		{AudienceAll, true},
+		{Audience(42), false},
+		{Audience(-1), false},
+	}
+	for _, tt := range tests {
+		t.Run(tt.a.String(), func(t *testing.T) {
+			if got := tt.a.IsValid(); got != tt.want {
+				t.Errorf("Audience(%d).IsValid() = %v, want %v", tt.a, got, tt.want)
+			}
+		})
+	}
+}
+
+func TestFamilyAudience(t *testing.T) {
+	tests := []struct {
+		family Family
+		want   Audience
+	}{
+		{Rejection, AudienceUser},
+		{Conflict, AudienceUser},
+		{Transient, AudienceAll},
+		{Corruption, AudienceOps},
+		{Infrastructure, AudienceOps},
+		{Family(99), AudienceOps},
+	}
+	for _, tt := range tests {
+		t.Run(tt.family.String(), func(t *testing.T) {
+			if got := tt.family.Audience(); got != tt.want {
+				t.Errorf("Family(%v).Audience() = %v, want %v", tt.family, got, tt.want)
+			}
+		})
+	}
+}
