@@ -34,7 +34,7 @@ func (r *GitRule) Applicable(err error) bool {
 	return gitSpec.Matches(err)
 }
 
-var gitSpec = diagnose.RuleSpec{
+var gitSpec = diagnose.RuleSpec{ //nolint:gochecknoglobals // Immutable rule matching spec.
 	ContextKeys: []diagnose.ContextKey{
 		diagnose.KeyGit,
 		diagnose.KeyRepository,

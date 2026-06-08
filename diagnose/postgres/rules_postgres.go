@@ -39,7 +39,7 @@ func (r *PostgresRule) Applicable(err error) bool {
 	return postgresSpec.Matches(err)
 }
 
-var postgresSpec = diagnose.RuleSpec{
+var postgresSpec = diagnose.RuleSpec{ //nolint:gochecknoglobals // Immutable rule matching spec.
 	ContextSubstr: []string{strPostgres, "postgresql", "database", "sql"},
 	ContextKeys: []diagnose.ContextKey{
 		diagnose.KeyDBHost,
