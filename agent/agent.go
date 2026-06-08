@@ -90,11 +90,7 @@ func (a *agent) Analyze(
 	diagnosis []*diagnose.DiagnosticResult,
 ) (*AgentResult, error) {
 	if !a.cfg.Enabled {
-		return &AgentResult{
-			RootCause:   "agent disabled",
-			Confidence:  0,
-			Explanation: "AI debug agent is not enabled. Enable via agent.Config{Enabled: true}.",
-		}, nil
+		return nil, fmt.Errorf("agent is disabled: set agent.Config{Enabled: true}")
 	}
 
 	ctx, cancel := context.WithTimeout(ctx, a.cfg.Timeout)

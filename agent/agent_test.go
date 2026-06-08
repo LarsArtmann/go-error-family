@@ -34,14 +34,11 @@ func TestAnalyzeDisabled(t *testing.T) {
 	ag := New(cfg)
 
 	result, err := ag.Analyze(context.Background(), errorfamily.NewTransient("test", "msg"), nil)
-	if err != nil {
-		t.Fatalf("Analyze() error: %v", err)
+	if err == nil {
+		t.Fatal("Expected error from disabled agent, got nil")
 	}
-	if result.Confidence != 0 {
-		t.Errorf("Confidence = %v, want 0 for disabled agent", result.Confidence)
-	}
-	if result.RootCause != "agent disabled" {
-		t.Errorf("RootCause = %q, want 'agent disabled'", result.RootCause)
+	if result != nil {
+		t.Errorf("Result = %v, want nil for disabled agent", result)
 	}
 }
 
