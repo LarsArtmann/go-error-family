@@ -37,6 +37,7 @@ import (
 	"context"
 	"fmt"
 	"slices"
+	"strings"
 	"sync"
 	"time"
 )
@@ -85,23 +86,34 @@ const (
 )
 
 func (s Status) String() string {
-	switch s {
-	case StatusHealthy:
-		return "healthy"
-	case StatusDegraded:
-		return "degraded"
-	case StatusFailed:
-		return "failed"
-	case StatusUnknown:
-		return strUnknown
-	default:
-		return strUnknown
+	if s.IsValid() {
+		return statusNames[s]
 	}
+	return strUnknown
 }
 
 // IsValid reports whether the Status value is one of the four defined constants.
 func (s Status) IsValid() bool {
 	return s >= StatusHealthy && s <= StatusUnknown
+}
+
+// ParseStatus parses a status string, case-insensitive.
+// Returns StatusUnknown for unrecognized values.
+func ParseStatus(s string) Status {
+	lower := strings.ToLower(s)
+	for st, name := range statusNames {
+		if name == lower {
+			return st
+		}
+	}
+	return StatusUnknown
+}
+
+var statusNames = map[Status]string{ //nolint:gochecknoglobals // Immutable lookup table.
+	StatusHealthy: "healthy",
+	StatusDegraded: "degraded",
+	StatusFailed:   "failed",
+	StatusUnknown:  strUnknown,
 }
 
 // DiagnosticResult holds the outcome of a single diagnostic check.

@@ -147,3 +147,22 @@ func TestStatusIsValid(t *testing.T) {
 		})
 	}
 }
+
+func TestParseStatus(t *testing.T) {
+	tests := []struct {
+		input string
+		want  Status
+	}{
+		{"healthy", StatusHealthy},
+		{"HEALTHY", StatusHealthy},
+		{"degraded", StatusDegraded},
+		{"failed", StatusFailed},
+		{"unknown", StatusUnknown},
+		{"garbage", StatusUnknown},
+	}
+	for _, tt := range tests {
+		if got := ParseStatus(tt.input); got != tt.want {
+			t.Errorf("ParseStatus(%q) = %v, want %v", tt.input, got, tt.want)
+		}
+	}
+}

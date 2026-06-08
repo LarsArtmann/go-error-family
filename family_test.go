@@ -191,3 +191,22 @@ func TestFamilyAudience(t *testing.T) {
 		})
 	}
 }
+
+func TestParseAudience(t *testing.T) {
+	tests := []struct {
+		input string
+		want  Audience
+	}{
+		{"user", AudienceUser},
+		{"USER", AudienceUser},
+		{"ops", AudienceOps},
+		{"all", AudienceAll},
+		{"unknown", AudienceUser},
+		{"garbage", AudienceUser},
+	}
+	for _, tt := range tests {
+		if got := ParseAudience(tt.input); got != tt.want {
+			t.Errorf("ParseAudience(%q) = %v, want %v", tt.input, got, tt.want)
+		}
+	}
+}

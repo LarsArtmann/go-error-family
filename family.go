@@ -183,16 +183,28 @@ func (a Audience) IsValid() bool {
 
 // String returns the lowercase name of the Audience (e.g. "user", "ops").
 func (a Audience) String() string {
-	switch a {
-	case AudienceUser:
-		return "user"
-	case AudienceOps:
-		return "ops"
-	case AudienceAll:
-		return "all"
-	default:
-		return strUnknown
+	if a.IsValid() {
+		return audienceNames[a]
 	}
+	return strUnknown
+}
+
+// ParseAudience parses an audience string, case-insensitive.
+// Returns AudienceUser for unrecognized values (safest default).
+func ParseAudience(s string) Audience {
+	lower := strings.ToLower(s)
+	for a, name := range audienceNames {
+		if name == lower {
+			return a
+		}
+	}
+	return AudienceUser
+}
+
+var audienceNames = map[Audience]string{ //nolint:gochecknoglobals // Immutable lookup table.
+	AudienceUser: "user",
+	AudienceOps:  "ops",
+	AudienceAll:  "all",
 }
 
 // Audience returns who should be notified about errors of this family.
