@@ -3,7 +3,7 @@
 Structured error protocol library. Library only — no `main`, no build system, no external deps. Full API reference: `SKILL.md`.
 
 **Last Updated:** 2026-06-08
-**Version:** v0.3.0
+**Version:** v0.4.0-dev
 **Status:** All tests pass (root + bridge + submodules), 0 lint issues, 0 race conditions
 **Workspace modules:** root (zero-dep), `bridge` (oops integration), `diagnose/git`, `diagnose/postgres`
 
@@ -45,7 +45,7 @@ go build ./...                                 # build check
 1. **Multi-error** (`errors.Join`) → classify each sub-error, first non-Transient wins
 2. `Classified` interface → `ErrorFamily()`
 3. `Retryable` interface → infer `Transient` (true) or `Rejection` (false)
-4. Registered sentinels via `errors.Is` chain walk (lock-free snapshot)
+4. Registered sentinels via `errors.Is` chain walk (snapshot copy, lock-free iteration)
 5. Default → `Transient`
 
 This means a type implementing both `Classified` and `Retryable` will use `Classified` and ignore `Retryable`. Registering a sentinel for an error that already implements `Classified` has no effect.
@@ -78,7 +78,7 @@ Not a library type — partial success is a consumption pattern, not a classific
 | `diagnose/git`       | 98.5%    |
 | `diagnose/postgres`  | 81.0%    |
 
-Git and postgres coverage improved with mock `CommandRunner` injection. Diagnose core coverage reflects shell-out rules that are tested via integration.
+Diagnose core coverage improved from 66.8% to 77% with integration tests (temp dir filesystem, localhost DNS/TCP network).
 
 ## Fuzz Tests
 
@@ -111,19 +111,22 @@ Connects go-error-family with `samber/oops`. Separate module with its own `go.mo
 - `gochecknoglobals` is enabled but suppressed via `//nolint:gochecknoglobals` on each legitimate package-level var (mutex-protected registries, immutable lookup tables, rule specs) — the BuildFlow pre-commit auto-configure hook re-enables it if disabled in `.golangci.yml`.
 - `exhaustruct` is enabled but most project types are excluded via `.golangci.yml` because they have intentional optional fields (HandleConfig, MessageTemplate, DiagnosticResult, etc.). Test files also exclude exhaustruct.
 - `flake.nix` uses `pkgs.go_1_26` as `goPkg` — do NOT use `let goPkg = goPkg;` (infinite recursion).
-- `lookupRegistered` uses `RLock` with deferred unlock for iteration (no snapshot copy) — safe because write paths hold full `Lock`.
-- `HandleConfig.Diagnose` bool was removed — diagnostics now run whenever `DiagnosticFunc` is set. No separate enable flag.
+- `lookupRegistered` snapshots the map before iterating — `errors.Is` runs lock-free. No deadlock possible.
+- `HandleConfig.Diagnose` bool was removed — diagnostics run whenever `DiagnosticFunc` is set. No separate enable flag.
 - `diagnose.Status` has `IsValid()` matching `Family.IsValid()` pattern.
 - `diagnose.sortByConfidence` uses `slices.SortFunc` (Go 1.26 stdlib).
-- CI now has explicit `bridge/` test and lint steps.
+- CI now has explicit `bridge/` test and lint steps, plus `go build ./examples/...` step.
 - `familyInfo` includes `Audience` field — adding a new Family truly requires only one entry in `familyData`.
 - `NetworkRule.Run` returns `StatusUnknown` when no host found in error context (prevents undefined DNS behavior).
 - `Audience.IsValid()` mirrors `Family.IsValid()` and `Status.IsValid()` — all three enum types have consistent validation.
+- `ParseAudience` and `ParseStatus` mirror `ParseFamily` — case-insensitive string parsing for all enums.
+- `Family` and `Audience` implement `encoding.TextMarshaler`/`TextUnmarshaler` for YAML/JSON config.
+- `agent.Config.Enabled` now returns `(nil, error)` instead of synthetic result — calling `Analyze` on a disabled agent is a programming error.
+- `Compose` doc explains it exists for API discoverability (thin wrapper over `errors.Join`).
 
 ## Known Limitations
 
 - **`applyContext` XSS (handle.go):** Template values are substituted via `strings.ReplaceAll` without HTML escaping. This is intentional for CLI output (stderr) but would be unsafe for HTML rendering. Consumers building HTTP responses should escape values before embedding in HTML.
-- **`agent.Config.Enabled` footgun:** A disabled agent returns a synthetic `AgentResult` with `"agent disabled"` root cause and 0 confidence, rather than an error. Consumers must check `result.Confidence > 0` or `result.RootCause != "agent disabled"` to distinguish real from synthetic results.
+- **`agent.Config.Enabled` is now honest:** A disabled agent returns `(nil, error)` instead of a synthetic `AgentResult`. Calling `Analyze` on a disabled agent is a programming error, not a silent result.
 - **`ClassifiedError` value-embeds `oops.OopsError`:** The zero value has nil internals. Methods like `Error()` and `Is()` guard against this, but future methods added to `ClassifiedError` must handle the zero-OopsError case.
-- **`Compose` is a thin wrapper:** It delegates directly to `errors.Join` with zero added logic. It exists for discoverability (consumers find it via the package API) but adds no behavioral value.
-- **Examples not tested in CI:** `examples/cmd/` is excluded from test runs. Breakage is caught by `go build ./...` but not by `go test`. Consider adding a build-only CI step.
+- **Examples built in CI:** `examples/cmd/` is now compiled by a CI step (`go build ./examples/...`).
