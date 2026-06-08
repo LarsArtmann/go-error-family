@@ -48,7 +48,8 @@ func handleHTTPError(w http.ResponseWriter, err error) {
 	}
 
 	var msg string
-	if e, ok := err.(*errorfamily.Error); ok {
+	e := &errorfamily.Error{}
+	if errors.As(err, &e) {
 		msg = e.Message()
 	} else {
 		msg = err.Error()

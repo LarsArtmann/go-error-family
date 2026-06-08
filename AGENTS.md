@@ -68,7 +68,7 @@ Not a library type — partial success is a consumption pattern, not a classific
 
 ## Test Coverage
 
-**Updated:** 2026-05-31
+**Updated:** 2026-06-08
 
 | Package              | Coverage |
 | -------------------- | -------- |
@@ -118,3 +118,12 @@ Connects go-error-family with `samber/oops`. Separate module with its own `go.mo
 - CI now has explicit `bridge/` test and lint steps.
 - `familyInfo` includes `Audience` field — adding a new Family truly requires only one entry in `familyData`.
 - `NetworkRule.Run` returns `StatusUnknown` when no host found in error context (prevents undefined DNS behavior).
+- `Audience.IsValid()` mirrors `Family.IsValid()` and `Status.IsValid()` — all three enum types have consistent validation.
+
+## Known Limitations
+
+- **`applyContext` XSS (handle.go):** Template values are substituted via `strings.ReplaceAll` without HTML escaping. This is intentional for CLI output (stderr) but would be unsafe for HTML rendering. Consumers building HTTP responses should escape values before embedding in HTML.
+- **`agent.Config.Enabled` footgun:** A disabled agent returns a synthetic `AgentResult` with `"agent disabled"` root cause and 0 confidence, rather than an error. Consumers must check `result.Confidence > 0` or `result.RootCause != "agent disabled"` to distinguish real from synthetic results.
+- **`ClassifiedError` value-embeds `oops.OopsError`:** The zero value has nil internals. Methods like `Error()` and `Is()` guard against this, but future methods added to `ClassifiedError` must handle the zero-OopsError case.
+- **`Compose` is a thin wrapper:** It delegates directly to `errors.Join` with zero added logic. It exists for discoverability (consumers find it via the package API) but adds no behavioral value.
+- **Examples not tested in CI:** `examples/cmd/` is excluded from test runs. Breakage is caught by `go build ./...` but not by `go test`. Consider adding a build-only CI step.
