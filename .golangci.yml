@@ -1,177 +1,177 @@
 version: "2"
 run:
-    timeout: 5m
-    go: 1.26.3
-    build-tags:
-        - goexperiment.arenas
-        - goexperiment.goroutineleakprofile
-        - goexperiment.jsonv2
-        - goexperiment.runtimesecret
-        - goexperiment.simd
-    allow-parallel-runners: true
-    allow-serial-runners: true
+  timeout: 5m
+  go: 1.26.3
+  build-tags:
+    - goexperiment.arenas
+    - goexperiment.goroutineleakprofile
+    - goexperiment.jsonv2
+    - goexperiment.runtimesecret
+    - goexperiment.simd
+  allow-parallel-runners: true
+  allow-serial-runners: true
 output:
-    formats: {}
+  formats: {}
 linters:
-    enable:
-        - bodyclose
-        - contextcheck
-        - copyloopvar
-        - cyclop
-        - dupl
-        - durationcheck
-        - errcheck
-        - errchkjson
-        - errname
-        - errorlint
-        - exhaustive
-        - exhaustruct
-        - forcetypeassert
-        - funlen
-        - ginkgolinter
-        - gochecknoglobals
-        - gochecknoinits
-        - gochecksumtype
-        - gocognit
-        - goconst
-        - gocritic
-        - gocyclo
-        - gosec
-        - gosmopolitan
-        - govet
-        - ineffassign
-        - interfacebloat
-        - intrange
-        - loggercheck
-        - maintidx
-        - mirror
-        - misspell
-        - musttag
-        - nakedret
-        - nestif
-        - nilerr
-        - nilnesserr
-        - nilnil
-        - noctx
-        - nolintlint
-        - paralleltest
-        - perfsprint
-        - prealloc
-        - predeclared
-        - protogetter
-        - reassign
-        - recvcheck
-        - revive
-        - rowserrcheck
-        - sloglint
-        - spancheck
-        - sqlclosecheck
-        - staticcheck
-        - testifylint
-        - thelper
-        - unconvert
-        - unparam
-        - unused
-        - usetesting
-        - wastedassign
-        - wrapcheck
-        - zerologlint
-    settings:
-        cyclop:
-            max-complexity: 12
-        dupl:
-            threshold: 100
-        exhaustruct:
-            exclude:
-                - os/exec.Cmd
-                - os/exec.ExitError
-                - net.Dialer
-                - github.com/larsartmann/go-error-family.HandleConfig
-                - github.com/larsartmann/go-error-family.HandleResult
-                - github.com/larsartmann/go-error-family.MessageTemplate
-                - github.com/larsartmann/go-error-family.DiagnosticFinding
-                - github.com/larsartmann/go-error-family.familyInfo
-                - github.com/larsartmann/go-error-family/diagnose.DiagnosticResult
-                - github.com/larsartmann/go-error-family/diagnose.Runner
-                - github.com/larsartmann/go-error-family/diagnose.RuleSpec
-                - github.com/larsartmann/go-error-family/diagnose.MockCommandRunner
-                - github.com/larsartmann/go-error-family/diagnose.ruleResult
-                - github.com/larsartmann/go-error-family/diagnose.staticRule
-                - github.com/larsartmann/go-error-family/agent.AgentResult
-                - github.com/larsartmann/go-error-family/agent.Config
-        ginkgolinter:
-            forbid-focus-container: true
-            forbid-spec-pollution: true
-        gocritic:
-            disabled-checks:
-                - ifElseChain
-        revive:
-            rules:
-                - disabled: true
-                  name: exported
-                - disabled: true
-                  name: package-comments
-        testifylint:
-            disable:
-                - go-require
-            enable-all: true
-    exclusions:
-        generated: lax
-        rules:
-            - path: _test\.go
-              linters:
-                - goconst
-                - dupl
-                - errcheck
-                - paralleltest
-                - revive
-                - exhaustruct
-            - path: diagnose/
-              linters:
-                - wrapcheck
-                - noctx
-            - path: diagnose/rules_filesystem\.go
-              text: G304
-              linters:
-                - gosec
-            - path: agent/
-              linters:
-                - wrapcheck
-            - path: bridge/
-              linters:
-                - wrapcheck
-            - path: examples/
-              linters:
-                - gosec
-            - path: _test\.go
-              text: unused
-              linters:
-                - unused
-            - path: classify\.go
-              text: anonymous.*is missing field mu
-              linters:
-                - exhaustruct
-            - path: handle\.go
-              text: anonymous.*is missing field mu
-              linters:
-                - exhaustruct
-        paths:
-            - \.gen\.go$
-            - _mock\.go$
-            - _templ\.go$
-            - vendor/
+  enable:
+    - bodyclose
+    - contextcheck
+    - copyloopvar
+    - cyclop
+    - dupl
+    - durationcheck
+    - errcheck
+    - errchkjson
+    - errname
+    - errorlint
+    - exhaustive
+    - exhaustruct
+    - forcetypeassert
+    - funlen
+    - ginkgolinter
+    - gochecknoglobals
+    - gochecknoinits
+    - gochecksumtype
+    - gocognit
+    - goconst
+    - gocritic
+    - gocyclo
+    - gosec
+    - gosmopolitan
+    - govet
+    - ineffassign
+    - interfacebloat
+    - intrange
+    - loggercheck
+    - maintidx
+    - mirror
+    - misspell
+    - musttag
+    - nakedret
+    - nestif
+    - nilerr
+    - nilnesserr
+    - nilnil
+    - noctx
+    - nolintlint
+    - paralleltest
+    - perfsprint
+    - prealloc
+    - predeclared
+    - protogetter
+    - reassign
+    - recvcheck
+    - revive
+    - rowserrcheck
+    - sloglint
+    - spancheck
+    - sqlclosecheck
+    - staticcheck
+    - testifylint
+    - thelper
+    - unconvert
+    - unparam
+    - unused
+    - usetesting
+    - wastedassign
+    - wrapcheck
+    - zerologlint
+  settings:
+    cyclop:
+      max-complexity: 12
+    dupl:
+      threshold: 100
+    exhaustruct:
+      exclude:
+        - os/exec.Cmd
+        - os/exec.ExitError
+        - net.Dialer
+        - github.com/larsartmann/go-error-family.HandleConfig
+        - github.com/larsartmann/go-error-family.HandleResult
+        - github.com/larsartmann/go-error-family.MessageTemplate
+        - github.com/larsartmann/go-error-family.DiagnosticFinding
+        - github.com/larsartmann/go-error-family.familyInfo
+        - github.com/larsartmann/go-error-family/diagnose.DiagnosticResult
+        - github.com/larsartmann/go-error-family/diagnose.Runner
+        - github.com/larsartmann/go-error-family/diagnose.RuleSpec
+        - github.com/larsartmann/go-error-family/diagnose.MockCommandRunner
+        - github.com/larsartmann/go-error-family/diagnose.ruleResult
+        - github.com/larsartmann/go-error-family/diagnose.staticRule
+        - github.com/larsartmann/go-error-family/agent.AgentResult
+        - github.com/larsartmann/go-error-family/agent.Config
+    ginkgolinter:
+      forbid-focus-container: true
+      forbid-spec-pollution: true
+    gocritic:
+      disabled-checks:
+        - ifElseChain
+    revive:
+      rules:
+        - disabled: true
+          name: exported
+        - disabled: true
+          name: package-comments
+    testifylint:
+      disable:
+        - go-require
+      enable-all: true
+  exclusions:
+    generated: lax
+    rules:
+      - path: _test\.go
+        linters:
+          - goconst
+          - dupl
+          - errcheck
+          - paralleltest
+          - revive
+          - exhaustruct
+      - path: diagnose/
+        linters:
+          - wrapcheck
+          - noctx
+      - path: diagnose/rules_filesystem\.go
+        text: G304
+        linters:
+          - gosec
+      - path: agent/
+        linters:
+          - wrapcheck
+      - path: bridge/
+        linters:
+          - wrapcheck
+      - path: examples/
+        linters:
+          - gosec
+      - path: _test\.go
+        text: unused
+        linters:
+          - unused
+      - path: classify\.go
+        text: anonymous.*is missing field mu
+        linters:
+          - exhaustruct
+      - path: handle\.go
+        text: anonymous.*is missing field mu
+        linters:
+          - exhaustruct
+    paths:
+      - \.gen\.go$
+      - _mock\.go$
+      - _templ\.go$
+      - vendor/
 formatters:
-    enable:
-        - gci
-        - goimports
-        - gofumpt
-        - golines
-    settings:
-        golines:
-            max-len: 120
-    exclusions:
-        generated: lax
-        paths:
-            - _mock\.go$
-            - _templ\.go$
+  enable:
+    - gci
+    - goimports
+    - gofumpt
+    - golines
+  settings:
+    golines:
+      max-len: 120
+  exclusions:
+    generated: lax
+    paths:
+      - _mock\.go$
+      - _templ\.go$
 issues: {}

@@ -93,7 +93,7 @@ Connects go-error-family with `samber/oops`. Separate module with its own `go.mo
 | `bridge.Wrap(err, family)` | Attach a Family to any error, preserving OopsError context                            |
 | `bridge.AutoWrap(err)`     | Infer Family from oops metadata (tags + domain), then wrap                            |
 | `bridge.InferFamily(err)`  | Derive Family from oops tags (explicit) → domain (structural) → Transient (fail-open) |
-| `ClassifiedError`          | Embeds `oops.OopsError`; satisfies `Classified`, `Coded`, `Retryable`, `Contextual`            |
+| `ClassifiedError`          | Embeds `oops.OopsError`; satisfies `Classified`, `Coded`, `Retryable`, `Contextual`   |
 
 **Tag overrides** (checked first): `retryable`, `transient`, `conflict`, `corruption`/`corrupted`, `rejection`/`rejected`, `infrastructure`/`infra`.
 **Domain defaults** (checked second): `validation`/`auth` → Rejection, `database`/`network`/`cache`/`queue` → Transient, `storage`/`infra`/`startup` → Infrastructure, `data`/`schema`/`migration` → Corruption.
