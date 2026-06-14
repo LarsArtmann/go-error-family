@@ -10,6 +10,9 @@ const (
 	strCorruption     = "corruption"
 	strInfrastructure = "infrastructure"
 	strUnknown        = "unknown"
+	strUser           = "user"
+	strOps            = "ops"
+	strAll            = "all"
 	msgCheckInput     = "Check your input and try again."
 	msgRefreshData    = "Refresh your data and try the operation again."
 )
@@ -20,6 +23,8 @@ const (
 //   - Retry loops: "Should I try again?" (Transient = yes)
 //   - Exit codes: "Which exit code for the shell?" (maps to BSD sysexits.h)
 //   - Presentation: "Whose fault is it?" (determines tone and framing in user messages)
+//
+//nolint:recvcheck // UnmarshalText must use pointer receiver per encoding.TextUnmarshaler contract.
 type Family int
 
 const (
@@ -177,6 +182,8 @@ func (f Family) DefaultFix() string {
 }
 
 // Audience describes who should be notified about this error.
+//
+//nolint:recvcheck // UnmarshalText must use pointer receiver per encoding.TextUnmarshaler contract.
 type Audience int
 
 const (
@@ -226,9 +233,9 @@ func (a *Audience) UnmarshalText(text []byte) error {
 }
 
 var audienceNames = map[Audience]string{ //nolint:gochecknoglobals // Immutable lookup table.
-	AudienceUser: "user",
-	AudienceOps:  "ops",
-	AudienceAll:  "all",
+	AudienceUser: strUser,
+	AudienceOps:  strOps,
+	AudienceAll:  strAll,
 }
 
 // Audience returns who should be notified about errors of this family.

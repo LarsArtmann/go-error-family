@@ -75,7 +75,8 @@
                 goPkg
                 pkgs.golangci-lint
               ];
-            };          };
+            };
+          };
 
           checks = {
             build = pkgs.runCommand "go-error-family-build" { nativeBuildInputs = [ goPkg ]; } ''
