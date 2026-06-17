@@ -16,12 +16,12 @@ The root module contains four concerns: stable classification library, experimen
 
 ### Module Landscape
 
-| Module   | Path                                     | Packages                              | Internal Deps | External Deps | Replace | State                                        |
-| -------- | ---------------------------------------- | ------------------------------------- | ------------- | ------------- | ------- | -------------------------------------------- |
-| root     | `github.com/larsartmann/go-error-family` |  errorfamily + agent/ + diagnose/ + examples/ | —             | zero          | —       | **God-module** (stable + experimental mixed) |
-| bridge   | `github.com/.../bridge`                  | bridge/                               | root (v0.3.0) | samber/oops   | —       | Clean                                        |
-| git      | `github.com/.../diagnose/git`            | git/                                  | root (v0.3.0) | zero          | —       | Clean                                        |
-| postgres | `github.com/.../diagnose/postgres`       | postgres/                             | root (v0.3.0) | zero          | —       | Clean                                        |
+| Module   | Path                                     | Packages                                     | Internal Deps | External Deps | Replace | State                                        |
+| -------- | ---------------------------------------- | -------------------------------------------- | ------------- | ------------- | ------- | -------------------------------------------- |
+| root     | `github.com/larsartmann/go-error-family` | errorfamily + agent/ + diagnose/ + examples/ | —             | zero          | —       | **God-module** (stable + experimental mixed) |
+| bridge   | `github.com/.../bridge`                  | bridge/                                      | root (v0.3.0) | samber/oops   | —       | Clean                                        |
+| git      | `github.com/.../diagnose/git`            | git/                                         | root (v0.3.0) | zero          | —       | Clean                                        |
+| postgres | `github.com/.../diagnose/postgres`       | postgres/                                    | root (v0.3.0) | zero          | —       | Clean                                        |
 
 ### Starting State: Workspace mode with one god-module
 
@@ -37,24 +37,24 @@ The project already has `go.work` coordinating 4 modules. The problem is that th
 
 ### Existing Module Scores
 
-| Module       | Cohesion (1-5)                                         | Coupling (1-5, lower=better) | Independent?                                                       | Action                      |
-| ------------ | ------------------------------------------------------ | ---------------------------- | ------------------------------------------------------------------ | --------------------------- |
+| Module       | Cohesion (1-5)                                                | Coupling (1-5, lower=better) | Independent?                                                       | Action                      |
+| ------------ | ------------------------------------------------------------- | ---------------------------- | ------------------------------------------------------------------ | --------------------------- |
 | **root**     | **2** — contains errorfamily + diagnostics + agent + examples | 1 — zero external deps       | No — experimental packages force version coupling with stable root | **Split**                   |
-| **bridge**   | 5 — single purpose (oops integration)                  | 2 — depends on root + oops   | Yes                                                                | **Keep** (bump version pin) |
-| **git**      | 5 — single purpose (git diagnostics)                   | 1 — depends on root only     | Yes                                                                | **Keep** (bump version pin) |
-| **postgres** | 5 — single purpose (pg diagnostics)                    | 1 — depends on root only     | Yes                                                                | **Keep** (bump version pin) |
+| **bridge**   | 5 — single purpose (oops integration)                         | 2 — depends on root + oops   | Yes                                                                | **Keep** (bump version pin) |
+| **git**      | 5 — single purpose (git diagnostics)                          | 1 — depends on root only     | Yes                                                                | **Keep** (bump version pin) |
+| **postgres** | 5 — single purpose (pg diagnostics)                           | 1 — depends on root only     | Yes                                                                | **Keep** (bump version pin) |
 
 ### Proposed Remodel
 
-| Old            | Action           | New Module(s)                               | Rationale                                        |
-| -------------- | ---------------- | ------------------------------------------- | ------------------------------------------------ |
-| root (errorfamily)    | **Keep**         | `github.com/.../error-family` (v1.0 stable) | Root is ready for v1.0                           |
-| root/diagnose/ | **Extract**      | `github.com/.../diagnose` (v0.x)            | Experimental, zero-dep, depends on the root module only     |
-| root/agent/    | **Extract**      | `github.com/.../agent` (v0.x)               | Experimental, depends on root + diagnose         |
-| root/examples/ | **Keep in root** | Stays in root module                        | Leaf nodes, compiled by CI, share deps with root |
-| bridge         | **Keep**         | No change                                   | Clean module                                     |
-| git            | **Keep**         | No change (update deps: add diagnose)       | Clean module                                     |
-| postgres       | **Keep**         | No change (update deps: add diagnose)       | Clean module                                     |
+| Old                | Action           | New Module(s)                               | Rationale                                               |
+| ------------------ | ---------------- | ------------------------------------------- | ------------------------------------------------------- |
+| root (errorfamily) | **Keep**         | `github.com/.../error-family` (v1.0 stable) | Root is ready for v1.0                                  |
+| root/diagnose/     | **Extract**      | `github.com/.../diagnose` (v0.x)            | Experimental, zero-dep, depends on the root module only |
+| root/agent/        | **Extract**      | `github.com/.../agent` (v0.x)               | Experimental, depends on root + diagnose                |
+| root/examples/     | **Keep in root** | Stays in root module                        | Leaf nodes, compiled by CI, share deps with root        |
+| bridge             | **Keep**         | No change                                   | Clean module                                            |
+| git                | **Keep**         | No change (update deps: add diagnose)       | Clean module                                            |
+| postgres           | **Keep**         | No change (update deps: add diagnose)       | Clean module                                            |
 
 ---
 
@@ -182,35 +182,35 @@ root (v1.0)
 
 ### Versioning Strategy
 
-| Module        | Strategy                                    | Rationale                                       |
-| ------------- | ------------------------------------------- | ----------------------------------------------- |
+| Module        | Strategy                                    | Rationale                                          |
+| ------------- | ------------------------------------------- | -------------------------------------------------- |
 | root          | **v1.0.0** — frozen, semver guarantees      | Stable classification library, no breaking changes |
-| diagnose      | **v0.1.0** — independent semver             | Experimental, may change                        |
-| agent         | **v0.1.0** — independent semver             | Experimental, may change                        |
-| bridge        | Continue at current version + bump root dep | Already independent                             |
-| git, postgres | Continue at current version + update deps   | Already independent                             |
+| diagnose      | **v0.1.0** — independent semver             | Experimental, may change                           |
+| agent         | **v0.1.0** — independent semver             | Experimental, may change                           |
+| bridge        | Continue at current version + bump root dep | Already independent                                |
+| git, postgres | Continue at current version + update deps   | Already independent                                |
 
 ---
 
 ## Phase 4 — Brutal Self-Review
 
-| #   | Question                | Answer                                                                                                                                                                                                                                     |
-| --- | ----------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| 1   | What did we forget?     | `examples/cmd/` uses both errorfamily AND could use diagnose in future examples. Today it only uses errorfamily — stays in root. ✓                                                                                                                       |
-| 2   | What could be improved? | Agent should depend on an interface for diagnostic results, not concrete `diagnose.DiagnosticResult`. But this is a future improvement, not a blocker for extraction.                                                                      |
+| #   | Question                | Answer                                                                                                                                                                                                                                            |
+| --- | ----------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| 1   | What did we forget?     | `examples/cmd/` uses both errorfamily AND could use diagnose in future examples. Today it only uses errorfamily — stays in root. ✓                                                                                                                |
+| 2   | What could be improved? | Agent should depend on an interface for diagnostic results, not concrete `diagnose.DiagnosticResult`. But this is a future improvement, not a blocker for extraction.                                                                             |
 | 3   | Split brains?           | No duplicate types. DiagnosticFinding (in errorfamily/handle.go) vs DiagnosticResult (in diagnose/) serve different purposes — the former is a minimal CLI-boundary type, the latter is a rich diagnostic engine type. Both are correctly placed. |
-| 4   | Right granularity?      | 3 modules + 3 submodules = 6 total. Each does one thing. No micro-modules. ✓                                                                                                                                                               |
-| 5   | Existing code reuse?    | The existing submodule pattern (bridge, git, postgres) already proves the extraction works. We're applying the same pattern to agent and diagnose.                                                                                         |
-| 6   | Type model quality?     | Registry type (v0.5.0) already provides the injectable pattern. No type changes needed for extraction.                                                                                                                                     |
-| 7   | Reinventing the wheel?  | No — this is standard Go multi-module workspace pattern.                                                                                                                                                                                   |
-| 8   | Import paths verified?  | All submodules already import `diagnose` through root. After extraction, they add a `require` for the diagnose module. The import path doesn't change.                                                                                     |
-| 9   | Test deps isolated?     | All packages have zero test-only external deps. ✓                                                                                                                                                                                          |
-| 10  | CI actually faster?     | Yes — 3 independent test jobs instead of 1 combined. The current CI already parallelizes submodules.                                                                                                                                       |
+| 4   | Right granularity?      | 3 modules + 3 submodules = 6 total. Each does one thing. No micro-modules. ✓                                                                                                                                                                      |
+| 5   | Existing code reuse?    | The existing submodule pattern (bridge, git, postgres) already proves the extraction works. We're applying the same pattern to agent and diagnose.                                                                                                |
+| 6   | Type model quality?     | Registry type (v0.5.0) already provides the injectable pattern. No type changes needed for extraction.                                                                                                                                            |
+| 7   | Reinventing the wheel?  | No — this is standard Go multi-module workspace pattern.                                                                                                                                                                                          |
+| 8   | Import paths verified?  | All submodules already import `diagnose` through root. After extraction, they add a `require` for the diagnose module. The import path doesn't change.                                                                                            |
+| 9   | Test deps isolated?     | All packages have zero test-only external deps. ✓                                                                                                                                                                                                 |
+| 10  | CI actually faster?     | Yes — 3 independent test jobs instead of 1 combined. The current CI already parallelizes submodules.                                                                                                                                              |
 | 11  | Versioning realistic?   | Root at v1.0, rest at v0.x — matches how the library is consumed (errorfamily is the stable interface, rest is opt-in).                                                                                                                           |
 | 12  | Error types accessible? | All error types live in root. `errors.Is`/`errors.As` work through errorfamily interfaces. ✓                                                                                                                                                      |
-| 13  | internal/ safe?         | No internal/ packages to break. Future improvement: move diagnose/mock.go behind internal/ after extraction.                                                                                                                               |
+| 13  | internal/ safe?         | No internal/ packages to break. Future improvement: move diagnose/mock.go behind internal/ after extraction.                                                                                                                                      |
 | 14  | Over-modularized?       | No — 6 modules for a library with 5 distinct concerns (errorfamily, diagnostics, agent, bridge, git, postgres) is correct.                                                                                                                        |
-| 15  | Consumers broken?       | Import paths don't change — `github.com/.../diagnose` already works as a package import. Adding a go.mod at `diagnose/` makes it a module at the same path. ✓                                                                              |
+| 15  | Consumers broken?       | Import paths don't change — `github.com/.../diagnose` already works as a package import. Adding a go.mod at `diagnose/` makes it a module at the same path. ✓                                                                                     |
 
 ---
 

@@ -336,8 +336,8 @@
         <div class="section-label">The bottom line</div>
         <h2 class="section-title">One god-module, four submodules, one clear path to v1.0</h2>
         <p class="section-intro">
-          The classification library is excellent — zero-dep, well-tested, copy-on-write immutable. But
-          it shares a
+          The classification library is excellent — zero-dep, well-tested, copy-on-write immutable.
+          But it shares a
           <code
             class="inline"
             style="
@@ -418,8 +418,8 @@
               border-radius: 3px;
             "
             >go.work</code
-          >. The root module is the heaviest — it contains the stable classification library AND three
-          experimental packages.
+          >. The root module is the heaviest — it contains the stable classification library AND
+          three experimental packages.
         </p>
         <table>
           <thead>
@@ -435,7 +435,7 @@
           <tbody>
             <tr>
               <td><strong>root</strong> (errorfamily)</td>
-              <td> errorfamily + agent/ + diagnose/ + examples/</td>
+              <td>errorfamily + agent/ + diagnose/ + examples/</td>
               <td>zero</td>
               <td>— (it IS the root)</td>
               <td>v0.5.0</td>
@@ -502,9 +502,9 @@
               >go.mod</code
             >
             has zero external dependencies. No samber/oops, no OpenTelemetry, no testify. This means
-            any Go project can adopt the classification library without pulling transitive dependency
-            trees. The bridge module (which pulls in oops) is opt-in. This is textbook "mechanism,
-            not policy" — it defines
+            any Go project can adopt the classification library without pulling transitive
+            dependency trees. The bridge module (which pulls in oops) is opt-in. This is textbook
+            "mechanism, not policy" — it defines
             <em>what</em> classification means; consumers bring <em>how</em> they want their errors
             enriched.
           </p>
@@ -710,8 +710,8 @@ examples/ → root (leaf nodes)</pre
             <span class="severity high">high impact</span>
           </div>
           <p>
-            The root module contains four distinct concerns: (1) the stable classification library, (2)
-            the experimental diagnostic engine (<code
+            The root module contains four distinct concerns: (1) the stable classification library,
+            (2) the experimental diagnostic engine (<code
               class="inline"
               style="
                 font-family: var(--mono);
