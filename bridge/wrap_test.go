@@ -142,7 +142,12 @@ func TestWrap_UnwrapChain(t *testing.T) {
 		family errorfamily.Family
 	}{
 		{"oops chain", errors.New("root cause"), oops.Wrap, errorfamily.Transient},
-		{"plain error", errors.New("plain error"), func(e error) error { return e }, errorfamily.Rejection},
+		{
+			"plain error",
+			errors.New("plain error"),
+			func(e error) error { return e },
+			errorfamily.Rejection,
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
@@ -262,7 +267,14 @@ func TestWrap_Format(t *testing.T) {
 	}{
 		{"%v oops", "%v", oops.Errorf("test msg"), errorfamily.Transient, true, ""},
 		{"%v plain", "%v", errors.New("plain"), errorfamily.Rejection, false, "[rejection] plain"},
-		{"+v oops", "%+v", oops.In("database").With("host", "db1").Errorf("test"), errorfamily.Transient, true, ""},
+		{
+			"+v oops",
+			"%+v",
+			oops.In("database").With("host", "db1").Errorf("test"),
+			errorfamily.Transient,
+			true,
+			"",
+		},
 		{"%s oops", "%s", oops.Errorf("short"), errorfamily.Transient, true, ""},
 		{"%s plain", "%s", errors.New("short"), errorfamily.Rejection, false, "short"},
 	}

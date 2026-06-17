@@ -180,7 +180,11 @@ func (r *Runner) applicableRules(err error) []DiagnosticRule {
 	return rules
 }
 
-func (r *Runner) runRules(ctx context.Context, err error, rules []DiagnosticRule) []*DiagnosticResult {
+func (r *Runner) runRules(
+	ctx context.Context,
+	err error,
+	rules []DiagnosticRule,
+) []*DiagnosticResult {
 	type ruleResult struct {
 		idx    int
 		result *DiagnosticResult
@@ -266,7 +270,12 @@ const (
 )
 
 type CommandRunner interface {
-	Run(ctx context.Context, timeout time.Duration, name string, args ...string) (string, int, error)
+	Run(
+		ctx context.Context,
+		timeout time.Duration,
+		name string,
+		args ...string,
+	) (string, int, error)
 	Exists(name string) bool
 }
 

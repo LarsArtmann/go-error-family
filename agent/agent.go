@@ -168,7 +168,8 @@ func extractCommand(suggest string) string {
 		// Indented lines (2+ spaces) in the middle of a suggestion are commands.
 		if strings.HasPrefix(line, "  ") && len(trimmed) > 0 {
 			// Skip lines that are just prose (contain ":" at end or are too wordy).
-			if strings.HasSuffix(trimmed, ":") || strings.Contains(trimmed, " ") && !looksLikeCommand(trimmed) {
+			if strings.HasSuffix(trimmed, ":") ||
+				strings.Contains(trimmed, " ") && !looksLikeCommand(trimmed) {
 				continue
 			}
 			return trimmed

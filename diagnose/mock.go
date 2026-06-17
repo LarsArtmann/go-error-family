@@ -32,7 +32,12 @@ func NewMockCommandRunner() *MockCommandRunner {
 }
 
 // Run records the call and returns the matching MockResponse.
-func (m *MockCommandRunner) Run(_ context.Context, _ time.Duration, name string, args ...string) (string, int, error) {
+func (m *MockCommandRunner) Run(
+	_ context.Context,
+	_ time.Duration,
+	name string,
+	args ...string,
+) (string, int, error) {
 	key := name + " " + strings.Join(args, " ")
 	m.mu.Lock()
 	defer m.mu.Unlock()

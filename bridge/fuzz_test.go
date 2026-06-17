@@ -34,7 +34,12 @@ func FuzzInferFamily(f *testing.F) {
 
 		family := InferFamily(err)
 		if !family.IsValid() {
-			t.Errorf("InferFamily returned invalid family %v for domain=%q tag=%q", family, domain, tag)
+			t.Errorf(
+				"InferFamily returned invalid family %v for domain=%q tag=%q",
+				family,
+				domain,
+				tag,
+			)
 		}
 	})
 }

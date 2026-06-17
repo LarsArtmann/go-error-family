@@ -92,7 +92,11 @@ func (r *NetworkRule) Run(ctx context.Context, err error) (*DiagnosticResult, er
 }
 
 func (r *NetworkRule) resolveHost(err error) string {
-	v := ResolveContextKey(err, []string{string(KeyHost), string(KeyRemote), string(KeyEndpoint)}, "")
+	v := ResolveContextKey(
+		err,
+		[]string{string(KeyHost), string(KeyRemote), string(KeyEndpoint)},
+		"",
+	)
 	if v == "" {
 		return ""
 	}

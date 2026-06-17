@@ -205,7 +205,13 @@ func extractContext(err error) map[string]string {
 	return map[string]string{}
 }
 
-func renderCLI(code string, context map[string]string, family Family, cfg HandleConfig, reg *Registry) string {
+func renderCLI(
+	code string,
+	context map[string]string,
+	family Family,
+	cfg HandleConfig,
+	reg *Registry,
+) string {
 	// 1. Consumer override (per-call).
 	if cfg.TemplateOverride != nil {
 		if tmpl, ok := cfg.TemplateOverride[code]; ok {

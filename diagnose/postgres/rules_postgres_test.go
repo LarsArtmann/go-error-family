@@ -24,14 +24,29 @@ func TestPostgresRuleApplicableTrue(t *testing.T) {
 		{"db_host", errorfamily.NewTransient("test", "msg").WithContext("db_host", "localhost")},
 		{"db_port", errorfamily.NewTransient("test", "msg").WithContext("db_port", "5432")},
 		{"db_name", errorfamily.NewTransient("test", "msg").WithContext("db_name", "mydb")},
-		{"database_url", errorfamily.NewTransient("test", "msg").WithContext("database_url", "postgres://...")},
-		{"postgres_host", errorfamily.NewTransient("test", "msg").WithContext("postgres_host", "db")},
+		{
+			"database_url",
+			errorfamily.NewTransient("test", "msg").WithContext("database_url", "postgres://..."),
+		},
+		{
+			"postgres_host",
+			errorfamily.NewTransient("test", "msg").WithContext("postgres_host", "db"),
+		},
 		{"db code", errorfamily.NewTransient("db.timeout", "msg")},
 		{"database code", errorfamily.NewTransient("database.error", "msg")},
-		{"sql context", errorfamily.NewTransient("test", "msg").WithContext("url", "postgres://host")},
-		{"postgres substr", errorfamily.NewTransient("test", "msg").WithContext("info", "postgresql failed")},
+		{
+			"sql context",
+			errorfamily.NewTransient("test", "msg").WithContext("url", "postgres://host"),
+		},
+		{
+			"postgres substr",
+			errorfamily.NewTransient("test", "msg").WithContext("info", "postgresql failed"),
+		},
 		{"transient+sql", errorfamily.NewTransient("test", "sql error during query")},
-		{"database substr", errorfamily.NewTransient("test", "msg").WithContext("info", "database unavailable")},
+		{
+			"database substr",
+			errorfamily.NewTransient("test", "msg").WithContext("info", "database unavailable"),
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
@@ -153,9 +168,21 @@ func TestPostgresRuleMockSuggestStartFix(t *testing.T) {
 		exists      map[string]bool
 		wantCommand string
 	}{
-		{"brew", map[string]bool{"brew": true, "pg_isready": true}, "brew services start postgresql"},
-		{"systemctl", map[string]bool{"systemctl": true, "pg_isready": true}, "sudo systemctl start postgresql"},
-		{"service", map[string]bool{"service": true, "pg_isready": true}, "sudo service postgresql start"},
+		{
+			"brew",
+			map[string]bool{"brew": true, "pg_isready": true},
+			"brew services start postgresql",
+		},
+		{
+			"systemctl",
+			map[string]bool{"systemctl": true, "pg_isready": true},
+			"sudo systemctl start postgresql",
+		},
+		{
+			"service",
+			map[string]bool{"service": true, "pg_isready": true},
+			"sudo service postgresql start",
+		},
 		{"default", map[string]bool{"pg_isready": true}, "pg_ctl start"},
 	}
 	for _, tt := range tests {
