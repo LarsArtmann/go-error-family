@@ -8,9 +8,9 @@ import (
 
 func TestMessageTemplateApply(t *testing.T) {
 	tmpl := MessageTemplate{
-		What:   "Could not connect to {{.host}}:{{.port}}",
+		What:   "Could not connect to {host}:{port}",
 		Why:    "The server is not responding.",
-		Fix:    "Check {{.host}} is running.",
+		Fix:    "Check {host} is running.",
 		WayOut: "Run with --verbose for details.",
 	}
 
@@ -40,7 +40,7 @@ func TestMessageTemplateApply(t *testing.T) {
 
 func TestRegisterTemplateAndLookup(t *testing.T) {
 	RegisterTemplate("test.registered", MessageTemplate{
-		What: "Custom message for {{.key}}",
+		What: "Custom message for {key}",
 		Fix:  "Do the thing",
 	})
 	t.Cleanup(func() { UnregisterTemplate("test.registered") })

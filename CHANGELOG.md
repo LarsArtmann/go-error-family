@@ -4,6 +4,28 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
+## [0.5.0] - 2026-06-17
+
+### Added
+
+- `Registry` type (`registry.go`) — injectable classification sentinels + message templates. Replaces global mutable maps with a construct-and-pass type for test isolation (no `t.Cleanup(Unregister...)` needed) and scoped error handling within a single binary.
+- `NewRegistry()` constructor and `DefaultRegistry` package-level var — backward-compatible defaults for all convenience functions.
+- `HandleConfig.Registry` field — pass a custom registry to `HandleError*` functions. Falls back to `DefaultRegistry` when nil.
+- `resolveSuggestedFix` — unified template resolution chain for `SuggestedFix` (override → registry template → built-in default → family fallback), closing a gap where registry templates were ignored for `SuggestedFix`.
+- Experimental stability notices in package docs for `agent`, `diagnose`, `diagnose/git`, `diagnose/postgres`, and `bridge`. Root package documented as the stable classification core.
+
+### Changed
+
+- **BREAKING:** `WithContext`, `WithCause`, and `WithTimestamp` are now copy-on-write — they return a NEW `*Error` instead of mutating the receiver in place. Fixes a data race when errors are shared across goroutines (e.g. package-level sentinels). Previous chaining calls that assumed identity preservation (`err2 := err1.WithContext(...)`) still compile but now get a distinct pointer.
+- **BREAKING:** Removed `Compose(errs...)`. Use stdlib `errors.Join` directly — `Classify` already handles multi-errors (first non-Transient wins). One less API surface to learn.
+- **BREAKING:** Template placeholder syntax changed from `{{.key}}` to `{key}`. The old syntax collided with Go's `text/template`, misleading users into expecting pipeline/conditional/escaping behavior. Migration: replace all `{{.key}}` with `{key}` in registered templates.
+- Package-level `RegisterClassification`/`RegisterClassifications`/`UnregisterClassification`/`RegisterTemplate`/`UnregisterTemplate` now delegate to `DefaultRegistry` (backward compatible — no code changes needed for existing callers).
+- README retry wording tightened to clarify that `IsRetryable` returns a binary signal; backoff, jitter, and idempotency are the consumer's responsibility.
+
+### Fixed
+
+- Data race in `WithContext`/`WithCause`/`WithTimestamp` — these methods mutated the receiver's fields and returned the same pointer, causing aliasing bugs when errors were stored in shared locations (struct fields, sentinels). All three now use copy-on-write via a shared `clone()` helper.
+
 ## [0.4.0] - 2026-06-17
 
 ### Added

@@ -3,7 +3,7 @@
 Structured error protocol library. Library only — no `main`, no build system, no external deps. Full API reference: `SKILL.md`.
 
 **Last Updated:** 2026-06-17
-**Version:** v0.4.0
+**Version:** v0.5.0
 **Status:** All tests pass (root + bridge + submodules), 0 lint issues, 0 race conditions
 **Workspace modules:** root (zero-dep), `bridge` (oops integration), `diagnose/git`, `diagnose/postgres`
 
@@ -21,8 +21,11 @@ go build ./...                                 # build check
 - **`Classify` defaults unknown errors to `Transient`** (retryable). Fail-open design — unknown errors get retried. Same for `ParseFamily` with unrecognized strings.
 - **`errors.Is` matches on `code + family` only**, ignoring message. Two `*Error`s with different messages but same code and family will match.
 - **`Wrap(nil, ...)` returns `nil`** — nil-safe, but means you can't construct an error wrapping nil.
+- **`WithContext`/`WithCause`/`WithTimestamp` are copy-on-write** — they return a NEW `*Error`, not the same pointer. Safe to chain from shared/sentinel errors. Do NOT assume identity preservation.
+- **Template placeholders use `{key}`, not `{{.key}}`** — the old syntax collided with Go's `text/template`. Migration: replace all `{{.key}}` with `{key}` in registered templates.
 - **Consumer interfaces (`Coded`, `Classified`, `Contextual`, `Retryable`) embed `error`** — required for Go 1.26's `errors.AsType[T]()`. Don't remove the embedding.
 - **`HandleErrorWithContext` is the canonical entry point** — `HandleError` and `HandleErrorWithConfig` delegate to it. Always prefer the context-accepting variant when you have a `context.Context`.
+- **Package-level `Classify`/`RegisterClassification`/`RegisterTemplate` delegate to `DefaultRegistry`** — backward compatible. For test isolation or scoped handling, construct a `NewRegistry()` and pass it via `HandleConfig.Registry`.
 - **`CommandRunner` defaults to `DefaultCommandRunner{}`** — rules with a nil `Runner` field use the real system commands. Tests inject mocks.
 
 ## New APIs (v0.3.0)
@@ -52,6 +55,15 @@ This means a type implementing both `Classified` and `Retryable` will use `Class
 
 **Multi-error behavior:** For `errors.Join(err1, err2, ...)`, each sub-error is classified recursively. The first sub-error with a non-Transient family determines the result. If all are Transient, the result is Transient. This is fail-closed: if any part of a multi-error is not retryable, the whole operation is not retryable.
 
+## Registry Pattern
+
+The library uses an injectable `Registry` type (`registry.go`) that holds both classification sentinels and message templates. The zero value is not usable — use `NewRegistry()`.
+
+- **`DefaultRegistry`** is a package-level `*Registry` used by all convenience functions (`Classify`, `RegisterClassification`, `RegisterTemplate`, etc.) and by `HandleError` when `HandleConfig.Registry` is nil.
+- **Custom registries** enable test isolation (no `t.Cleanup(Unregister...)` needed) and scoped error handling within a single binary. Pass via `HandleConfig.Registry`.
+- **Thread-safety:** `Registry` snapshots the sentinels map under RLock before iterating — `errors.Is` runs lock-free. Same pattern as the original global registry.
+- **`resolveSuggestedFix`** checks the same template chain as `renderCLI`: per-call override → registry template → built-in default → family fallback.
+
 ## Agent Is Analysis-Only
 
 The `DebugAgent` interface has a single method: `Analyze`. It produces root cause analysis and `FixStep` suggestions. The library does NOT execute fixes — the consumer decides what to do with `FixStep.Command`. The `Involvement` and `RiskLevel` concepts belong to the consumer, not the library.
@@ -72,13 +84,13 @@ Not a library type — partial success is a consumption pattern, not a classific
 
 | Package              | Coverage |
 | -------------------- | -------- |
-| root (`errorfamily`) | 96.5%    |
+| root (`errorfamily`) | 98.4%    |
 | `agent`              | 89.4%    |
 | `diagnose` (core)    | 77.3%    |
 | `diagnose/git`       | 98.5%    |
 | `diagnose/postgres`  | 80.3%    |
 
-Diagnose core coverage at 77.3% with integration tests (temp dir filesystem, localhost DNS/TCP network).
+Root coverage at 98.4% (up from 96.5%) after adding `registry_test.go` with 9 isolation tests.
 
 ## Fuzz Tests
 
@@ -113,7 +125,9 @@ Connects go-error-family with `samber/oops`. Separate module with its own `go.mo
 - `gochecknoglobals` is enabled but suppressed via `//nolint:gochecknoglobals` on each legitimate package-level var (mutex-protected registries, immutable lookup tables, rule specs) — the BuildFlow pre-commit auto-configure hook re-enables it if disabled in `.golangci.yml`.
 - `exhaustruct` is enabled but most project types are excluded via `.golangci.yml` because they have intentional optional fields (HandleConfig, MessageTemplate, DiagnosticResult, etc.). Test files also exclude exhaustruct.
 - `flake.nix` uses `pkgs.go_1_26` as `goPkg` — do NOT use `let goPkg = goPkg;` (infinite recursion).
-- `lookupRegistered` snapshots the map before iterating — `errors.Is` runs lock-free. No deadlock possible.
+- `lookupRegistered` is now `Registry.lookupSentinel` — still snapshots the map before iterating, `errors.Is` runs lock-free. No deadlock possible.
+- `HandleConfig.Registry` field added — when nil, falls back to `DefaultRegistry`. `resolveSuggestedFix` checks registry templates alongside built-in defaults.
+- `Registry` is excluded from `exhaustruct` via `.golangci.yml` — the `mu` field (sync.RWMutex) has a correct zero value set by `NewRegistry()`.
 - `HandleConfig.Diagnose` bool was removed — diagnostics run whenever `DiagnosticFunc` is set. No separate enable flag.
 - `diagnose.Status` has `IsValid()` matching `Family.IsValid()` pattern.
 - `diagnose.sortByConfidence` uses `slices.SortFunc` (Go 1.26 stdlib).
@@ -124,11 +138,10 @@ Connects go-error-family with `samber/oops`. Separate module with its own `go.mo
 - `ParseAudience` and `ParseStatus` mirror `ParseFamily` — case-insensitive string parsing for all enums.
 - `Family` and `Audience` implement `encoding.TextMarshaler`/`TextUnmarshaler` for YAML/JSON config.
 - `agent.Config.Enabled` now returns `(nil, error)` instead of synthetic result — calling `Analyze` on a disabled agent is a programming error.
-- `Compose` doc explains it exists for API discoverability (thin wrapper over `errors.Join`).
 
 ## Known Limitations
 
-- **`applyContext` XSS (handle.go):** Template values are substituted via `strings.ReplaceAll` without HTML escaping. This is intentional for CLI output (stderr) but would be unsafe for HTML rendering. Consumers building HTTP responses should escape values before embedding in HTML.
+- **`applyContext` uses `{key}` syntax (handle.go):** Template values are substituted via `strings.ReplaceAll` without HTML escaping. This is intentional for CLI output (stderr) but would be unsafe for HTML rendering. Consumers building HTTP responses should escape values before embedding in HTML.
 - **`agent.Config.Enabled` is now honest:** A disabled agent returns `(nil, error)` instead of a synthetic `AgentResult`. Calling `Analyze` on a disabled agent is a programming error, not a silent result.
 - **`ClassifiedError` value-embeds `oops.OopsError`:** The zero value has nil internals. Methods like `Error()` and `Is()` guard against this, but future methods added to `ClassifiedError` must handle the zero-OopsError case.
 - **Examples built in CI:** `examples/cmd/` is now compiled by a CI step (`go build ./examples/...`).

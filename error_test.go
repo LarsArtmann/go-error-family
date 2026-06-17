@@ -97,6 +97,58 @@ func TestErrorContextIsolation(t *testing.T) {
 	}
 }
 
+func TestErrorWithContextCopyOnWrite(t *testing.T) {
+	original := NewRejection("test", "msg").
+		WithContext("key1", "val1")
+
+	derived := original.WithContext("key2", "val2")
+
+	if original.ContextValue("key2") != "" {
+		t.Error("WithContext should not mutate the original error")
+	}
+	if original.ContextValue("key1") != "val1" {
+		t.Error("original context should be preserved after WithContext on derived")
+	}
+	if derived.ContextValue("key1") != "val1" {
+		t.Error("derived should inherit existing context")
+	}
+	if derived.ContextValue("key2") != "val2" {
+		t.Error("derived should have the new context key")
+	}
+}
+
+func TestErrorWithCauseCopyOnWrite(t *testing.T) {
+	original := NewRejection("test", "msg")
+	cause1 := errors.New("first")
+	cause2 := errors.New("second")
+
+	original = original.WithCause(cause1)
+	derived := original.WithCause(cause2)
+
+	if !errors.Is(original.Cause(), cause1) {
+		t.Error("WithCause should not mutate the original error's cause")
+	}
+	if !errors.Is(derived.Cause(), cause2) {
+		t.Error("derived should have the new cause")
+	}
+}
+
+func TestErrorWithTimestampCopyOnWrite(t *testing.T) {
+	original := NewRejection("test", "msg")
+	originalTS := time.Date(2025, 1, 1, 0, 0, 0, 0, time.UTC)
+	original = original.WithTimestamp(originalTS)
+
+	newTS := time.Date(2026, 6, 17, 0, 0, 0, 0, time.UTC)
+	derived := original.WithTimestamp(newTS)
+
+	if original.Timestamp() != originalTS {
+		t.Error("WithTimestamp should not mutate the original error")
+	}
+	if derived.Timestamp() != newTS {
+		t.Error("derived should have the new timestamp")
+	}
+}
+
 func TestErrorFormat(t *testing.T) {
 	err := NewTransient("db.timeout", "connection refused").
 		WithContext("host", "localhost")

@@ -2,6 +2,9 @@
 // by checking the live system state. Rules are matched by error codes, context keys,
 // and message patterns, then run concurrent checks to produce actionable findings.
 //
+// Stability: experimental (v0.x). The API may change between minor versions.
+// The classification core (errorfamily root package) is the stable foundation.
+//
 // The package ships with zero-dependency rules (FilesystemRule, NetworkRule) in
 // DefaultRunner. Additional rules live in submodules:
 //   - diagnose/git: GitRule (checks repo state, working tree, remotes)

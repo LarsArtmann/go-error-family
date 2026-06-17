@@ -116,8 +116,8 @@ func TestHandleErrorDetailedWithConfigTemplateOverride(t *testing.T) {
 	result := HandleErrorDetailedWithConfig(err, HandleConfig{
 		TemplateOverride: map[string]MessageTemplate{
 			"file.not_found": {
-				What: "Custom: {{.path}} not found",
-				Fix:  "Create {{.path}}",
+				What: "Custom: {path} not found",
+				Fix:  "Create {path}",
 			},
 		},
 	})

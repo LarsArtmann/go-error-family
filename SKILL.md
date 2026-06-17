@@ -17,7 +17,8 @@ errorfamily/          ← root package: types, constructors, classification, CLI
   family.go             Family enum + Audience/Tone metadata
   interfaces.go         Coded, Classified, Contextual, Retryable
   constructors.go       New/Wrap + family shortcuts
-  classify.go           Classify(), IsRetryable, ExitCode, RegisterClassification(s), Compose
+  classify.go           Classify(), IsRetryable, ExitCode, RegisterClassification(s)
+  registry.go           Registry type (injectable sentinels + templates), DefaultRegistry, NewRegistry()
   handle.go             HandleError(), HandleErrorWithContext(), HandleErrorDetailed(), template system
 
 diagnose/             ← concurrent diagnostic rules (zero-dep core)
@@ -179,8 +180,8 @@ family := errorfamily.ParseFamily("transient")  // parse from string (case-insen
 errorfamily.RegisterClassification(sql.ErrConnDone, errorfamily.Transient)
 errorfamily.RegisterClassifications(map[error]errorfamily.Family{...})
 
-// Combine errors for partial-success patterns
-combined := errorfamily.Compose(err1, err2)  // errors.Join wrapper
+// Combine errors for partial-success patterns — use stdlib errors.Join
+combined := errors.Join(err1, err2)  // Classify picks the worst Family automatically
 ```
 
 **Classification precedence** (first match wins):
@@ -190,6 +191,26 @@ combined := errorfamily.Compose(err1, err2)  // errors.Join wrapper
 3. `Retryable` interface → infer `Transient` (true) or `Rejection` (false)
 4. Registered sentinels via `errors.Is` chain walk (RLock-protected iteration)
 5. Default → `Transient` (fail-open)
+
+### Injectable Registry (test isolation, scoped handling)
+
+Package-level functions (`Classify`, `RegisterClassification`, `RegisterTemplate`) delegate to `DefaultRegistry`. For test isolation or scoped error handling within a binary, construct a custom registry:
+
+```go
+reg := errorfamily.NewRegistry()
+reg.RegisterClassification(sql.ErrConnDone, errorfamily.Transient)
+reg.RegisterTemplate("custom.code", errorfamily.MessageTemplate{What: "Custom"})
+
+// Pass via HandleConfig.Registry
+code := errorfamily.HandleErrorWithConfig(err, errorfamily.HandleConfig{
+    Registry: reg,
+})
+
+// Or classify directly
+family := reg.Classify(err)
+```
+
+No `t.Cleanup(Unregister...)` needed — the registry is local, no global state mutated.
 
 ### CLI Boundary (main.go pattern)
 
@@ -228,7 +249,7 @@ exitCode := errorfamily.HandleErrorWithConfig(err, errorfamily.HandleConfig{
         return ... // adapt diagnose.Runner results
     },
     TemplateOverride: map[string]errorfamily.MessageTemplate{
-        "db.timeout": {What: "DB timed out on {{.host}}", Fix: "Check {{.host}}"},
+        "db.timeout": {What: "DB timed out on {host}", Fix: "Check {host}"},
     },
     OnDiagnosed: func(err error, findings []errorfamily.DiagnosticFinding) { ... },
 })
@@ -289,7 +310,7 @@ for _, r := range results {
 for _, f := range failures {
     switch errorfamily.Classify(f.err) {
     case errorfamily.Transient:
-        // retry with backoff
+        // retry (backoff, jitter, idempotency are the consumer's responsibility)
     case errorfamily.Rejection:
         // skip, log, or surface to user
     case errorfamily.Corruption:
@@ -331,7 +352,7 @@ result, err := ag.Analyze(ctx, err, diagnosis)
 | `errors.Is` matches on **code + family** only      | Two `*Error`s with different messages but same code+family match |
 | `Wrap(nil, ...)` returns `nil`                     | Nil-safe, but can't construct error wrapping nil                 |
 | `Error.ErrorContext()` returns a **copy**          | Mutations won't affect the original                              |
-| Template `{{.key}}` uses `strings.ReplaceAll`      | Not html/template — just simple substitution                     |
+| Template `{key}` uses `strings.ReplaceAll`         | Not html/template — just simple substitution                     |
 | `DiagnosticFunc` is a function type, not interface | Avoids circular import between root and diagnose packages        |
 
 ---
@@ -339,9 +360,11 @@ result, err := ag.Analyze(ctx, err, diagnosis)
 ## Template Resolution Order
 
 1. `HandleConfig.TemplateOverride[code]` — per-call override
-2. `lookupTemplate(code)` — global registry via `RegisterTemplate()`
+2. `Registry.lookupTemplate(code)` — registry templates via `RegisterTemplate()` (uses `DefaultRegistry` unless `HandleConfig.Registry` is set)
 3. `defaultMessages[code]` — built-in exact-match (see handle.go)
 4. `family.DefaultMessage()` — generic fallback
+
+`SuggestedFix` resolution follows the same chain via `resolveSuggestedFix()`.
 
 All lookups are exact code match (case-insensitive). No substring matching.
 
@@ -541,14 +564,14 @@ func TestExample(t *testing.T) {
 
 ```go
 type MessageTemplate struct {
-    What   string  // "Could not connect to {{.host}}"
+    What   string  // "Could not connect to {host}"
     Why    string  // "The database is not reachable."
-    Fix    string  // "Check that {{.host}} is running."
+    Fix    string  // "Check that {host} is running."
     WayOut string  // "Run with --verbose for more details."
 }
 ```
 
-`{{.key}}` placeholders are replaced from error context values. Empty fields fall back to family defaults.
+`{key}` placeholders are replaced from error context values. Empty fields fall back to family defaults.
 
 ---
 

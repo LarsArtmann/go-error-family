@@ -1,6 +1,8 @@
 // Package agent provides an error analysis agent that uses diagnostic context
 // to produce root cause analysis and fix suggestions.
 //
+// Stability: experimental (v0.x). The API may change between minor versions.
+//
 // The agent proposes fixes but does NOT execute them. The consumer decides
 // what to do with the suggested FixSteps.
 //

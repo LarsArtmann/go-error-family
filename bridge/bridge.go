@@ -3,6 +3,8 @@
 // OopsError satisfy error-family's Classified, Coded, Retryable, and Contextual
 // interfaces without either library knowing about the other.
 //
+// Stability: experimental (v0.x). The API may change between minor versions.
+//
 // Usage:
 //
 //	rich := oops.In("database").Tags("timeout").With("host", "db1").Wrap(dbErr)

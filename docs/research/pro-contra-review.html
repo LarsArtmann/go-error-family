@@ -1,0 +1,1194 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>go-error-family — Architecture Review (PRO / CONTRA)</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Geist+Mono:wght@300;400;500&family=Geist:wght@300;400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      :root {
+        --bg: #fafaf8;
+        --fg: #1a1a1a;
+        --muted: #6b6b6b;
+        --accent-pro: #1a5c3a;
+        --accent-con: #c23a22;
+        --accent-neutral: #8a6d00;
+        --border: #d4d4d0;
+        --border-soft: #e6e6e2;
+        --card: #ffffff;
+        --code-bg: #f0f0ec;
+        --highlight: #fff3cd;
+        --pro-bg: #f0f7f1;
+        --con-bg: #fbf0ee;
+        --neutral-bg: #faf6e8;
+        --serif: "Instrument Serif", Georgia, serif;
+        --sans: "Geist", -apple-system, sans-serif;
+        --mono: "Geist Mono", "SF Mono", monospace;
+      }
+
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+
+      body {
+        font-family: var(--sans);
+        color: var(--fg);
+        background: var(--bg);
+        line-height: 1.65;
+        -webkit-font-smoothing: antialiased;
+      }
+
+      ::selection {
+        background: var(--highlight);
+      }
+
+      .container {
+        max-width: 1080px;
+        margin: 0 auto;
+        padding: 0 2rem;
+      }
+
+      /* ─── HERO ─── */
+      header {
+        padding: 6rem 0 4rem;
+        border-bottom: 1px solid var(--border);
+      }
+
+      .hero-tag {
+        display: inline-block;
+        font-family: var(--mono);
+        font-size: 0.7rem;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+        padding: 0.25rem 0.6rem;
+        border: 1px solid var(--border);
+        border-radius: 3px;
+        margin-bottom: 1.25rem;
+        color: var(--muted);
+      }
+
+      .hero-title {
+        font-family: var(--serif);
+        font-size: clamp(2.6rem, 5.5vw, 4.4rem);
+        line-height: 1.05;
+        letter-spacing: -0.02em;
+        max-width: 900px;
+      }
+
+      .hero-title em {
+        font-style: italic;
+        color: var(--muted);
+      }
+
+      .hero-subtitle {
+        margin-top: 1.5rem;
+        font-size: 1.15rem;
+        color: var(--muted);
+        max-width: 680px;
+        line-height: 1.7;
+      }
+
+      .hero-meta {
+        margin-top: 2.5rem;
+        display: flex;
+        flex-wrap: wrap;
+        gap: 2.5rem;
+        font-size: 0.82rem;
+        color: var(--muted);
+      }
+
+      .hero-meta div {
+        line-height: 1.7;
+      }
+
+      .hero-meta strong {
+        display: block;
+        color: var(--fg);
+        font-weight: 500;
+        font-size: 0.78rem;
+        font-family: var(--mono);
+        letter-spacing: 0.04em;
+        text-transform: uppercase;
+        margin-bottom: 0.15rem;
+      }
+
+      /* ─── TL;DR ─── */
+      .tldr {
+        padding: 3.5rem 0;
+        border-bottom: 1px solid var(--border);
+      }
+
+      .tldr-card {
+        padding: 2.5rem;
+        background: var(--card);
+        border: 1px solid var(--border);
+        border-left: 4px solid var(--accent-neutral);
+        border-radius: 4px;
+      }
+
+      .tldr-card .label {
+        font-family: var(--mono);
+        font-size: 0.7rem;
+        letter-spacing: 0.1em;
+        text-transform: uppercase;
+        color: var(--muted);
+        margin-bottom: 0.75rem;
+      }
+
+      .tldr-card .verdict {
+        font-family: var(--serif);
+        font-size: 1.7rem;
+        line-height: 1.3;
+        margin-bottom: 1rem;
+      }
+
+      .tldr-card p {
+        font-size: 0.95rem;
+        color: #444;
+        line-height: 1.75;
+      }
+
+      .score-row {
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        gap: 1px;
+        margin-top: 2rem;
+        background: var(--border-soft);
+        border: 1px solid var(--border-soft);
+        border-radius: 4px;
+        overflow: hidden;
+      }
+
+      .score-cell {
+        background: var(--card);
+        padding: 1.1rem 1rem;
+        text-align: center;
+      }
+
+      .score-cell .name {
+        font-family: var(--mono);
+        font-size: 0.62rem;
+        letter-spacing: 0.06em;
+        text-transform: uppercase;
+        color: var(--muted);
+        margin-bottom: 0.4rem;
+      }
+
+      .score-cell .value {
+        font-family: var(--serif);
+        font-size: 1.7rem;
+        line-height: 1;
+      }
+
+      .score-cell .value.a {
+        color: var(--accent-pro);
+      }
+      .score-cell .value.b {
+        color: var(--accent-neutral);
+      }
+      .score-cell .value.c {
+        color: var(--accent-con);
+      }
+
+      /* ─── SECTIONS ─── */
+      section {
+        padding: 4rem 0;
+        border-bottom: 1px solid var(--border);
+      }
+
+      .section-label {
+        font-family: var(--mono);
+        font-size: 0.7rem;
+        letter-spacing: 0.1em;
+        text-transform: uppercase;
+        color: var(--muted);
+        margin-bottom: 1rem;
+      }
+
+      .section-title {
+        font-family: var(--serif);
+        font-size: clamp(1.9rem, 3.2vw, 2.6rem);
+        line-height: 1.15;
+        margin-bottom: 0.75rem;
+        max-width: 700px;
+      }
+
+      .section-intro {
+        font-size: 1.02rem;
+        color: var(--muted);
+        max-width: 700px;
+        margin-bottom: 2.5rem;
+        line-height: 1.7;
+      }
+
+      /* ─── FINDING CARDS ─── */
+      .finding {
+        padding: 1.8rem 2rem;
+        background: var(--card);
+        border: 1px solid var(--border);
+        border-radius: 4px;
+        margin-bottom: 1rem;
+        position: relative;
+        border-left: 3px solid transparent;
+      }
+
+      .finding.pro {
+        border-left-color: var(--accent-pro);
+        background: var(--pro-bg);
+      }
+
+      .finding.con {
+        border-left-color: var(--accent-con);
+        background: var(--con-bg);
+      }
+
+      .finding-head {
+        display: flex;
+        align-items: baseline;
+        gap: 0.75rem;
+        flex-wrap: wrap;
+        margin-bottom: 0.5rem;
+      }
+
+      .finding-num {
+        font-family: var(--mono);
+        font-size: 0.7rem;
+        color: var(--muted);
+        letter-spacing: 0.05em;
+      }
+
+      .finding-title {
+        font-family: var(--sans);
+        font-size: 1.08rem;
+        font-weight: 600;
+        line-height: 1.3;
+        flex: 1;
+      }
+
+      .severity {
+        font-family: var(--mono);
+        font-size: 0.6rem;
+        letter-spacing: 0.07em;
+        text-transform: uppercase;
+        padding: 0.18rem 0.5rem;
+        border-radius: 3px;
+        white-space: nowrap;
+      }
+
+      .severity.high {
+        background: #fde2dc;
+        color: #9a2d18;
+      }
+      .severity.med {
+        background: var(--highlight);
+        color: #6b5500;
+      }
+      .severity.low {
+        background: #e8efe9;
+        color: #2d5a3a;
+      }
+
+      .finding p {
+        font-size: 0.92rem;
+        line-height: 1.7;
+        color: #3a3a3a;
+      }
+
+      .finding .ref {
+        margin-top: 0.6rem;
+        font-family: var(--mono);
+        font-size: 0.76rem;
+        color: var(--muted);
+      }
+
+      .finding pre {
+        margin-top: 0.8rem;
+        background: var(--code-bg);
+        border: 1px solid var(--border-soft);
+        border-radius: 4px;
+        padding: 0.9rem 1rem;
+        font-family: var(--mono);
+        font-size: 0.8rem;
+        line-height: 1.55;
+        overflow-x: auto;
+        color: #2a2a2a;
+      }
+
+      .finding code.inline {
+        font-family: var(--mono);
+        font-size: 0.84em;
+        background: var(--code-bg);
+        padding: 0.08rem 0.35rem;
+        border-radius: 3px;
+      }
+
+      /* ─── COMPETITIVE TABLE ─── */
+      .table-wrap {
+        overflow-x: auto;
+        border: 1px solid var(--border);
+        border-radius: 4px;
+      }
+
+      table {
+        width: 100%;
+        border-collapse: collapse;
+        font-size: 0.86rem;
+        background: var(--card);
+      }
+
+      th,
+      td {
+        padding: 0.85rem 1rem;
+        text-align: left;
+        border-bottom: 1px solid var(--border-soft);
+      }
+
+      th {
+        font-family: var(--mono);
+        font-size: 0.68rem;
+        letter-spacing: 0.05em;
+        text-transform: uppercase;
+        color: var(--muted);
+        background: #f6f6f3;
+        white-space: nowrap;
+      }
+
+      tbody tr:last-child td {
+        border-bottom: none;
+      }
+
+      td.center {
+        text-align: center;
+      }
+
+      .yes {
+        color: var(--accent-pro);
+        font-weight: 600;
+      }
+      .no {
+        color: var(--muted);
+      }
+      .partial {
+        color: var(--accent-neutral);
+      }
+
+      /* ─── RECOMMENDATIONS ─── */
+      .rec-list {
+        counter-reset: rec;
+        list-style: none;
+      }
+
+      .rec-list li {
+        counter-increment: rec;
+        padding: 1.4rem 0 1.4rem 3rem;
+        border-bottom: 1px solid var(--border-soft);
+        position: relative;
+        font-size: 0.95rem;
+        line-height: 1.7;
+        color: #333;
+      }
+
+      .rec-list li:last-child {
+        border-bottom: none;
+      }
+
+      .rec-list li::before {
+        content: counter(rec);
+        position: absolute;
+        left: 0;
+        top: 1.4rem;
+        width: 2rem;
+        height: 2rem;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-family: var(--mono);
+        font-size: 0.8rem;
+        color: var(--muted);
+        border: 1px solid var(--border);
+        border-radius: 50%;
+      }
+
+      .rec-list strong {
+        color: var(--fg);
+      }
+
+      /* ─── FOOTER ─── */
+      footer {
+        padding: 3rem 0 5rem;
+        text-align: center;
+        color: var(--muted);
+        font-size: 0.82rem;
+        line-height: 1.7;
+      }
+
+      footer a {
+        color: var(--fg);
+        text-decoration: underline;
+        text-underline-offset: 2px;
+      }
+
+      @media (max-width: 640px) {
+        .container {
+          padding: 0 1.25rem;
+        }
+        header {
+          padding: 4rem 0 3rem;
+        }
+        .score-row {
+          grid-template-columns: repeat(2, 1fr);
+        }
+        .finding {
+          padding: 1.4rem 1.25rem;
+        }
+      }
+
+      @media print {
+        body {
+          background: #fff;
+        }
+        .finding,
+        .tldr-card {
+          break-inside: avoid;
+        }
+        section {
+          break-before: auto;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <header>
+      <div class="container">
+        <span class="hero-tag">Architecture Review</span>
+        <h1 class="hero-title">
+          go-error-family<br />
+          <em>PRO &amp; CONTRA</em>
+        </h1>
+        <p class="hero-subtitle">
+          A structured error protocol for Go — behavioral classification, exit codes, and diagnostic
+          rules. This review evaluates the concept, the implementation, and the competitive
+          positioning of <code>github.com/larsartmann/go-error-family</code> at v0.4.0.
+        </p>
+        <div class="hero-meta">
+          <div>
+            <strong>Reviewed</strong>
+            v0.4.0 · 2026-06-17
+          </div>
+          <div>
+            <strong>Stack</strong>
+            Go 1.26 · zero-dep core · 4 modules
+          </div>
+          <div>
+            <strong>Verified</strong>
+            Build ✓ · Tests ✓ (race) · 0 lint issues
+          </div>
+          <div>
+            <strong>Coverage</strong>
+            96.5% root · 89.4% agent · 77.3% diagnose
+          </div>
+        </div>
+      </div>
+    </header>
+
+    <!-- ─── TL;DR ─── -->
+    <section class="tldr" style="border-bottom: 1px solid var(--border)">
+      <div class="container">
+        <div class="tldr-card">
+          <div class="label">The bottom line</div>
+          <p class="verdict">
+            A genuinely novel, high-craftsmanship library that solves a real problem nobody else
+            solves — but its bleeding-edge Go requirement and pre-1.0 API churn are real adoption
+            headwinds.
+          </p>
+          <p>
+            The core idea — a behavioral <em>Family</em> that answers <em>“should I retry?”</em>,
+            <em>“what exit code?”</em>, and <em>“whose fault is it?”</em> in one concept — is the
+            differentiator. No major Go error library provides this. The engineering hygiene
+            (zero-dependency core, 96% coverage, fuzz tests, strict lint, exemplary documentation)
+            is excellent. The main risks are a hard dependency on Go&nbsp;1.26’s
+            <code class="inline">errors.AsType[T]</code> (limits the addressable audience), global
+            mutable registries, and a scope (classification + diagnostics + “agent”) that is
+            ambitious for a v0.x library. Ship a stable v1.0 of the classification core first.
+          </p>
+          <div class="score-row">
+            <div class="score-cell">
+              <div class="name">Concept</div>
+              <div class="value a">A</div>
+            </div>
+            <div class="score-cell">
+              <div class="name">Craftsmanship</div>
+              <div class="value a">A</div>
+            </div>
+            <div class="score-cell">
+              <div class="name">Adoption Risk</div>
+              <div class="value c">C+</div>
+            </div>
+            <div class="score-cell">
+              <div class="name">API Stability</div>
+              <div class="value b">B−</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ─── STRENGTHS ─── -->
+    <section>
+      <div class="container">
+        <div class="section-label">Strengths</div>
+        <h2 class="section-title">What it gets right</h2>
+        <p class="section-intro">
+          The library’s value lives in one insight, executed with unusually disciplined engineering.
+          The code, tests, and documentation are all above the bar for an open-source Go library.
+        </p>
+
+        <div class="finding pro">
+          <div class="finding-head">
+            <span class="finding-num">PRO 01</span>
+            <span class="finding-title"
+              >A genuinely novel niche: behavioral classification as a first-class concept</span
+            >
+            <span class="severity low">high impact</span>
+          </div>
+          <p>
+            Every Go program hits <code class="inline">if err != nil</code> — but then what?
+            <em>pkg/errors</em> adds stack traces. <em>cockroachdb/errors</em> makes errors
+            network-portable. <em>samber/oops</em> adds structured context. <em>emperror</em> routes
+            errors to handlers.
+            <strong
+              >None of them answer the three questions a CLI/HTTP boundary actually needs:</strong
+            >
+            should I retry? what exit code? whose fault is it? go-error-family’s
+            <code class="inline">Family</code> answers all three in one concept. This is a real,
+            differentiated value proposition, not a re-skin of existing work.
+          </p>
+          <div class="ref">family.go · classify.go · README “The Problem” table</div>
+        </div>
+
+        <div class="finding pro">
+          <div class="finding-head">
+            <span class="finding-num">PRO 02</span>
+            <span class="finding-title"
+              >“Share the protocol, not the implementation” — the interfaces are the product</span
+            >
+            <span class="severity low">high impact</span>
+          </div>
+          <p>
+            Four small consumer interfaces — <code class="inline">Coded</code>,
+            <code class="inline">Classified</code>, <code class="inline">Contextual</code>,
+            <code class="inline">Retryable</code> — each embedding
+            <code class="inline">error</code>. You don’t have to use the built-in
+            <code class="inline">Error</code> struct; implement the interfaces you need. This is
+            idiomatic Go (accept interfaces, return structs) and makes the library play well with
+            arbitrary existing error types. The built-in <code class="inline">Error</code> is a
+            convenience, not a tax.
+          </p>
+          <div class="ref">
+            interfaces.go · error.go · README “Implementing Your Own Error Type”
+          </div>
+        </div>
+
+        <div class="finding pro">
+          <div class="finding-head">
+            <span class="finding-num">PRO 03</span>
+            <span class="finding-title">Zero-dependency core with surgical module boundaries</span>
+            <span class="severity low">high impact</span>
+          </div>
+          <p>
+            The root module (<code class="inline">go.mod</code>) has
+            <strong>zero external dependencies</strong> — it uses only the standard library. The
+            heavier integrations are isolated in opt-in submodules:
+            <code class="inline">bridge</code> (pulls in samber/oops),
+            <code class="inline">diagnose/git</code> and
+            <code class="inline">diagnose/postgres</code> (each their own module).
+            <code class="inline">go.work</code> ties them together for local development. Submodules
+            pin the root at a valid lower bound (v0.3.0) so MVS resolves correctly. This is
+            sophisticated, mature multi-module hygiene for a Go library.
+          </p>
+          <pre>
+go.work
+├── .                  root: zero-dep, classification core
+├── bridge/            opt-in: samber/oops integration
+├── diagnose/git/      opt-in: GitRule
+└── diagnose/postgres/ opt-in: PostgresRule</pre
+          >
+          <div class="ref">go.mod · go.work · bridge/go.mod · diagnose/git/go.mod</div>
+        </div>
+
+        <div class="finding pro">
+          <div class="finding-head">
+            <span class="finding-num">PRO 04</span>
+            <span class="finding-title">Engineering honesty: the “analysis-only” agent</span>
+            <span class="severity low">high impact</span>
+          </div>
+          <p>
+            The <code class="inline">DebugAgent</code> interface has a single
+            <code class="inline">Analyze</code> method that
+            <strong>proposes fixes but does not execute them</strong>. An earlier
+            <code class="inline">ApplyFixes</code> method that ran shell commands was identified as
+            fraud (“a library should never run <code class="inline">mkdir</code>/<code
+              class="inline"
+              >git</code
+            >
+            on behalf of callers”) and removed. This is the kind of scope discipline most libraries
+            lack. The consumer decides what to do with <code class="inline">FixStep.Command</code>.
+          </p>
+          <div class="ref">agent/agent.go · docs/top-5-stupidest-things.md item 1</div>
+        </div>
+
+        <div class="finding pro">
+          <div class="finding-head">
+            <span class="finding-num">PRO 05</span>
+            <span class="finding-title">Exceptional test and quality hygiene</span>
+            <span class="severity low">high impact</span>
+          </div>
+          <p>
+            96.5% root coverage. 5 fuzz tests. 16+ benchmarks. Race-clean across all modules.
+            <strong>0 lint issues</strong> under a golangci-lint v2 config that enables 40+ linters
+            (errorlint, nilnesserr, gosec, exhaustive, wrapcheck, etc.). The thread-safety fix in
+            <code class="inline">lookupRegistered</code> — snapshot the map, release the lock, then
+            iterate lock-free — is exactly right and was found via self-critique.
+          </p>
+          <pre>
+BenchmarkClassifyErrorStruct   8.3 ns/op    0 allocs   (struct-based)
+BenchmarkClassifyPlainError     30 ns/op    0 allocs   (any error)
+BenchmarkExitCode               9.3 ns/op    0 allocs
+BenchmarkIsRetryable            8.0 ns/op    0 allocs</pre
+          >
+          <div class="ref">classify.go · benchmark_test.go · fuzz_test.go · .golangci.yml</div>
+        </div>
+
+        <div class="finding pro">
+          <div class="finding-head">
+            <span class="finding-num">PRO 06</span>
+            <span class="finding-title">Documentation that treats the reader as an engineer</span>
+            <span class="severity low">med impact</span>
+          </div>
+          <p>
+            A DDD <code class="inline">DOMAIN_LANGUAGE.md</code> with a glossary, a
+            <code class="inline">SKILL.md</code> for AI context, an
+            <code class="inline">AGENTS.md</code> that documents every surprising behavior, a
+            self-critique doc that lists and resolves the “Top 5 Stupidest Things”, and a CHANGELOG
+            with clear breaking-change callouts. The “Surprising Behaviors” section — e.g.
+            <em>“Classify(nil) returns Rejection, not a zero value”</em> — is exemplary engineering
+            honesty. Most libraries hide their footguns; this one catalogues them.
+          </p>
+          <div class="ref">AGENTS.md · docs/DOMAIN_LANGUAGE.md · SKILL.md · CHANGELOG.md</div>
+        </div>
+
+        <div class="finding pro">
+          <div class="finding-head">
+            <span class="finding-num">PRO 07</span>
+            <span class="finding-title">Principled, predictable classification cascade</span>
+            <span class="severity low">med impact</span>
+          </div>
+          <p>
+            <code class="inline">Classify(err)</code> checks five sources in order, first match
+            wins: multi-error (errors.Join) → Classified interface → Retryable interface →
+            registered sentinels → default. The multi-error behavior is fail-closed: if
+            <em>any</em> sub-error is non-retryable, the whole operation is non-retryable. The
+            fail-open default (unknown → Transient) is a defensible opinion, documented and
+            intentional.
+          </p>
+          <div class="ref">classify.go:18-57 · AGENTS.md “Classification Precedence”</div>
+        </div>
+
+        <div class="finding pro">
+          <div class="finding-head">
+            <span class="finding-num">PRO 08</span>
+            <span class="finding-title"
+              >The bridge module proves the protocol is library-agnostic</span
+            >
+            <span class="severity low">med impact</span>
+          </div>
+          <p>
+            <code class="inline">bridge.Wrap(err, family)</code> attaches a Family to a samber/oops
+            error, preserving its stack trace and context, while satisfying the
+            Classified/Coded/Retryable/Contextual interfaces —
+            <strong>without either library knowing about the other</strong>.
+            <code class="inline">AutoWrap</code> even infers the Family from oops tags/domains. This
+            validates the core claim: the protocol composes with any error enrichment library you
+            already use.
+          </p>
+          <div class="ref">bridge/bridge.go · bridge/classify.go</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ─── WEAKNESSES ─── -->
+    <section>
+      <div class="container">
+        <div class="section-label">Weaknesses</div>
+        <h2 class="section-title">What holds it back</h2>
+        <p class="section-intro">
+          These are not careless bugs — most are documented and intentional. But they are real
+          frictions for adopters, and several carry real risk. They are ranked by impact on the
+          library’s stated goal of broad adoption.
+        </p>
+
+        <div class="finding con">
+          <div class="finding-head">
+            <span class="finding-num">CON 01</span>
+            <span class="finding-title"
+              >Hard dependency on Go 1.26 limits the addressable audience</span
+            >
+            <span class="severity high">high impact</span>
+          </div>
+          <p>
+            The library requires Go 1.26 for <code class="inline">errors.AsType[T]()</code>. As of
+            release, Go 1.26 is bleeding-edge — most production codebases run on the previous stable
+            release. A library at v0.x that demands the absolute latest Go version creates a real
+            adoption barrier: teams on older toolchains cannot use it, and the feature (<code
+              class="inline"
+              >errors.AsType</code
+            >) is used pervasively, so there is no easy fallback path. For a library seeking uptake,
+            this is the single biggest headwind. It is a deliberate bet on the modern idiom — but
+            the bet narrows who can play.
+          </p>
+          <pre>
+// classify.go — pervasively used, no fallback
+if c, ok := errors.AsType[Classified](err); ok { ... }
+if r, ok := errors.AsType[Retryable](err); ok { ... }</pre
+          >
+          <div class="ref">go.mod (go 1.26.3) · classify.go · handle.go · diagnose/helpers.go</div>
+        </div>
+
+        <div class="finding con">
+          <div class="finding-head">
+            <span class="finding-num">CON 02</span>
+            <span class="finding-title">Global mutable registries are a library smell</span>
+            <span class="severity high">high impact</span>
+          </div>
+          <p>
+            Two package-level mutable maps —
+            <code class="inline">registry.entries</code> (classification) and
+            <code class="inline">templateRegistry.entries</code> (message templates) — are mutated
+            via <code class="inline">Register*</code> functions, typically from
+            <code class="inline">init()</code>. They are mutex-protected and the read path snapshots
+            before iterating (good), but global mutable state in a library is still a smell: it
+            creates hidden coupling between packages, it cannot be scoped per-test without explicit
+            <code class="inline">Unregister</code> cleanup, and parallel tests can interfere. The
+            test code already bears the symptom —
+            <code class="inline">t.Cleanup(func() { UnregisterClassification(sentinel) })</code>
+            appears throughout the suite. A registry-bearing type you construct and pass in would be
+            cleaner and testable by construction.
+          </p>
+          <div class="ref">classify.go:119-139 · handle.go:328-340 · classify_test.go:46</div>
+        </div>
+
+        <div class="finding con">
+          <div class="finding-head">
+            <span class="finding-num">CON 03</span>
+            <span class="finding-title"
+              ><code class="inline">WithContext</code> mutates in place — not immutable</span
+            >
+            <span class="severity high">high impact</span>
+          </div>
+          <p>
+            The chaining API
+            <code class="inline">err.WithContext("k", "v").WithContext("k2", "v2")</code>
+            <em>looks</em> immutable, but <code class="inline">WithContext</code> returns the
+            <strong>same pointer</strong> after mutating the internal map. If an error is shared
+            (e.g. a package-level sentinel, or an error stored in a struct field), adding context
+            mutates it for everyone — a data race under concurrency and a source of surprising
+            aliasing. For a library that preaches immutability, this is a contradiction. The 0-alloc
+            benchmark result is itself the tell: no copy means no isolation.
+          </p>
+          <pre>
+func (e *Error) WithContext(key, value string) *Error {
+    if e.context == nil { e.context = make(map[string]string) }
+    e.context[key] = value  // mutates receiver in place
+    return e                // returns same pointer
+}</pre
+          >
+          <div class="ref">error.go:122-128 · benchmark_test.go:94 (0 allocs = no copy)</div>
+        </div>
+
+        <div class="finding con">
+          <div class="finding-head">
+            <span class="finding-num">CON 04</span>
+            <span class="finding-title">The “agent” is deterministic, not an AI agent</span>
+            <span class="severity high">med impact</span>
+          </div>
+          <p>
+            The package is named <code class="inline">agent</code>, the type is
+            <code class="inline">DebugAgent</code>, and the README calls it an “AI debug agent”. But
+            <code class="inline">deterministicAnalyze</code> is a fixed rule-synthesizer: it walks
+            the diagnostic results, copies <code class="inline">StatusFailed</code> summaries, and
+            parses shell commands out of prose. There is no probabilistic model, no learning, no
+            inference — it is deterministic. The naming oversells the capability and may mislead
+            adopters expecting pluggable LLM-backed analysis. A name like
+            <code class="inline">RCA</code> (root cause analysis) or
+            <code class="inline">Synthesizer</code> would be honest.
+          </p>
+          <div class="ref">agent/agent.go:103-146 · README “AI debug agent”</div>
+        </div>
+
+        <div class="finding con">
+          <div class="finding-head">
+            <span class="finding-num">CON 05</span>
+            <span class="finding-title"
+              ><code class="inline">extractCommand</code> parses prose with fragile heuristics</span
+            >
+            <span class="severity high">med impact</span>
+          </div>
+          <p>
+            The agent’s <code class="inline">extractCommand</code> reverse-engineers a shell command
+            from a human-readable diagnostic suggestion by matching
+            <code class="inline">$ </code> prefixes, <code class="inline">Run: </code> prefixes,
+            indented lines, and a <strong>hardcoded list</strong> of command prefixes (<code
+              class="inline"
+              >git</code
+            >, <code class="inline">mkdir</code>, <code class="inline">nc</code>…). This is
+            stringly-typed parsing of free-form prose. It will silently break the moment a
+            diagnostic rule changes its suggestion format, and the
+            <code class="inline">looksLikeCommand</code> heuristic will misclassify any new tool not
+            in the list. The fix is structural: diagnostic rules should emit a structured
+            <code class="inline">{summary, command, rationale}</code> triple, not prose to be parsed
+            back.
+          </p>
+          <div class="ref">agent/agent.go:148-197</div>
+        </div>
+
+        <div class="finding con">
+          <div class="finding-head">
+            <span class="finding-num">CON 06</span>
+            <span class="finding-title"
+              >Retry is a single boolean — coarse for real-world semantics</span
+            >
+            <span class="severity high">med impact</span>
+          </div>
+          <p>
+            Only <code class="inline">Transient</code> is retryable; everything else is not. This is
+            clean, but real retry logic is nuanced: a DB deadlock is retryable <em>a few times</em>;
+            a connection refused needs <em>backoff</em>; a write conflict is retryable
+            <em>only if idempotent</em>; a rate-limit is retryable <em>after a delay</em>. The
+            library gives callers a binary signal and leaves all the hard parts (limits, jitter,
+            idempotency, circuit-breaking) to be re-implemented everywhere. The
+            <code class="inline">Retryable</code> interface returns
+            <code class="inline">bool</code>, not a policy. That’s fine for a classification
+            primitive, but the README’s <em>“schedule a retry with backoff”</em> framing implies
+            more than the API delivers.
+          </p>
+          <div class="ref">family.go:143-145 · interfaces.go:38-41 · README Quick Start</div>
+        </div>
+
+        <div class="finding con">
+          <div class="finding-head">
+            <span class="finding-num">CON 07</span>
+            <span class="finding-title"
+              ><code class="inline">{{.key}}</code> looks like
+              <code class="inline">text/template</code> but isn’t</span
+            >
+            <span class="severity med">med impact</span>
+          </div>
+          <p>
+            <code class="inline">MessageTemplate</code> uses
+            <code class="inline">{{.key}}</code> placeholders resolved by naive
+            <code class="inline">strings.ReplaceAll</code> — no escaping, no pipelines, no
+            conditionals. The syntax is the same as Go’s <code class="inline">text/template</code>,
+            so users will assume it behaves like it (and then hit <strong>no HTML escaping</strong>,
+            which the AGENTS.md itself flags as an XSS concern). Either use real
+            <code class="inline">text/template</code> (with
+            <code class="inline">template.HTML</code> escaping opt-in), or pick a syntax that does
+            not collide with the standard library. The current middle ground is the worst of both.
+          </p>
+          <pre>
+// handle.go — looks like text/template, behaves like ReplaceAll
+func applyContext(template string, context map[string]string) string {
+    s := template
+    for k, v := range context {
+        s = strings.ReplaceAll(s, "{{."+k+"}}", v) // no escaping
+    }
+    return s
+}</pre
+          >
+          <div class="ref">handle.go:255-261 · AGENTS.md “Known Limitations” (XSS)</div>
+        </div>
+
+        <div class="finding con">
+          <div class="finding-head">
+            <span class="finding-num">CON 08</span>
+            <span class="finding-title">Several intentional-but-surprising edge cases</span>
+            <span class="severity med">low impact</span>
+          </div>
+          <p>A cluster of opinionated choices, each defensible but unintuitive:</p>
+          <ul style="margin: 0.5rem 0 0.5rem 1.4rem; font-size: 0.9rem; line-height: 1.7">
+            <li>
+              <code class="inline">Classify(nil)</code> →
+              <code class="inline">Rejection</code> (“nil = caller’s fault”).
+              <code class="inline">ExitCode(nil)</code> → <code class="inline">0</code>. The
+              asymmetry is intentional but trips up the unwary.
+            </li>
+            <li>
+              <code class="inline">errors.Is</code> matches on <strong>code + family only</strong>,
+              ignoring message — two errors with the same code but different messages are “equal”.
+            </li>
+            <li>
+              <code class="inline">Wrap(nil, …)</code> → <code class="inline">nil</code> — you
+              cannot construct an error wrapping a nil cause.
+            </li>
+            <li>
+              <code class="inline">ParseFamily("garbage")</code> →
+              <code class="inline">Transient</code> — unrecognized input silently becomes retryable.
+            </li>
+          </ul>
+          <p>
+            Credit: <strong>every one of these is documented</strong> in the “Surprising Behaviors”
+            section. The critique is that a library with this many intentional surprises needs its
+            adopters to read that section carefully — which not all will.
+          </p>
+          <div class="ref">AGENTS.md “Surprising Behaviors” · classify.go · error.go:39-45</div>
+        </div>
+
+        <div class="finding con">
+          <div class="finding-head">
+            <span class="finding-num">CON 09</span>
+            <span class="finding-title"
+              ><code class="inline">Compose</code> is acknowledged dead weight</span
+            >
+            <span class="severity med">low impact</span>
+          </div>
+          <p>
+            <code class="inline">Compose(errs...)</code> is literally
+            <code class="inline">return errors.Join(errs...)</code> with a doc comment admitting it
+            exists “for API discoverability”. Wrapping a stdlib function with a new name is API
+            noise: it adds a thing to learn, document, and maintain, that does nothing the stdlib
+            doesn’t. Honest move to document it; better move to remove it and point users at
+            <code class="inline">errors.Join</code> in the README.
+          </p>
+          <pre>
+func Compose(errs ...error) error {
+    return errors.Join(errs...) // zero added logic
+}</pre
+          >
+          <div class="ref">classify.go:83-85 · AGENTS.md “Partial Success”</div>
+        </div>
+
+        <div class="finding con">
+          <div class="finding-head">
+            <span class="finding-num">CON 10</span>
+            <span class="finding-title"
+              >Pre-1.0 with repeated breaking changes — adopters must accept churn</span
+            >
+            <span class="severity med">med impact</span>
+          </div>
+          <p>
+            At v0.4.0 the library has already shipped multiple breaking changes across four minor
+            versions: rules modularized into submodules (v0.2.0),
+            <code class="inline">HandleConfig.Diagnose</code> removed and
+            <code class="inline">agent.Config.Enabled</code> return type changed (v0.4.0). This is
+            expected and healthy for a v0 library actively finding its shape — but it means any
+            adopter today is signing up for migration work on each release. The path to confidence
+            is a deliberate v1.0 that freezes the core classification API.
+          </p>
+          <div class="ref">CHANGELOG.md [0.2.0] [0.4.0]</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ─── COMPETITIVE LANDSCAPE ─── -->
+    <section>
+      <div class="container">
+        <div class="section-label">Competitive position</div>
+        <h2 class="section-title">Where it stands</h2>
+        <p class="section-intro">
+          go-error-family is not competing with context/wrapping libraries — it composes with them
+          (the bridge module proves this). It occupies its own category: behavioral classification
+          at the system boundary. No peer provides that out of the box.
+        </p>
+
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>Capability</th>
+                <th class="center">go-error-family</th>
+                <th class="center">pkg/errors</th>
+                <th class="center">cockroachdb/errors</th>
+                <th class="center">samber/oops</th>
+                <th class="center">emperror</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>Behavioral family (retry taxonomy)</td>
+                <td class="center yes">✓ 5 families</td>
+                <td class="center no">—</td>
+                <td class="center no">—</td>
+                <td class="center no">—</td>
+                <td class="center no">—</td>
+              </tr>
+              <tr>
+                <td>Retry decision (first-class)</td>
+                <td class="center yes">✓</td>
+                <td class="center no">—</td>
+                <td class="center partial">predicates only</td>
+                <td class="center no">—</td>
+                <td class="center no">—</td>
+              </tr>
+              <tr>
+                <td>Exit codes (BSD sysexits.h)</td>
+                <td class="center yes">✓</td>
+                <td class="center no">—</td>
+                <td class="center no">—</td>
+                <td class="center no">—</td>
+                <td class="center no">—</td>
+              </tr>
+              <tr>
+                <td>User-vs-system attribution</td>
+                <td class="center yes">✓ Audience</td>
+                <td class="center no">—</td>
+                <td class="center partial">hints/details</td>
+                <td class="center partial">.Public()</td>
+                <td class="center no">—</td>
+              </tr>
+              <tr>
+                <td>Structured context</td>
+                <td class="center yes">map[string]string</td>
+                <td class="center partial">message only</td>
+                <td class="center yes">WithDetail/Hint</td>
+                <td class="center yes">rich builder</td>
+                <td class="center partial">via handler</td>
+              </tr>
+              <tr>
+                <td>Stack traces</td>
+                <td class="center no">—</td>
+                <td class="center yes">✓</td>
+                <td class="center yes">✓</td>
+                <td class="center yes">✓ + source</td>
+                <td class="center no">—</td>
+              </tr>
+              <tr>
+                <td>Network-portable errors</td>
+                <td class="center no">—</td>
+                <td class="center no">—</td>
+                <td class="center yes">✓ protobuf</td>
+                <td class="center no">—</td>
+                <td class="center no">—</td>
+              </tr>
+              <tr>
+                <td>Deterministic diagnostics</td>
+                <td class="center yes">✓ rules</td>
+                <td class="center no">—</td>
+                <td class="center no">—</td>
+                <td class="center no">—</td>
+                <td class="center no">—</td>
+              </tr>
+              <tr>
+                <td>External dependencies</td>
+                <td class="center yes">zero (core)</td>
+                <td class="center yes">zero</td>
+                <td class="center partial">several</td>
+                <td class="center yes">zero</td>
+                <td class="center partial">several</td>
+              </tr>
+              <tr>
+                <td>Composes with the above?</td>
+                <td class="center yes">✓ bridge module</td>
+                <td class="center no">—</td>
+                <td class="center no">—</td>
+                <td class="center no">—</td>
+                <td class="center no">—</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <p style="margin-top: 1.25rem; font-size: 0.84rem; color: var(--muted)">
+          The decisive row is the last one: go-error-family is designed to <em>compose</em> with a
+          context/stack-trace library, not replace one. Use oops for enrichment, go-error-family for
+          the boundary decision.
+        </p>
+      </div>
+    </section>
+
+    <!-- ─── RECOMMENDATIONS ─── -->
+    <section>
+      <div class="container">
+        <div class="section-label">Path forward</div>
+        <h2 class="section-title">Recommendations</h2>
+        <p class="section-intro">
+          Ordered by impact on adoption and stability. The first three would materially change the
+          library’s trajectory toward a credible v1.0.
+        </p>
+
+        <ol class="rec-list">
+          <li>
+            <strong>Ship a v1.0 of the classification core and freeze it.</strong> The root package
+            (Family, Classify, ExitCode, IsRetryable, constructors, interfaces) is already excellent
+            and stable in spirit. Cut v1.0 for <em>just</em> that, mark the diagnostics/agent/bridge
+            as v0 experimental. A stable core is the single biggest unlock for adoption — it lets
+            teams commit without fear of churn.
+          </li>
+          <li>
+            <strong>Resolve the Go 1.26 tension deliberately.</strong> Either own it (document Go
+            1.26 as a firm requirement and lean into being modern), or provide a
+            <code class="inline">errors.As</code>-based fallback build tag so the core runs on Go
+            1.23+. The current middle (requires latest, no fallback) is the highest-friction option.
+          </li>
+          <li>
+            <strong>Make <code class="inline">WithContext</code> copy-on-write</strong> (or document
+            clearly that <code class="inline">Error</code> is single-owner). A chaining API that
+            looks immutable but mutates in place is a data-race waiting to happen for anyone who
+            stores an error in a shared location. The 0-alloc benchmark is not worth the footgun.
+          </li>
+          <li>
+            <strong>Replace the global registries with an injectable registry type.</strong> A
+            <code class="inline">*Classifier</code> (or <code class="inline">*Registry</code>) you
+            construct and pass in removes hidden global coupling, makes parallel tests trivially
+            safe, and eliminates the <code class="inline">t.Cleanup(Unregister…)</code> tax across
+            the test suite. Keep the package-level defaults for convenience.
+          </li>
+          <li>
+            <strong>Rename the “agent” to match what it does.</strong> It is a deterministic
+            root-cause synthesizer. <code class="inline">RCA</code>,
+            <code class="inline">Synthesizer</code>, or
+            <code class="inline">DiagnosticAnalyzer</code> would not oversell. If real pluggable AI
+            analysis is the vision, make the interface accept an injectable analyzer so an LLM
+            backend can be swapped in.
+          </li>
+          <li>
+            <strong>Make diagnostic rules emit structured fix data, not prose.</strong>
+            <code class="inline">DiagnosticResult</code> should carry a typed
+            <code class="inline">{summary, command, rationale}</code> so the agent doesn’t have to
+            reverse-parse shell commands out of human-readable strings with a hardcoded prefix list.
+            This kills the fragile <code class="inline">extractCommand</code> heuristic at the root.
+          </li>
+          <li>
+            <strong>Choose a template syntax and own it.</strong> Either adopt real
+            <code class="inline">text/template</code> (with explicit escaping semantics) or rename
+            the placeholders to something that doesn’t collide with the stdlib (e.g.
+            <code class="inline">{key}</code>). The current
+            <code class="inline">{{.key}}</code>-that-isn’t-template is the most confusing option.
+          </li>
+          <li>
+            <strong>Drop <code class="inline">Compose</code>.</strong> Point users at
+            <code class="inline">errors.Join</code> in the README. One less API surface to document,
+            test, and explain.
+          </li>
+        </ol>
+      </div>
+    </section>
+
+    <footer>
+      <div class="container">
+        <p>
+          Architecture review of
+          <a href="https://github.com/larsartmann/go-error-family">go-error-family</a> at v0.4.0.<br />
+          Generated 2026-06-17. All claims verified against the source: build, tests (-race),
+          benchmarks, and golangci-lint all pass clean.<br />
+          Competitive data sourced from project documentation and public library docs (pkg/errors,
+          cockroachdb/errors, samber/oops, emperror).
+        </p>
+      </div>
+    </footer>
+  </body>
+</html>

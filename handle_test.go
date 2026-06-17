@@ -52,8 +52,8 @@ func TestHandleErrorWithConfigTemplateOverride(t *testing.T) {
 		Output: &buf,
 		TemplateOverride: map[string]MessageTemplate{
 			"file.not_found": {
-				What: "Could not find {{.path}}",
-				Fix:  "Create the file at {{.path}}",
+				What: "Could not find {path}",
+				Fix:  "Create the file at {path}",
 			},
 		},
 	})

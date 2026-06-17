@@ -52,7 +52,7 @@ func main() {
     // → Transient (default: unknown errors are retryable)
 
     if errorfamily.IsRetryable(err) {
-        // yes — schedule a retry with backoff
+        // yes — retrying is appropriate (backoff/jitter/idempotency are yours to implement)
     }
 
     os.Exit(errorfamily.ExitCode(err))
@@ -80,8 +80,9 @@ See [examples/](examples/) for runnable CLI, HTTP, and custom diagnostic rule de
 - **Small interfaces** — `Coded`, `Classified`, `Contextual`, `Retryable` — each error type implements what it needs
 - **`Classify(err)`** — universal classification for any error (multi-error → interface → registered sentinels → default)
 - **`ExitCode(err)`** — BSD sysexits.h exit codes derived from Family
+- **`Registry`** — injectable registry for test isolation and scoped error handling (no `t.Cleanup` needed)
 - **`HandleError(err)`** — CLI boundary handler with structured messages (What / Why / Fix / WayOut)
-- **`Compose(errs...)`** — combine errors via `errors.Join` for partial-success patterns
+- **Multi-error support** — `errors.Join` + `Classify` picks the worst Family automatically (partial-success patterns)
 - **Diagnostic rules** — deterministic checks (PostgreSQL, filesystem, network, git) that auto-discover why an error occurred
 - **AI debug agent** — root cause analysis and `FixStep` suggestions from diagnostic context
 
@@ -114,8 +115,8 @@ err := errorfamily.NewRejection("file.not_found", "config missing").
 // Formatted
 err := errorfamily.Newf(errorfamily.Rejection, "file.not_found", "missing: %s", path)
 
-// Multi-error (partial success)
-err := errorfamily.Compose(err1, err2, err3)
+// Multi-error (partial success) — use stdlib errors.Join, Classify picks the worst Family
+err := errors.Join(err1, err2, err3)
 ```
 
 Family-specific constructors: `NewRejection`, `NewConflict`, `NewTransient`, `NewCorruption`, `NewInfrastructure`. Wrap variants: `WrapRejection`, `WrapConflict`, `WrapTransient`, `WrapCorruption`, `WrapInfrastructure`.
@@ -126,7 +127,7 @@ Family-specific constructors: `NewRejection`, `NewConflict`, `NewTransient`, `Ne
 // Classify any error → Family
 family := errorfamily.Classify(err)
 
-// Retry decision
+// Retry decision — binary signal only; backoff/idempotency are your responsibility
 if errorfamily.IsRetryable(err) {
     retry(err)
 }
@@ -236,9 +237,9 @@ exitCode := errorfamily.HandleErrorWithContext(ctx, err, errorfamily.HandleConfi
     },
     TemplateOverride: map[string]errorfamily.MessageTemplate{
         "file.not_found": {
-            What:   "Could not find {{.path}}",
+            What:   "Could not find {path}",
             Why:    "The file doesn't exist at the expected location.",
-            Fix:    "Check that {{.path}} exists and is readable.",
+            Fix:    "Check that {path} exists and is readable.",
             WayOut: "Run with --verbose for more details.",
         },
     },

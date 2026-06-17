@@ -118,26 +118,40 @@ func (e *Error) formatVerbose(f fmt.State) {
 }
 
 // WithContext adds a key-value pair to the error's context.
-// Returns the same error for chaining.
+// Returns a new Error, leaving the original unchanged — safe for shared/sentinel errors.
 func (e *Error) WithContext(key, value string) *Error {
-	if e.context == nil {
-		e.context = make(map[string]string)
-	}
-	e.context[key] = value
-	return e
+	clone := e.clone()
+	clone.context[key] = value
+	return clone
 }
 
-// WithCause sets the underlying cause and returns the error for chaining.
+// WithCause sets the underlying cause and returns a new error for chaining.
 func (e *Error) WithCause(cause error) *Error {
-	e.cause = cause
-	return e
+	clone := e.clone()
+	clone.cause = cause
+	return clone
 }
 
-// WithTimestamp sets the error timestamp and returns the error for chaining.
+// WithTimestamp sets the error timestamp and returns a new error for chaining.
 // Useful for testing and deterministic construction.
 func (e *Error) WithTimestamp(ts time.Time) *Error {
-	e.timestamp = ts
-	return e
+	clone := e.clone()
+	clone.timestamp = ts
+	return clone
+}
+
+// clone returns a shallow copy of the error with a deep-copied context map.
+func (e *Error) clone() *Error {
+	c := &Error{
+		code:      e.code,
+		message:   e.message,
+		family:    e.family,
+		cause:     e.cause,
+		timestamp: e.timestamp,
+		context:   make(map[string]string, len(e.context)),
+	}
+	maps.Copy(c.context, e.context)
+	return c
 }
 
 // Summary returns a one-line human-readable summary suitable for logs and CLI output.
