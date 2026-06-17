@@ -2,11 +2,11 @@ direction: down
 
 # ─── CURRENT ARCHITECTURE (v0.5.0) ───
 
-root_module: "Root Module\ngithub.com/larsartmann/go-error-family" {
+root_module: "Root Module\ngithub.com/larsartmann/go-error-family\n(the classification library)" {
   style.fill: "#f0f7f1"
   style.stroke: "#1a5c3a"
 
-  core: "Classification Core (STABLE)\n— Family, Error, Interfaces\n— Classify, Registry\n— HandleError, Constructors\n— Zero external deps" {
+  errorfamily: "errorfamily (STABLE)\n— Family, Error, Interfaces\n— Classify, Registry\n— HandleError, Constructors\n— Zero external deps" {
     style.fill: "#e8efe9"
     style.stroke: "#2d5a3a"
   }
@@ -26,11 +26,11 @@ root_module: "Root Module\ngithub.com/larsartmann/go-error-family" {
     style.stroke: "#d4d4d0"
   }
 
-  core -> diagnose_pkg: "errors.AsType\n(Classified, Contextual)"
-  diagnose_pkg -> core: "errorfamily.Classify\nerrorfamily.Family"
+  errorfamily -> diagnose_pkg: "errors.AsType\n(Classified, Contextual)"
+  diagnose_pkg -> errorfamily: "errorfamily.Classify\nerrorfamily.Family"
   agent_pkg -> diagnose_pkg: "diagnose.DiagnosticResult\ndiagnose.StatusFailed"
-  agent_pkg -> core: "errorfamily.Classify"
-  examples -> core: "NewRejection, HandleError\nWrapTransient, etc."
+  agent_pkg -> errorfamily: "errorfamily.Classify"
+  examples -> errorfamily: "NewRejection, HandleError\nWrapTransient, etc."
 }
 
 bridge_mod: "Bridge Module\nbridge/\ngithub.com/.../bridge" {
@@ -59,7 +59,7 @@ external_oops: "samber/oops v1.22.0" {
 bridge_mod -> external_oops: "oops.OopsError"
 
 legend: |label
-  GREEN = stable (classification core)
+  GREEN = stable (the errorfamily package)
   YELLOW = experimental (within root module, shared version)
   RED = separate modules (pinned at v0.3.0, NOT v0.5.0)
   GRAY = external dependency

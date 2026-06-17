@@ -336,7 +336,7 @@
         <div class="section-label">The bottom line</div>
         <h2 class="section-title">One god-module, four submodules, one clear path to v1.0</h2>
         <p class="section-intro">
-          The classification core is excellent — zero-dep, well-tested, copy-on-write immutable. But
+          The classification library is excellent — zero-dep, well-tested, copy-on-write immutable. But
           it shares a
           <code
             class="inline"
@@ -377,13 +377,13 @@
               border-radius: 3px;
             "
             >examples/</code
-          >). This prevents the core from reaching v1.0 stability independently. Extracting the two
+          >). This prevents the root from reaching v1.0 stability independently. Extracting the two
           experimental packages into their own modules is the single highest-leverage architectural
           change.
         </p>
         <div class="score-row">
           <div class="score-cell">
-            <div class="name">Core Design</div>
+            <div class="name">Architecture Design</div>
             <div class="value a">A</div>
           </div>
           <div class="score-cell">
@@ -418,7 +418,7 @@
               border-radius: 3px;
             "
             >go.work</code
-          >. The root module is the heaviest — it contains the stable classification core AND three
+          >. The root module is the heaviest — it contains the stable classification library AND three
           experimental packages.
         </p>
         <table>
@@ -435,11 +435,11 @@
           <tbody>
             <tr>
               <td><strong>root</strong> (errorfamily)</td>
-              <td>core + agent/ + diagnose/ + examples/</td>
+              <td> errorfamily + agent/ + diagnose/ + examples/</td>
               <td>zero</td>
               <td>— (it IS the root)</td>
               <td>v0.5.0</td>
-              <td style="color: #1a5c3a">Mixed (core stable, rest experimental)</td>
+              <td style="color: #1a5c3a">Mixed (errorfamily stable, rest experimental)</td>
             </tr>
             <tr>
               <td><strong>bridge</strong></td>
@@ -485,7 +485,7 @@
           <div class="finding-head">
             <span class="finding-num">STR 01</span>
             <span class="finding-title"
-              >Zero-dependency core — the hardest constraint, achieved</span
+              >Zero-dependency root — the hardest constraint, achieved</span
             >
             <span class="severity low">high impact</span>
           </div>
@@ -502,9 +502,9 @@
               >go.mod</code
             >
             has zero external dependencies. No samber/oops, no OpenTelemetry, no testify. This means
-            any Go project can adopt the classification core without pulling transitive dependency
+            any Go project can adopt the classification library without pulling transitive dependency
             trees. The bridge module (which pulls in oops) is opt-in. This is textbook "mechanism,
-            not policy" — the core defines
+            not policy" — it defines
             <em>what</em> classification means; consumers bring <em>how</em> they want their errors
             enriched.
           </p>
@@ -515,22 +515,22 @@
           <div class="finding-head">
             <span class="finding-num">STR 02</span>
             <span class="finding-title"
-              >Clean DAG — all dependency arrows point toward the core</span
+              >Clean DAG — all dependency arrows point toward the root</span
             >
             <span class="severity low">high impact</span>
           </div>
           <p>
-            Every internal dependency points toward the classification core. No cycles exist. The
-            agent depends on diagnose (which depends on core). The bridge depends on core. The
-            git/postgres submodules depend on core + diagnose. This is the correct direction —
+            Every internal dependency points toward the classification library. No cycles exist. The
+            agent depends on diagnose (which depends on root). The bridge depends on root. The
+            git/postgres submodules depend on root + diagnose. This is the correct direction —
             domain types define the interface, infrastructure implements it.
           </p>
           <pre>
-agent/    → diagnose/ → core (root)
-bridge/   → core (root)
-git/      → core + diagnose
-postgres/ → core + diagnose
-examples/ → core (leaf nodes)</pre
+agent/    → diagnose/ → root (errorfamily)
+bridge/   → root (errorfamily)
+git/      → root + diagnose
+postgres/ → root + diagnose
+examples/ → root (leaf nodes)</pre
           >
           <div class="ref">go.work · all go.mod files</div>
         </div>
@@ -705,12 +705,12 @@ examples/ → core (leaf nodes)</pre
           <div class="finding-head">
             <span class="finding-num">CON 01</span>
             <span class="finding-title"
-              >God-module: stable core shares go.mod with experimental packages</span
+              >God-module: stable root shares go.mod with experimental packages</span
             >
             <span class="severity high">high impact</span>
           </div>
           <p>
-            The root module contains four distinct concerns: (1) the stable classification core, (2)
+            The root module contains four distinct concerns: (1) the stable classification library, (2)
             the experimental diagnostic engine (<code
               class="inline"
               style="
@@ -738,9 +738,9 @@ examples/ → core (leaf nodes)</pre
                 border-radius: 3px;
               "
               >examples/cmd/</code
-            >). This means the core <strong>cannot reach v1.0 independently</strong> — a breaking
+            >). This means the root <strong>cannot reach v1.0 independently</strong> — a breaking
             change to the agent forces a version bump for the entire module, including the stable
-            core. The v1.0 dream requires extracting agent/ and diagnose/ into their own modules.
+            root. The v1.0 dream requires extracting agent/ and diagnose/ into their own modules.
           </p>
           <pre>
 root go.mod
@@ -979,9 +979,9 @@ agent/agent.go:120 if d.Status == diagnose.StatusFailed</pre
               >
               into separate modules.</strong
             >
-            The root module shrinks to the classification core only (~1000 LOC). Agent depends on
-            diagnose (explicit go.mod require). Diagnose depends on core. Each versions
-            independently. This unblocks the v1.0 stable core without freezing the experimental
+            The root module shrinks to the classification library only (~1000 LOC). Agent depends on
+            diagnose (explicit go.mod require). Diagnose depends on root. Each versions
+            independently. This unblocks the v1.0 stable root without freezing the experimental
             packages.
           </li>
           <li>
@@ -1034,7 +1034,7 @@ agent/agent.go:120 if d.Status == diagnose.StatusFailed</pre
               "
               >DiagnosticResult</code
             >
-            interface or move the type to core. This allows the agent to consume results from any
+            interface or move the type to root. This allows the agent to consume results from any
             diagnostic engine, not just this library's.
           </li>
           <li>
@@ -1125,8 +1125,8 @@ agent/agent.go:120 if d.Status == diagnose.StatusFailed</pre
             modules.
           </li>
           <li>
-            <strong>Ship v1.0 of the classification core.</strong>
-            Once the core module contains only Family, Error, interfaces, Classify, Registry,
+            <strong>Ship v1.0 of the classification library.</strong>
+            Once the root module contains only Family, Error, interfaces, Classify, Registry,
             HandleError, and constructors — freeze it. Tag it
             <code
               class="inline"
@@ -1150,7 +1150,7 @@ agent/agent.go:120 if d.Status == diagnose.StatusFailed</pre
         <h2 class="section-title">Current vs Ideal</h2>
         <p class="section-intro">
           D2 diagrams showing the current module structure (god-module with experimental packages)
-          and the ideal target (core as v1.0 stable, all experimental packages as separate modules).
+          and the ideal target (root as v1.0 stable, all experimental packages as separate modules).
           SVG files:
           <code
             class="inline"

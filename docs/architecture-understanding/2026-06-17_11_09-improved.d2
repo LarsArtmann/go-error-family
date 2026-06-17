@@ -2,7 +2,7 @@ direction: down
 
 # ─── IDEAL ARCHITECTURE (v1.0 target) ───
 
-core_mod: "Core Module (v1.0 STABLE)\ngithub.com/larsartmann/go-error-family\n— Family, Error, Interfaces\n— Classify, Registry, HandleError\n— Constructors\n— Zero external deps\n— ~1000 LOC" {
+root_mod: "Root Module (v1.0 STABLE)\ngithub.com/larsartmann/go-error-family\n(the classification library)\n— Family, Error, Interfaces\n— Classify, Registry, HandleError\n— Constructors\n— Zero external deps\n— ~1000 LOC" {
   style.fill: "#e8efe9"
   style.stroke: "#1a5c3a"
   style.stroke-width: 2
@@ -33,21 +33,21 @@ pg_mod: "Postgres Submodule (v0.x)\ngithub.com/.../diagnose/postgres\n— Postgr
   style.stroke: "#c23a22"
 }
 
-examples: "examples/cmd/ (stays in core repo)\n— cli, http, custom_rule\n— LEAF nodes, compiled in CI" {
+examples: "examples/cmd/ (stays in root)\n— cli, http, custom_rule\n— LEAF nodes, compiled in CI" {
   style.fill: "#f0f0ec"
   style.stroke: "#d4d4d0"
 }
 
 # ─── DEPENDENCY EDGES (clean DAG) ───
-diagnose_mod -> core_mod: "errorfamily.Classify\nerrorfamily.Family\nerrorfamily.Contextual"
+diagnose_mod -> root_mod: "errorfamily.Classify\nerrorfamily.Family\nerrorfamily.Contextual"
 agent_mod -> diagnose_mod: "diagnose.DiagnosticResult\ndiagnose.StatusFailed"
-agent_mod -> core_mod: "errorfamily.Classify"
-bridge_mod -> core_mod: "errorfamily.Family\nerrorfamily.IsRetryable"
+agent_mod -> root_mod: "errorfamily.Classify"
+bridge_mod -> root_mod: "errorfamily.Family\nerrorfamily.IsRetryable"
 git_mod -> diagnose_mod: "diagnose.CommandRunner\ndiagnose.RuleSpec"
-git_mod -> core_mod: "(via diagnose)"
+git_mod -> root_mod: "(via diagnose)"
 pg_mod -> diagnose_mod: "diagnose.FamilyIs\ndiagnose.CommandRunner"
-pg_mod -> core_mod: "errorfamily.Transient"
-examples -> core_mod: "NewRejection, HandleError"
+pg_mod -> root_mod: "errorfamily.Transient"
+examples -> root_mod: "NewRejection, HandleError"
 
 external_oops: "samber/oops" {
   style.fill: "#f0f0ec"
@@ -58,11 +58,11 @@ bridge_mod -> external_oops: "oops.OopsError"
 legend: |label
   GREEN = v1.0 stable — frozen API, semver guarantees
   YELLOW = v0.x experimental — separate module, independent versioning
-  RED = integration submodules — opt-in, pinned to core
+  RED = integration submodules — opt-in, pinned to root
   GRAY = external dependency / examples
 
   KEY CHANGE: agent/ and diagnose/ extracted from root module.
-  Root module shrinks to classification core only.
+  Root module shrinks to classification only.
   Each module versions independently.
   No experimental code in the v1.0 stable module.
 |

@@ -9,7 +9,7 @@
 
 Each task is the smallest unit that leaves the project buildable and testable. Each is independently revertable (single commit).
 
-### Tier 1 — Core (foundational)
+### Tier 1 — Root (foundational)
 
 #### Task 1: Create diagnose/go.mod
 
@@ -127,7 +127,7 @@ Each task is the smallest unit that leaves the project buildable and testable. E
 
 #### Task 9: Tag releases (if shipping v1.0)
 
-**What:** Tag core as v1.0.0, diagnose as v0.1.0, agent as v0.1.0.
+**What:** Tag root as v1.0.0, diagnose as v0.1.0, agent as v0.1.0.
 **Dependencies:** Task 8 + user approval.
 **Steps:**
 
