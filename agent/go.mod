@@ -3,8 +3,8 @@ module github.com/larsartmann/go-error-family/agent
 go 1.26.3
 
 require (
-	github.com/larsartmann/go-error-family v0.3.0
-	github.com/larsartmann/go-error-family/diagnose v0.0.0-00010101000000-000000000000
+	github.com/larsartmann/go-error-family v0.4.0
+	github.com/larsartmann/go-error-family/diagnose v0.0.0-20260617102902-cf14885f58fe
 )
 
 // Local replaces until root/diagnose get published versions that

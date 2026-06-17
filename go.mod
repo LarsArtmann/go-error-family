@@ -10,4 +10,4 @@ replace (
 	github.com/larsartmann/go-error-family/diagnose => ./diagnose
 )
 
-require github.com/larsartmann/go-error-family/diagnose v0.0.0-00010101000000-000000000000
+require github.com/larsartmann/go-error-family/diagnose v0.0.0-20260617102902-cf14885f58fe

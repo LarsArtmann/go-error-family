@@ -10,27 +10,27 @@
 
 ### v0.5.0 — Pro/Contra Review Execution (committed: `9edc7fb`)
 
-| CON | Fix | Verification |
-|-----|-----|-------------|
-| 03 | `WithContext`/`WithCause`/`WithTimestamp` copy-on-write | Race-clean, 3 new isolation tests |
-| 09 | Dropped `Compose` | Pointed at `errors.Join` |
-| 07 | Template syntax `{{.key}}` → `{key}` | All tests pass |
-| 02 | Injectable `Registry` type | 9 isolation tests, backward compatible |
-| 06 | README retry wording | No longer implies backoff policy |
-| 10 | Experimental stability notices | All non-root packages marked v0.x |
+| CON | Fix                                                     | Verification                           |
+| --- | ------------------------------------------------------- | -------------------------------------- |
+| 03  | `WithContext`/`WithCause`/`WithTimestamp` copy-on-write | Race-clean, 3 new isolation tests      |
+| 09  | Dropped `Compose`                                       | Pointed at `errors.Join`               |
+| 07  | Template syntax `{{.key}}` → `{key}`                    | All tests pass                         |
+| 02  | Injectable `Registry` type                              | 9 isolation tests, backward compatible |
+| 06  | README retry wording                                    | No longer implies backoff policy       |
+| 10  | Experimental stability notices                          | All non-root packages marked v0.x      |
 
 ### v0.6.0 — Module Extraction (committed: `4ba7843`, `a83f311`)
 
-| Task | Status |
-|------|--------|
+| Task                                                    | Status                        |
+| ------------------------------------------------------- | ----------------------------- |
 | Extract `diagnose/` into own module (`diagnose/go.mod`) | Done — build, test, lint pass |
-| Extract `agent/` into own module (`agent/go.mod`) | Done — build, test, lint pass |
-| Update `go.work` (6 modules) | Done |
-| Local replace directives for unpublished modules | Done — root, diagnose, agent |
-| CI updated with test/lint steps for diagnose and agent | Done |
-| CHANGELOG v0.6.0 entry | Done |
-| SKILL.md architecture overview updated | Done |
-| AGENTS.md workspace modules list + version | Done |
+| Extract `agent/` into own module (`agent/go.mod`)       | Done — build, test, lint pass |
+| Update `go.work` (6 modules)                            | Done                          |
+| Local replace directives for unpublished modules        | Done — root, diagnose, agent  |
+| CI updated with test/lint steps for diagnose and agent  | Done                          |
+| CHANGELOG v0.6.0 entry                                  | Done                          |
+| SKILL.md architecture overview updated                  | Done                          |
+| AGENTS.md workspace modules list + version              | Done                          |
 
 ### Architecture Analysis Artifacts (committed: `eda4116`, `97848d6`)
 
@@ -41,14 +41,14 @@
 
 ### Current Module Landscape (6 modules)
 
-| Module | go.mod | External Deps | Tests (race) | Lint | Coverage |
-|--------|--------|---------------|-------------|------|----------|
-| root (`errorfamily`) | yes | zero | pass | 0 issues | 98.4% |
-| `diagnose` | yes (NEW) | zero | pass | 0 issues | 77.3% |
-| `agent` | yes (NEW) | zero | pass | 0 issues | 89.4% |
-| `bridge` | yes | samber/oops | pass | 0 issues | — |
-| `diagnose/git` | yes | zero | pass | 0 issues | 98.5% |
-| `diagnose/postgres` | yes | zero | pass | 0 issues | 80.3% |
+| Module               | go.mod    | External Deps | Tests (race) | Lint     | Coverage |
+| -------------------- | --------- | ------------- | ------------ | -------- | -------- |
+| root (`errorfamily`) | yes       | zero          | pass         | 0 issues | 98.4%    |
+| `diagnose`           | yes (NEW) | zero          | pass         | 0 issues | 77.3%    |
+| `agent`              | yes (NEW) | zero          | pass         | 0 issues | 89.4%    |
+| `bridge`             | yes       | samber/oops   | pass         | 0 issues | —        |
+| `diagnose/git`       | yes       | zero          | pass         | 0 issues | 98.5%    |
+| `diagnose/postgres`  | yes       | zero          | pass         | 0 issues | 80.3%    |
 
 ---
 
@@ -70,16 +70,16 @@ The plan (`docs/planning/2026-06-17_11-51_module-extraction-and-polish.md`) has 
 
 ## c) NOT STARTED
 
-| # | Task | Impact | Effort |
-|---|------|--------|--------|
-| 9 | `Registry.Clone()` method | Medium | 20min |
-| 10 | `Registry.RegisterTemplates()` batch | Low | 15min |
-| 11 | DRY `resolveSuggestedFix` / `renderCLI` | Medium | 30min |
-| 12 | Update README for new module structure | Medium | 30min |
-| 13 | Update AGENTS.md build commands per module | Medium | 20min |
-| 14 | Update SKILL.md details (beyond architecture overview) | Low | 20min |
-| 16 | Check/update DOMAIN_LANGUAGE.md | Low | 10min |
-| 17 | Final full verification + release prep | Low | 10min |
+| #   | Task                                                   | Impact | Effort |
+| --- | ------------------------------------------------------ | ------ | ------ |
+| 9   | `Registry.Clone()` method                              | Medium | 20min  |
+| 10  | `Registry.RegisterTemplates()` batch                   | Low    | 15min  |
+| 11  | DRY `resolveSuggestedFix` / `renderCLI`                | Medium | 30min  |
+| 12  | Update README for new module structure                 | Medium | 30min  |
+| 13  | Update AGENTS.md build commands per module             | Medium | 20min  |
+| 14  | Update SKILL.md details (beyond architecture overview) | Low    | 20min  |
+| 16  | Check/update DOMAIN_LANGUAGE.md                        | Low    | 10min  |
+| 17  | Final full verification + release prep                 | Low    | 10min  |
 
 ---
 
@@ -162,6 +162,7 @@ The replace directive chain works for development, but it's a hack. The clean fi
 4. Remove all replace directives
 
 But this is a **publishing strategy decision** — it affects every external consumer. I can't determine the right timeline without knowing:
+
 - Are there external consumers today?
 - Is v1.0 the right version number, or should it be v0.7.0 first?
 - Should we keep backward compatibility (re-export from root) or make a clean break?
@@ -170,14 +171,14 @@ But this is a **publishing strategy decision** — it affects every external con
 
 ## Verification Summary
 
-| Module | Build | Tests (race) | Lint | Coverage |
-|--------|------|-------------|------|----------|
-| root (`errorfamily`) | ✓ | ✓ | 0 issues | 98.4% |
-| `diagnose` | ✓ | ✓ | 0 issues | 77.3% |
-| `agent` | ✓ | ✓ | 0 issues | 89.4% |
-| `bridge` | ✓ | ✓ | 0 issues | — |
-| `diagnose/git` | ✓ | ✓ | 0 issues | 98.5% |
-| `diagnose/postgres` | ✓ | ✓ | 0 issues | 80.3% |
+| Module               | Build | Tests (race) | Lint     | Coverage |
+| -------------------- | ----- | ------------ | -------- | -------- |
+| root (`errorfamily`) | ✓     | ✓            | 0 issues | 98.4%    |
+| `diagnose`           | ✓     | ✓            | 0 issues | 77.3%    |
+| `agent`              | ✓     | ✓            | 0 issues | 89.4%    |
+| `bridge`             | ✓     | ✓            | 0 issues | —        |
+| `diagnose/git`       | ✓     | ✓            | 0 issues | 98.5%    |
+| `diagnose/postgres`  | ✓     | ✓            | 0 issues | 80.3%    |
 
 **Git log (this session):**
 

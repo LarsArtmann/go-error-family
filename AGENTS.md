@@ -28,19 +28,6 @@ go build ./...                                 # build check
 - **Package-level `Classify`/`RegisterClassification`/`RegisterTemplate` delegate to `DefaultRegistry`** — backward compatible. For test isolation or scoped handling, construct a `NewRegistry()` and pass it via `HandleConfig.Registry`.
 - **`CommandRunner` defaults to `DefaultCommandRunner{}`** — rules with a nil `Runner` field use the real system commands. Tests inject mocks.
 
-## New APIs (v0.3.0)
-
-| API                                       | Purpose                                                    |
-| ----------------------------------------- | ---------------------------------------------------------- |
-| `HandleErrorWithContext(ctx, err, cfg)`   | Context-propagating CLI boundary handler                   |
-| `HandleErrorDetailedWithConfig(err, cfg)` | Template-aware structured result                           |
-| `Error.WithTimestamp(ts)`                 | Deterministic timestamp for testing                        |
-| `diagnose.CommandRunner`                  | Injectable command execution interface                     |
-| `diagnose.DefaultCommandRunner{}`         | Default implementation using `RunCommand`/`CommandExists`  |
-| `diagnose.ContextKey`                     | Typed string for context keys (`KeyHost`, `KeyPort`, etc.) |
-| `diagnose.ErrorContext(err)`              | Extract context from any error                             |
-| `DiagnosticResult.Context`                | Error context that triggered the rule                      |
-
 ## Classification Precedence
 
 `Classify(err)` checks in order — first match wins:
