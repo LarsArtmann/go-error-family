@@ -4,6 +4,20 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
+## [0.6.0] - 2026-06-17
+
+### Added
+
+- `diagnose/` is now its own Go module (`github.com/larsartmann/go-error-family/diagnose`). Extracted from the root module to enable independent versioning of the diagnostic engine.
+- `agent/` is now its own Go module (`github.com/larsartmann/go-error-family/agent`). Extracted from the root module to enable independent versioning of the root-cause analyzer.
+- CI now runs tests and lint for the `diagnose/` and `agent/` modules independently.
+- `go.work` expanded to 6 workspace modules (root, diagnose, agent, bridge, diagnose/git, diagnose/postgres).
+
+### Changed
+
+- **BREAKING:** The root module no longer contains the `diagnose/` and `agent/` packages as part of its module — they are separate modules with their own `go.mod`. Import paths are unchanged (`github.com/.../diagnose`, `github.com/.../agent`). Consumers using `go.work` see no difference.
+- Local `replace` directives added to root, diagnose, and agent `go.mod` files until published versions resolve the package extraction ambiguity.
+
 ## [0.5.0] - 2026-06-17
 
 ### Added

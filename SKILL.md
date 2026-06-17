@@ -12,7 +12,7 @@ A structured error protocol for Go. Every error gets a behavioral **Family** (re
 ## Architecture at a Glance
 
 ```
-errorfamily/          ← root package: types, constructors, classification, CLI boundary
+errorfamily/          ← root module: types, constructors, classification, CLI boundary
   error.go              Error struct (reference implementation)
   family.go             Family enum + Audience/Tone metadata
   interfaces.go         Coded, Classified, Contextual, Retryable
@@ -21,7 +21,8 @@ errorfamily/          ← root package: types, constructors, classification, CLI
   registry.go           Registry type (injectable sentinels + templates), DefaultRegistry, NewRegistry()
   handle.go             HandleError(), HandleErrorWithContext(), HandleErrorDetailed(), template system
 
-diagnose/             ← concurrent diagnostic rules (zero-dep core)
+diagnose/             ← OWN MODULE (v0.x experimental): concurrent diagnostic rules
+  go.mod                independent module (depends on root)
   diagnose.go           Runner, DiagnosticRule, RuleSpec, CommandRunner, ContextKey, ErrorContext
   command.go           RunCommand, CommandExists, DefaultCommandRunner
   rules_filesystem.go   FilesystemRule
@@ -33,7 +34,8 @@ diagnose/git/         ← submodule: GitRule (opt-in)
 diagnose/postgres/    ← submodule: PostgresRule (opt-in)
   rules_postgres.go     PostgresRule, IsPostgresRunning
 
-agent/                ← analysis-only debug agent
+agent/                ← OWN MODULE (v0.x experimental): analysis-only debug agent
+  go.mod                independent module (depends on root + diagnose)
   agent.go              DebugAgent interface, deterministic analyzer
 
 bridge/               ← submodule: samber/oops integration (opt-in, depends on both libraries)
