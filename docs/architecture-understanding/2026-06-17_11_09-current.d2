@@ -1,0 +1,66 @@
+direction: down
+
+# ─── CURRENT ARCHITECTURE (v0.5.0) ───
+
+root_module: "Root Module\ngithub.com/larsartmann/go-error-family" {
+  style.fill: "#f0f7f1"
+  style.stroke: "#1a5c3a"
+
+  core: "Classification Core (STABLE)\n— Family, Error, Interfaces\n— Classify, Registry\n— HandleError, Constructors\n— Zero external deps" {
+    style.fill: "#e8efe9"
+    style.stroke: "#2d5a3a"
+  }
+
+  diagnose_pkg: "diagnose/ (EXPERIMENTAL)\n— DiagnosticRule, Runner\n— FilesystemRule, NetworkRule\n— CommandRunner, MockCommandRunner\n— Helpers (FamilyIs, ErrorContext)" {
+    style.fill: "#faf6e8"
+    style.stroke: "#8a6d00"
+  }
+
+  agent_pkg: "agent/ (EXPERIMENTAL)\n— DebugAgent interface\n— deterministicAnalyze\n— FixStep suggestions\n— extractCommand (prose parser)" {
+    style.fill: "#faf6e8"
+    style.stroke: "#8a6d00"
+  }
+
+  examples: "examples/cmd/ (LEAF)\n— cli, http, custom_rule" {
+    style.fill: "#f0f0ec"
+    style.stroke: "#d4d4d0"
+  }
+
+  core -> diagnose_pkg: "errors.AsType\n(Classified, Contextual)"
+  diagnose_pkg -> core: "errorfamily.Classify\nerrorfamily.Family"
+  agent_pkg -> diagnose_pkg: "diagnose.DiagnosticResult\ndiagnose.StatusFailed"
+  agent_pkg -> core: "errorfamily.Classify"
+  examples -> core: "NewRejection, HandleError\nWrapTransient, etc."
+}
+
+bridge_mod: "Bridge Module\nbridge/\ngithub.com/.../bridge" {
+  style.fill: "#fbf0ee"
+  style.stroke: "#c23a22"
+}
+
+git_mod: "Git Submodule\ndiagnose/git/\ngithub.com/.../diagnose/git" {
+  style.fill: "#fbf0ee"
+  style.stroke: "#c23a22"
+}
+
+pg_mod: "Postgres Submodule\ndiagnose/postgres/\ngithub.com/.../diagnose/postgres" {
+  style.fill: "#fbf0ee"
+  style.stroke: "#c23a22"
+}
+
+bridge_mod -> root_module: "errorfamily.Family\nerrorfamily.IsRetryable\n(pinned v0.3.0)"
+git_mod -> root_module: "diagnose.CommandRunner\ndiagnose.RuleSpec\n(pinned v0.3.0)"
+pg_mod -> root_module: "errorfamily.Transient\ndiagnose.FamilyIs\n(pinned v0.3.0)"
+
+external_oops: "samber/oops v1.22.0" {
+  style.fill: "#f0f0ec"
+  style.stroke: "#d4d4d0"
+}
+bridge_mod -> external_oops: "oops.OopsError"
+
+legend: |label
+  GREEN = stable (classification core)
+  YELLOW = experimental (within root module, shared version)
+  RED = separate modules (pinned at v0.3.0, NOT v0.5.0)
+  GRAY = external dependency
+|

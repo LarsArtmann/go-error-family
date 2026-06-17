@@ -1,0 +1,454 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>go-error-family — Architecture Review</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Geist+Mono:wght@300;400;500&family=Geist:wght@300;400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      :root {
+        --bg: #fafaf8;
+        --fg: #1a1a1a;
+        --muted: #6b6b6b;
+        --accent-pro: #1a5c3a;
+        --accent-con: #c23a22;
+        --accent-neutral: #8a6d00;
+        --border: #d4d4d0;
+        --border-soft: #e6e6e2;
+        --card: #ffffff;
+        --code-bg: #f0f0ec;
+        --pro-bg: #f0f7f1;
+        --con-bg: #fbf0ee;
+        --neutral-bg: #faf6e8;
+        --serif: "Instrument Serif", Georgia, serif;
+        --sans: "Geist", -apple-system, sans-serif;
+        --mono: "Geist Mono", "SF Mono", monospace;
+      }
+      * { margin: 0; padding: 0; box-sizing: border-box; }
+      body { font-family: var(--sans); color: var(--fg); background: var(--bg); line-height: 1.65; -webkit-font-smoothing: antialiased; }
+      .container { max-width: 1080px; margin: 0 auto; padding: 0 2rem; }
+
+      header { padding: 6rem 0 4rem; border-bottom: 1px solid var(--border); }
+      .hero-tag { display: inline-block; font-family: var(--mono); font-size: 0.7rem; letter-spacing: 0.08em; text-transform: uppercase; padding: 0.25rem 0.6rem; border: 1px solid var(--border); border-radius: 3px; margin-bottom: 1.25rem; color: var(--muted); }
+      .hero-title { font-family: var(--serif); font-size: clamp(2.6rem, 5.5vw, 4.4rem); line-height: 1.05; letter-spacing: -0.02em; max-width: 900px; }
+      .hero-title em { font-style: italic; color: var(--muted); }
+      .hero-subtitle { margin-top: 1.5rem; font-size: 1.15rem; color: var(--muted); max-width: 680px; line-height: 1.7; }
+
+      section { padding: 4rem 0; border-bottom: 1px solid var(--border); }
+      .section-label { font-family: var(--mono); font-size: 0.7rem; letter-spacing: 0.1em; text-transform: uppercase; color: var(--muted); margin-bottom: 1rem; }
+      .section-title { font-family: var(--serif); font-size: clamp(1.9rem, 3.2vw, 2.6rem); line-height: 1.15; margin-bottom: 0.75rem; max-width: 700px; }
+      .section-intro { font-size: 1.02rem; color: var(--muted); max-width: 700px; margin-bottom: 2.5rem; line-height: 1.7; }
+
+      .finding { padding: 1.8rem 2rem; background: var(--card); border: 1px solid var(--border); border-radius: 4px; margin-bottom: 1rem; border-left: 3px solid transparent; }
+      .finding.pro { border-left-color: var(--accent-pro); background: var(--pro-bg); }
+      .finding.con { border-left-color: var(--accent-con); background: var(--con-bg); }
+      .finding.neutral { border-left-color: var(--accent-neutral); background: var(--neutral-bg); }
+
+      .finding-head { display: flex; align-items: baseline; gap: 0.75rem; flex-wrap: wrap; margin-bottom: 0.5rem; }
+      .finding-num { font-family: var(--mono); font-size: 0.7rem; color: var(--muted); letter-spacing: 0.05em; }
+      .finding-title { font-size: 1.08rem; font-weight: 600; line-height: 1.3; flex: 1; }
+      .severity { font-family: var(--mono); font-size: 0.6rem; letter-spacing: 0.07em; text-transform: uppercase; padding: 0.18rem 0.5rem; border-radius: 3px; white-space: nowrap; }
+      .severity.high { background: #fde2dc; color: #9a2d18; }
+      .severity.med { background: var(--code-bg); color: #6b5500; }
+      .severity.low { background: #e8efe9; color: #2d5a3a; }
+
+      .finding p { font-size: 0.92rem; line-height: 1.7; color: #3a3a3a; margin-top: 0.3rem; }
+      .finding .ref { margin-top: 0.6rem; font-family: var(--mono); font-size: 0.76rem; color: var(--muted); }
+      .finding pre { margin-top: 0.8rem; background: var(--code-bg); border: 1px solid var(--border-soft); border-radius: 4px; padding: 0.9rem 1rem; font-family: var(--mono); font-size: 0.8rem; line-height: 1.55; overflow-x: auto; color: #2a2a2a; }
+      .finding code.inline { font-family: var(--mono); font-size: 0.84em; background: var(--code-bg); padding: 0.08rem 0.35rem; border-radius: 3px; }
+
+      .score-row { display: grid; grid-template-columns: repeat(4, 1fr); gap: 1px; margin-top: 2rem; background: var(--border-soft); border: 1px solid var(--border-soft); border-radius: 4px; overflow: hidden; }
+      .score-cell { background: var(--card); padding: 1.1rem 1rem; text-align: center; }
+      .score-cell .name { font-family: var(--mono); font-size: 0.62rem; letter-spacing: 0.06em; text-transform: uppercase; color: var(--muted); margin-bottom: 0.4rem; }
+      .score-cell .value { font-family: var(--serif); font-size: 1.7rem; line-height: 1; }
+      .score-cell .value.a { color: var(--accent-pro); }
+      .score-cell .value.b { color: var(--accent-neutral); }
+      .score-cell .value.c { color: var(--accent-con); }
+
+      table { width: 100%; border-collapse: collapse; font-size: 0.86rem; background: var(--card); }
+      th, td { padding: 0.85rem 1rem; text-align: left; border-bottom: 1px solid var(--border-soft); }
+      th { font-family: var(--mono); font-size: 0.68rem; letter-spacing: 0.05em; text-transform: uppercase; color: var(--muted); background: #f6f6f3; }
+
+      .rec-list { counter-reset: rec; list-style: none; }
+      .rec-list li { counter-increment: rec; padding: 1.4rem 0 1.4rem 3rem; border-bottom: 1px solid var(--border-soft); position: relative; font-size: 0.95rem; line-height: 1.7; color: #333; }
+      .rec-list li:last-child { border-bottom: none; }
+      .rec-list li::before { content: counter(rec); position: absolute; left: 0; top: 1.4rem; width: 2rem; height: 2rem; display: flex; align-items: center; justify-content: center; font-family: var(--mono); font-size: 0.8rem; color: var(--muted); border: 1px solid var(--border); border-radius: 50%; }
+      .rec-list strong { color: var(--fg); }
+
+      footer { padding: 3rem 0 5rem; text-align: center; color: var(--muted); font-size: 0.82rem; }
+      @media (max-width: 640px) { .container { padding: 0 1.25rem; } .score-row { grid-template-columns: repeat(2, 1fr); } }
+    </style>
+  </head>
+  <body>
+    <header>
+      <div class="container">
+        <span class="hero-tag">Architecture Review</span>
+        <h1 class="hero-title">
+          go-error-family<br />
+          <em>Scalability &amp; Modularity</em>
+        </h1>
+        <p class="hero-subtitle">
+          Evaluates the module boundaries, dependency directions, coupling, and composability of
+          <code>github.com/larsartmann/go-error-family</code> at v0.5.0 — after the pro/contra review execution.
+          Includes D2 diagrams of the current and ideal architecture.
+        </p>
+      </div>
+    </header>
+
+    <!-- TL;DR -->
+    <section>
+      <div class="container">
+        <div class="section-label">The bottom line</div>
+        <h2 class="section-title">One god-module, four submodules, one clear path to v1.0</h2>
+        <p class="section-intro">
+          The classification core is excellent — zero-dep, well-tested, copy-on-write immutable. But it shares a
+          <code class="inline" style="font-family:var(--mono);background:var(--code-bg);padding:0.08rem 0.35rem;border-radius:3px">go.mod</code>
+          with three experimental packages (<code class="inline" style="font-family:var(--mono);background:var(--code-bg);padding:0.08rem 0.35rem;border-radius:3px">agent/</code>,
+          <code class="inline" style="font-family:var(--mono);background:var(--code-bg);padding:0.08rem 0.35rem;border-radius:3px">diagnose/</code>,
+          <code class="inline" style="font-family:var(--mono);background:var(--code-bg);padding:0.08rem 0.35rem;border-radius:3px">examples/</code>).
+          This prevents the core from reaching v1.0 stability independently. Extracting the two experimental packages
+          into their own modules is the single highest-leverage architectural change.
+        </p>
+        <div class="score-row">
+          <div class="score-cell"><div class="name">Core Design</div><div class="value a">A</div></div>
+          <div class="score-cell"><div class="name">Module Boundaries</div><div class="value c">C+</div></div>
+          <div class="score-cell"><div class="name">Composability</div><div class="value a">A−</div></div>
+          <div class="score-cell"><div class="name">Service Orientation</div><div class="value b">B</div></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- MODULE LANDSCAPE -->
+    <section>
+      <div class="container">
+        <div class="section-label">Module Landscape</div>
+        <h2 class="section-title">What exists today</h2>
+        <p class="section-intro">
+          Four Go modules coordinated via <code class="inline" style="font-family:var(--mono);background:var(--code-bg);padding:0.08rem 0.35rem;border-radius:3px">go.work</code>.
+          The root module is the heaviest — it contains the stable classification core AND three experimental packages.
+        </p>
+        <table>
+          <thead>
+            <tr>
+              <th>Module</th>
+              <th>Packages</th>
+              <th>External Deps</th>
+              <th>Internal Deps</th>
+              <th>Version Pin</th>
+              <th>Stability</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><strong>root</strong> (errorfamily)</td>
+              <td>core + agent/ + diagnose/ + examples/</td>
+              <td>zero</td>
+              <td>— (it IS the root)</td>
+              <td>v0.5.0</td>
+              <td style="color:#1a5c3a">Mixed (core stable, rest experimental)</td>
+            </tr>
+            <tr>
+              <td><strong>bridge</strong></td>
+              <td>bridge/</td>
+              <td>samber/oops + 5 indirect</td>
+              <td>root (pinned v0.3.0)</td>
+              <td>v0.1.1</td>
+              <td style="color:#8a6d00">Experimental</td>
+            </tr>
+            <tr>
+              <td><strong>diagnose/git</strong></td>
+              <td>git/</td>
+              <td>zero</td>
+              <td>root (pinned v0.3.0)</td>
+              <td>v0.3.0</td>
+              <td style="color:#8a6d00">Experimental</td>
+            </tr>
+            <tr>
+              <td><strong>diagnose/postgres</strong></td>
+              <td>postgres/</td>
+              <td>zero</td>
+              <td>root (pinned v0.3.0)</td>
+              <td>v0.3.0</td>
+              <td style="color:#8a6d00">Experimental</td>
+            </tr>
+          </tbody>
+        </table>
+        <p style="margin-top:1rem;font-size:0.84rem;color:var(--muted)">
+          The submodule version pins are <strong>stale</strong> — all three submodules pin root at v0.3.0,
+          but v0.5.0 introduced breaking changes (copy-on-write, Registry, template syntax). The submodules
+          haven't been bumped yet.
+        </p>
+      </div>
+    </section>
+
+    <!-- STRENGTHS -->
+    <section>
+      <div class="container">
+        <div class="section-label">Strengths</div>
+        <h2 class="section-title">What the architecture gets right</h2>
+
+        <div class="finding pro">
+          <div class="finding-head">
+            <span class="finding-num">STR 01</span>
+            <span class="finding-title">Zero-dependency core — the hardest constraint, achieved</span>
+            <span class="severity low">high impact</span>
+          </div>
+          <p>
+            The root <code class="inline" style="font-family:var(--mono);background:var(--code-bg);padding:0.08rem 0.35rem;border-radius:3px">go.mod</code>
+            has zero external dependencies. No samber/oops, no OpenTelemetry, no testify. This means any Go project
+            can adopt the classification core without pulling transitive dependency trees. The bridge module
+            (which pulls in oops) is opt-in. This is textbook "mechanism, not policy" — the core defines
+            <em>what</em> classification means; consumers bring <em>how</em> they want their errors enriched.
+          </p>
+          <div class="ref">go.mod (root) — zero require directives</div>
+        </div>
+
+        <div class="finding pro">
+          <div class="finding-head">
+            <span class="finding-num">STR 02</span>
+            <span class="finding-title">Clean DAG — all dependency arrows point toward the core</span>
+            <span class="severity low">high impact</span>
+          </div>
+          <p>
+            Every internal dependency points toward the classification core. No cycles exist. The agent depends
+            on diagnose (which depends on core). The bridge depends on core. The git/postgres submodules depend
+            on core + diagnose. This is the correct direction — domain types define the interface, infrastructure
+            implements it.
+          </p>
+          <pre>agent/    → diagnose/ → core (root)
+bridge/   → core (root)
+git/      → core + diagnose
+postgres/ → core + diagnose
+examples/ → core (leaf nodes)</pre>
+          <div class="ref">go.work · all go.mod files</div>
+        </div>
+
+        <div class="finding pro">
+          <div class="finding-head">
+            <span class="finding-num">STR 03</span>
+            <span class="finding-title">Interfaces are the product — composable with any error type</span>
+            <span class="severity low">high impact</span>
+          </div>
+          <p>
+            Four small interfaces (Coded, Classified, Contextual, Retryable), each embedding <code class="inline" style="font-family:var(--mono);background:var(--code-bg);padding:0.08rem 0.35rem;border-radius:3px">error</code>,
+            define the protocol. Any error type implementing them works with <code class="inline" style="font-family:var(--mono);background:var(--code-bg);padding:0.08rem 0.35rem;border-radius:3px">Classify</code>,
+            <code class="inline" style="font-family:var(--mono);background:var(--code-bg);padding:0.08rem 0.35rem;border-radius:3px">HandleError</code>, and
+            <code class="inline" style="font-family:var(--mono);background:var(--code-bg);padding:0.08rem 0.35rem;border-radius:3px">ExitCode</code>.
+            The bridge module proves this — it makes samber/oops errors satisfy the interfaces without either
+            library knowing about the other. This is Unix-pipe composability.
+          </p>
+          <div class="ref">interfaces.go · bridge/bridge.go</div>
+        </div>
+
+        <div class="finding pro">
+          <div class="finding-head">
+            <span class="finding-num">STR 04</span>
+            <span class="finding-title">Copy-on-write errors — safe for concurrent use</span>
+            <span class="severity low">med impact</span>
+          </div>
+          <p>
+            After v0.5.0, <code class="inline" style="font-family:var(--mono);background:var(--code-bg);padding:0.08rem 0.35rem;border-radius:3px">WithContext</code>,
+            <code class="inline" style="font-family:var(--mono);background:var(--code-bg);padding:0.08rem 0.35rem;border-radius:3px">WithCause</code>, and
+            <code class="inline" style="font-family:var(--mono);background:var(--code-bg);padding:0.08rem 0.35rem;border-radius:3px">WithTimestamp</code> all
+            return new <code class="inline" style="font-family:var(--mono);background:var(--code-bg);padding:0.08rem 0.35rem;border-radius:3px">*Error</code> pointers.
+            This eliminates the data race where shared/sentinel errors were mutated by chaining. Errors are now
+            safe to share across goroutines.
+          </p>
+          <div class="ref">error.go:120-152 (clone helper + copy-on-write methods)</div>
+        </div>
+
+        <div class="finding pro">
+          <div class="finding-head">
+            <span class="finding-num">STR 05</span>
+            <span class="finding-title">Injectable Registry — test isolation without global state</span>
+            <span class="severity low">med impact</span>
+          </div>
+          <p>
+            The <code class="inline" style="font-family:var(--mono);background:var(--code-bg);padding:0.08rem 0.35rem;border-radius:3px">Registry</code> type
+            (new in v0.5.0) replaces global mutable maps with a construct-and-pass pattern. Tests get isolation
+            (no <code class="inline" style="font-family:var(--mono);background:var(--code-bg);padding:0.08rem 0.35rem;border-radius:3px">t.Cleanup(Unregister...)</code> needed),
+            and services get scoped error handling. <code class="inline" style="font-family:var(--mono);background:var(--code-bg);padding:0.08rem 0.35rem;border-radius:3px">DefaultRegistry</code>
+            preserves backward compatibility.
+          </p>
+          <div class="ref">registry.go · HandleConfig.Registry field</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- WEAKNESSES -->
+    <section>
+      <div class="container">
+        <div class="section-label">Weaknesses</div>
+        <h2 class="section-title">What holds the architecture back</h2>
+
+        <div class="finding con">
+          <div class="finding-head">
+            <span class="finding-num">CON 01</span>
+            <span class="finding-title">God-module: stable core shares go.mod with experimental packages</span>
+            <span class="severity high">high impact</span>
+          </div>
+          <p>
+            The root module contains four distinct concerns: (1) the stable classification core, (2) the experimental
+            diagnostic engine (<code class="inline" style="font-family:var(--mono);background:var(--code-bg);padding:0.08rem 0.35rem;border-radius:3px">diagnose/</code>),
+            (3) the experimental agent (<code class="inline" style="font-family:var(--mono);background:var(--code-bg);padding:0.08rem 0.35rem;border-radius:3px">agent/</code>),
+            and (4) examples (<code class="inline" style="font-family:var(--mono);background:var(--code-bg);padding:0.08rem 0.35rem;border-radius:3px">examples/cmd/</code>).
+            This means the core <strong>cannot reach v1.0 independently</strong> — a breaking change to the agent
+            forces a version bump for the entire module, including the stable core. The v1.0 dream requires
+            extracting agent/ and diagnose/ into their own modules.
+          </p>
+          <pre>root go.mod
+├── errorfamily/     ← STABLE: should be v1.0
+├── diagnose/        ← EXPERIMENTAL: should be own module
+├── agent/           ← EXPERIMENTAL: should be own module
+└── examples/cmd/    ← LEAF: stays in root, compiled by CI</pre>
+          <div class="ref">go.mod (root) · go.work</div>
+        </div>
+
+        <div class="finding con">
+          <div class="finding-head">
+            <span class="finding-num">CON 02</span>
+            <span class="finding-title">Stale submodule version pins — submodules reference v0.3.0, not v0.5.0</span>
+            <span class="severity high">high impact</span>
+          </div>
+          <p>
+            All three submodules (<code class="inline" style="font-family:var(--mono);background:var(--code-bg);padding:0.08rem 0.35rem;border-radius:3px">bridge</code>,
+            <code class="inline" style="font-family:var(--mono);background:var(--code-bg);padding:0.08rem 0.35rem;border-radius:3px">diagnose/git</code>,
+            <code class="inline" style="font-family:var(--mono);background:var(--code-bg);padding:0.08rem 0.35rem;border-radius:3px">diagnose/postgres</code>)
+            pin the root dependency at <code class="inline" style="font-family:var(--mono);background:var(--code-bg);padding:0.08rem 0.35rem;border-radius:3px">v0.3.0</code>.
+            But v0.5.0 introduced breaking changes: copy-on-write methods, Registry type, template syntax change,
+            and Compose removal. The submodules work locally via <code class="inline" style="font-family:var(--mono);background:var(--code-bg);padding:0.08rem 0.35rem;border-radius:3px">go.work</code>
+            (which overrides version pins), but external consumers pulling these submodules from the Go proxy
+            would get v0.3.0 root — missing the breaking changes.
+          </p>
+          <div class="ref">bridge/go.mod · diagnose/git/go.mod · diagnose/postgres/go.mod — all pin v0.3.0</div>
+        </div>
+
+        <div class="finding con">
+          <div class="finding-head">
+            <span class="finding-num">CON 03</span>
+            <span class="finding-title">agent → diagnose coupling within the same module</span>
+            <span class="severity med">med impact</span>
+          </div>
+          <p>
+            The <code class="inline" style="font-family:var(--mono);background:var(--code-bg);padding:0.08rem 0.35rem;border-radius:3px">agent</code> package
+            imports <code class="inline" style="font-family:var(--mono);background:var(--code-bg);padding:0.08rem 0.35rem;border-radius:3px">diagnose.DiagnosticResult</code>
+            and <code class="inline" style="font-family:var(--mono);background:var(--code-bg);padding:0.08rem 0.35rem;border-radius:3px">diagnose.StatusFailed</code> directly.
+            Today this is invisible — both are in the same module. But if either is extracted to its own module,
+            the agent must explicitly depend on diagnose. This is a <em>correct</em> dependency direction (agent
+            consumes diagnostic results), but the coupling should be through a thin interface, not concrete types.
+          </p>
+          <pre>agent/agent.go:26  import ".../diagnose"
+agent/agent.go:73  diagnosis []*diagnose.DiagnosticResult
+agent/agent.go:120 if d.Status == diagnose.StatusFailed</pre>
+          <div class="ref">agent/agent.go · diagnose/diagnose.go</div>
+        </div>
+
+        <div class="finding con">
+          <div class="finding-head">
+            <span class="finding-num">CON 04</span>
+            <span class="finding-title">No internal/ usage — all packages are public export</span>
+            <span class="severity med">low impact</span>
+          </div>
+          <p>
+            Every package in the root module is importable by any external consumer. There is no
+            <code class="inline" style="font-family:var(--mono);background:var(--code-bg);padding:0.08rem 0.35rem;border-radius:3px">internal/</code> directory.
+            The <code class="inline" style="font-family:var(--mono);background:var(--code-bg);padding:0.08rem 0.35rem;border-radius:3px">diagnose/mock.go</code>
+            (test helper) is public. The <code class="inline" style="font-family:var(--mono);background:var(--code-bg);padding:0.08rem 0.35rem;border-radius:3px">applyContext</code>
+            function in <code class="inline" style="font-family:var(--mono);background:var(--code-bg);padding:0.08rem 0.35rem;border-radius:3px">handle.go</code> is
+            unexported (good), but package-level visibility means the <em>package itself</em> is public API.
+            After module extraction, <code class="inline" style="font-family:var(--mono);background:var(--code-bg);padding:0.08rem 0.35rem;border-radius:3px">internal/</code>
+            should be used for test helpers and implementation details.
+          </p>
+          <div class="ref">diagnose/mock.go · diagnose/helpers.go</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- RECOMMENDATIONS -->
+    <section>
+      <div class="container">
+        <div class="section-label">Path forward</div>
+        <h2 class="section-title">Recommendations</h2>
+        <p class="section-intro">
+          Ordered by impact on the path to v1.0. The first two are the single highest-leverage architectural change.
+        </p>
+        <ol class="rec-list">
+          <li>
+            <strong>Extract <code class="inline" style="font-family:var(--mono);background:var(--code-bg);padding:0.08rem 0.35rem;border-radius:3px">agent/</code> and <code class="inline" style="font-family:var(--mono);background:var(--code-bg);padding:0.08rem 0.35rem;border-radius:3px">diagnose/</code> into separate modules.</strong>
+            The root module shrinks to the classification core only (~1000 LOC). Agent depends on diagnose
+            (explicit go.mod require). Diagnose depends on core. Each versions independently. This unblocks
+            the v1.0 stable core without freezing the experimental packages.
+          </li>
+          <li>
+            <strong>Bump submodule version pins to v0.5.0.</strong>
+            All three submodules must pin root at v0.5.0 (not v0.3.0). Run <code class="inline" style="font-family:var(--mono);background:var(--code-bg);padding:0.08rem 0.35rem;border-radius:3px">go mod tidy</code>
+            in each submodule directory. Verify with <code class="inline" style="font-family:var(--mono);background:var(--code-bg);padding:0.08rem 0.35rem;border-radius:3px">GOWORK=off go build ./...</code> in each.
+          </li>
+          <li>
+            <strong>Define the agent's dependency on diagnose through a thin interface.</strong>
+            Instead of importing <code class="inline" style="font-family:var(--mono);background:var(--code-bg);padding:0.08rem 0.35rem;border-radius:3px">[]*diagnose.DiagnosticResult</code> directly,
+            define a <code class="inline" style="font-family:var(--mono);background:var(--code-bg);padding:0.08rem 0.35rem;border-radius:3px">DiagnosticResult</code> interface or move the type to core.
+            This allows the agent to consume results from any diagnostic engine, not just this library's.
+          </li>
+          <li>
+            <strong>Use <code class="inline" style="font-family:var(--mono);background:var(--code-bg);padding:0.08rem 0.35rem;border-radius:3px">internal/</code> for test helpers after module extraction.</strong>
+            <code class="inline" style="font-family:var(--mono);background:var(--code-bg);padding:0.08rem 0.35rem;border-radius:3px">diagnose/mock.go</code> should be in
+            <code class="inline" style="font-family:var(--mono);background:var(--code-bg);padding:0.08rem 0.35rem;border-radius:3px">diagnose/internal/mock.go</code> or a separate
+            <code class="inline" style="font-family:var(--mono);background:var(--code-bg);padding:0.08rem 0.35rem;border-radius:3px">diagnose/testutil</code> module.
+            Implementation details that are currently package-level public should move behind <code class="inline" style="font-family:var(--mono);background:var(--code-bg);padding:0.08rem 0.35rem;border-radius:3px">internal/</code>.
+          </li>
+          <li>
+            <strong>Update CI for per-module parallelism.</strong>
+            After module extraction, CI should test each module in parallel. The current CI already does this
+            for the submodules — add steps for the new <code class="inline" style="font-family:var(--mono);background:var(--code-bg);padding:0.08rem 0.35rem;border-radius:3px">agent/</code> and
+            <code class="inline" style="font-family:var(--mono);background:var(--code-bg);padding:0.08rem 0.35rem;border-radius:3px">diagnose/</code> modules.
+          </li>
+          <li>
+            <strong>Ship v1.0 of the classification core.</strong>
+            Once the core module contains only Family, Error, interfaces, Classify, Registry, HandleError,
+            and constructors — freeze it. Tag it <code class="inline" style="font-family:var(--mono);background:var(--code-bg);padding:0.08rem 0.35rem;border-radius:3px">v1.0.0</code>.
+            The experimental modules (agent, diagnose, bridge, git, postgres) stay at v0.x.
+          </li>
+        </ol>
+      </div>
+    </section>
+
+    <!-- DIAGRAMS -->
+    <section>
+      <div class="container">
+        <div class="section-label">Architecture Diagrams</div>
+        <h2 class="section-title">Current vs Ideal</h2>
+        <p class="section-intro">
+          D2 diagrams showing the current module structure (god-module with experimental packages) and the
+          ideal target (core as v1.0 stable, all experimental packages as separate modules).
+          SVG files: <code class="inline" style="font-family:var(--mono);background:var(--code-bg);padding:0.08rem 0.35rem;border-radius:3px">2026-06-17_11_09-current.svg</code> and
+          <code class="inline" style="font-family:var(--mono);background:var(--code-bg);padding:0.08rem 0.35rem;border-radius:3px">2026-06-17_11_09-improved.svg</code>.
+        </p>
+        <div style="margin-top:2rem;display:grid;gap:2rem">
+          <div>
+            <h3 style="font-family:var(--mono);font-size:0.8rem;text-transform:uppercase;color:var(--muted);margin-bottom:0.5rem">Current (v0.5.0)</h3>
+            <object data="2026-06-17_11_09-current.svg" type="image/svg+xml" style="width:100%;border:1px solid var(--border);border-radius:4px"></object>
+          </div>
+          <div>
+            <h3 style="font-family:var(--mono);font-size:0.8rem;text-transform:uppercase;color:var(--muted);margin-bottom:0.5rem">Ideal (v1.0 target)</h3>
+            <object data="2026-06-17_11_09-improved.svg" type="image/svg+xml" style="width:100%;border:1px solid var(--border);border-radius:4px"></object>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <footer>
+      <div class="container">
+        <p>
+          Architecture review of <a href="https://github.com/larsartmann/go-error-family">go-error-family</a> at v0.5.0.<br />
+          Generated 2026-06-17. All claims verified against source: 4 modules, go.work, all go.mod files, import graph, CI config.
+        </p>
+      </div>
+    </footer>
+  </body>
+</html>
