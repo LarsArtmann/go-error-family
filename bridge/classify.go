@@ -15,7 +15,7 @@ const (
 // domainDefaults maps oops domain strings to error-family Families.
 // Domains are structural signals — less intentional than tags, more reliable
 // than guessing. Used when no explicit tag override is present.
-var domainDefaults = map[string]errorfamily.Family{
+var domainDefaults = map[string]errorfamily.Family{ //nolint:gochecknoglobals // Immutable lookup table for oops domain → Family mapping.
 	"validation":         errorfamily.Rejection,
 	"auth":               errorfamily.Rejection,
 	"authorization":      errorfamily.Rejection,
@@ -36,7 +36,7 @@ var domainDefaults = map[string]errorfamily.Family{
 // tagOverrides maps oops tag strings to error-family Families.
 // Tags are developer-intentional signals — checked before domain.
 // Any oops tag matching a key here overrides the domain default.
-var tagOverrides = map[string]errorfamily.Family{
+var tagOverrides = map[string]errorfamily.Family{ //nolint:gochecknoglobals // Immutable lookup table for oops tag → Family overrides.
 	"retryable":          errorfamily.Transient,
 	"transient":          errorfamily.Transient,
 	"conflict":           errorfamily.Conflict,

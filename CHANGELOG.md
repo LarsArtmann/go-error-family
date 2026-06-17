@@ -4,6 +4,38 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
+## [0.4.0] - 2026-06-17
+
+### Added
+
+- `Family` and `Audience` now implement `encoding.TextMarshaler`/`TextUnmarshaler`, enabling YAML/JSON config decoding of error families and audiences (e.g. unmarshalling a family from a config struct tag)
+- `ParseAudience(string)` and `ParseStatus(string)` — case-insensitive string parsing, completing the enum-parse trio alongside `ParseFamily`
+- `Audience.IsValid()` — validation mirroring `Family.IsValid()`, giving all three enums (`Family`, `Audience`, `Status`) a consistent validation API
+- `Family.Audience()` — exposes the audience metadata (User vs Operator) for each family; audience is now a first-class field in the family metadata table
+- `diagnose.Status.IsValid()` — validation consistency with `Family.IsValid()` and `Audience.IsValid()`
+- `Compose` rationale documentation and `example_test.go` covering the new enum APIs
+- Integration tests for `FilesystemRule` (temp-dir filesystem) and `NetworkRule` (localhost DNS/TCP), raising diagnose core coverage to ~77%
+
+### Changed
+
+- **BREAKING:** Removed `HandleConfig.Diagnose` bool field. Diagnostics now run whenever `DiagnosticFunc` is set — no separate enable flag. Consumers using `Diagnose: true` must drop that field; diagnostic behavior is unchanged when a `DiagnosticFunc` is configured.
+- **BREAKING:** `agent.Config.Enabled` now returns `(nil, error)` instead of a synthetic `AgentResult`. Calling `Analyze` on a disabled agent is a programming error rather than a silent no-op result.
+- `familyInfo` gained an `Audience` field; adding a new `Family` now requires only a single entry in the `familyData` table (previously audience was implicit).
+
+### Fixed
+
+- `lookupRegistered` now snapshots the classification registry map before iterating, so `errors.Is` chain walks run lock-free — eliminates a deadlock risk under concurrent sentinel registration.
+- `NetworkRule` returns `StatusUnknown` when no host is found in the error context, preventing undefined DNS resolution behavior.
+
+### Modules
+
+Coordinated multi-module release. Submodule `go.mod` files retain their root dependency at **v0.3.0** — a valid lower bound since none use v0.4.0-only APIs. Consumers pulling root v0.4.0 get it automatically via MVS.
+
+- `github.com/larsartmann/go-error-family` → **v0.4.0** (breaking changes + new APIs)
+- `github.com/larsartmann/go-error-family/diagnose/git` → **v0.3.0** (new `Runner` field on `GitRule`; was skipped in v0.3.0 root release)
+- `github.com/larsartmann/go-error-family/diagnose/postgres` → **v0.3.0** (new `Runner` field on `PostgresRule`; was skipped in v0.3.0 root release)
+- `github.com/larsartmann/go-error-family/bridge` → **v0.1.1** (lint fix, transitive dependency update)
+
 ## [0.3.0] - 2026-06-01
 
 ### Added

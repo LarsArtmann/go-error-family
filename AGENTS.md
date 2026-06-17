@@ -2,8 +2,8 @@
 
 Structured error protocol library. Library only — no `main`, no build system, no external deps. Full API reference: `SKILL.md`.
 
-**Last Updated:** 2026-06-08
-**Version:** v0.4.0-dev
+**Last Updated:** 2026-06-17
+**Version:** v0.4.0
 **Status:** All tests pass (root + bridge + submodules), 0 lint issues, 0 race conditions
 **Workspace modules:** root (zero-dep), `bridge` (oops integration), `diagnose/git`, `diagnose/postgres`
 
@@ -68,17 +68,17 @@ Not a library type — partial success is a consumption pattern, not a classific
 
 ## Test Coverage
 
-**Updated:** 2026-06-08
+**Updated:** 2026-06-17
 
 | Package              | Coverage |
 | -------------------- | -------- |
-| root (`errorfamily`) | 97.2%    |
-| `agent`              | 100%     |
-| `diagnose` (core)    | 66.8%    |
+| root (`errorfamily`) | 96.5%    |
+| `agent`              | 89.4%    |
+| `diagnose` (core)    | 77.3%    |
 | `diagnose/git`       | 98.5%    |
-| `diagnose/postgres`  | 81.0%    |
+| `diagnose/postgres`  | 80.3%    |
 
-Diagnose core coverage improved from 66.8% to 77% with integration tests (temp dir filesystem, localhost DNS/TCP network).
+Diagnose core coverage at 77.3% with integration tests (temp dir filesystem, localhost DNS/TCP network).
 
 ## Fuzz Tests
 
@@ -102,7 +102,9 @@ Connects go-error-family with `samber/oops`. Separate module with its own `go.mo
 
 ## Lint Configuration
 
-**Updated:** 2026-06-08
+**Updated:** 2026-06-17
+
+- `bridge` package-level lookup tables (`domainDefaults`, `tagOverrides`) suppress `gochecknoglobals` via inline `//nolint` — same pattern as root's immutable lookup tables.
 
 - G304 (gosec file inclusion) is excluded for `diagnose/rules_filesystem.go` via `.golangci.yml` path-based exclusion — `os.Open(path)` and `os.Create(testFile)` are intentional in diagnostic rules.
 - Do NOT use `//nolint:gosec` directives for G304 in the diagnose package — the `.golangci.yml` exclusion handles it. Inline nolint directives break when `golines` wraps lines.
