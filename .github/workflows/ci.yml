@@ -24,6 +24,14 @@ jobs:
       - name: Run tests (workspace)
         run: go test -race -count=1 ./...
 
+      - name: Run tests (diagnose module)
+        working-directory: ./diagnose
+        run: go test -race -count=1 ./...
+
+      - name: Run tests (agent module)
+        working-directory: ./agent
+        run: go test -race -count=1 ./...
+
       - name: Run tests (bridge submodule)
         working-directory: ./bridge
         run: go test -race -count=1 ./...
@@ -58,6 +66,20 @@ jobs:
         with:
           version: latest
           args: --timeout=5m
+
+      - name: Run golangci-lint (diagnose module)
+        uses: golangci/golangci-lint-action@v6
+        with:
+          version: latest
+          args: --timeout=5m
+          working-directory: ./diagnose
+
+      - name: Run golangci-lint (agent module)
+        uses: golangci/golangci-lint-action@v6
+        with:
+          version: latest
+          args: --timeout=5m
+          working-directory: ./agent
 
       - name: Run golangci-lint (bridge submodule)
         uses: golangci/golangci-lint-action@v6

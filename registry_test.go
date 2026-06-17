@@ -172,7 +172,7 @@ func TestRegistryHandleErrorDetailedWithCustomRegistry(t *testing.T) {
 	result := HandleErrorDetailedWithConfig(err, HandleConfig{Registry: reg})
 
 	if !strings.Contains(result.Message, "Detailed custom message") {
-		t.Errorf("HandleErrorDetailedWithConfig should use custom registry template: %q", result.Message)
+		t.Errorf("custom registry template not used: %q", result.Message)
 	}
 	if result.SuggestedFix != "Detailed custom fix" {
 		t.Errorf("SuggestedFix should use template fix: %q", result.SuggestedFix)
