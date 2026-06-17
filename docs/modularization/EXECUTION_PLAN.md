@@ -16,6 +16,7 @@ Each task is the smallest unit that leaves the project buildable and testable. E
 **What:** Extract `diagnose/` package into its own module.
 **Dependencies:** None (first step).
 **Steps:**
+
 1. Create `diagnose/go.mod`:
    ```
    module github.com/larsartmann/go-error-family/diagnose
@@ -35,6 +36,7 @@ Each task is the smallest unit that leaves the project buildable and testable. E
 **What:** Extract `agent/` package into its own module.
 **Dependencies:** Task 1 (agent imports diagnose).
 **Steps:**
+
 1. Create `agent/go.mod`:
    ```
    module github.com/larsartmann/go-error-family/agent
@@ -60,6 +62,7 @@ Each task is the smallest unit that leaves the project buildable and testable. E
 **What:** Update bridge/go.mod to pin root at v0.5.0.
 **Dependencies:** None (independent of Tasks 1-2).
 **Steps:**
+
 1. `cd bridge && go get github.com/larsartmann/go-error-family@v0.5.0 && go mod tidy`
 2. Verify: `cd bridge && GOWORK=off go build ./...`
 3. Commit: `chore(bridge): bump root dependency to v0.5.0`
@@ -69,6 +72,7 @@ Each task is the smallest unit that leaves the project buildable and testable. E
 **What:** Update diagnose/git/go.mod to pin root at v0.5.0 and add diagnose dep.
 **Dependencies:** Task 1 (git imports diagnose).
 **Steps:**
+
 1. `cd diagnose/git && go get github.com/larsartmann/go-error-family@v0.5.0`
 2. `cd diagnose/git && go get github.com/larsartmann/go-error-family/diagnose@v0.0.0`
 3. `cd diagnose/git && go mod tidy`
@@ -89,6 +93,7 @@ Each task is the smallest unit that leaves the project buildable and testable. E
 **What:** Run all tests across all modules.
 **Dependencies:** Tasks 1-5.
 **Steps:**
+
 1. `go work sync`
 2. `go build ./...` (workspace)
 3. `go test ./... -race -count=1` (workspace)
@@ -101,6 +106,7 @@ Each task is the smallest unit that leaves the project buildable and testable. E
 **What:** Add test/lint steps for new diagnose/ and agent/ modules.
 **Dependencies:** Task 6.
 **Steps:**
+
 1. Add CI steps for `./diagnose` (test + lint)
 2. Add CI steps for `./agent` (test + lint)
 3. Commit: `ci: add test and lint steps for diagnose and agent modules`
@@ -112,6 +118,7 @@ Each task is the smallest unit that leaves the project buildable and testable. E
 **What:** Update README, AGENTS.md, SKILL.md, CHANGELOG.
 **Dependencies:** Task 7.
 **Steps:**
+
 1. README: update module structure section
 2. AGENTS.md: update build commands per module
 3. SKILL.md: update architecture overview
@@ -123,6 +130,7 @@ Each task is the smallest unit that leaves the project buildable and testable. E
 **What:** Tag core as v1.0.0, diagnose as v0.1.0, agent as v0.1.0.
 **Dependencies:** Task 8 + user approval.
 **Steps:**
+
 1. `git tag v1.0.0` (core)
 2. `git tag diagnose/v0.1.0` (diagnose)
 3. `git tag agent/v0.1.0` (agent)
