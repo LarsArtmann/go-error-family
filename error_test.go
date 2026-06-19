@@ -178,6 +178,13 @@ func TestErrorSummary(t *testing.T) {
 	}
 }
 
+func assertFamily(t *testing.T, err *Error, want Family) {
+	t.Helper()
+	if err.ErrorFamily() != want {
+		t.Errorf("family = %v, want %v", err.ErrorFamily(), want)
+	}
+}
+
 func TestConstructors(t *testing.T) {
 	tests := []struct {
 		name   string
@@ -193,9 +200,7 @@ func TestConstructors(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			if tt.err.ErrorFamily() != tt.family {
-				t.Errorf("family = %v, want %v", tt.err.ErrorFamily(), tt.family)
-			}
+			assertFamily(t, tt.err, tt.family)
 			if tt.err.ErrorCode() != tt.code {
 				t.Errorf("code = %q, want %q", tt.err.ErrorCode(), tt.code)
 			}
@@ -219,9 +224,7 @@ func TestWrapConstructors(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			if tt.err.ErrorFamily() != tt.family {
-				t.Errorf("family = %v, want %v", tt.err.ErrorFamily(), tt.family)
-			}
+			assertFamily(t, tt.err, tt.family)
 			if !errors.Is(tt.err.Unwrap(), cause) {
 				t.Error("should wrap cause")
 			}

@@ -137,10 +137,7 @@ func (r *FilesystemRule) checkDirWritable(result *DiagnosticResult, path string)
 	}
 	_ = f.Close()
 	_ = os.Remove(testFile)
-	result.Details["writable"] = strTrue
-	result.Status = StatusHealthy
-	result.Summary = "Path exists and is writable: " + path
-	result.Confidence = ConfidenceNotCause
+	setAccessSuccess(result, "writable", "Path exists and is writable: "+path)
 }
 
 func (r *FilesystemRule) checkFileReadable(result *DiagnosticResult, path string) {
@@ -155,14 +152,11 @@ func (r *FilesystemRule) checkFileReadable(result *DiagnosticResult, path string
 		return
 	}
 	_ = f.Close()
-	result.Details["readable"] = strTrue
-	result.Status = StatusHealthy
-	result.Summary = fmt.Sprintf(
+	setAccessSuccess(result, "readable", fmt.Sprintf(
 		"File exists and is readable: %s (%s)",
 		path,
 		result.Details["permissions"],
-	)
-	result.Confidence = ConfidenceNotCause
+	))
 }
 
 func setAccessFailure(result *DiagnosticResult, key, summary, fix string) {
@@ -170,6 +164,13 @@ func setAccessFailure(result *DiagnosticResult, key, summary, fix string) {
 	result.Status = StatusDegraded
 	result.Summary = summary
 	result.SuggestedFix = fix
+}
+
+func setAccessSuccess(result *DiagnosticResult, key, summary string) {
+	result.Details[key] = strTrue
+	result.Status = StatusHealthy
+	result.Summary = summary
+	result.Confidence = ConfidenceNotCause
 }
 
 func (r *FilesystemRule) resolvePath(err error) string {

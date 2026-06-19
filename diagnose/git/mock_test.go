@@ -61,10 +61,7 @@ func TestGitRuleApplicable(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			r := &GitRule{}
-			if got := r.Applicable(tt.err); got != tt.want {
-				t.Errorf("Applicable() = %v, want %v", got, tt.want)
-			}
+			diagnose.AssertApplicable(t, &GitRule{}, tt.err, tt.want)
 		})
 	}
 }
@@ -97,20 +94,6 @@ func TestGitRuleResolveRepoPath(t *testing.T) {
 
 func newMockRunner() *diagnose.MockCommandRunner {
 	return diagnose.NewMockCommandRunner()
-}
-
-func assertDetail(t *testing.T, result *diagnose.DiagnosticResult, key, want string) {
-	t.Helper()
-	if result.Details[key] != want {
-		t.Errorf("Expected %s=%s, got %v", key, want, result.Details)
-	}
-}
-
-func assertStatus(t *testing.T, result *diagnose.DiagnosticResult, want diagnose.Status) {
-	t.Helper()
-	if result.Status != want {
-		t.Errorf("Expected %v, got %v", want, result.Status)
-	}
 }
 
 func initGitRepo(t *testing.T, dir string) {

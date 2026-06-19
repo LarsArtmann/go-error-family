@@ -18,8 +18,8 @@ func TestGitRuleMockNotARepo(t *testing.T) {
 	if runErr != nil {
 		t.Fatalf("Run() error: %v", runErr)
 	}
-	assertDetail(t, result, "is_repo", "false")
-	assertStatus(t, result, diagnose.StatusFailed)
+	diagnose.AssertDetail(t, result, "is_repo", "false")
+	diagnose.AssertStatus(t, result, diagnose.StatusFailed)
 	if !strings.Contains(result.SuggestedFix, "git init") {
 		t.Errorf("Expected git init suggestion, got %q", result.SuggestedFix)
 	}
@@ -38,7 +38,7 @@ func TestGitRuleMockNoGitBinary(t *testing.T) {
 	if runErr != nil {
 		t.Fatalf("Run() error: %v", runErr)
 	}
-	assertStatus(t, result, diagnose.StatusUnknown)
+	diagnose.AssertStatus(t, result, diagnose.StatusUnknown)
 	if !strings.Contains(result.Summary, "not found") {
 		t.Errorf("Expected 'not found' in summary, got %q", result.Summary)
 	}
@@ -63,9 +63,9 @@ func TestGitRuleMockCleanWorkingTree(t *testing.T) {
 	if runErr != nil {
 		t.Fatalf("Run() error: %v", runErr)
 	}
-	assertDetail(t, result, "is_repo", "true")
-	assertDetail(t, result, "clean", "true")
-	assertStatus(t, result, diagnose.StatusHealthy)
+	diagnose.AssertDetail(t, result, "is_repo", "true")
+	diagnose.AssertDetail(t, result, "clean", "true")
+	diagnose.AssertStatus(t, result, diagnose.StatusHealthy)
 }
 
 func TestGitRuleMockDirtyWorkingTree(t *testing.T) {
@@ -86,9 +86,9 @@ func TestGitRuleMockDirtyWorkingTree(t *testing.T) {
 	if runErr != nil {
 		t.Fatalf("Run() error: %v", runErr)
 	}
-	assertDetail(t, result, "clean", "false")
-	assertDetail(t, result, "dirty_files", "2")
-	assertStatus(t, result, diagnose.StatusDegraded)
+	diagnose.AssertDetail(t, result, "clean", "false")
+	diagnose.AssertDetail(t, result, "dirty_files", "2")
+	diagnose.AssertStatus(t, result, diagnose.StatusDegraded)
 	if !strings.Contains(result.SuggestedFix, "git add") {
 		t.Errorf("Expected 'git add' in fix, got %q", result.SuggestedFix)
 	}
@@ -112,8 +112,8 @@ func TestGitRuleMockMergeConflicts(t *testing.T) {
 	if runErr != nil {
 		t.Fatalf("Run() error: %v", runErr)
 	}
-	assertDetail(t, result, "merge_conflicts", "true")
-	assertStatus(t, result, diagnose.StatusFailed)
+	diagnose.AssertDetail(t, result, "merge_conflicts", "true")
+	diagnose.AssertStatus(t, result, diagnose.StatusFailed)
 	if !strings.Contains(result.SuggestedFix, "mergetool") {
 		t.Errorf("Expected 'mergetool' in fix, got %q", result.SuggestedFix)
 	}
@@ -137,7 +137,7 @@ func TestGitRuleMockGitStatusFails(t *testing.T) {
 	if runErr != nil {
 		t.Fatalf("Run() error: %v", runErr)
 	}
-	assertStatus(t, result, diagnose.StatusUnknown)
+	diagnose.AssertStatus(t, result, diagnose.StatusUnknown)
 }
 
 func TestGitRuleMockUnreachableRemote(t *testing.T) {
@@ -163,8 +163,8 @@ func TestGitRuleMockUnreachableRemote(t *testing.T) {
 	if runErr != nil {
 		t.Fatalf("Run() error: %v", runErr)
 	}
-	assertStatus(t, result, diagnose.StatusDegraded)
-	assertDetail(t, result, "remote_reachable", "false")
+	diagnose.AssertStatus(t, result, diagnose.StatusDegraded)
+	diagnose.AssertDetail(t, result, "remote_reachable", "false")
 }
 
 func TestGitRuleMockReachableRemote(t *testing.T) {
@@ -190,8 +190,8 @@ func TestGitRuleMockReachableRemote(t *testing.T) {
 	if runErr != nil {
 		t.Fatalf("Run() error: %v", runErr)
 	}
-	assertStatus(t, result, diagnose.StatusHealthy)
-	assertDetail(t, result, "remote_reachable", "true")
+	diagnose.AssertStatus(t, result, diagnose.StatusHealthy)
+	diagnose.AssertDetail(t, result, "remote_reachable", "true")
 }
 
 func TestGitRuleMockCallsCommandRunner(t *testing.T) {

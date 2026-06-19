@@ -27,11 +27,17 @@ func TestNetworkRuleRunLocalhostDNS(t *testing.T) {
 	}
 }
 
-func TestNetworkRuleRunTCPConnect(t *testing.T) {
+func newTestServer(t *testing.T) *httptest.Server {
+	t.Helper()
 	srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, _ *http.Request) {
 		w.WriteHeader(http.StatusOK)
 	}))
-	defer srv.Close()
+	t.Cleanup(srv.Close)
+	return srv
+}
+
+func TestNetworkRuleRunTCPConnect(t *testing.T) {
+	srv := newTestServer(t)
 
 	host, port, splitErr := net.SplitHostPort(srv.Listener.Addr().String())
 	if splitErr != nil {
@@ -88,10 +94,7 @@ func TestNetworkRuleRunDNSFailure(t *testing.T) {
 }
 
 func TestNetworkRuleRunWithURL(t *testing.T) {
-	srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, _ *http.Request) {
-		w.WriteHeader(http.StatusOK)
-	}))
-	defer srv.Close()
+	srv := newTestServer(t)
 
 	host, port, splitErr := net.SplitHostPort(srv.Listener.Addr().String())
 	if splitErr != nil {

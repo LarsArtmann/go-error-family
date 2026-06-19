@@ -18,8 +18,8 @@ func TestGitRuleIntegrationNotARepo(t *testing.T) {
 	if runErr != nil {
 		t.Fatalf("Run() error: %v", runErr)
 	}
-	assertDetail(t, result, "is_repo", "false")
-	assertStatus(t, result, diagnose.StatusFailed)
+	diagnose.AssertDetail(t, result, "is_repo", "false")
+	diagnose.AssertStatus(t, result, diagnose.StatusFailed)
 }
 
 func TestGitRuleIntegrationCleanRepo(t *testing.T) {
@@ -33,8 +33,8 @@ func TestGitRuleIntegrationCleanRepo(t *testing.T) {
 	if runErr != nil {
 		t.Fatalf("Run() error: %v", runErr)
 	}
-	assertDetail(t, result, "is_repo", "true")
-	assertDetail(t, result, "clean", "true")
+	diagnose.AssertDetail(t, result, "is_repo", "true")
+	diagnose.AssertDetail(t, result, "clean", "true")
 }
 
 func TestGitRuleIntegrationDirtyRepo(t *testing.T) {
@@ -53,11 +53,11 @@ func TestGitRuleIntegrationDirtyRepo(t *testing.T) {
 	if runErr != nil {
 		t.Fatalf("Run() error: %v", runErr)
 	}
-	assertDetail(t, result, "clean", "false")
+	diagnose.AssertDetail(t, result, "clean", "false")
 	if result.Details["dirty_files"] == "" {
 		t.Error("Expected dirty_files to be set")
 	}
-	assertStatus(t, result, diagnose.StatusDegraded)
+	diagnose.AssertStatus(t, result, diagnose.StatusDegraded)
 }
 
 func TestGitRuleIntegrationRepoPathFromGitDir(t *testing.T) {
@@ -71,7 +71,7 @@ func TestGitRuleIntegrationRepoPathFromGitDir(t *testing.T) {
 	if runErr != nil {
 		t.Fatalf("Run() error: %v", runErr)
 	}
-	assertDetail(t, result, "is_repo", "true")
+	diagnose.AssertDetail(t, result, "is_repo", "true")
 }
 
 func TestGitRuleIntegrationRepoPathFromRepository(t *testing.T) {
@@ -85,7 +85,7 @@ func TestGitRuleIntegrationRepoPathFromRepository(t *testing.T) {
 	if runErr != nil {
 		t.Fatalf("Run() error: %v", runErr)
 	}
-	assertDetail(t, result, "is_repo", "true")
+	diagnose.AssertDetail(t, result, "is_repo", "true")
 }
 
 func TestGitRuleIntegrationCleanRepoNoRemote(t *testing.T) {
@@ -99,8 +99,8 @@ func TestGitRuleIntegrationCleanRepoNoRemote(t *testing.T) {
 	if runErr != nil {
 		t.Fatalf("Run() error: %v", runErr)
 	}
-	assertDetail(t, result, "clean", "true")
-	assertStatus(t, result, diagnose.StatusHealthy)
+	diagnose.AssertDetail(t, result, "clean", "true")
+	diagnose.AssertStatus(t, result, diagnose.StatusHealthy)
 }
 
 func TestGitRuleIntegrationCurrentDir(t *testing.T) {

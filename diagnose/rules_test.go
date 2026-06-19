@@ -30,10 +30,7 @@ func TestNetworkRuleApplicable(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			r := &NetworkRule{}
-			if got := r.Applicable(tt.err); got != tt.want {
-				t.Errorf("Applicable() = %v, want %v", got, tt.want)
-			}
+			AssertApplicable(t, &NetworkRule{}, tt.err, tt.want)
 		})
 	}
 }
@@ -55,10 +52,7 @@ func TestFilesystemRuleApplicable(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			r := &FilesystemRule{}
-			if got := r.Applicable(tt.err); got != tt.want {
-				t.Errorf("Applicable() = %v, want %v", got, tt.want)
-			}
+			AssertApplicable(t, &FilesystemRule{}, tt.err, tt.want)
 		})
 	}
 }
