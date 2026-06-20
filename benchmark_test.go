@@ -2,6 +2,7 @@ package errorfamily
 
 import (
 	"errors"
+	"fmt"
 	"io"
 	"testing"
 )
@@ -116,3 +117,62 @@ type retryablePlainError struct {
 
 func (r *retryablePlainError) Error() string     { return "retryable plain error" }
 func (r *retryablePlainError) IsRetryable() bool { return r.retryable }
+
+// BenchmarkClassifyManySentinels guards the atomic.Pointer sentinel store: it
+// must stay allocation-free as the registry grows. Regression target for the
+// lookupSentinel refactor (previously allocated ~1.8KB/3 allocs per call at 50
+// sentinels due to a full-map snapshot copy on every Classify).
+func BenchmarkClassifyManySentinels(b *testing.B) {
+	reg := NewRegistry()
+	target := errors.New("target sentinel")
+	for i := range 50 {
+		reg.RegisterClassification(fmt.Errorf("sentinel-%d", i), Transient)
+	}
+	reg.RegisterClassification(target, Rejection)
+	b.ResetTimer()
+	for b.Loop() {
+		_ = reg.Classify(target)
+	}
+}
+
+// BenchmarkClassifyViaRegistryVsPackage measures the indirection cost of a
+// custom Registry.Classify versus the package-level Classify (which delegates
+// to DefaultRegistry). They should be within noise of each other.
+func BenchmarkClassifyViaRegistryVsPackage(b *testing.B) {
+	reg := NewRegistry()
+	sentinel := errors.New("bench sentinel")
+	reg.RegisterClassification(sentinel, Transient)
+	RegisterClassification(sentinel, Transient)
+	b.ResetTimer()
+	b.Run("Registry.Classify", func(b *testing.B) {
+		for b.Loop() {
+			_ = reg.Classify(sentinel)
+		}
+	})
+	b.Run("package Classify", func(b *testing.B) {
+		for b.Loop() {
+			_ = Classify(sentinel)
+		}
+	})
+}
+
+func BenchmarkFamilyHTTPStatus(b *testing.B) {
+	for b.Loop() {
+		_ = Transient.HTTPStatus()
+	}
+}
+
+func BenchmarkFamilyRetryPolicy(b *testing.B) {
+	for b.Loop() {
+		_ = Transient.RetryPolicy()
+	}
+}
+
+func BenchmarkErrorJSON(b *testing.B) {
+	e := NewTransient("db.timeout", "query timed out").
+		WithContext("host", "db1").
+		WithContext("port", "5432")
+	for b.Loop() {
+		_, _ = e.JSON()
+	}
+}

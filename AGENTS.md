@@ -2,7 +2,7 @@
 
 Structured error protocol library. Library only — no `main`, no build system, no external deps. Full API reference: `SKILL.md`.
 
-**Last Updated:** 2026-06-17
+**Last Updated:** 2026-06-20
 **Version:** v0.6.0
 **Status:** All tests pass (root + bridge + submodules), 0 lint issues, 0 race conditions
 **Workspace modules:** root (zero-dep), `agent`, `bridge` (oops integration), `diagnose`, `diagnose/git`, `diagnose/postgres`
@@ -14,6 +14,15 @@ go test ./... -count=1 -timeout 120s -race   # all tests
 golangci-lint run ./...                        # lint (all modules)
 go build ./...                                 # build check
 ```
+
+## Architecture Decision: Libraries Classify, Applications Enrich
+
+**go-error-family (classification) and samber/oops (enrichment) are complementary, not competing.** The `bridge/` package is the seam where they meet.
+
+- **LIBRARY code** (clients, SDKs, domain packages) imports `go-error-family` only and returns classified errors. A library knows its own domain contract (404 = Rejection, timeout = Transient) but must NOT presume the application's observability stack — so it never imports oops.
+- **APPLICATION code** imports oops for enrichment (stack traces, trace IDs, request context) and, if it also needs behavioral decisions, wraps library errors via the bridge.
+
+The classification protocol is the **four interfaces** (`Coded`/`Classified`/`Contextual`/`Retryable`) — the sole public contract. `Error` is a reference implementation, not the contract; domain types implement only the interfaces they need.
 
 ## Surprising Behaviors
 
@@ -30,17 +39,32 @@ go build ./...                                 # build check
 
 ## Classification Precedence
 
+## API Surface (post-0.6.0 additions)
+
+**Family adapters** (in `family.go` / `retry.go`, all single-source-of-truth via `familyData`):
+- `Family.Severity() int` — total order for multi-error classification (Transient<Rejection<Conflict<Infrastructure<Corruption).
+- `Family.HTTPStatus() int` — canonical family→HTTP status (Rejection→400, Conflict→409, Transient→503, Corruption→500, Infrastructure→503).
+- `Family.RetryPolicy() RetryPolicy` — advisory defaults (Transient: 3 attempts, 100ms-5s; others: single attempt). Library does not run the loop.
+
+**Error methods** (`error.go`): `WithContextMap(map)`, `WithContextf(key, fmt, args)`, `JSON() ([]byte, error)` (canonical `{family,code,message,context,retryable,timestamp}` for API boundaries).
+
+**Registry** (`registry.go`): `Clone()` (deep-copy, inherit-and-extend), `RegisterTemplates(map)` (batch, parity with `RegisterClassifications`).
+
+**Stdlib taxonomy** (`stdlib.go`): `RegisterStdlibDefaults(reg)` — maps context/sql/os errors with documented rationale for ambiguous cases (DeadlineExceeded→Transient, Canceled→Rejection, etc.).
+
+## Classification Precedence
+
 `Classify(err)` checks in order — first match wins:
 
-1. **Multi-error** (`errors.Join`) → classify each sub-error, first non-Transient wins
+1. **Multi-error** (`errors.Join`) → classify each sub-error, pick the **worst by severity** (see below)
 2. `Classified` interface → `ErrorFamily()`
 3. `Retryable` interface → infer `Transient` (true) or `Rejection` (false)
-4. Registered sentinels via `errors.Is` chain walk (snapshot copy, lock-free iteration)
+4. Registered sentinels via `errors.Is` chain walk (atomic.Pointer to immutable map — lock-free, allocation-free iteration)
 5. Default → `Transient`
 
 This means a type implementing both `Classified` and `Retryable` will use `Classified` and ignore `Retryable`. Registering a sentinel for an error that already implements `Classified` has no effect.
 
-**Multi-error behavior:** For `errors.Join(err1, err2, ...)`, each sub-error is classified recursively. The first sub-error with a non-Transient family determines the result. If all are Transient, the result is Transient. This is fail-closed: if any part of a multi-error is not retryable, the whole operation is not retryable.
+**Multi-error behavior:** For `errors.Join(err1, err2, ...)`, each sub-error is classified recursively and the result is the **highest-severity** sub-error (`Family.Severity()` total order: Transient(1) < Rejection(2) < Conflict(3) < Infrastructure(4) < Corruption(5)). This is deterministic regardless of join argument order and remains fail-closed: if any sub-error is non-Transient (severity > 1), the joined result is non-Transient.
 
 ## Registry Pattern
 
@@ -48,8 +72,8 @@ The library uses an injectable `Registry` type (`registry.go`) that holds both c
 
 - **`DefaultRegistry`** is a package-level `*Registry` used by all convenience functions (`Classify`, `RegisterClassification`, `RegisterTemplate`, etc.) and by `HandleError` when `HandleConfig.Registry` is nil.
 - **Custom registries** enable test isolation (no `t.Cleanup(Unregister...)` needed) and scoped error handling within a single binary. Pass via `HandleConfig.Registry`.
-- **Thread-safety:** `Registry` snapshots the sentinels map under RLock before iterating — `errors.Is` runs lock-free. Same pattern as the original global registry.
-- **`resolveSuggestedFix`** checks the same template chain as `renderCLI`: per-call override → registry template → built-in default → family fallback.
+- **Thread-safety:** `Registry.sentinels` is an `atomic.Pointer[sentinelMap]` to an immutable snapshot: reads (the `Classify` hot path) load the pointer once and iterate lock-free and allocation-free; rare writers serialize under the write lock and publish a new snapshot via copy-on-write. At 50 registered sentinels this is ~285 ns/0 allocs (was ~1330 ns/3 allocs/1.8KB under the old RLock+copy approach).
+- **`resolveSuggestedFix`** and **`renderCLI`** share one `resolveTemplate(code, cfg, reg)` helper (override → registry → built-in default). Templates are cohesive units — What/Why/Fix belong together, never mixed across sources.
 
 ## Agent Is Analysis-Only
 
@@ -58,6 +82,8 @@ The `DebugAgent` interface has a single method: `Analyze`. It produces root caus
 ## Diagnostic Rule Pattern
 
 When adding a new `DiagnosticRule`, use the matching helpers from the `diagnose` package: `HasContextKey`, `ContextValue`, `ResolveContextKey`, `HasContextSubstring`, `FamilyIs`, `ErrorCodeContains`. Use execution helpers `RunCommand` and `CommandExists` for system checks. Rules run concurrently via `Runner.Run` and results sort by confidence descending.
+
+**Structured Fix:** `DiagnosticResult` carries a `Fix struct{Summary, Command string}` (not freeform prose). Rules populate both fields at construction time so the agent reads `Fix.Command` directly — there is no prose-parsing heuristic. When adding a rule, set `result.Fix = diagnose.Fix{Summary: "...", Command: "exact shell command"}`.
 
 **Submodules:** `GitRule` lives in `github.com/larsartmann/go-error-family/diagnose/git`, `PostgresRule` in `github.com/larsartmann/go-error-family/diagnose/postgres`. `DefaultRunner()` only includes zero-dep rules (`FilesystemRule`, `NetworkRule`).
 

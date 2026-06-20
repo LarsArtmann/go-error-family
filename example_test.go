@@ -3,6 +3,7 @@ package errorfamily
 import (
 	"errors"
 	"fmt"
+	"time"
 )
 
 func ExampleNewTransient() {
@@ -72,4 +73,30 @@ func ExampleFamily_UnmarshalText() {
 	_ = f.UnmarshalText([]byte("rejection"))
 	fmt.Println(f)
 	// Output: rejection
+}
+
+func ExampleNewRegistry() {
+	// A custom Registry enables test isolation and scoped handling without
+	// touching the package-level DefaultRegistry.
+	reg := NewRegistry()
+	reg.RegisterClassification(errors.New("sentinel"), Transient)
+
+	fmt.Println(reg.Classify(errors.New("sentinel")))
+	// Output: transient
+}
+
+func ExampleFamily_HTTPStatus() {
+	// Translate a family into an HTTP status code at REST boundaries.
+	err := NewConflict("order.duplicate", "order already exists")
+	fmt.Println(Classify(err).HTTPStatus())
+	// Output: 409
+}
+
+func ExampleError_JSON() {
+	err := NewTransient("db.timeout", "query timed out").
+		WithContext("host", "db1").
+		WithTimestamp(time.Date(2026, 1, 1, 0, 0, 0, 0, time.UTC))
+	data, _ := err.JSON()
+	fmt.Println(string(data))
+	// Output: {"family":"transient","code":"db.timeout","message":"query timed out","context":{"host":"db1"},"retryable":true,"timestamp":"2026-01-01T00:00:00Z"}
 }
