@@ -1,7 +1,6 @@
 package errorfamily
 
 import (
-	"errors"
 	"fmt"
 	"time"
 )
@@ -98,10 +97,4 @@ func WrapCorruption(err error, code, message string) *Error {
 // WrapInfrastructure wraps an error as Infrastructure.
 func WrapInfrastructure(err error, code, message string) *Error {
 	return Wrap(err, Infrastructure, code, message)
-}
-
-// Compose joins multiple errors into one, preserving all in the Unwrap chain.
-// Nil errors are skipped. Returns nil if all inputs are nil (or none given).
-func Compose(errs ...error) error {
-	return errors.Join(errs...)
 }

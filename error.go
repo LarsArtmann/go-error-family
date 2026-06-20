@@ -8,6 +8,10 @@ import (
 
 // Error is the reference implementation of a classified, structured error.
 //
+// This is a convenience type, not the contract. The public protocol is the
+// Coded/Classified/Contextual/Retryable interfaces — your own domain error
+// types implement only those and need not embed or use this struct.
+//
 // Projects with simple error needs can use this directly.
 // Projects with domain-specific needs (e.g., FindingError with Position/File)
 // can build their own struct and implement the Coded/Classified/Contextual interfaces.
@@ -122,6 +126,24 @@ func (e *Error) formatVerbose(f fmt.State) {
 func (e *Error) WithContext(key, value string) *Error {
 	clone := e.clone()
 	clone.context[key] = value
+	return clone
+}
+
+// WithContextMap merges a map of key-value pairs into the error's context.
+// Returns a new Error, leaving the original unchanged. Nil or empty input
+// returns a clone with no added context.
+func (e *Error) WithContextMap(ctx map[string]string) *Error {
+	clone := e.clone()
+	maps.Insert(clone.context, maps.All(ctx))
+	return clone
+}
+
+// WithContextf adds a formatted key-value pair to the error's context.
+// The value is produced by fmt.Sprintf(format, args...).
+// Returns a new Error, leaving the original unchanged.
+func (e *Error) WithContextf(key, format string, args ...any) *Error {
+	clone := e.clone()
+	clone.context[key] = fmt.Sprintf(format, args...)
 	return clone
 }
 

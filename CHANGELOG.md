@@ -4,6 +4,29 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
+## [Unreleased]
+
+### Changed
+
+- **BREAKING:** `Classify` on an `errors.Join` result now returns the worst (highest-severity) sub-error instead of the first non-Transient one. Introduced `Family.Severity()` total order (Transient < Rejection < Conflict < Infrastructure < Corruption). Classification is now deterministic regardless of join argument order; fail-closed retry semantics are preserved.
+- **BREAKING:** Sentinel lookup is now lock-free and allocation-free via an `atomic.Pointer` copy-on-write store. `Registry.sentinels` changed from `map[error]Family` to `atomic.Pointer[sentinelMap]`. At 50 registered sentinels, `Classify` dropped from ~1330 ns/3 allocs/1832 B to ~285 ns/0 allocs/0 B.
+- **BREAKING (diagnose):** `DiagnosticResult.SuggestedFix string` replaced with a structured `Fix struct{Summary, Command string}`. Diagnostic rules now emit the remediation summary and shell command as distinct fields instead of embedding commands in prose. The `agent` no longer parses suggestions — `extractCommand` and `looksLikeCommand` (40+ lines of heuristic prose parsing) are deleted; `FixStep.Command` now comes directly from `diagnose.Fix.Command`.
+- Template resolution (override → registry → built-in default) extracted into a single shared `resolveTemplate` helper used by both `renderCLI` and `resolveSuggestedFix`, eliminating the split-brain where the two could diverge. Templates are now treated as cohesive units (What/Why/Fix belong together).
+
+### Added
+
+- `Registry.Clone()` — deep-copy a Registry for inherit-and-extend patterns (start from `DefaultRegistry`, clone, register scope-specific overrides without touching the global).
+- `Registry.RegisterTemplates(map)` — batch template registration, matching the existing `RegisterClassifications` batch on the sentinel side.
+- `Error.WithContextMap(map[string]string)` and `Error.WithContextf(key, format, args...)` — batch and formatted context attachment.
+
+### Removed
+
+- **BREAKING:** `Compose(errs...)` removed (again). It was a one-line `errors.Join` wrapper with no callers. Use stdlib `errors.Join` directly — `Classify` already classifies multi-errors. (Previously removed in 0.5.0, briefly re-added in a later commit; now permanently removed to keep one API for joining.)
+
+### Deprecated
+
+- The "share the protocol, not the implementation" tagline is now backed by explicit docs: the four interfaces (`Coded`, `Classified`, `Contextual`, `Retryable`) are documented as the sole public contract; `Error` is documented as a reference implementation.
+
 ## [0.6.0] - 2026-06-17
 
 ### Added

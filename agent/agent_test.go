@@ -49,10 +49,10 @@ func TestAnalyzeWithDiagnosis(t *testing.T) {
 	err := errorfamily.NewTransient("db.timeout", "connection refused")
 	diagnosis := []*diagnose.DiagnosticResult{
 		{
-			Status:       diagnose.StatusFailed,
-			Summary:      "PostgreSQL is NOT responding",
-			SuggestedFix: "Start PostgreSQL: brew services start postgresql",
-			Confidence:   0.9,
+			Status:     diagnose.StatusFailed,
+			Summary:    "PostgreSQL is NOT responding",
+			Fix:        diagnose.Fix{Summary: "Start PostgreSQL", Command: "brew services start postgresql"},
+			Confidence: 0.9,
 		},
 	}
 
@@ -113,10 +113,10 @@ func TestAnalyzeWithContext(t *testing.T) {
 
 	diagnosis := []*diagnose.DiagnosticResult{
 		{
-			Status:       diagnose.StatusFailed,
-			Summary:      "Cannot connect",
-			Confidence:   0.9,
-			SuggestedFix: "Check connection",
+			Status:     diagnose.StatusFailed,
+			Summary:    "Cannot connect",
+			Confidence: 0.9,
+			Fix:        diagnose.Fix{Summary: "Check connection"},
 		},
 	}
 
@@ -155,43 +155,9 @@ func TestAnalyzeTimeoutExceeded(t *testing.T) {
 	}
 }
 
-func TestExtractCommand(t *testing.T) {
-	tests := []struct {
-		input string
-		want  string
-	}{
-		{"$ brew services start postgresql", "brew services start postgresql"},
-		{"Run: git status", "git status"},
-		{"Some text\n$ actual command", "actual command"},
-		{"no command here", ""},
-		{
-			"Initialize a git repository:\n  cd /tmp && git init",
-			"cd /tmp && git init",
-		},
-		{
-			"Start PostgreSQL:\n  brew services start postgresql",
-			"brew services start postgresql",
-		},
-		{
-			"Fix permissions:\n  chmod 755 /etc/config",
-			"chmod 755 /etc/config",
-		},
-		{
-			"Check connectivity:\n  nc -zv host 5432\n\nCheck firewall rules and service status.",
-			"nc -zv host 5432",
-		},
-		{
-			"Resolve merge conflicts:\n  git mergetool\n  git add <resolved files>\n  git commit",
-			"git mergetool",
-		},
-		{
-			"Commit or stash changes:\n  git add . && git commit -m \"wip\"\nOr: git stash",
-			"git add . && git commit -m \"wip\"",
-		},
-	}
-	for _, tt := range tests {
-		if got := extractCommand(tt.input); got != tt.want {
-			t.Errorf("extractCommand(%q) = %q, want %q", tt.input, got, tt.want)
-		}
-	}
+func TestExtractCommand_REMOVED(t *testing.T) {
+	// extractCommand was deleted: diagnostic rules now emit structured
+	// diagnose.Fix{Summary, Command} directly, so prose parsing is unnecessary.
+	// This test remains as a tombstone documenting the removal.
+	_ = t
 }

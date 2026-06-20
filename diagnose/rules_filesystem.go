@@ -94,10 +94,10 @@ func (r *FilesystemRule) handleStatError(
 		result.Summary = "Permission denied: " + path
 		result.Details["exists"] = strTrue
 		result.Details["permissions"] = "denied"
-		result.SuggestedFix = fmt.Sprintf(
-			"Fix permissions:\n  chmod 755 %s\nOr run with appropriate privileges.",
-			path,
-		)
+		result.Fix = Fix{
+			Summary: "Fix permissions on " + path,
+			Command: "chmod 755 " + path,
+		}
 		return result, nil
 	}
 
@@ -111,15 +111,24 @@ func (r *FilesystemRule) suggestCreate(result *DiagnosticResult, path string) {
 	parentInfo, parentErr := os.Stat(parent)
 	if parentErr != nil {
 		result.Details["parent_exists"] = strFalse
-		result.SuggestedFix = "Create parent directory and path:\n  mkdir -p " + parent
+		result.Fix = Fix{
+			Summary: "Create parent directory: " + parent,
+			Command: "mkdir -p " + parent,
+		}
 		return
 	}
 	result.Details["parent_exists"] = strTrue
 	result.Details["parent_permissions"] = parentInfo.Mode().Perm().String()
 	if filepath.Ext(path) != "" {
-		result.SuggestedFix = "Create the file: " + path
+		result.Fix = Fix{
+			Summary: "Create the file: " + path,
+			Command: "touch " + path,
+		}
 	} else {
-		result.SuggestedFix = "Create directory: mkdir -p " + path
+		result.Fix = Fix{
+			Summary: "Create directory: " + path,
+			Command: "mkdir -p " + path,
+		}
 	}
 }
 
@@ -131,7 +140,7 @@ func (r *FilesystemRule) checkDirWritable(result *DiagnosticResult, path string)
 			result,
 			"writable",
 			"Directory exists but is not writable: "+path,
-			"Fix write permissions:\n  chmod 755 "+path,
+			"chmod 755 "+path,
 		)
 		return
 	}
@@ -147,7 +156,7 @@ func (r *FilesystemRule) checkFileReadable(result *DiagnosticResult, path string
 			result,
 			"readable",
 			"File exists but is not readable: "+path,
-			"Fix read permissions:\n  chmod 644 "+path,
+			"chmod 644 "+path,
 		)
 		return
 	}
@@ -159,11 +168,11 @@ func (r *FilesystemRule) checkFileReadable(result *DiagnosticResult, path string
 	))
 }
 
-func setAccessFailure(result *DiagnosticResult, key, summary, fix string) {
+func setAccessFailure(result *DiagnosticResult, key, summary, command string) {
 	result.Details[key] = strFalse
 	result.Status = StatusDegraded
 	result.Summary = summary
-	result.SuggestedFix = fix
+	result.Fix = Fix{Summary: summary, Command: command}
 }
 
 func setAccessSuccess(result *DiagnosticResult, key, summary string) {

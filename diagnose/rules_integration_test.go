@@ -160,8 +160,8 @@ func TestFilesystemRuleRunCreateFileSuggestion(t *testing.T) {
 	if result.Details["parent_exists"] != "false" {
 		t.Errorf("parent_exists = %q, want %q", result.Details["parent_exists"], "false")
 	}
-	if result.SuggestedFix == "" {
-		t.Error("SuggestedFix should not be empty for missing parent")
+	if result.Fix.Command == "" && result.Fix.Summary == "" {
+		t.Error("Fix should not be empty for missing parent")
 	}
 }
 

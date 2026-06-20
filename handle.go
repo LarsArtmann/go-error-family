@@ -205,6 +205,25 @@ func extractContext(err error) map[string]string {
 	return map[string]string{}
 }
 
+// resolveTemplate walks the shared template-resolution chain (per-call override →
+// registry → built-in default) and returns the first matching template.
+// renderCLI and resolveSuggestedFix both build on this so the resolution order
+// can never diverge between message rendering and fix suggestion.
+func resolveTemplate(code string, cfg HandleConfig, reg *Registry) (MessageTemplate, bool) {
+	if cfg.TemplateOverride != nil {
+		if tmpl, ok := cfg.TemplateOverride[code]; ok {
+			return tmpl, true
+		}
+	}
+	if tmpl, ok := reg.lookupTemplate(code); ok {
+		return tmpl, true
+	}
+	if tmpl, ok := lookupDefault(code); ok {
+		return tmpl, true
+	}
+	return MessageTemplate{}, false
+}
+
 func renderCLI(
 	code string,
 	context map[string]string,
@@ -212,25 +231,16 @@ func renderCLI(
 	cfg HandleConfig,
 	reg *Registry,
 ) string {
-	// 1. Consumer override (per-call).
-	if cfg.TemplateOverride != nil {
-		if tmpl, ok := cfg.TemplateOverride[code]; ok {
-			return applyTemplate(tmpl, context, family)
-		}
-	}
-
-	// 2. Registered template (from registry).
-	if tmpl, ok := reg.lookupTemplate(code); ok {
+	if tmpl, ok := resolveTemplate(code, cfg, reg); ok {
 		return applyTemplate(tmpl, context, family)
 	}
-
-	// 3. Default rendering (exact code match → family fallback).
 	return renderMessage(code, context, family)
 }
 
-// resolveSuggestedFix finds the Fix field from the same template resolution
-// chain as renderCLI: per-call override → registry template → built-in default
-// → family fallback. Only called for non-retryable errors.
+// resolveSuggestedFix finds the Fix field from the resolved template
+// (override → registry → built-in default), falling back to the family default.
+// Only called for non-retryable errors. A template is treated as a cohesive
+// unit: its Fix belongs with its What/Why rather than being mixed across sources.
 func resolveSuggestedFix(
 	code string,
 	errCtx map[string]string,
@@ -238,24 +248,9 @@ func resolveSuggestedFix(
 	reg *Registry,
 	family Family,
 ) string {
-	// 1. Per-call template override.
-	if cfg.TemplateOverride != nil {
-		if tmpl, ok := cfg.TemplateOverride[code]; ok && tmpl.Fix != "" {
-			return applyContext(tmpl.Fix, errCtx)
-		}
-	}
-
-	// 2. Registry-registered template.
-	if tmpl, ok := reg.lookupTemplate(code); ok && tmpl.Fix != "" {
+	if tmpl, ok := resolveTemplate(code, cfg, reg); ok && tmpl.Fix != "" {
 		return applyContext(tmpl.Fix, errCtx)
 	}
-
-	// 3. Built-in default template.
-	if tmpl, ok := lookupDefault(code); ok && tmpl.Fix != "" {
-		return applyContext(tmpl.Fix, errCtx)
-	}
-
-	// 4. Family fallback.
 	return family.DefaultFix()
 }
 

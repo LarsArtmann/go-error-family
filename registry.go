@@ -164,6 +164,41 @@ func (r *Registry) UnregisterTemplate(code string) {
 	delete(r.templates, strings.ToLower(code))
 }
 
+// RegisterTemplates registers multiple code-to-template mappings at once.
+// Thread-safe. Keys are lower-cased for case-insensitive lookup.
+// Parity with [Registry.RegisterClassifications] for the sentinel side.
+func (r *Registry) RegisterTemplates(templates map[string]MessageTemplate) {
+	r.mu.Lock()
+	defer r.mu.Unlock()
+	for code, tmpl := range templates {
+		r.templates[strings.ToLower(code)] = tmpl
+	}
+}
+
+// Clone returns a new Registry with a deep copy of this Registry's sentinels
+// and templates. Mutations to the clone do not affect the original and vice
+// versa. Enables inherit-and-extend patterns: start from [DefaultRegistry],
+// clone it, and register scope-specific overrides without touching the global.
+func (r *Registry) Clone() *Registry {
+	clone := NewRegistry()
+
+	// Copy sentinels from the current immutable snapshot (lock-free read).
+	if cur := r.sentinels.Load(); cur != nil {
+		copied := make(sentinelMap, len(*cur))
+		maps.Copy(copied, *cur)
+		clone.sentinels.Store(&copied)
+	}
+
+	// Copy templates under the read lock.
+	r.mu.RLock()
+	for code, tmpl := range r.templates {
+		clone.templates[code] = tmpl
+	}
+	r.mu.RUnlock()
+
+	return clone
+}
+
 // lookupSentinel loads the immutable sentinel snapshot once (lock-free,
 // allocation-free) and walks the error chain against it.
 func (r *Registry) lookupSentinel(err error) (Family, bool) {

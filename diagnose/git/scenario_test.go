@@ -20,8 +20,8 @@ func TestGitRuleMockNotARepo(t *testing.T) {
 	}
 	diagnose.AssertDetail(t, result, "is_repo", "false")
 	diagnose.AssertStatus(t, result, diagnose.StatusFailed)
-	if !strings.Contains(result.SuggestedFix, "git init") {
-		t.Errorf("Expected git init suggestion, got %q", result.SuggestedFix)
+	if !strings.Contains(result.Fix.Command, "git init") {
+		t.Errorf("Expected git init suggestion, got %q", result.Fix.Command)
 	}
 }
 
@@ -89,8 +89,8 @@ func TestGitRuleMockDirtyWorkingTree(t *testing.T) {
 	diagnose.AssertDetail(t, result, "clean", "false")
 	diagnose.AssertDetail(t, result, "dirty_files", "2")
 	diagnose.AssertStatus(t, result, diagnose.StatusDegraded)
-	if !strings.Contains(result.SuggestedFix, "git add") {
-		t.Errorf("Expected 'git add' in fix, got %q", result.SuggestedFix)
+	if !strings.Contains(result.Fix.Command, "git add") {
+		t.Errorf("Expected 'git add' in fix, got %q", result.Fix.Command)
 	}
 }
 
@@ -114,8 +114,8 @@ func TestGitRuleMockMergeConflicts(t *testing.T) {
 	}
 	diagnose.AssertDetail(t, result, "merge_conflicts", "true")
 	diagnose.AssertStatus(t, result, diagnose.StatusFailed)
-	if !strings.Contains(result.SuggestedFix, "mergetool") {
-		t.Errorf("Expected 'mergetool' in fix, got %q", result.SuggestedFix)
+	if !strings.Contains(result.Fix.Command, "mergetool") {
+		t.Errorf("Expected 'mergetool' in fix, got %q", result.Fix.Command)
 	}
 }
 

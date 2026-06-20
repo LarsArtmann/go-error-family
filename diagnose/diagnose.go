@@ -16,8 +16,11 @@
 //	results := runner.Run(ctx, err)
 //	for _, r := range results {
 //	    fmt.Println(r.Summary)
-//	    if r.SuggestedFix != "" {
-//	        fmt.Println("  Fix:", r.SuggestedFix)
+//	    if r.Fix.Command != "" {
+//	        fmt.Println("  Run:", r.Fix.Command)
+//	    }
+//	    if r.Fix.Summary != "" {
+//	        fmt.Println("  Fix:", r.Fix.Summary)
 //	    }
 //	}
 //
@@ -119,16 +122,26 @@ var statusNames = map[Status]string{ //nolint:gochecknoglobals // Immutable look
 	StatusUnknown:  strUnknown,
 }
 
+// Fix is a structured remediation suggestion for a diagnostic finding.
+// Rules populate the fields they know at construction time, so consumers (the
+// agent, CLI renderers) never need to parse prose to recover the command.
+type Fix struct {
+	// Summary is a one-line human description of the remediation.
+	Summary string
+	// Command is the exact shell command to run (empty when no single command applies).
+	Command string
+}
+
 // DiagnosticResult holds the outcome of a single diagnostic check.
 type DiagnosticResult struct {
-	RuleName     string
-	Status       Status
-	Summary      string
-	Details      map[string]string
-	Context      map[string]string
-	SuggestedFix string
-	Confidence   float64
-	Duration     time.Duration
+	RuleName   string
+	Status     Status
+	Summary    string
+	Details    map[string]string
+	Context    map[string]string
+	Fix        Fix
+	Confidence float64
+	Duration   time.Duration
 }
 
 // DiagnosticRule is the interface for deterministic error diagnostic checks.

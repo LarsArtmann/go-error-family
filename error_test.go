@@ -386,3 +386,48 @@ func testFamilyProperty[T comparable](t *testing.T, name string, cases []struct 
 		})
 	}
 }
+
+func TestErrorWithContextMap(t *testing.T) {
+	e := NewTransient("db.timeout", "msg").
+		WithContextMap(map[string]string{"host": "db1", "port": "5432"})
+
+	if e.ContextValue("host") != "db1" {
+		t.Errorf("host = %q, want db1", e.ContextValue("host"))
+	}
+	if e.ContextValue("port") != "5432" {
+		t.Errorf("port = %q, want 5432", e.ContextValue("port"))
+	}
+}
+
+func TestErrorWithContextMapNilIsSafe(t *testing.T) {
+	original := NewTransient("code", "msg").WithContext("keep", "yes")
+	e := original.WithContextMap(nil)
+	if e.ContextValue("keep") != "yes" {
+		t.Error("WithContextMap(nil) clobbered existing context")
+	}
+}
+
+func TestErrorWithContextf(t *testing.T) {
+	e := NewTransient("db.timeout", "msg").
+		WithContextf("latency_ms", "%.2f", 42.567)
+
+	if got := e.ContextValue("latency_ms"); got != "42.57" {
+		t.Errorf("latency_ms = %q, want 42.57", got)
+	}
+}
+
+func TestErrorWithContextMapImmutable(t *testing.T) {
+	base := NewTransient("code", "msg").WithContext("a", "1")
+	mutated := map[string]string{"b": "2"}
+	derived := base.WithContextMap(mutated)
+
+	// Mutating the input map after the call must not affect the error.
+	mutated["b"] = "changed"
+	if derived.ContextValue("b") != "2" {
+		t.Errorf("WithContextMap stored a reference: b = %q, want 2", derived.ContextValue("b"))
+	}
+	// Base unchanged.
+	if base.ContextValue("b") != "" {
+		t.Error("base gained derived context")
+	}
+}

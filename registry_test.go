@@ -211,3 +211,53 @@ func TestRegistryConcurrentRegisterAndClassify(t *testing.T) {
 
 	<-done
 }
+
+func TestRegistryCloneIndependence(t *testing.T) {
+	original := NewRegistry()
+	sentinel := errors.New("original sentinel")
+	original.RegisterClassification(sentinel, Rejection)
+	original.RegisterTemplate("original.code", MessageTemplate{What: "original what"})
+
+	clone := original.Clone()
+
+	// Mutate the clone.
+	clone.RegisterClassification(errors.New("clone-only"), Conflict)
+	clone.UnregisterClassification(sentinel)
+	clone.RegisterTemplate("clone.code", MessageTemplate{What: "clone what"})
+
+	// Original must be unaffected.
+	if got := original.Classify(sentinel); got != Rejection {
+		t.Errorf("original mutated by clone: Classify(sentinel) = %v, want Rejection", got)
+	}
+	tmpl, ok := original.lookupTemplate("original.code")
+	if !ok || tmpl.What != "original what" {
+		t.Errorf("original template lost after clone mutation: %+v ok=%v", tmpl, ok)
+	}
+	if _, ok := original.lookupTemplate("clone.code"); ok {
+		t.Error("original gained clone-only template")
+	}
+
+	// Clone must have dropped the sentinel: Classify now falls through to the
+	// Transient default (distinct from Rejection, so this proves the drop).
+	if got := clone.Classify(sentinel); got != Transient {
+		t.Errorf("clone did not drop sentinel: Classify = %v, want Transient (default)", got)
+	}
+}
+
+func TestRegistryRegisterTemplatesBatch(t *testing.T) {
+	reg := NewRegistry()
+	reg.RegisterTemplates(map[string]MessageTemplate{
+		"code.one": {What: "one"},
+		"CODE.TWO": {What: "two"},
+	})
+
+	one, ok := reg.lookupTemplate("code.one")
+	if !ok || one.What != "one" {
+		t.Errorf("batch template code.one missing: %+v ok=%v", one, ok)
+	}
+	// Case-insensitive lookup (registered as CODE.TWO).
+	two, ok := reg.lookupTemplate("code.two")
+	if !ok || two.What != "two" {
+		t.Errorf("batch template code.two (case-insensitive) missing: %+v ok=%v", two, ok)
+	}
+}

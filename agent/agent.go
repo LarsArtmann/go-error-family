@@ -120,10 +120,12 @@ func (a *agent) deterministicAnalyze(
 		if d.Status == diagnose.StatusFailed {
 			result.Confidence = max(result.Confidence, d.Confidence)
 			parts = append(parts, d.Summary)
-			if d.SuggestedFix != "" {
+			// Structured Fix comes directly from the diagnostic rule — no prose
+			// parsing needed. Emit a FixStep whenever the rule has any guidance.
+			if d.Fix.Command != "" || d.Fix.Summary != "" {
 				result.FixSteps = append(result.FixSteps, FixStep{
 					Description: d.Summary,
-					Command:     extractCommand(d.SuggestedFix),
+					Command:     d.Fix.Command,
 					Rationale: fmt.Sprintf(
 						"Diagnostic rule '%s' identified this issue",
 						d.RuleName,
@@ -145,56 +147,4 @@ func (a *agent) deterministicAnalyze(
 	}
 
 	return result, nil
-}
-
-func extractCommand(suggest string) string {
-	for line := range strings.SplitSeq(suggest, "\n") {
-		line = strings.TrimSpace(line)
-		if after, ok := strings.CutPrefix(line, "$ "); ok {
-			return after
-		}
-		if after, ok := strings.CutPrefix(line, "Run: "); ok {
-			return after
-		}
-	}
-
-	// Diagnostic rules produce suggestions like "Description:\n  command args".
-	// Look for the first indented line that looks like a shell command.
-	for line := range strings.SplitSeq(suggest, "\n") {
-		trimmed := strings.TrimSpace(line)
-		if trimmed == "" {
-			continue
-		}
-		// Indented lines (2+ spaces) in the middle of a suggestion are commands.
-		if strings.HasPrefix(line, "  ") && len(trimmed) > 0 {
-			// Skip lines that are just prose (contain ":" at end or are too wordy).
-			if strings.HasSuffix(trimmed, ":") ||
-				strings.Contains(trimmed, " ") && !looksLikeCommand(trimmed) {
-				continue
-			}
-			return trimmed
-		}
-	}
-	return ""
-}
-
-// looksLikeCommand reports whether a string looks like a shell command rather than prose.
-func looksLikeCommand(s string) bool {
-	// Commands typically start with a known command name or contain shell operators.
-	shellPrefixes := []string{
-		"git ", "mkdir ", "chmod ", "nc ", "dig ", "nslookup ",
-		"brew ", "systemctl ", "service ", "pg_", "cd ",
-		"docker ", "curl ", "ssh ", "cp ", "mv ", "rm ", "cat ",
-	}
-	lower := strings.ToLower(s)
-	for _, prefix := range shellPrefixes {
-		if strings.HasPrefix(lower, prefix) {
-			return true
-		}
-	}
-	// Lines containing && or | are almost certainly commands.
-	if strings.Contains(s, " && ") || strings.Contains(s, " | ") {
-		return true
-	}
-	return false
 }

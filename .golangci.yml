@@ -93,6 +93,7 @@ linters:
         - github.com/larsartmann/go-error-family.Registry
         - github.com/larsartmann/go-error-family.familyInfo
         - github.com/larsartmann/go-error-family/diagnose.DiagnosticResult
+        - github.com/larsartmann/go-error-family/diagnose.Fix
         - github.com/larsartmann/go-error-family/diagnose.Runner
         - github.com/larsartmann/go-error-family/diagnose.RuleSpec
         - github.com/larsartmann/go-error-family/diagnose.MockCommandRunner

@@ -331,8 +331,8 @@ func TestPostgresRuleRunWithNonLocalhost(t *testing.T) {
 	diagnose.AssertDetail(t, result, strHost, "192.0.2.1")
 	diagnose.AssertDetail(t, result, "port", "5433")
 	diagnose.AssertStatus(t, result, diagnose.StatusFailed)
-	if result.SuggestedFix == "" {
-		t.Error("Expected non-empty SuggestedFix")
+	if result.Fix.Command == "" && result.Fix.Summary == "" {
+		t.Error("Expected non-empty Fix")
 	}
 }
 

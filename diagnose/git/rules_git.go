@@ -63,10 +63,10 @@ func (r *GitRule) Run(ctx context.Context, err error) (*diagnose.DiagnosticResul
 		result.Status = diagnose.StatusFailed
 		result.Summary = "Not a git repository: " + repoPath
 		result.Details["is_repo"] = strFalse
-		result.SuggestedFix = fmt.Sprintf(
-			"Initialize a git repository:\n  cd %s && git init",
-			repoPath,
-		)
+		result.Fix = diagnose.Fix{
+			Summary: "Initialize a git repository in " + repoPath,
+			Command: "git init",
+		}
 		return result, nil
 	}
 	result.Details["is_repo"] = strTrue
@@ -129,13 +129,19 @@ func (r *GitRule) checkWorkingTree(
 			strings.Count(trimmed, "UU")+strings.Count(trimmed, "AA"),
 		)
 		result.Details["merge_conflicts"] = strTrue
-		result.SuggestedFix = "Resolve merge conflicts:\n  git mergetool\n  git add <resolved files>\n  git commit"
+		result.Fix = diagnose.Fix{
+			Summary: "Resolve merge conflicts",
+			Command: "git mergetool",
+		}
 		return true
 	}
 
 	result.Status = diagnose.StatusDegraded
 	result.Summary = fmt.Sprintf("Working tree has uncommitted changes (%d files)", lineCount)
-	result.SuggestedFix = "Commit or stash changes:\n  git add . && git commit -m \"wip\"\nOr: git stash"
+	result.Fix = diagnose.Fix{
+		Summary: "Commit or stash uncommitted changes",
+		Command: "git add . && git commit -m \"wip\"",
+	}
 	return true
 }
 
@@ -166,7 +172,10 @@ func (r *GitRule) checkRemote(
 		result.Status = diagnose.StatusDegraded
 		result.Summary = "Git repo is clean but remote is unreachable: " + repoPath
 		result.Details["remote_reachable"] = strFalse
-		result.SuggestedFix = "Check network connectivity and remote URL:\n  git remote -v\n  git ls-remote origin"
+		result.Fix = diagnose.Fix{
+			Summary: "Check network connectivity and remote URL",
+			Command: "git ls-remote origin",
+		}
 		return
 	}
 

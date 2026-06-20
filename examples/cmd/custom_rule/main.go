@@ -38,10 +38,10 @@ func (r *RateLimitRule) Run(ctx context.Context, err error) (*diagnose.Diagnosti
 
 	if retryAfter == "unknown" {
 		result.Summary = "Rate limited but no Retry-After header found"
-		result.SuggestedFix = "Wait 1 second and retry, or implement exponential backoff"
+		result.Fix = diagnose.Fix{Summary: "Wait 1 second and retry, or implement exponential backoff"}
 	} else {
 		result.Summary = fmt.Sprintf("Rate limited — wait %s before retrying", retryAfter)
-		result.SuggestedFix = "Wait for the duration specified in the Retry-After header"
+		result.Fix = diagnose.Fix{Summary: "Wait for the duration specified in the Retry-After header"}
 		result.Status = diagnose.StatusHealthy
 		result.Confidence = diagnose.ConfidenceNotCause
 	}
@@ -62,8 +62,8 @@ func main() {
 	results := runner.Run(context.Background(), err)
 	for _, r := range results {
 		fmt.Printf("[%s] %s: %s\n", r.RuleName, r.Status, r.Summary)
-		if r.SuggestedFix != "" {
-			fmt.Printf("  Fix: %s\n", r.SuggestedFix)
+		if r.Fix.Summary != "" {
+			fmt.Printf("  Fix: %s\n", r.Fix.Summary)
 		}
 	}
 }
