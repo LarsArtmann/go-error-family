@@ -5,9 +5,14 @@ import (
 	"maps"
 	"strings"
 	"sync"
+	"sync/atomic"
 )
 
-// Registry holds classification sentinel mappings and message templates.
+// sentinelMap is the immutable snapshot stored behind an atomic.Pointer.
+// Reads load the pointer once (lock-free, allocation-free); writes copy-on-write.
+type sentinelMap map[error]Family
+
+// Registry holds classification sentinels and message templates.
 // It is safe for concurrent use. The zero value is not usable — use [NewRegistry].
 //
 // A Registry solves two problems that package-level globals cannot:
@@ -19,18 +24,24 @@ import (
 // The package-level [DefaultRegistry] is used by the convenience functions
 // ([Classify], [RegisterClassification], [RegisterTemplate], etc.) and by the
 // HandleError family when no custom Registry is provided in [HandleConfig].
+//
+// Sentinels are stored behind an atomic.Pointer to an immutable snapshot: the
+// hot read path (every Classify) is lock-free and allocation-free, while rare
+// writes serialize under the write lock and publish a new snapshot via copy-on-write.
 type Registry struct {
-	mu        sync.RWMutex
-	sentinels map[error]Family
+	mu        sync.RWMutex // serializes writers (templates direct + sentinels copy-on-write)
+	sentinels atomic.Pointer[sentinelMap]
 	templates map[string]MessageTemplate
 }
 
 // NewRegistry creates an empty Registry ready for use.
 func NewRegistry() *Registry {
-	return &Registry{
-		sentinels: make(map[error]Family),
+	r := &Registry{
 		templates: make(map[string]MessageTemplate),
 	}
+	empty := make(sentinelMap)
+	r.sentinels.Store(&empty)
+	return r
 }
 
 // DefaultRegistry is the package-level Registry used by the convenience
@@ -56,17 +67,17 @@ func (r *Registry) Classify(err error) Family {
 	}
 
 	// 1. Multi-error support (errors.Join).
-	// errors.AsType traverses multi-errors and returns the first match,
-	// but we want fail-closed behavior: if any sub-error is not retryable,
-	// the whole operation should not be retried.
+	// Pick the worst (highest-severity) sub-error, independent of join order.
+	// Preserves fail-closed retry semantics: any non-Transient sub-error
+	// (severity > Transient's) makes the joined result non-Transient.
 	if u, ok := err.(interface{ Unwrap() []error }); ok {
+		worst := Transient
 		for _, sub := range u.Unwrap() {
-			family := r.Classify(sub)
-			if family != Transient {
-				return family
+			if f := r.Classify(sub); f.Severity() > worst.Severity() {
+				worst = f
 			}
 		}
-		return Transient
+		return worst
 	}
 
 	// 2. Check for explicit classification.
@@ -103,7 +114,7 @@ func (r *Registry) Classify(err error) Family {
 func (r *Registry) RegisterClassification(sentinel error, family Family) {
 	r.mu.Lock()
 	defer r.mu.Unlock()
-	r.sentinels[sentinel] = family
+	r.swapSentinels(func(m sentinelMap) { m[sentinel] = family })
 }
 
 // UnregisterClassification removes a previously registered sentinel mapping.
@@ -111,7 +122,7 @@ func (r *Registry) RegisterClassification(sentinel error, family Family) {
 func (r *Registry) UnregisterClassification(sentinel error) {
 	r.mu.Lock()
 	defer r.mu.Unlock()
-	delete(r.sentinels, sentinel)
+	r.swapSentinels(func(m sentinelMap) { delete(m, sentinel) })
 }
 
 // RegisterClassifications registers multiple sentinel-to-Family mappings at once.
@@ -119,7 +130,22 @@ func (r *Registry) UnregisterClassification(sentinel error) {
 func (r *Registry) RegisterClassifications(classifications map[error]Family) {
 	r.mu.Lock()
 	defer r.mu.Unlock()
-	maps.Copy(r.sentinels, classifications)
+	r.swapSentinels(func(m sentinelMap) { maps.Copy(m, classifications) })
+}
+
+// swapSentinels performs copy-on-write: clones the current immutable sentinel
+// snapshot, applies fn to the clone, and atomically publishes it. Callers must
+// hold r.mu (write lock) so concurrent writers never lose updates; readers
+// remain fully lock-free.
+func (r *Registry) swapSentinels(fn func(m sentinelMap)) {
+	old := r.sentinels.Load()
+	newMap := make(sentinelMap, 1)
+	if old != nil {
+		newMap = make(sentinelMap, len(*old)+1)
+		maps.Copy(newMap, *old)
+	}
+	fn(newMap)
+	r.sentinels.Store(&newMap)
 }
 
 // RegisterTemplate adds a MessageTemplate for a specific error code.
@@ -138,16 +164,15 @@ func (r *Registry) UnregisterTemplate(code string) {
 	delete(r.templates, strings.ToLower(code))
 }
 
-// lookupSentinel snapshots the sentinels and walks the error chain.
-// The snapshot is taken under RLock, then iterated lock-free — same
-// pattern as the original lookupRegistered.
+// lookupSentinel loads the immutable sentinel snapshot once (lock-free,
+// allocation-free) and walks the error chain against it.
 func (r *Registry) lookupSentinel(err error) (Family, bool) {
-	r.mu.RLock()
-	snapshot := make(map[error]Family, len(r.sentinels))
-	maps.Copy(snapshot, r.sentinels)
-	r.mu.RUnlock()
+	m := r.sentinels.Load()
+	if m == nil {
+		return Rejection, false
+	}
 
-	for sentinel, family := range snapshot {
+	for sentinel, family := range *m {
 		if errors.Is(err, sentinel) {
 			return family, true
 		}

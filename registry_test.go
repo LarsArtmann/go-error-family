@@ -178,3 +178,36 @@ func TestRegistryHandleErrorDetailedWithCustomRegistry(t *testing.T) {
 		t.Errorf("SuggestedFix should use template fix: %q", result.SuggestedFix)
 	}
 }
+
+// TestRegistryConcurrentRegisterAndClassify hammers the copy-on-write sentinel
+// store with concurrent writers and readers. Run with -race to catch any data race
+// in the atomic.Pointer swap path.
+func TestRegistryConcurrentRegisterAndClassify(t *testing.T) {
+	reg := NewRegistry()
+
+	target := errors.New("target sentinel")
+	reg.RegisterClassification(target, Transient)
+
+	done := make(chan struct{})
+
+	// Writers: register/unregister in a tight loop.
+	go func() {
+		defer close(done)
+		for i := range 1000 {
+			e := fmt.Errorf("writer-%d", i)
+			reg.RegisterClassification(e, Rejection)
+			if i%2 == 0 {
+				reg.UnregisterClassification(e)
+			}
+		}
+	}()
+
+	// Readers: classify concurrently (lock-free, must never race or panic).
+	for range 1000 {
+		if got := reg.Classify(target); got != Transient {
+			t.Fatalf("Classify(target) = %v, want Transient", got)
+		}
+	}
+
+	<-done
+}

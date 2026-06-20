@@ -41,6 +41,25 @@ func TestParseFamily(t *testing.T) {
 	}
 }
 
+func TestFamilySeverity(t *testing.T) {
+	tests := []struct {
+		family Family
+		want   int
+	}{
+		{Transient, 1},
+		{Rejection, 2},
+		{Conflict, 3},
+		{Infrastructure, 4},
+		{Corruption, 5},
+		{Family(99), 0}, // invalid → 0
+	}
+	for _, tt := range tests {
+		if got := tt.family.Severity(); got != tt.want {
+			t.Errorf("Family(%d).Severity() = %d, want %d", tt.family, got, tt.want)
+		}
+	}
+}
+
 func TestFamilyIsRetryable(t *testing.T) {
 	if Rejection.IsRetryable() {
 		t.Error("Rejection should not be retryable")

@@ -71,6 +71,8 @@ func TestClassifyMultiError(t *testing.T) {
 	transient := NewTransient("db.timeout", "timed out")
 	rejection := NewRejection("validation", "invalid")
 	conflict := NewConflict("state", "stale")
+	corruption := NewCorruption("decode", "bad payload")
+	infrastructure := NewInfrastructure("startup", "nil dep")
 
 	tests := []struct {
 		name string
@@ -88,6 +90,17 @@ func TestClassifyMultiError(t *testing.T) {
 		{"plain then rejection", errors.Join(errors.New("plain"), rejection), Rejection},
 		{"nested join", errors.Join(errors.Join(transient), rejection), Rejection},
 		{"all plain", errors.Join(errors.New("a"), errors.New("b")), Transient},
+
+		// Severity-ordered: the worst (highest-severity) sub-error wins,
+		// independent of argument order.
+		{"worst wins: conflict over rejection", errors.Join(rejection, conflict), Conflict},
+		{"worst wins: infrastructure over conflict", errors.Join(conflict, infrastructure), Infrastructure},
+		{"worst wins: corruption over infrastructure", errors.Join(infrastructure, corruption), Corruption},
+		{"order independence: corruption first", errors.Join(corruption, rejection), Corruption},
+		{"order independence: corruption last", errors.Join(rejection, corruption), Corruption},
+		{"order independence: conflict both orders a", errors.Join(conflict, rejection), Conflict},
+		{"order independence: conflict both orders b", errors.Join(rejection, conflict), Conflict},
+		{"worst wins all", errors.Join(transient, rejection, conflict, corruption), Corruption},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {

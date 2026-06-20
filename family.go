@@ -53,6 +53,7 @@ const (
 // Adding a new family requires exactly one entry here.
 type familyInfo struct {
 	Name     string
+	Severity int // total order for multi-error classification: higher = worse (Transient=1 … Corruption=5)
 	Exit     int
 	Tone     Tone
 	Audience Audience
@@ -64,6 +65,7 @@ type familyInfo struct {
 var familyData = [...]familyInfo{ //nolint:gochecknoglobals // Immutable lookup table for Family metadata.
 	Rejection: {
 		Name:     strRejection,
+		Severity: 2, // user error — fixable by caller
 		Exit:     1,
 		Tone:     ToneInstructional,
 		Audience: AudienceUser,
@@ -72,6 +74,7 @@ var familyData = [...]familyInfo{ //nolint:gochecknoglobals // Immutable lookup 
 	},
 	Conflict: {
 		Name:     strConflict,
+		Severity: 3, // user must resolve state before retrying
 		Exit:     1,
 		Tone:     ToneExplanatory,
 		Audience: AudienceUser,
@@ -80,6 +83,7 @@ var familyData = [...]familyInfo{ //nolint:gochecknoglobals // Immutable lookup 
 	},
 	Transient: {
 		Name:     strTransient,
+		Severity: 1, // least bad — temporary, will likely pass on retry
 		Exit:     75,
 		Tone:     ToneReassuring,
 		Audience: AudienceAll,
@@ -89,6 +93,7 @@ var familyData = [...]familyInfo{ //nolint:gochecknoglobals // Immutable lookup 
 	},
 	Corruption: {
 		Name:     strCorruption,
+		Severity: 5, // worst — source of truth is damaged, data integrity at risk
 		Exit:     65,
 		Tone:     ToneUrgent,
 		Audience: AudienceOps,
@@ -98,6 +103,7 @@ var familyData = [...]familyInfo{ //nolint:gochecknoglobals // Immutable lookup 
 	},
 	Infrastructure: {
 		Name:     strInfrastructure,
+		Severity: 4, // system cannot serve, but data is intact
 		Exit:     69,
 		Tone:     ToneApologetic,
 		Audience: AudienceOps,
@@ -147,6 +153,21 @@ func (f Family) IsRetryable() bool {
 // IsValid reports whether the Family value is one of the five defined constants.
 func (f Family) IsValid() bool {
 	return f >= Rejection && f <= Infrastructure
+}
+
+// Severity returns a total order across families for multi-error classification.
+// Higher = worse. Used by Classify to pick the worst sub-error of an errors.Join
+// result deterministically, independent of argument order.
+//
+//	Transient(1) < Rejection(2) < Conflict(3) < Infrastructure(4) < Corruption(5)
+//
+// This preserves the fail-closed retry guarantee: if ANY sub-error is non-Transient
+// (severity > 1), the joined error is non-Transient.
+func (f Family) Severity() int {
+	if f.IsValid() {
+		return familyData[f].Severity
+	}
+	return 0
 }
 
 // ExitCode returns the BSD sysexits.h compatible exit code for this family.
