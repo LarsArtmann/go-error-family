@@ -1,6 +1,7 @@
 package errorfamily
 
 import (
+	"encoding/json"
 	"fmt"
 	"maps"
 	"time"
@@ -200,4 +201,36 @@ func (e *Error) ContextValue(key string) string {
 		return ""
 	}
 	return e.context[key]
+}
+
+// jsonError is the JSON view of an Error for API responses.
+type jsonError struct {
+	Family    string            `json:"family"`
+	Code      string            `json:"code"`
+	Message   string            `json:"message"`
+	Context   map[string]string `json:"context,omitempty"`
+	Retryable bool              `json:"retryable"`
+	Timestamp string            `json:"timestamp,omitempty"`
+}
+
+// JSON returns a canonical JSON encoding of the error for API boundaries.
+// The shape is stable: {family, code, message, context, retryable, timestamp}.
+// Use this for HTTP/REST error responses where a structured body is preferable
+// to the [transient:code] message format of Error().
+func (e *Error) JSON() ([]byte, error) {
+	view := jsonError{
+		Family:    e.family.String(),
+		Code:      e.code,
+		Message:   e.message,
+		Context:   e.context,
+		Retryable: e.IsRetryable(),
+	}
+	if !e.timestamp.IsZero() {
+		view.Timestamp = e.timestamp.Format(time.RFC3339)
+	}
+	data, err := json.Marshal(view)
+	if err != nil {
+		return nil, fmt.Errorf("marshal error view: %w", err)
+	}
+	return data, nil
 }

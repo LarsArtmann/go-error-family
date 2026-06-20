@@ -19,26 +19,9 @@ type errorResponse struct {
 	Retry   bool   `json:"retryable"`
 }
 
-func classifyToStatus(f errorfamily.Family) int {
-	switch f {
-	case errorfamily.Rejection:
-		return http.StatusBadRequest
-	case errorfamily.Conflict:
-		return http.StatusConflict
-	case errorfamily.Transient:
-		return http.StatusServiceUnavailable
-	case errorfamily.Corruption:
-		return http.StatusInternalServerError
-	case errorfamily.Infrastructure:
-		return http.StatusInternalServerError
-	default:
-		return http.StatusInternalServerError
-	}
-}
-
 func handleHTTPError(w http.ResponseWriter, err error) {
 	family := errorfamily.Classify(err)
-	status := classifyToStatus(family)
+	status := family.HTTPStatus()
 
 	var code string
 	if c, ok := errors.AsType[errorfamily.Coded](err); ok {

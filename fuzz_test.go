@@ -95,3 +95,20 @@ func FuzzErrorFormatting(f *testing.F) {
 		}
 	})
 }
+
+// FuzzApplyContext verifies the {key} template substitution never panics and
+// always terminates for arbitrary input (including nested/malformed braces).
+// Replacement is a single non-overlapping pass; nested placeholders like
+// "{x{x}}" are an inherent edge case, not a bug, so we only assert crash-safety.
+func FuzzApplyContext(f *testing.F) {
+	f.Add("hello {name}", "name", "world")
+	f.Add("no placeholders", "k", "v")
+	f.Add("{a} and {b}", "a", "1")
+	f.Add("nested {brace", "x", "y")
+	f.Add("value with {x} inside", "x", "replaced")
+	f.Add("{x{x}}", "x", "")
+
+	f.Fuzz(func(t *testing.T, template, key, value string) {
+		_ = applyContext(template, map[string]string{key: value})
+	})
+}

@@ -1,6 +1,7 @@
 package errorfamily
 
 import (
+	"encoding/json"
 	"errors"
 	"fmt"
 	"strings"
@@ -429,5 +430,33 @@ func TestErrorWithContextMapImmutable(t *testing.T) {
 	// Base unchanged.
 	if base.ContextValue("b") != "" {
 		t.Error("base gained derived context")
+	}
+}
+
+func TestErrorJSON(t *testing.T) {
+	e := NewTransient("db.timeout", "query timed out").
+		WithContext("host", "db1").
+		WithTimestamp(time.Date(2026, 1, 1, 0, 0, 0, 0, time.UTC))
+
+	data, err := e.JSON()
+	if err != nil {
+		t.Fatalf("JSON() error: %v", err)
+	}
+
+	var got map[string]any
+	if err := json.Unmarshal(data, &got); err != nil {
+		t.Fatalf("invalid JSON output: %v", err)
+	}
+	if got["family"] != "transient" {
+		t.Errorf("family = %v, want transient", got["family"])
+	}
+	if got["code"] != "db.timeout" {
+		t.Errorf("code = %v, want db.timeout", got["code"])
+	}
+	if got["retryable"] != true {
+		t.Errorf("retryable = %v, want true", got["retryable"])
+	}
+	if got["timestamp"] != "2026-01-01T00:00:00Z" {
+		t.Errorf("timestamp = %v, want RFC3339", got["timestamp"])
 	}
 }

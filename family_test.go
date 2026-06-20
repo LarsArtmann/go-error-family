@@ -290,3 +290,22 @@ func TestAudienceUnmarshalText(t *testing.T) {
 		t.Errorf("UnmarshalText() = %v, want %v", a, AudienceAll)
 	}
 }
+
+func TestFamilyHTTPStatus(t *testing.T) {
+	tests := []struct {
+		family Family
+		want   int
+	}{
+		{Rejection, 400},
+		{Conflict, 409},
+		{Transient, 503},
+		{Corruption, 500},
+		{Infrastructure, 503},
+		{Family(99), 500},
+	}
+	for _, tt := range tests {
+		if got := tt.family.HTTPStatus(); got != tt.want {
+			t.Errorf("Family(%d).HTTPStatus() = %d, want %d", tt.family, got, tt.want)
+		}
+	}
+}

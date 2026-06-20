@@ -89,6 +89,8 @@ linters:
         - github.com/larsartmann/go-error-family.HandleConfig
         - github.com/larsartmann/go-error-family.HandleResult
         - github.com/larsartmann/go-error-family.MessageTemplate
+        - github.com/larsartmann/go-error-family.RetryPolicy
+        - github.com/larsartmann/go-error-family.jsonError
         - github.com/larsartmann/go-error-family.DiagnosticFinding
         - github.com/larsartmann/go-error-family.Registry
         - github.com/larsartmann/go-error-family.familyInfo

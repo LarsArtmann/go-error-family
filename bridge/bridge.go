@@ -3,9 +3,26 @@
 // OopsError satisfy error-family's Classified, Coded, Retryable, and Contextual
 // interfaces without either library knowing about the other.
 //
+// # Architectural rule: libraries classify, applications enrich
+//
+// go-error-family and samber/oops are complementary, not competing, and this
+// bridge is the seam where they meet:
+//
+//   - LIBRARY code (clients, SDKs, domain packages) imports go-error-family
+//     only and returns classified errors. A library knows its own domain
+//     contract (a 404 is a Rejection, a timeout is Transient) but must NOT
+//     presume the application's observability stack, so it never imports oops.
+//   - APPLICATION code (HTTP handlers, CLI mains, jobs) imports oops for
+//     enrichment (stack traces, trace IDs, request context) and, if it also
+//     needs behavioral decisions, wraps library errors via this bridge.
+//
+// This keeps the classification protocol (four small interfaces) as the only
+// thing libraries force on consumers, while the heavier enrichment choice stays
+// opt-in at the application boundary.
+//
 // Stability: experimental (v0.x). The API may change between minor versions.
 //
-// Usage:
+// # Usage
 //
 //	rich := oops.In("database").Tags("timeout").With("host", "db1").Wrap(dbErr)
 //	classified := bridge.Wrap(rich, errorfamily.Transient)
