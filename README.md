@@ -31,7 +31,16 @@ go get github.com/larsartmann/go-error-family
 
 Requires Go 1.26+ (uses `errors.AsType`).
 
-This is a Go workspace. The root module provides core types and classification. Diagnostic submodules (`diagnose/git`, `diagnose/postgres`) require separate imports.
+This is a Go workspace. The root module (classification core, zero third-party deps) is stable. Experimental submodules — `agent`, `bridge` (samber/oops integration), `diagnose`, `diagnose/git`, `diagnose/postgres` — have their own `go.mod` and require separate imports.
+
+## Complementary, not competing
+
+go-error-family **classifies**; [samber/oops](https://github.com/samber/oops) **enriches** (stack traces, trace IDs). Use both:
+
+- **Libraries** import go-error-family only — they know their domain contract (a 404 is a Rejection, a timeout is Transient) but must not presume the app's observability stack, so they never import oops.
+- **Applications** import oops for enrichment and, if they also need behavioral decisions, wrap library errors via the `bridge/` package.
+
+The four interfaces (`Coded`, `Classified`, `Contextual`, `Retryable`) are the sole public contract; the `Error` struct is a reference implementation, not a requirement.
 
 ## Quick Start
 
@@ -76,14 +85,18 @@ See [examples/](examples/) for runnable CLI, HTTP, and custom diagnostic rule de
 
 ## What It Gives You
 
-- **`Family`** — behavioral classification (Rejection, Conflict, Transient, Corruption, Infrastructure) that maps to retry decisions, exit codes, and user-facing tone
-- **Small interfaces** — `Coded`, `Classified`, `Contextual`, `Retryable` — each error type implements what it needs
+- **`Family`** — behavioral classification (Rejection, Conflict, Transient, Corruption, Infrastructure) that maps to retry decisions, exit codes, HTTP status codes, and user-facing tone
+- **Small interfaces** — `Coded`, `Classified`, `Contextual`, `Retryable` — each error type implements what it needs; the `Error` struct is just a reference implementation
 - **`Classify(err)`** — universal classification for any error (multi-error → interface → registered sentinels → default)
+- **Multi-error support** — `errors.Join` + `Classify` picks the **worst** Family by severity, deterministically regardless of argument order
 - **`ExitCode(err)`** — BSD sysexits.h exit codes derived from Family
-- **`Registry`** — injectable registry for test isolation and scoped error handling (no `t.Cleanup` needed)
+- **`Family.HTTPStatus()`** — canonical family→HTTP status mapping (Rejection→400, Conflict→409, Transient→503, …)
+- **`Family.RetryPolicy()`** — advisory retry defaults (attempts + backoff); the library does not run the loop
+- **`Error.JSON()`** — canonical JSON view for API boundaries
+- **`Registry`** — injectable registry with `Clone()` for inherit-and-extend; test isolation and scoped error handling (no `t.Cleanup` needed)
+- **`RegisterStdlibDefaults(reg)`** — pre-registered classifications for common stdlib errors (context/sql/os) with documented rationale
 - **`HandleError(err)`** — CLI boundary handler with structured messages (What / Why / Fix / WayOut)
-- **Multi-error support** — `errors.Join` + `Classify` picks the worst Family automatically (partial-success patterns)
-- **Diagnostic rules** — deterministic checks (PostgreSQL, filesystem, network, git) that auto-discover why an error occurred
+- **Diagnostic rules** — deterministic checks (PostgreSQL, filesystem, network, git) that auto-discover why an error occurred and emit structured `Fix{Summary, Command}`
 - **AI debug agent** — root cause analysis and `FixStep` suggestions from diagnostic context
 
 ## The Five Families
