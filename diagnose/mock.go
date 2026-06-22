@@ -38,11 +38,6 @@ func (m *MockCommandRunner) Set(key, stdout string, exitCode int) {
 	m.Responses[key] = MockResponse{Stdout: stdout, ExitCode: exitCode}
 }
 
-// SetError registers a mock response that returns the given error.
-func (m *MockCommandRunner) SetError(key string, err error) {
-	m.Responses[key] = MockResponse{Err: err}
-}
-
 // Run records the call and returns the matching MockResponse.
 func (m *MockCommandRunner) Run(
 	_ context.Context,

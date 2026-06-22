@@ -99,6 +99,7 @@ linters:
         - github.com/larsartmann/go-error-family/diagnose.Runner
         - github.com/larsartmann/go-error-family/diagnose.RuleSpec
         - github.com/larsartmann/go-error-family/diagnose.MockCommandRunner
+        - github.com/larsartmann/go-error-family/diagnose.MockResponse
         - github.com/larsartmann/go-error-family/diagnose.ruleResult
         - github.com/larsartmann/go-error-family/diagnose.staticRule
         - github.com/larsartmann/go-error-family/agent.AgentResult

@@ -434,8 +434,9 @@ func TestErrorWithContextMapImmutable(t *testing.T) {
 }
 
 func TestErrorJSON(t *testing.T) {
-	e := NewTransient("db.timeout", "query timed out").
-		WithContext("host", "db1").
+	e := NewRejection("auth.invalid", "token expired").
+		WithContext("user", "alice").
+		WithContext("ip", "10.0.0.1").
 		WithTimestamp(time.Date(2026, 1, 1, 0, 0, 0, 0, time.UTC))
 
 	data, err := e.JSON()
@@ -447,14 +448,14 @@ func TestErrorJSON(t *testing.T) {
 	if err := json.Unmarshal(data, &got); err != nil {
 		t.Fatalf("invalid JSON output: %v", err)
 	}
-	if got["family"] != "transient" {
-		t.Errorf("family = %v, want transient", got["family"])
+	if got["family"] != "rejection" {
+		t.Errorf("family = %v, want rejection", got["family"])
 	}
-	if got["code"] != "db.timeout" {
-		t.Errorf("code = %v, want db.timeout", got["code"])
+	if got["code"] != "auth.invalid" {
+		t.Errorf("code = %v, want auth.invalid", got["code"])
 	}
-	if got["retryable"] != true {
-		t.Errorf("retryable = %v, want true", got["retryable"])
+	if got["retryable"] != false {
+		t.Errorf("retryable = %v, want false", got["retryable"])
 	}
 	if got["timestamp"] != "2026-01-01T00:00:00Z" {
 		t.Errorf("timestamp = %v, want RFC3339", got["timestamp"])

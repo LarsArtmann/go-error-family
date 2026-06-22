@@ -4,7 +4,7 @@ go 1.26.3
 
 require (
 	github.com/larsartmann/go-error-family v0.4.0
-	github.com/larsartmann/go-error-family/diagnose v0.0.0-20260622173950-5ede599ce76d
+	github.com/larsartmann/go-error-family/diagnose v0.0.0-20260622180241-47c288d06048
 )
 
 // Local replaces until root/diagnose get published versions that
