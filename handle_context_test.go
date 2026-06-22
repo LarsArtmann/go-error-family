@@ -13,18 +13,14 @@ func (e plainError) Error() string { return string(e) }
 
 func TestHandleErrorDetailedNil(t *testing.T) {
 	result := HandleErrorDetailed(nil)
-	if result.ExitCode != 0 {
-		t.Errorf("ExitCode = %d, want 0", result.ExitCode)
-	}
+	assertExitCode(t, result, 0)
 }
 
 func TestHandleErrorDetailedRejection(t *testing.T) {
 	err := NewRejection("file.not_found", "config missing")
 	result := HandleErrorDetailed(err)
 
-	if result.ExitCode != 1 {
-		t.Errorf("ExitCode = %d, want 1", result.ExitCode)
-	}
+	assertExitCode(t, result, 1)
 	if result.Message == "" {
 		t.Error("Message should not be empty")
 	}
@@ -37,9 +33,7 @@ func TestHandleErrorDetailedTransient(t *testing.T) {
 	err := NewTransient("db.timeout", "timed out")
 	result := HandleErrorDetailed(err)
 
-	if result.ExitCode != 75 {
-		t.Errorf("ExitCode = %d, want 75", result.ExitCode)
-	}
+	assertExitCode(t, result, 75)
 	if result.SuggestedFix != "" {
 		t.Errorf("SuggestedFix should be empty for retryable errors, got %q", result.SuggestedFix)
 	}
@@ -57,9 +51,7 @@ func TestHandleErrorDetailedWithCode(t *testing.T) {
 func TestHandleErrorDetailedPlainError(t *testing.T) {
 	result := HandleErrorDetailed(plainError("something went wrong"))
 
-	if result.ExitCode != 75 {
-		t.Errorf("plain error should default to Transient (exit 75), got %d", result.ExitCode)
-	}
+	assertExitCode(t, result, 75)
 }
 
 type testContextKey string
@@ -122,9 +114,7 @@ func TestHandleErrorDetailedWithConfigTemplateOverride(t *testing.T) {
 		},
 	})
 
-	if result.ExitCode != 1 {
-		t.Errorf("ExitCode = %d, want 1", result.ExitCode)
-	}
+	assertExitCode(t, result, 1)
 	if !strings.Contains(result.Message, "Custom: /etc/config not found") {
 		t.Errorf("Message should use template override: %q", result.Message)
 	}

@@ -129,19 +129,13 @@ func (r *GitRule) checkWorkingTree(
 			strings.Count(trimmed, "UU")+strings.Count(trimmed, "AA"),
 		)
 		result.Details["merge_conflicts"] = strTrue
-		result.Fix = diagnose.Fix{
-			Summary: "Resolve merge conflicts",
-			Command: "git mergetool",
-		}
+		diagnose.SetFix(result, "Resolve merge conflicts", "git mergetool")
 		return true
 	}
 
 	result.Status = diagnose.StatusDegraded
 	result.Summary = fmt.Sprintf("Working tree has uncommitted changes (%d files)", lineCount)
-	result.Fix = diagnose.Fix{
-		Summary: "Commit or stash uncommitted changes",
-		Command: "git add . && git commit -m \"wip\"",
-	}
+	diagnose.SetFix(result, "Commit or stash uncommitted changes", `git add . && git commit -m "wip"`)
 	return true
 }
 
@@ -172,10 +166,7 @@ func (r *GitRule) checkRemote(
 		result.Status = diagnose.StatusDegraded
 		result.Summary = "Git repo is clean but remote is unreachable: " + repoPath
 		result.Details["remote_reachable"] = strFalse
-		result.Fix = diagnose.Fix{
-			Summary: "Check network connectivity and remote URL",
-			Command: "git ls-remote origin",
-		}
+		diagnose.SetFix(result, "Check network connectivity and remote URL", "git ls-remote origin")
 		return
 	}
 

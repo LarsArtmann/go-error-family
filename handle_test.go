@@ -84,6 +84,13 @@ func testOnDiagnosedPtr(called *bool) func(error, []DiagnosticFinding) {
 	return func(_ error, _ []DiagnosticFinding) { *called = true }
 }
 
+func assertExitCode(t *testing.T, result *HandleResult, want int) {
+	t.Helper()
+	if result.ExitCode != want {
+		t.Errorf("ExitCode = %d, want %d", result.ExitCode, want)
+	}
+}
+
 func TestHandleErrorWithConfigDiagnostics(t *testing.T) {
 	var buf bytes.Buffer
 	called := false

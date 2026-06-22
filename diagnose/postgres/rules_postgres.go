@@ -55,7 +55,6 @@ var postgresSpec = diagnose.RuleSpec{ //nolint:gochecknoglobals // Immutable rul
 	},
 }
 
-//nolint:funlen // Diagnostic rule: sequential checks with early returns.
 func (r *PostgresRule) Run(ctx context.Context, err error) (*diagnose.DiagnosticResult, error) {
 	host := r.resolveHost(err)
 	port := r.resolvePort(err)
@@ -92,10 +91,7 @@ func (r *PostgresRule) Run(ctx context.Context, err error) (*diagnose.Diagnostic
 			port,
 			stdout,
 		)
-		result.Fix = diagnose.Fix{
-			Summary: "Start PostgreSQL",
-			Command: r.suggestStartFix(),
-		}
+		diagnose.SetFix(result, "Start PostgreSQL", r.suggestStartFix())
 		result.Confidence = diagnose.ConfidenceCertain
 		result.Status = diagnose.StatusFailed
 		return result, nil
@@ -119,10 +115,7 @@ func (r *PostgresRule) Run(ctx context.Context, err error) (*diagnose.Diagnostic
 	result.Status = diagnose.StatusFailed
 	result.Summary = fmt.Sprintf("Cannot connect to %s: %v", addr, dialErr)
 	result.Details["tcp_error"] = dialErr.Error()
-	result.Fix = diagnose.Fix{
-		Summary: "Check if PostgreSQL is running on " + addr,
-		Command: "pg_isready -h " + host + " -p " + port,
-	}
+	diagnose.SetFix(result, "Check if PostgreSQL is running on "+addr, "pg_isready -h "+host+" -p "+port)
 	result.Confidence = diagnose.ConfidenceVeryHigh
 
 	return result, nil

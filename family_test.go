@@ -9,6 +9,11 @@ type familyStringCase = struct {
 	want   string
 }
 
+type familyIntCase = struct {
+	family Family
+	want   int
+}
+
 func TestFamilyString(t *testing.T) {
 	testFamilyProperty(t, "String", []familyStringCase{
 		{Rejection, "rejection"},
@@ -79,22 +84,14 @@ func TestFamilyIsRetryable(t *testing.T) {
 }
 
 func TestFamilyExitCode(t *testing.T) {
-	tests := []struct {
-		family Family
-		want   int
-	}{
+	testFamilyProperty(t, "ExitCode", []familyIntCase{
 		{Rejection, 1},
 		{Conflict, 1},
 		{Transient, 75},
 		{Corruption, 65},
 		{Infrastructure, 69},
 		{Family(99), 70},
-	}
-	for _, tt := range tests {
-		if got := tt.family.ExitCode(); got != tt.want {
-			t.Errorf("Family(%d).ExitCode() = %d, want %d", tt.family, got, tt.want)
-		}
-	}
+	}, Family.ExitCode)
 }
 
 func TestFamilyTone(t *testing.T) {
@@ -292,20 +289,12 @@ func TestAudienceUnmarshalText(t *testing.T) {
 }
 
 func TestFamilyHTTPStatus(t *testing.T) {
-	tests := []struct {
-		family Family
-		want   int
-	}{
+	testFamilyProperty(t, "HTTPStatus", []familyIntCase{
 		{Rejection, 400},
 		{Conflict, 409},
 		{Transient, 503},
 		{Corruption, 500},
 		{Infrastructure, 503},
 		{Family(99), 500},
-	}
-	for _, tt := range tests {
-		if got := tt.family.HTTPStatus(); got != tt.want {
-			t.Errorf("Family(%d).HTTPStatus() = %d, want %d", tt.family, got, tt.want)
-		}
-	}
+	}, Family.HTTPStatus)
 }

@@ -79,12 +79,8 @@ func TestFilesystemRuleRunNonexistentPath(t *testing.T) {
 	if runErr != nil {
 		t.Fatalf("Run() error: %v", runErr)
 	}
-	if result.Status != StatusFailed {
-		t.Errorf("Status = %v, want StatusFailed", result.Status)
-	}
-	if result.Details["exists"] != "false" {
-		t.Errorf("Expected exists=false, got %v", result.Details)
-	}
+	AssertStatus(t, result, StatusFailed)
+	AssertDetail(t, result, "exists", "false")
 }
 
 func TestFilesystemRuleRunNoPath(t *testing.T) {
@@ -95,9 +91,7 @@ func TestFilesystemRuleRunNoPath(t *testing.T) {
 	if runErr != nil {
 		t.Fatalf("Run() error: %v", runErr)
 	}
-	if result.Status != StatusUnknown {
-		t.Errorf("Status = %v, want StatusUnknown", result.Status)
-	}
+	AssertStatus(t, result, StatusUnknown)
 }
 
 func TestNetworkRuleRunNoHost(t *testing.T) {

@@ -53,12 +53,8 @@ func TestNetworkRuleRunTCPConnect(t *testing.T) {
 	if runErr != nil {
 		t.Fatalf("Run() error: %v", runErr)
 	}
-	if result.Status != StatusHealthy {
-		t.Errorf("Status = %v, want StatusHealthy", result.Status)
-	}
-	if result.Details["tcp_reachable"] != "true" {
-		t.Errorf("tcp_reachable = %q, want %q", result.Details["tcp_reachable"], "true")
-	}
+	AssertStatus(t, result, StatusHealthy)
+	AssertDetail(t, result, "tcp_reachable", "true")
 }
 
 func TestNetworkRuleRunTCPRefused(t *testing.T) {
@@ -71,12 +67,8 @@ func TestNetworkRuleRunTCPRefused(t *testing.T) {
 	if runErr != nil {
 		t.Fatalf("Run() error: %v", runErr)
 	}
-	if result.Status != StatusFailed {
-		t.Errorf("Status = %v, want StatusFailed", result.Status)
-	}
-	if result.Details["tcp_reachable"] != "false" {
-		t.Errorf("tcp_reachable = %q, want %q", result.Details["tcp_reachable"], "false")
-	}
+	AssertStatus(t, result, StatusFailed)
+	AssertDetail(t, result, "tcp_reachable", "false")
 }
 
 func TestNetworkRuleRunDNSFailure(t *testing.T) {
@@ -88,9 +80,7 @@ func TestNetworkRuleRunDNSFailure(t *testing.T) {
 	if runErr != nil {
 		t.Fatalf("Run() error: %v", runErr)
 	}
-	if result.Status != StatusFailed {
-		t.Errorf("Status = %v, want StatusFailed", result.Status)
-	}
+	AssertStatus(t, result, StatusFailed)
 }
 
 func TestNetworkRuleRunWithURL(t *testing.T) {
@@ -109,9 +99,7 @@ func TestNetworkRuleRunWithURL(t *testing.T) {
 	if runErr != nil {
 		t.Fatalf("Run() error: %v", runErr)
 	}
-	if result.Status != StatusHealthy {
-		t.Errorf("Status = %v, want StatusHealthy", result.Status)
-	}
+	AssertStatus(t, result, StatusHealthy)
 }
 
 func TestNetworkRuleStripHost(t *testing.T) {

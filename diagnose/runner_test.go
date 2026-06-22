@@ -29,9 +29,7 @@ func TestRunnerRegister(t *testing.T) {
 
 	err := errorfamily.NewTransient("test", "msg")
 	results := runner.Run(context.Background(), err)
-	if len(results) != 1 {
-		t.Fatalf("Expected 1 result, got %d", len(results))
-	}
+	assertResultsLen(t, results, 1)
 	if results[0].RuleName != "test" {
 		t.Errorf("RuleName = %q, want 'test'", results[0].RuleName)
 	}
@@ -73,9 +71,7 @@ func TestRunnerSortsByConfidence(t *testing.T) {
 	err := errorfamily.NewTransient("test", "msg")
 	results := runner.Run(context.Background(), err)
 
-	if len(results) != 3 {
-		t.Fatalf("Expected 3 results, got %d", len(results))
-	}
+	assertResultsLen(t, results, 3)
 	if results[0].Confidence < results[1].Confidence {
 		t.Errorf("Results not sorted by confidence: %v >= %v >= %v",
 			results[0].Confidence, results[1].Confidence, results[2].Confidence)
@@ -92,9 +88,7 @@ func TestRunnerHandlesError(t *testing.T) {
 
 	err := errorfamily.NewTransient("test", "msg")
 	results := runner.Run(context.Background(), err)
-	if len(results) != 1 {
-		t.Fatalf("Expected 1 result, got %d", len(results))
-	}
+	assertResultsLen(t, results, 1)
 	if results[0].Status != StatusUnknown {
 		t.Errorf("Status = %v, want StatusUnknown", results[0].Status)
 	}
@@ -150,9 +144,7 @@ func TestDiagnosticResultDuration(t *testing.T) {
 	runner := NewRunner(&slowRule{name: "slow", duration: 50 * time.Millisecond})
 	err := errorfamily.NewTransient("test", "msg")
 	results := runner.Run(context.Background(), err)
-	if len(results) != 1 {
-		t.Fatalf("Expected 1 result, got %d", len(results))
-	}
+	assertResultsLen(t, results, 1)
 	if results[0].Duration < 40*time.Millisecond {
 		t.Errorf("Duration = %v, expected at least 40ms", results[0].Duration)
 	}
@@ -174,6 +166,13 @@ func (r *staticRule) Run(_ context.Context, _ error) (*DiagnosticResult, error) 
 type slowRule struct {
 	name     string
 	duration time.Duration
+}
+
+func assertResultsLen(t *testing.T, results []*DiagnosticResult, want int) {
+	t.Helper()
+	if len(results) != want {
+		t.Fatalf("Expected %d result(s), got %d", want, len(results))
+	}
 }
 
 func (r *slowRule) Name() string            { return r.name }

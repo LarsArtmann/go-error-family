@@ -26,15 +26,9 @@ func TestFilesystemRuleRunDirWritable(t *testing.T) {
 	if runErr != nil {
 		t.Fatalf("Run() error: %v", runErr)
 	}
-	if result.Status != StatusHealthy {
-		t.Errorf("Status = %v, want StatusHealthy", result.Status)
-	}
-	if result.Details["writable"] != "true" {
-		t.Errorf("writable = %q, want %q", result.Details["writable"], "true")
-	}
-	if result.Details["type"] != "directory" {
-		t.Errorf("type = %q, want %q", result.Details["type"], "directory")
-	}
+	AssertStatus(t, result, StatusHealthy)
+	AssertDetail(t, result, "writable", "true")
+	AssertDetail(t, result, "type", "directory")
 }
 
 func TestFilesystemRuleRunDirNotWritable(t *testing.T) {
@@ -57,12 +51,8 @@ func TestFilesystemRuleRunDirNotWritable(t *testing.T) {
 	if runErr != nil {
 		t.Fatalf("Run() error: %v", runErr)
 	}
-	if result.Status != StatusDegraded {
-		t.Errorf("Status = %v, want StatusDegraded", result.Status)
-	}
-	if result.Details["writable"] != "false" {
-		t.Errorf("writable = %q, want %q", result.Details["writable"], "false")
-	}
+	AssertStatus(t, result, StatusDegraded)
+	AssertDetail(t, result, "writable", "false")
 }
 
 func TestFilesystemRuleRunFileReadable(t *testing.T) {
@@ -80,12 +70,8 @@ func TestFilesystemRuleRunFileReadable(t *testing.T) {
 	if runErr != nil {
 		t.Fatalf("Run() error: %v", runErr)
 	}
-	if result.Status != StatusHealthy {
-		t.Errorf("Status = %v, want StatusHealthy", result.Status)
-	}
-	if result.Details["readable"] != "true" {
-		t.Errorf("readable = %q, want %q", result.Details["readable"], "true")
-	}
+	AssertStatus(t, result, StatusHealthy)
+	AssertDetail(t, result, "readable", "true")
 }
 
 func TestFilesystemRuleRunFileNotReadable(t *testing.T) {
@@ -107,12 +93,8 @@ func TestFilesystemRuleRunFileNotReadable(t *testing.T) {
 	if runErr != nil {
 		t.Fatalf("Run() error: %v", runErr)
 	}
-	if result.Status != StatusDegraded {
-		t.Errorf("Status = %v, want StatusDegraded", result.Status)
-	}
-	if result.Details["readable"] != "false" {
-		t.Errorf("readable = %q, want %q", result.Details["readable"], "false")
-	}
+	AssertStatus(t, result, StatusDegraded)
+	AssertDetail(t, result, "readable", "false")
 }
 
 func TestFilesystemRuleRunPermissionDenied(t *testing.T) {
@@ -134,12 +116,8 @@ func TestFilesystemRuleRunPermissionDenied(t *testing.T) {
 	if runErr != nil {
 		t.Fatalf("Run() error: %v", runErr)
 	}
-	if result.Status != StatusDegraded {
-		t.Errorf("Status = %v, want StatusDegraded", result.Status)
-	}
-	if result.Details["readable"] != "false" {
-		t.Errorf("readable = %q, want %q", result.Details["readable"], "false")
-	}
+	AssertStatus(t, result, StatusDegraded)
+	AssertDetail(t, result, "readable", "false")
 }
 
 func TestFilesystemRuleRunCreateFileSuggestion(t *testing.T) {
@@ -154,12 +132,8 @@ func TestFilesystemRuleRunCreateFileSuggestion(t *testing.T) {
 	if runErr != nil {
 		t.Fatalf("Run() error: %v", runErr)
 	}
-	if result.Status != StatusFailed {
-		t.Errorf("Status = %v, want StatusFailed", result.Status)
-	}
-	if result.Details["parent_exists"] != "false" {
-		t.Errorf("parent_exists = %q, want %q", result.Details["parent_exists"], "false")
-	}
+	AssertStatus(t, result, StatusFailed)
+	AssertDetail(t, result, "parent_exists", "false")
 	if result.Fix.Command == "" && result.Fix.Summary == "" {
 		t.Error("Fix should not be empty for missing parent")
 	}
@@ -177,12 +151,8 @@ func TestFilesystemRuleRunCreateDirSuggestion(t *testing.T) {
 	if runErr != nil {
 		t.Fatalf("Run() error: %v", runErr)
 	}
-	if result.Status != StatusFailed {
-		t.Errorf("Status = %v, want StatusFailed", result.Status)
-	}
-	if result.Details["parent_exists"] != "true" {
-		t.Errorf("parent_exists = %q, want %q", result.Details["parent_exists"], "true")
-	}
+	AssertStatus(t, result, StatusFailed)
+	AssertDetail(t, result, "parent_exists", "true")
 }
 
 func TestFilesystemRuleRunExistingDirWithParentExists(t *testing.T) {
@@ -200,7 +170,5 @@ func TestFilesystemRuleRunExistingDirWithParentExists(t *testing.T) {
 	if runErr != nil {
 		t.Fatalf("Run() error: %v", runErr)
 	}
-	if result.Status != StatusHealthy {
-		t.Errorf("Status = %v, want StatusHealthy", result.Status)
-	}
+	AssertStatus(t, result, StatusHealthy)
 }

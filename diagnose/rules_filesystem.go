@@ -94,10 +94,7 @@ func (r *FilesystemRule) handleStatError(
 		result.Summary = "Permission denied: " + path
 		result.Details["exists"] = strTrue
 		result.Details["permissions"] = "denied"
-		result.Fix = Fix{
-			Summary: "Fix permissions on " + path,
-			Command: "chmod 755 " + path,
-		}
+		SetFix(result, "Fix permissions on "+path, "chmod 755 "+path)
 		return result, nil
 	}
 
@@ -111,24 +108,15 @@ func (r *FilesystemRule) suggestCreate(result *DiagnosticResult, path string) {
 	parentInfo, parentErr := os.Stat(parent)
 	if parentErr != nil {
 		result.Details["parent_exists"] = strFalse
-		result.Fix = Fix{
-			Summary: "Create parent directory: " + parent,
-			Command: "mkdir -p " + parent,
-		}
+		SetFix(result, "Create parent directory: "+parent, "mkdir -p "+parent)
 		return
 	}
 	result.Details["parent_exists"] = strTrue
 	result.Details["parent_permissions"] = parentInfo.Mode().Perm().String()
 	if filepath.Ext(path) != "" {
-		result.Fix = Fix{
-			Summary: "Create the file: " + path,
-			Command: "touch " + path,
-		}
+		SetFix(result, "Create the file: "+path, "touch "+path)
 	} else {
-		result.Fix = Fix{
-			Summary: "Create directory: " + path,
-			Command: "mkdir -p " + path,
-		}
+		SetFix(result, "Create directory: "+path, "mkdir -p "+path)
 	}
 }
 
@@ -172,7 +160,7 @@ func setAccessFailure(result *DiagnosticResult, key, summary, command string) {
 	result.Details[key] = strFalse
 	result.Status = StatusDegraded
 	result.Summary = summary
-	result.Fix = Fix{Summary: summary, Command: command}
+	SetFix(result, summary, command)
 }
 
 func setAccessSuccess(result *DiagnosticResult, key, summary string) {
@@ -180,6 +168,15 @@ func setAccessSuccess(result *DiagnosticResult, key, summary string) {
 	result.Status = StatusHealthy
 	result.Summary = summary
 	result.Confidence = ConfidenceNotCause
+}
+
+// SetFix populates the Fix field from a summary and command. Used everywhere a
+// rule constructs a Fix literal — collapses 4 lines into 1.
+//
+// Exposed as public so external submodules (git, postgres) can reuse the
+// same one-line idiom instead of repeating `result.Fix = Fix{...}` blocks.
+func SetFix(result *DiagnosticResult, summary, command string) {
+	result.Fix = Fix{Summary: summary, Command: command}
 }
 
 func (r *FilesystemRule) resolvePath(err error) string {
