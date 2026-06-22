@@ -3,7 +3,7 @@ module github.com/larsartmann/go-error-family/bridge
 go 1.26.3
 
 require (
-	github.com/larsartmann/go-error-family v0.4.0
+	github.com/larsartmann/go-error-family v0.5.0
 	github.com/samber/oops v1.22.0
 )
 

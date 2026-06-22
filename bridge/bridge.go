@@ -175,8 +175,10 @@ func (c *ClassifiedError) Format(f fmt.State, verb rune) {
 	case 's':
 		if c.OopsError.Error() != "" {
 			_, _ = fmt.Fprintf(f, "%s", c.OopsError.Error())
-		} else if c.original != nil {
+		} else if c.original != nil && c.original.Error() != "" {
 			_, _ = fmt.Fprintf(f, "%s", c.original.Error())
+		} else {
+			_, _ = fmt.Fprintf(f, "[%s]", c.family)
 		}
 	case 'v':
 		if f.Flag('+') {

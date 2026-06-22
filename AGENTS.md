@@ -2,8 +2,8 @@
 
 Structured error protocol library. Library only — no `main`, no build system, no external deps. Full API reference: `SKILL.md`.
 
-**Last Updated:** 2026-06-20
-**Version:** v0.6.0
+**Last Updated:** 2026-06-22
+**Version:** v0.5.0
 **Status:** All tests pass (root + bridge + submodules), 0 lint issues, 0 race conditions
 **Workspace modules:** root (zero-dep), `agent`, `bridge` (oops integration), `diagnose`, `diagnose/git`, `diagnose/postgres`
 
@@ -37,9 +37,7 @@ The classification protocol is the **four interfaces** (`Coded`/`Classified`/`Co
 - **Package-level `Classify`/`RegisterClassification`/`RegisterTemplate` delegate to `DefaultRegistry`** — backward compatible. For test isolation or scoped handling, construct a `NewRegistry()` and pass it via `HandleConfig.Registry`.
 - **`CommandRunner` defaults to `DefaultCommandRunner{}`** — rules with a nil `Runner` field use the real system commands. Tests inject mocks.
 
-## Classification Precedence
-
-## API Surface (post-0.6.0 additions)
+## API Surface (v0.5.0)
 
 **Family adapters** (in `family.go` / `retry.go`, all single-source-of-truth via `familyData`):
 
@@ -94,21 +92,22 @@ Not a library type — partial success is a consumption pattern, not a classific
 
 ## Test Coverage
 
-**Updated:** 2026-06-17
+**Updated:** 2026-06-22
 
 | Package              | Coverage |
 | -------------------- | -------- |
-| root (`errorfamily`) | 98.4%    |
-| `agent`              | 89.4%    |
-| `diagnose` (core)    | 77.3%    |
+| root (`errorfamily`) | 97.7%    |
+| `agent`              | 100.0%   |
+| `bridge`             | 94.1%    |
+| `diagnose` (core)    | 83.9%    |
 | `diagnose/git`       | 98.5%    |
 | `diagnose/postgres`  | 80.3%    |
 
-Root coverage at 98.4% (up from 96.5%) after adding `registry_test.go` with 9 isolation tests.
+All packages at 80%+; root and `diagnose/git` near-complete.
 
 ## Fuzz Tests
 
-`fuzz_test.go` contains: `FuzzParseFamily`, `FuzzParseFamilyRoundTrip`, `FuzzClassify`, `FuzzClassifyPlainError`, `FuzzErrorFormatting`.
+`fuzz_test.go` (root) contains: `FuzzParseFamily`, `FuzzParseFamilyRoundTrip`, `FuzzClassify`, `FuzzClassifyPlainError`, `FuzzErrorFormatting`. `bridge/fuzz_test.go` contains: `FuzzFormat`.
 
 ## Bridge Submodule (`bridge/`)
 
@@ -128,7 +127,7 @@ Connects go-error-family with `samber/oops`. Separate module with its own `go.mo
 
 ## Lint Configuration
 
-**Updated:** 2026-06-17
+**Updated:** 2026-06-22
 
 - `bridge` package-level lookup tables (`domainDefaults`, `tagOverrides`) suppress `gochecknoglobals` via inline `//nolint` — same pattern as root's immutable lookup tables.
 
