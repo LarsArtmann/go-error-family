@@ -42,6 +42,7 @@ The classification protocol is the **four interfaces** (`Coded`/`Classified`/`Co
 ## API Surface (post-0.6.0 additions)
 
 **Family adapters** (in `family.go` / `retry.go`, all single-source-of-truth via `familyData`):
+
 - `Family.Severity() int` — total order for multi-error classification (Transient<Rejection<Conflict<Infrastructure<Corruption).
 - `Family.HTTPStatus() int` — canonical family→HTTP status (Rejection→400, Conflict→409, Transient→503, Corruption→500, Infrastructure→503).
 - `Family.RetryPolicy() RetryPolicy` — advisory defaults (Transient: 3 attempts, 100ms-5s; others: single attempt). Library does not run the loop.

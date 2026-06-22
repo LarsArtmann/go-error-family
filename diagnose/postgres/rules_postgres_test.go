@@ -87,10 +87,7 @@ func TestPostgresRuleMockPgIsreadyHealthy(t *testing.T) {
 	mr.ExistsMap["brew"] = false
 	mr.ExistsMap["systemctl"] = false
 	mr.ExistsMap["service"] = false
-	mr.Responses["pg_isready -h localhost -p 5432"] = diagnose.MockResponse{
-		Stdout:   "localhost:5432 - accepting connections",
-		ExitCode: 0,
-	}
+	mr.Set("pg_isready -h localhost -p 5432", "localhost:5432 - accepting connections", 0)
 
 	r := &PostgresRule{Runner: mr}
 	err := errorfamily.NewTransient("db.timeout", "msg").
@@ -114,10 +111,7 @@ func TestPostgresRuleMockPgIsreadyFailed(t *testing.T) {
 	mr.ExistsMap["brew"] = false
 	mr.ExistsMap["systemctl"] = false
 	mr.ExistsMap["service"] = false
-	mr.Responses["pg_isready -h localhost -p 5432"] = diagnose.MockResponse{
-		Stdout:   "localhost:5432 - no response",
-		ExitCode: 2,
-	}
+	mr.Set("pg_isready -h localhost -p 5432", "localhost:5432 - no response", 2)
 
 	r := &PostgresRule{Runner: mr}
 	err := errorfamily.NewTransient("db.connection", "msg")
@@ -190,10 +184,7 @@ func TestPostgresRuleMockCustomHostPort(t *testing.T) {
 	mr.ExistsMap["brew"] = false
 	mr.ExistsMap["systemctl"] = false
 	mr.ExistsMap["service"] = false
-	mr.Responses["pg_isready -h db.example.com -p 5433"] = diagnose.MockResponse{
-		Stdout:   "db.example.com:5433 - accepting connections",
-		ExitCode: 0,
-	}
+	mr.Set("pg_isready -h db.example.com -p 5433", "db.example.com:5433 - accepting connections", 0)
 
 	r := &PostgresRule{Runner: mr}
 	err := errorfamily.NewTransient("db.timeout", "msg").
@@ -214,10 +205,7 @@ func TestPostgresRuleMockUsesCommandRunner(t *testing.T) {
 	mr.ExistsMap["brew"] = false
 	mr.ExistsMap["systemctl"] = false
 	mr.ExistsMap["service"] = false
-	mr.Responses["pg_isready -h localhost -p 5432"] = diagnose.MockResponse{
-		Stdout:   "accepting",
-		ExitCode: 0,
-	}
+	mr.Set("pg_isready -h localhost -p 5432", "accepting", 0)
 
 	r := &PostgresRule{Runner: mr}
 	err := errorfamily.NewTransient("db.error", "msg")

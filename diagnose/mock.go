@@ -31,6 +31,18 @@ func NewMockCommandRunner() *MockCommandRunner {
 	}
 }
 
+// Set registers a mock response for the given command key.
+// Shorthand for assigning a MockResponse{Stdout: stdout, ExitCode: exitCode}
+// to m.Responses[key] — collapses a 4-line struct literal into one line.
+func (m *MockCommandRunner) Set(key, stdout string, exitCode int) {
+	m.Responses[key] = MockResponse{Stdout: stdout, ExitCode: exitCode}
+}
+
+// SetError registers a mock response that returns the given error.
+func (m *MockCommandRunner) SetError(key string, err error) {
+	m.Responses[key] = MockResponse{Err: err}
+}
+
 // Run records the call and returns the matching MockResponse.
 func (m *MockCommandRunner) Run(
 	_ context.Context,

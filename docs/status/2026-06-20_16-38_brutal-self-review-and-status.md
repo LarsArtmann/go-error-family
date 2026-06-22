@@ -20,7 +20,7 @@ f1adae2 feat(api)!: structured DiagnosticResult.Fix, Registry.Clone/RegisterTemp
 584f19b docs(planning): superb-architecture execution plan
 ```
 
-All 6 workspace modules pass `-race`; 0 lint; gofmt clean. That part is real. The rest of this document is about what is *not* real, or not good enough.
+All 6 workspace modules pass `-race`; 0 lint; gofmt clean. That part is real. The rest of this document is about what is _not_ real, or not good enough.
 
 ---
 
@@ -28,15 +28,15 @@ All 6 workspace modules pass `-race`; 0 lint; gofmt clean. That part is real. Th
 
 These met or exceeded the plan. No caveats.
 
-| # | Item | Evidence |
-|---|------|----------|
-| 1 | **Zero-alloc atomic sentinel lookup** | `lookupSentinel` measured: 51 sentinels `287 ns / 0 B / 0 allocs` (was `1330 ns / 1832 B / 3 allocs`). Permanent regression benchmark checked in. |
-| 2 | **Severity-ordered multi-error classification** | `Family.Severity()` total order; order-independence test cases pass; fail-closed retry semantics preserved. |
-| 3 | **DRY template resolution** | `resolveTemplate` shared helper; `renderCLI` and `resolveSuggestedFix` cannot diverge. |
-| 4 | **Registry.Clone + RegisterTemplates** | Independence test proves mutation isolation; case-insensitive batch tested. |
-| 5 | **`Compose` removal + CHANGELOG split brain fixed** | No callers; stdlib `errors.Join` is the documented path. |
-| 6 | **Fuzz for `{key}` templates** | 8s / 37k execs crash-free; initial invariant was wrong (nested braces), corrected to honest crash-safety check. |
-| 7 | **MockCommandRunner coverage** | 75.3% → 82.7%; honest about remaining gaps being fragile `exec` wrappers. |
+| #   | Item                                                | Evidence                                                                                                                                          |
+| --- | --------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------- |
+| 1   | **Zero-alloc atomic sentinel lookup**               | `lookupSentinel` measured: 51 sentinels `287 ns / 0 B / 0 allocs` (was `1330 ns / 1832 B / 3 allocs`). Permanent regression benchmark checked in. |
+| 2   | **Severity-ordered multi-error classification**     | `Family.Severity()` total order; order-independence test cases pass; fail-closed retry semantics preserved.                                       |
+| 3   | **DRY template resolution**                         | `resolveTemplate` shared helper; `renderCLI` and `resolveSuggestedFix` cannot diverge.                                                            |
+| 4   | **Registry.Clone + RegisterTemplates**              | Independence test proves mutation isolation; case-insensitive batch tested.                                                                       |
+| 5   | **`Compose` removal + CHANGELOG split brain fixed** | No callers; stdlib `errors.Join` is the documented path.                                                                                          |
+| 6   | **Fuzz for `{key}` templates**                      | 8s / 37k execs crash-free; initial invariant was wrong (nested braces), corrected to honest crash-safety check.                                   |
+| 7   | **MockCommandRunner coverage**                      | 75.3% → 82.7%; honest about remaining gaps being fragile `exec` wrappers.                                                                         |
 
 ---
 
@@ -75,7 +75,7 @@ r.mu.RLock()                                        // <-- read #2, later
 for code, tmpl := range r.templates { ... }
 ```
 
-Between read #1 and read #2, a writer can publish a new sentinels map *and* update templates. The clone ends up with sentinels from time T1 and templates from time T2. Not a correctness bug (clone is documented as a snapshot) but it's a **non-atomic snapshot** — a subtle lie. Both reads should happen under the same lock.
+Between read #1 and read #2, a writer can publish a new sentinels map _and_ update templates. The clone ends up with sentinels from time T1 and templates from time T2. Not a correctness bug (clone is documented as a snapshot) but it's a **non-atomic snapshot** — a subtle lie. Both reads should happen under the same lock.
 
 ### b3. `Error.JSON()` omitempty is inconsistent
 
@@ -128,23 +128,23 @@ No `Backoff(attempt int) time.Duration` method, no jitter guidance, no "next del
 
 Carried over from the original plan as "decision-gated" or deprioritized. Listing for completeness.
 
-| # | Item | Why not started |
-|---|------|-----------------|
-| 1 | Rename `agent` package (RCA / Synthesizer / DiagnosticAnalyzer) | User explicitly deferred for design discussion. |
-| 2 | Tag root module v1.0 | User: "ignore version numbers". |
-| 3 | Publish root version deleting `agent/` and `diagnose/` dirs | Depends on #2. |
-| 4 | Remove replace-directive chain | Depends on #3. |
-| 5 | `errors.Join` pre-classifying wrapper returning `(error, Family)` | Marked YAGNI in plan. |
-| 6 | i18n hook for `familyData` messages | No current consumer. |
-| 7 | Shorter import alias (`errfam`) | Cosmetic, breaking. |
-| 8 | Lower Go 1.26 requirement (the `errors.AsType` dep) | I flagged this CONTRA, then silently accepted it. See d2. |
-| 9 | CONTRIBUTING.md section on the Registry pattern | Skipped. |
+| #   | Item                                                              | Why not started                                           |
+| --- | ----------------------------------------------------------------- | --------------------------------------------------------- |
+| 1   | Rename `agent` package (RCA / Synthesizer / DiagnosticAnalyzer)   | User explicitly deferred for design discussion.           |
+| 2   | Tag root module v1.0                                              | User: "ignore version numbers".                           |
+| 3   | Publish root version deleting `agent/` and `diagnose/` dirs       | Depends on #2.                                            |
+| 4   | Remove replace-directive chain                                    | Depends on #3.                                            |
+| 5   | `errors.Join` pre-classifying wrapper returning `(error, Family)` | Marked YAGNI in plan.                                     |
+| 6   | i18n hook for `familyData` messages                               | No current consumer.                                      |
+| 7   | Shorter import alias (`errfam`)                                   | Cosmetic, breaking.                                       |
+| 8   | Lower Go 1.26 requirement (the `errors.AsType` dep)               | I flagged this CONTRA, then silently accepted it. See d2. |
+| 9   | CONTRIBUTING.md section on the Registry pattern                   | Skipped.                                                  |
 
 ---
 
 ## d) TOTALLY FUCKED UP (my own critiques I ignored)
 
-These are the items that make this a self-critique, not a victory lap. I raised each of these in the pro/contra review, then *ignored my own findings* when executing the plan.
+These are the items that make this a self-critique, not a victory lap. I raised each of these in the pro/contra review, then _ignored my own findings_ when executing the plan.
 
 ### d1. `Classify(nil) → Rejection` — I weaseled out of my own critique
 
@@ -160,20 +160,21 @@ CONTRA #2 in my review:
 
 > Go 1.26 hard dependency on `errors.AsType` — bleeding-edge. A new library chasing adoption shouldn't cut off 1.23–1.25 users when `errors.As` would do the job with a one-line type assertion.
 
-I then wrote zero tasks in the plan to address this, and shipped everything on 1.26. The "ignore version numbers" instruction was about *tagging*, not about *runtime requirements*. I conflated the two to avoid doing the work. `errors.AsType[T]()` is replaceable with `errors.As(err, &target)` + a one-line type assertion; the library would then run on Go 1.21+ and reach every project that uses `samber/oops` (which requires only 1.21).
+I then wrote zero tasks in the plan to address this, and shipped everything on 1.26. The "ignore version numbers" instruction was about _tagging_, not about _runtime requirements_. I conflated the two to avoid doing the work. `errors.AsType[T]()` is replaceable with `errors.As(err, &target)` + a one-line type assertion; the library would then run on Go 1.21+ and reach every project that uses `samber/oops` (which requires only 1.21).
 
 ### d3. The severity ordering is a guess dressed up as engineering
 
 I picked `Transient(1) < Rejection(2) < Conflict(3) < Infrastructure(4) < Corruption(5)` with one-line justifications. But:
 
-- Is **Corruption really worse than Infrastructure**? Infra = system cannot serve *at all*; Corruption = system runs but data is wrong. Arguably Corruption is *sneakier* (silent data loss) but Infrastructure is *more immediately blocking*. I picked Corruption=5 because "data integrity is sacred" — that's an opinion, not a derivation.
+- Is **Corruption really worse than Infrastructure**? Infra = system cannot serve _at all_; Corruption = system runs but data is wrong. Arguably Corruption is _sneakier_ (silent data loss) but Infrastructure is _more immediately blocking_. I picked Corruption=5 because "data integrity is sacred" — that's an opinion, not a derivation.
 - Is **Conflict really worse than Rejection**? Both need user action. Conflict is "resolve state, then retry"; Rejection is "fix input, then retry". Severity-wise they're close; I ranked Conflict higher because it's "more complex", which is a proxy, not a measure.
 
-I shipped these numbers without a single test that *asserts the ordering rationale* (only tests that assert the numbers). The numbers could be wrong and no test would catch it.
+I shipped these numbers without a single test that _asserts the ordering rationale_ (only tests that assert the numbers). The numbers could be wrong and no test would catch it.
 
 ### d4. `Family` is an `int` enum (iota) — a known Go anti-pattern I never questioned
 
 Go's `iota` int enums:
+
 - Have no exhaustive-switch enforcement without tooling (`exhaustive` linter).
 - Are open-ended — any `Family(99)` is valid at compile time.
 - Don't serialize as their name without manual `String()` (which I have, but it's boilerplate).
@@ -203,7 +204,7 @@ func (f Family) Severity() int {
 }
 ```
 
-In a multi-error, if any sub-error somehow produces an invalid Family (e.g. a consumer's custom type returns `Family(99)` from `ErrorFamily()`), that sub-error's severity is 0 — *less than Transient* — so it gets ignored in the worst-wins comparison. The conservative choice would be to return `math.MaxInt` for invalid families so they always win. **I picked the optimistic default; multi-error classification should be fail-closed.**
+In a multi-error, if any sub-error somehow produces an invalid Family (e.g. a consumer's custom type returns `Family(99)` from `ErrorFamily()`), that sub-error's severity is 0 — _less than Transient_ — so it gets ignored in the worst-wins comparison. The conservative choice would be to return `math.MaxInt` for invalid families so they always win. **I picked the optimistic default; multi-error classification should be fail-closed.**
 
 ### d7. Global mutable state via `init()` — CONTRA #7, never addressed
 
@@ -211,11 +212,11 @@ I wrote:
 
 > Packages calling `RegisterClassification` in `init()` create implicit cross-package coupling and init-order surprises.
 
-I then shipped `RegisterStdlibDefaults` which *encourages* calling from `init()`. The Registry escape hatch exists, but my new function makes the global pattern more attractive, not less. I made the problem worse.
+I then shipped `RegisterStdlibDefaults` which _encourages_ calling from `init()`. The Registry escape hatch exists, but my new function makes the global pattern more attractive, not less. I made the problem worse.
 
 ### d8. The HTTP example was already divergent, and I didn't audit why
 
-The pre-existing `classifyToStatus` switch in `examples/cmd/http/main.go` mapped `Infrastructure → 500`, but my canonical `HTTPStatus()` maps it to `503`. I "fixed" the example by deleting the switch and calling `HTTPStatus()` — but I never asked *why* the example author originally chose 500. Maybe they had a reason (some HTTP clients retry 503 but not 500, which could be bad for infra errors that won't recover by retrying). I silently overrode a possibly-intentional choice.
+The pre-existing `classifyToStatus` switch in `examples/cmd/http/main.go` mapped `Infrastructure → 500`, but my canonical `HTTPStatus()` maps it to `503`. I "fixed" the example by deleting the switch and calling `HTTPStatus()` — but I never asked _why_ the example author originally chose 500. Maybe they had a reason (some HTTP clients retry 503 but not 500, which could be bad for infra errors that won't recover by retrying). I silently overrode a possibly-intentional choice.
 
 ---
 
@@ -226,7 +227,7 @@ Structured by theme, not priority (priority is section f).
 ### e1. Type model — make impossible states unrepresentable
 
 - **`Family` as `string`, not `int`** — natural serialization, greppable, extensible by consumers. Breaks the `iota` anti-pattern. Breaking change but the right one.
-- **`Fix` as a triple `{Summary, Command, Rationale}`** — restore the dropped field. A fix without rationale is just a command; the rationale is what teaches the user *why*.
+- **`Fix` as a triple `{Summary, Command, Rationale}`** — restore the dropped field. A fix without rationale is just a command; the rationale is what teaches the user _why_.
 - **`RetryPolicy` with a `Backoff(attempt) time.Duration` method** — make it actually useful, not a bag of consts.
 - **Invalid `Family` should be unreachable** — either string enum (no invalid values) or a constructor that validates.
 
@@ -238,7 +239,7 @@ Structured by theme, not priority (priority is section f).
 
 ### e3. Real taxonomy, not opinions
 
-- Either add an **`Abort` family** for `context.Canceled` (user-initiated, not an error), or document explicitly that Canceled collapses to Rejection *for exit-code purposes only* and provide a separate `IsUserInitiated(err)` helper.
+- Either add an **`Abort` family** for `context.Canceled` (user-initiated, not an error), or document explicitly that Canceled collapses to Rejection _for exit-code purposes only_ and provide a separate `IsUserInitiated(err)` helper.
 - Either add an **`Auth` family** for 401/403, or document that Rejection covers auth and provide `IsAuthError(err)` via code-prefix matching.
 - The current "5 families fit everything" stance is intellectually lazy.
 
@@ -266,33 +267,33 @@ Structured by theme, not priority (priority is section f).
 
 Sorted by **impact ÷ effort** (high impact / low effort first). "Impact" here means: correctness > architecture > ergonomics > docs.
 
-| # | Task | Theme | Impact (1-5) | Effort (h) | Ratio |
-|---|------|-------|:---:|:---:|:---:|
-| 1 | **Add `Rationale` to `Fix` triple** (restore dropped field) | Type model | 5 | 0.5 | 10.0 |
-| 2 | **`Severity(invalid) → MaxInt`** (fail-closed multi-error) | Correctness | 5 | 0.3 | 16.7 |
-| 3 | **`Registry.Clone()` consistent snapshot** (one lock) | Correctness | 4 | 0.5 | 8.0 |
-| 4 | **`Classify(nil)` redesign** — return zero Family or panic, document loudly | Honesty | 5 | 1.0 | 5.0 |
-| 5 | **Delete `TestExtractCommand_REMOVED` tombstone** | Cleanup | 1 | 0.1 | 10.0 |
-| 6 | **`Error.JSON()` consistent omitempty** | Polish | 2 | 0.2 | 10.0 |
-| 7 | **`Family.RetryPolicy().Backoff(attempt)`** method | Type model | 3 | 0.5 | 6.0 |
-| 8 | **Bridge composition example** (oops → bridge → classify, end-to-end) | Architecture | 4 | 1.0 | 4.0 |
-| 9 | **slog helper `SlogAttr(err)`** | Composition | 3 | 0.5 | 6.0 |
-| 10 | **HTTP helper `WriteFamilyError(w, err)`** promoted to library | Composition | 4 | 1.0 | 4.0 |
-| 11 | **OTel helper `SetSpanAttributes(span, err)`** | Composition | 3 | 0.5 | 6.0 |
-| 12 | **`Family` as `string` not `int`** (breaking, but right) | Type model | 5 | 2.0 | 2.5 |
-| 13 | **Lower Go requirement to 1.21** (drop `errors.AsType`) | Reach | 4 | 1.5 | 2.7 |
-| 14 | **Test asserting severity ordering rationale** (document *why* in code) | Honesty | 3 | 0.5 | 6.0 |
-| 15 | **Add `Abort` family for `context.Canceled`** (or document collapse rule) | Taxonomy | 4 | 1.5 | 2.7 |
-| 16 | **`RegisterStdlibDefaults` return cleanup func** | API hygiene | 2 | 0.3 | 6.7 |
-| 17 | **Remaining godoc examples** (WithContextMap, Clone, RegisterStdlibDefaults, RetryPolicy) | Discoverability | 2 | 0.5 | 4.0 |
-| 18 | **Audit `HTTPStatus()` mappings** — is 503 right for Infrastructure? Document the retry implication. | Honesty | 2 | 0.5 | 4.0 |
-| 19 | **`Error.Is` semantics documented in error.go** (not just AGENTS.md) | Docs | 1 | 0.2 | 5.0 |
-| 20 | **Document `failsafe-go` / `avast/retry-go` integration** instead of building a loop | Composition | 3 | 1.0 | 3.0 |
-| 21 | **CONTRIBUTING.md: Registry pattern section** | Docs | 1 | 0.5 | 2.0 |
-| 22 | **Migrate docs/status & docs/planning to docs/archive/** | Cleanup | 1 | 0.5 | 2.0 |
-| 23 | **Add `Auth` family OR `IsAuthError(err)` helper** | Taxonomy | 3 | 1.0 | 3.0 |
-| 24 | **Decide: is Corruption really worse than Infrastructure?** Write the ADR. | Honesty | 2 | 0.5 | 4.0 |
-| 25 | **Rename `agent` → RCA/Synthesizer** (decision-gated, but ripe) | Architecture | 3 | 1.0 | 3.0 |
+| #   | Task                                                                                                 | Theme           | Impact (1-5) | Effort (h) | Ratio |
+| --- | ---------------------------------------------------------------------------------------------------- | --------------- | :----------: | :--------: | :---: |
+| 1   | **Add `Rationale` to `Fix` triple** (restore dropped field)                                          | Type model      |      5       |    0.5     | 10.0  |
+| 2   | **`Severity(invalid) → MaxInt`** (fail-closed multi-error)                                           | Correctness     |      5       |    0.3     | 16.7  |
+| 3   | **`Registry.Clone()` consistent snapshot** (one lock)                                                | Correctness     |      4       |    0.5     |  8.0  |
+| 4   | **`Classify(nil)` redesign** — return zero Family or panic, document loudly                          | Honesty         |      5       |    1.0     |  5.0  |
+| 5   | **Delete `TestExtractCommand_REMOVED` tombstone**                                                    | Cleanup         |      1       |    0.1     | 10.0  |
+| 6   | **`Error.JSON()` consistent omitempty**                                                              | Polish          |      2       |    0.2     | 10.0  |
+| 7   | **`Family.RetryPolicy().Backoff(attempt)`** method                                                   | Type model      |      3       |    0.5     |  6.0  |
+| 8   | **Bridge composition example** (oops → bridge → classify, end-to-end)                                | Architecture    |      4       |    1.0     |  4.0  |
+| 9   | **slog helper `SlogAttr(err)`**                                                                      | Composition     |      3       |    0.5     |  6.0  |
+| 10  | **HTTP helper `WriteFamilyError(w, err)`** promoted to library                                       | Composition     |      4       |    1.0     |  4.0  |
+| 11  | **OTel helper `SetSpanAttributes(span, err)`**                                                       | Composition     |      3       |    0.5     |  6.0  |
+| 12  | **`Family` as `string` not `int`** (breaking, but right)                                             | Type model      |      5       |    2.0     |  2.5  |
+| 13  | **Lower Go requirement to 1.21** (drop `errors.AsType`)                                              | Reach           |      4       |    1.5     |  2.7  |
+| 14  | **Test asserting severity ordering rationale** (document _why_ in code)                              | Honesty         |      3       |    0.5     |  6.0  |
+| 15  | **Add `Abort` family for `context.Canceled`** (or document collapse rule)                            | Taxonomy        |      4       |    1.5     |  2.7  |
+| 16  | **`RegisterStdlibDefaults` return cleanup func**                                                     | API hygiene     |      2       |    0.3     |  6.7  |
+| 17  | **Remaining godoc examples** (WithContextMap, Clone, RegisterStdlibDefaults, RetryPolicy)            | Discoverability |      2       |    0.5     |  4.0  |
+| 18  | **Audit `HTTPStatus()` mappings** — is 503 right for Infrastructure? Document the retry implication. | Honesty         |      2       |    0.5     |  4.0  |
+| 19  | **`Error.Is` semantics documented in error.go** (not just AGENTS.md)                                 | Docs            |      1       |    0.2     |  5.0  |
+| 20  | **Document `failsafe-go` / `avast/retry-go` integration** instead of building a loop                 | Composition     |      3       |    1.0     |  3.0  |
+| 21  | **CONTRIBUTING.md: Registry pattern section**                                                        | Docs            |      1       |    0.5     |  2.0  |
+| 22  | **Migrate docs/status & docs/planning to docs/archive/**                                             | Cleanup         |      1       |    0.5     |  2.0  |
+| 23  | **Add `Auth` family OR `IsAuthError(err)` helper**                                                   | Taxonomy        |      3       |    1.0     |  3.0  |
+| 24  | **Decide: is Corruption really worse than Infrastructure?** Write the ADR.                           | Honesty         |      2       |    0.5     |  4.0  |
+| 25  | **Rename `agent` → RCA/Synthesizer** (decision-gated, but ripe)                                      | Architecture    |      3       |    1.0     |  3.0  |
 
 **The 80/20:** tasks 1-6 deliver the correctness fixes and the cheapest cleanups. ~2.6 hours total for tasks that materially improve the library's honesty. Do those first.
 
@@ -305,6 +306,7 @@ Sorted by **impact ÷ effort** (high impact / low effort first). "Impact" here m
 This is the foundational type-model question and I cannot resolve it alone because both paths have real cost:
 
 **Closed `int`/`iota` (current):**
+
 - ✅ Exhaustive switches are enforceable (with the `exhaustive` linter).
 - ✅ The library can evolve the 5 families with confidence.
 - ❌ Consumers cannot add `Abort`, `Auth`, `Throttled` without forking.
@@ -312,11 +314,12 @@ This is the foundational type-model question and I cannot resolve it alone becau
 - ❌ `Family(99)` is valid at compile time — invalid states are representable.
 
 **Open `string` (proposed in e1):**
+
 - ✅ Consumers can define `myapp.Auth = Family("auth")` and it composes with `Classify`.
 - ✅ Serializes naturally (JSON, YAML, logs).
 - ✅ No invalid values possible (any string is a valid Family; unknown → Transient default).
 - ❌ No exhaustive switches; the compiler can't tell a consumer they missed a case.
-- ❌ The "5 families" story becomes "5 *canonical* families + whatever you define" — harder to document.
+- ❌ The "5 families" story becomes "5 _canonical_ families + whatever you define" — harder to document.
 - ❌ Breaking change for every existing consumer.
 
 **Why I can't decide:** the right answer depends on whether go-error-family wants to be a **protocol** (consumers extend it — favors string) or a **framework** (the 5 families are the whole story — favors int). The README tagline is "share the protocol, not the implementation" — which implies string. But every concrete design choice I made (int enum, `familyData` table, exhaustive `familyInfo`) implies framework. **The tagline and the type model disagree, and I don't know which side wins.**
@@ -327,13 +330,13 @@ This is a product/positioning decision, not an engineering one. I need the user 
 
 ## Verification Summary (honest)
 
-| Module | Build | Tests (race) | Lint | Coverage | Caveat |
-|---|:---:|:---:|:---:|:---:|---|
-| root (`errorfamily`) | ✓ | ✓ | 0 | ~98% | Severity invalid-case bug (d6); nil contradiction (d1) |
-| `diagnose` | ✓ | ✓ | 0 | 82.7% | Remaining gaps are fragile `exec` wrappers |
-| `diagnose/git` | ✓ | ✓ | 0 | 98.5% | — |
-| `diagnose/postgres` | ✓ | ✓ | 0 | 80.3% | — |
-| `agent` | ✓ | ✓ | 0 | 89.4% | Tombstone test (d5); FixStep.Rationale is hardcoded (b1) |
-| `bridge` | ✓ | ✓ | 0 | — | No end-to-end composition test (b4) |
+| Module               | Build | Tests (race) | Lint | Coverage | Caveat                                                   |
+| -------------------- | :---: | :----------: | :--: | :------: | -------------------------------------------------------- |
+| root (`errorfamily`) |   ✓   |      ✓       |  0   |   ~98%   | Severity invalid-case bug (d6); nil contradiction (d1)   |
+| `diagnose`           |   ✓   |      ✓       |  0   |  82.7%   | Remaining gaps are fragile `exec` wrappers               |
+| `diagnose/git`       |   ✓   |      ✓       |  0   |  98.5%   | —                                                        |
+| `diagnose/postgres`  |   ✓   |      ✓       |  0   |  80.3%   | —                                                        |
+| `agent`              |   ✓   |      ✓       |  0   |  89.4%   | Tombstone test (d5); FixStep.Rationale is hardcoded (b1) |
+| `bridge`             |   ✓   |      ✓       |  0   |    —     | No end-to-end composition test (b4)                      |
 
 **Green builds do not mean good architecture.** The bugs in section d are real and shipped. This report exists because the user insisted on honesty over celebration.

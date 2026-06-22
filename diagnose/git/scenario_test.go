@@ -50,11 +50,8 @@ func TestGitRuleMockCleanWorkingTree(t *testing.T) {
 
 	mr := newMockRunner()
 	mr.ExistsMap["git"] = true
-	mr.Responses["git -C "+tmpDir+" status --porcelain"] = diagnose.MockResponse{
-		Stdout:   "",
-		ExitCode: 0,
-	}
-	mr.Responses["git -C "+tmpDir+" remote"] = diagnose.MockResponse{Stdout: "", ExitCode: 0}
+	mr.Set("git -C "+tmpDir+" status --porcelain", "", 0)
+	mr.Set("git -C "+tmpDir+" remote", "", 0)
 
 	r := &GitRule{Runner: mr}
 	err := errorfamily.NewTransient("git.error", "msg").WithContext("repo", tmpDir)
@@ -74,10 +71,7 @@ func TestGitRuleMockDirtyWorkingTree(t *testing.T) {
 
 	mr := newMockRunner()
 	mr.ExistsMap["git"] = true
-	mr.Responses["git -C "+tmpDir+" status --porcelain"] = diagnose.MockResponse{
-		Stdout:   "?? untracked.txt\n M modified.txt",
-		ExitCode: 0,
-	}
+	mr.Set("git -C "+tmpDir+" status --porcelain", "?? untracked.txt\n M modified.txt", 0)
 
 	r := &GitRule{Runner: mr}
 	err := errorfamily.NewTransient("git.error", "msg").WithContext("repo", tmpDir)
@@ -100,10 +94,7 @@ func TestGitRuleMockMergeConflicts(t *testing.T) {
 
 	mr := newMockRunner()
 	mr.ExistsMap["git"] = true
-	mr.Responses["git -C "+tmpDir+" status --porcelain"] = diagnose.MockResponse{
-		Stdout:   "UU file1.txt\nUU file2.txt\nAA file3.txt",
-		ExitCode: 0,
-	}
+	mr.Set("git -C "+tmpDir+" status --porcelain", "UU file1.txt\nUU file2.txt\nAA file3.txt", 0)
 
 	r := &GitRule{Runner: mr}
 	err := errorfamily.NewTransient("git.error", "msg").WithContext("repo", tmpDir)
@@ -125,10 +116,7 @@ func TestGitRuleMockGitStatusFails(t *testing.T) {
 
 	mr := newMockRunner()
 	mr.ExistsMap["git"] = true
-	mr.Responses["git -C "+tmpDir+" status --porcelain"] = diagnose.MockResponse{
-		Stdout:   "fatal: not a git object",
-		ExitCode: 128,
-	}
+	mr.Set("git -C "+tmpDir+" status --porcelain", "fatal: not a git object", 128)
 
 	r := &GitRule{Runner: mr}
 	err := errorfamily.NewTransient("git.error", "msg").WithContext("repo", tmpDir)
@@ -146,15 +134,9 @@ func TestGitRuleMockUnreachableRemote(t *testing.T) {
 
 	mr := newMockRunner()
 	mr.ExistsMap["git"] = true
-	mr.Responses["git -C "+tmpDir+" status --porcelain"] = diagnose.MockResponse{
-		Stdout:   "",
-		ExitCode: 0,
-	}
-	mr.Responses["git -C "+tmpDir+" remote"] = diagnose.MockResponse{Stdout: "origin", ExitCode: 0}
-	mr.Responses["git -C "+tmpDir+" ls-remote --heads origin"] = diagnose.MockResponse{
-		Stdout:   "fatal: could not resolve",
-		ExitCode: 128,
-	}
+	mr.Set("git -C "+tmpDir+" status --porcelain", "", 0)
+	mr.Set("git -C "+tmpDir+" remote", "origin", 0)
+	mr.Set("git -C "+tmpDir+" ls-remote --heads origin", "fatal: could not resolve", 128)
 
 	r := &GitRule{Runner: mr}
 	err := errorfamily.NewTransient("git.error", "msg").WithContext("repo", tmpDir)
@@ -173,15 +155,9 @@ func TestGitRuleMockReachableRemote(t *testing.T) {
 
 	mr := newMockRunner()
 	mr.ExistsMap["git"] = true
-	mr.Responses["git -C "+tmpDir+" status --porcelain"] = diagnose.MockResponse{
-		Stdout:   "",
-		ExitCode: 0,
-	}
-	mr.Responses["git -C "+tmpDir+" remote"] = diagnose.MockResponse{Stdout: "origin", ExitCode: 0}
-	mr.Responses["git -C "+tmpDir+" ls-remote --heads origin"] = diagnose.MockResponse{
-		Stdout:   "abc123\trefs/heads/main",
-		ExitCode: 0,
-	}
+	mr.Set("git -C "+tmpDir+" status --porcelain", "", 0)
+	mr.Set("git -C "+tmpDir+" remote", "origin", 0)
+	mr.Set("git -C "+tmpDir+" ls-remote --heads origin", "abc123\trefs/heads/main", 0)
 
 	r := &GitRule{Runner: mr}
 	err := errorfamily.NewTransient("git.error", "msg").WithContext("repo", tmpDir)
@@ -200,11 +176,8 @@ func TestGitRuleMockCallsCommandRunner(t *testing.T) {
 
 	mr := newMockRunner()
 	mr.ExistsMap["git"] = true
-	mr.Responses["git -C "+tmpDir+" status --porcelain"] = diagnose.MockResponse{
-		Stdout:   "",
-		ExitCode: 0,
-	}
-	mr.Responses["git -C "+tmpDir+" remote"] = diagnose.MockResponse{Stdout: "", ExitCode: 0}
+	mr.Set("git -C "+tmpDir+" status --porcelain", "", 0)
+	mr.Set("git -C "+tmpDir+" remote", "", 0)
 
 	r := &GitRule{Runner: mr}
 	err := errorfamily.NewTransient("git.error", "msg").WithContext("repo", tmpDir)

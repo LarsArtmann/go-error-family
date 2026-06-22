@@ -191,9 +191,7 @@ func (r *Registry) Clone() *Registry {
 
 	// Copy templates under the read lock.
 	r.mu.RLock()
-	for code, tmpl := range r.templates {
-		clone.templates[code] = tmpl
-	}
+	maps.Copy(clone.templates, r.templates)
 	r.mu.RUnlock()
 
 	return clone
