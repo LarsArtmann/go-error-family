@@ -10,6 +10,7 @@ run:
     - goexperiment.simd
   allow-parallel-runners: true
   allow-serial-runners: true
+  issues-exit-code: 1
 output:
   formats: {}
 linters:
@@ -156,6 +157,8 @@ linters:
       - \.gen\.go$
       - _mock\.go$
       - _templ\.go$
+      - diagnose/
+      - diagnose/git/
       - vendor/
 formatters:
   enable:
@@ -171,4 +174,8 @@ formatters:
     paths:
       - _mock\.go$
       - _templ\.go$
-issues: {}
+      - diagnose/
+      - diagnose/git/
+issues:
+  max-issues-per-linter: 50
+  max-same-issues: 10
