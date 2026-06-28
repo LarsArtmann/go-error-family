@@ -1,6 +1,6 @@
 module github.com/larsartmann/go-error-family
 
-go 1.26.3
+go 1.26.4
 
 // Local replace for extracted modules (not yet published).
 // go.work handles workspace builds; replace lets go mod tidy resolve.
