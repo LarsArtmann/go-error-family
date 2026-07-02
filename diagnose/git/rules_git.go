@@ -135,7 +135,11 @@ func (r *GitRule) checkWorkingTree(
 
 	result.Status = diagnose.StatusDegraded
 	result.Summary = fmt.Sprintf("Working tree has uncommitted changes (%d files)", lineCount)
-	diagnose.SetFix(result, "Commit or stash uncommitted changes", `git add . && git commit -m "wip"`)
+	diagnose.SetFix(
+		result,
+		"Commit or stash uncommitted changes",
+		`git add . && git commit -m "wip"`,
+	)
 	return true
 }
 

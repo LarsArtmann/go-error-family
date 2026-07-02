@@ -94,8 +94,16 @@ func TestClassifyMultiError(t *testing.T) {
 		// Severity-ordered: the worst (highest-severity) sub-error wins,
 		// independent of argument order.
 		{"worst wins: conflict over rejection", errors.Join(rejection, conflict), Conflict},
-		{"worst wins: infrastructure over conflict", errors.Join(conflict, infrastructure), Infrastructure},
-		{"worst wins: corruption over infrastructure", errors.Join(infrastructure, corruption), Corruption},
+		{
+			"worst wins: infrastructure over conflict",
+			errors.Join(conflict, infrastructure),
+			Infrastructure,
+		},
+		{
+			"worst wins: corruption over infrastructure",
+			errors.Join(infrastructure, corruption),
+			Corruption,
+		},
 		{"order independence: corruption first", errors.Join(corruption, rejection), Corruption},
 		{"order independence: corruption last", errors.Join(rejection, corruption), Corruption},
 		{"order independence: conflict both orders a", errors.Join(conflict, rejection), Conflict},

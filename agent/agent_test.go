@@ -49,9 +49,12 @@ func TestAnalyzeWithDiagnosis(t *testing.T) {
 	err := errorfamily.NewTransient("db.timeout", "connection refused")
 	diagnosis := []*diagnose.DiagnosticResult{
 		{
-			Status:     diagnose.StatusFailed,
-			Summary:    "PostgreSQL is NOT responding",
-			Fix:        diagnose.Fix{Summary: "Start PostgreSQL", Command: "brew services start postgresql"},
+			Status:  diagnose.StatusFailed,
+			Summary: "PostgreSQL is NOT responding",
+			Fix: diagnose.Fix{
+				Summary: "Start PostgreSQL",
+				Command: "brew services start postgresql",
+			},
 			Confidence: 0.9,
 		},
 	}
