@@ -3,9 +3,9 @@
 Structured error protocol library. Library only — no `main`, no build system, no external deps. Full API reference: `SKILL.md`.
 
 **Last Updated:** 2026-07-05
-**Version:** v0.6.0
+**Version:** v0.6.1
 **Status:** All tests pass (root + bridge + submodules), 0 lint issues, 0 race conditions
-**Workspace modules:** root (zero-dep), `agent`, `bridge` (oops integration), `diagnose`, `diagnose/git`, `diagnose/postgres`
+**Workspace modules:** root (zero-dep), `agent`, `bridge` (oops integration), `diagnose`, `diagnose/git`, `diagnose/postgres`, `examples`
 
 ## Quick Start
 
@@ -158,7 +158,7 @@ Connects go-error-family with `samber/oops`. Separate module with its own `go.mo
 - `HandleConfig.Diagnose` bool was removed — diagnostics run whenever `DiagnosticFunc` is set. No separate enable flag.
 - `diagnose.Status` has `IsValid()` matching `Family.IsValid()` pattern.
 - `diagnose.sortByConfidence` uses `slices.SortFunc` (Go 1.26 stdlib).
-- CI now has explicit `bridge/` test and lint steps, plus `go build ./examples/...` step.
+- CI now has explicit `bridge/` test and lint steps, plus an examples build step (`working-directory: ./examples`).
 - `familyInfo` includes `Audience` field — adding a new Family truly requires only one entry in `familyData`.
 - `NetworkRule.Run` returns `StatusUnknown` when no host found in error context (prevents undefined DNS behavior).
 - `Audience.IsValid()` mirrors `Family.IsValid()` and `Status.IsValid()` — all three enum types have consistent validation.
@@ -171,4 +171,4 @@ Connects go-error-family with `samber/oops`. Separate module with its own `go.mo
 - **`applyContext` uses `{key}` syntax (handle.go):** Template values are substituted via `strings.ReplaceAll` without HTML escaping. This is intentional for CLI output (stderr) but would be unsafe for HTML rendering. Consumers building HTTP responses should escape values before embedding in HTML.
 - **`agent.Config.Enabled` is now honest:** A disabled agent returns `(nil, error)` instead of a synthetic `AgentResult`. Calling `Analyze` on a disabled agent is a programming error, not a silent result.
 - **`ClassifiedError` value-embeds `oops.OopsError`:** The zero value has nil internals. Methods like `Error()` and `Is()` guard against this, but future methods added to `ClassifiedError` must handle the zero-OopsError case.
-- **Examples built in CI:** `examples/cmd/` is now compiled by a CI step (`go build ./examples/...`).
+- **Examples are a separate module:** `examples/` has its own `go.mod` (requires root + diagnose). This keeps the root module truly zero-dependency — no `replace` directives, no phantom requires. CI builds it via `working-directory: ./examples`.

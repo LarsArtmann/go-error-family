@@ -1,9 +1,9 @@
 module github.com/larsartmann/go-error-family/bridge
 
-go 1.26.3
+go 1.26.4
 
 require (
-	github.com/larsartmann/go-error-family v0.5.1
+	github.com/larsartmann/go-error-family v0.6.0
 	github.com/samber/oops v1.22.0
 )
 

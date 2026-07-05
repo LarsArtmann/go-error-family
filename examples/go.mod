@@ -1,4 +1,4 @@
-module github.com/larsartmann/go-error-family/agent
+module github.com/larsartmann/go-error-family/examples
 
 go 1.26.4
 

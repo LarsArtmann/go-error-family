@@ -7,4 +7,5 @@ use (
 	./diagnose
 	./diagnose/git
 	./diagnose/postgres
+	./examples
 )

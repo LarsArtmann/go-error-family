@@ -4,6 +4,20 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
+## [0.6.1] - 2026-07-05
+
+Hotfix: the published `go.mod` files in 0.6.0 contained local `replace` directives plus phantom `require ... v0.0.0-00010101000000-000000000000` versions. Go strips `replace` when a module is fetched, so consumers hit unresolvable module-graph edges. `go.work` masked the defect locally.
+
+### Fixed
+
+- **Root `go.mod`** — removed the `replace` block and phantom `require` for `diagnose`. The root module is now genuinely zero-dependency: `GOWORK=off go list -m all` returns exactly one module.
+- **`diagnose/go.mod`** — `require root v0.0.0-...` replaced with real `v0.6.0`; local `replace` removed.
+- **`agent/go.mod`** — both phantom requires replaced with real `v0.6.0` + `diagnose v0.1.0`; local `replace` block removed.
+
+### Changed
+
+- **`examples/` is now a separate Go module** (`examples/go.mod`). Previously the root module required `diagnose` solely because `examples/cmd/custom_rule` imported it, dragging the entire `diagnose` subtree into every root consumer's module graph. Extracting examples restores the true zero-dependency invariant on root.
+
 ## [0.6.0] - 2026-07-05
 
 Driven by consumer feedback from SEC and browser-history integrations. The root
