@@ -109,8 +109,8 @@ Not a library type — partial success is a consumption pattern, not a classific
 
 | Package              | Coverage |
 | -------------------- | -------- |
-| root (`errorfamily`) | 97.1%    |
-| `errorfamilytest`    | 66.7%    |
+| root (`errorfamily`) | 97.3%    |
+| `errorfamilytest`    | 95.2%    |
 | `agent`              | 100.0%   |
 | `bridge`             | 94.1%    |
 | `diagnose` (core)    | 83.9%    |

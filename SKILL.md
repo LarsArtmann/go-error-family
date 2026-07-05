@@ -63,15 +63,29 @@ Only `Transient` is retryable. Everything else is not. This is the core design d
 ### Family Methods
 
 ```go
+// Classification
 family.IsRetryable() bool      // true only for Transient
-family.ExitCode() int          // BSD sysexits.h code (see table above)
 family.IsValid() bool          // true if within defined range
 family.String() string         // "rejection", "transient", etc.
-family.Tone() Tone             // presentation tone hint
+
+// Ordering & multi-error (powers errors.Join worst-severity selection)
+family.Severity() int          // total order: Transient(1) < Rejection(2) < Conflict(3) < Infrastructure(4) < Corruption(5)
+
+// Process & network boundaries
+family.ExitCode() int          // BSD sysexits.h code (see table above)
+family.HTTPStatus() int        // canonical family→HTTP (Rejection→400, Conflict→409, Transient→503, Corruption→500, Infrastructure→503)
+family.RetryPolicy() RetryPolicy  // advisory: Transient→{3 attempts, 100ms–5s backoff}; others→{1 attempt}
+
+// Presentation metadata
 family.Audience() Audience     // who to notify: User, Ops, or All
+family.Tone() Tone             // presentation tone hint
 family.DefaultMessage() string // generic human-readable message
 family.DefaultWhy() string     // generic "why" explanation
 family.DefaultFix() string     // generic fix suggestion
+
+// Config / serialization (implements encoding.TextMarshaler/TextUnmarshaler)
+family.MarshalText() ([]byte, error)   // YAML/JSON config: "transient"
+family.UnmarshalText([]byte) error     // case-insensitive parse, defaults to Transient
 ```
 
 ### Audience & Tone Types
@@ -105,7 +119,7 @@ type Contextual interface {   // factual key-value details
     ErrorContext() map[string]string
 }
 
-type Retryable interface {    // explicit retry hint (overrides Family)
+type Retryable interface {    // retry hint (consulted only when Classified is absent: true→Transient, false→Rejection)
     error
     IsRetryable() bool
 }
@@ -133,10 +147,15 @@ err.Message() string                    // human-readable technical message
 err.Cause() error                       // underlying error in the chain
 err.Timestamp() time.Time               // when the error was created
 
-// Mutators (chainable)
+// Mutators (chainable — all copy-on-write, return a NEW *Error)
 err.WithContext(key, value string) *Error
+err.WithContextMap(ctx map[string]string) *Error    // bulk set from a map
+err.WithContextf(key, format string, args ...any) *Error  // printf-style context value
 err.WithCause(cause error) *Error
 err.WithTimestamp(ts time.Time) *Error   // deterministic timestamp for tests
+
+// Serialization
+err.JSON() ([]byte, error)              // canonical JSON for API boundaries: {family,code,message,context,retryable,timestamp}
 
 // Helpers
 err.HasContext(key string) bool
@@ -173,6 +192,11 @@ WrapRejection / WrapConflict / WrapTransient / WrapCorruption / WrapInfrastructu
 WrapRejectionf / WrapConflictf / WrapTransientf / WrapCorruptionf / WrapInfrastructuref  // printf-style
 ```
 
+**When to use `New*` vs `Wrap*`:**
+
+- `New*` — the error originates here (no underlying cause). Use for validation failures, domain rule violations, sentinel errors.
+- `Wrap*` — the error has a cause you're classifying for the caller. `Wrap(nil, ...)` returns `nil` (nil-safe). Use when translating a third-party error into a behavioral family.
+
 ### Classification
 
 ```go
@@ -200,6 +224,11 @@ errorfamily.RegisterClassifier(func(err error) (errorfamily.Family, bool) {
     return errorfamily.Transient, false
 })
 
+// Register stdlib taxonomy (context/sql/os errors with documented rationale)
+errorfamily.RegisterStdlibDefaults(errorfamily.DefaultRegistry)
+// Maps: context.DeadlineExceeded→Transient, context.Canceled→Rejection,
+// sql.ErrNoRows→Rejection, sql.ErrConnDone→Transient, os.ErrNotExist→Rejection, etc.
+
 // Combine errors for partial-success patterns — use stdlib errors.Join
 combined := errors.Join(err1, err2)  // Classify picks the worst Family automatically
 ```
@@ -221,6 +250,15 @@ Package-level functions (`Classify`, `RegisterClassification`, `RegisterTemplate
 reg := errorfamily.NewRegistry()
 reg.RegisterClassification(sql.ErrConnDone, errorfamily.Transient)
 reg.RegisterTemplate("custom.code", errorfamily.MessageTemplate{What: "Custom"})
+reg.RegisterTemplates(map[string]errorfamily.MessageTemplate{  // batch variant
+    "db.timeout":  {What: "DB timed out on {host}"},
+    "auth.failed": {What: "Invalid credentials"},
+})
+errorfamily.RegisterStdlibDefaults(reg)  // context/sql/os taxonomy onto this registry
+
+// Clone — deep-copy with inherit-and-extend semantics
+child := reg.Clone()
+child.RegisterClassification(myErr, errorfamily.Corruption)
 
 // Pass via HandleConfig.Registry
 code := errorfamily.HandleErrorWithConfig(err, errorfamily.HandleConfig{
@@ -399,16 +437,18 @@ result, err := ag.Analyze(ctx, err, diagnosis)
 
 ## Surprising Behaviors (Gotchas)
 
-| Behavior                                           | Why                                                              |
-| -------------------------------------------------- | ---------------------------------------------------------------- |
-| `Classify(nil)` returns `Rejection`                | nil error = caller's fault                                       |
-| `Classify` defaults unknown → `Transient`          | Fail-open: unknown errors get retried                            |
-| `ParseFamily("unknown")` → `Transient`             | Same fail-open design                                            |
-| `errors.Is` matches on **code + family** only      | Two `*Error`s with different messages but same code+family match |
-| `Wrap(nil, ...)` returns `nil`                     | Nil-safe, but can't construct error wrapping nil                 |
-| `Error.ErrorContext()` returns a **copy**          | Mutations won't affect the original                              |
-| Template `{key}` uses `strings.ReplaceAll`         | Not html/template — just simple substitution                     |
-| `DiagnosticFunc` is a function type, not interface | Avoids circular import between root and diagnose packages        |
+| Behavior                                                    | Why                                                                                        |
+| ----------------------------------------------------------- | ------------------------------------------------------------------------------------------ |
+| `Classify(nil)` returns `Rejection`                         | nil error = caller's fault                                                                 |
+| `Classify` defaults unknown → `Transient`                   | Fail-open: unknown errors get retried                                                      |
+| `ParseFamily("unknown")` → `Transient`                      | Same fail-open design                                                                      |
+| `errors.Is` matches on **code + family** only               | Two `*Error`s with different messages but same code+family match                           |
+| `Wrap(nil, ...)` returns `nil`                              | Nil-safe, but can't construct error wrapping nil                                           |
+| `WithContext`/`WithCause`/`WithTimestamp` are copy-on-write | They return a NEW `*Error`, not the same pointer — safe to chain from shared sentinels     |
+| `Error.ErrorContext()` returns a **copy**                   | Mutations won't affect the original                                                        |
+| Template `{key}` uses `strings.ReplaceAll`                  | Not html/template — just simple substitution; NOT HTML-escaped (unsafe for HTML rendering) |
+| `DiagnosticFunc` is a function type, not interface          | Avoids circular import between root and diagnose packages                                  |
+| `diagnose/` and `agent/` are separate modules               | Opt-in: skip them unless you need infrastructure debugging or AI analysis                  |
 
 ---
 
@@ -545,30 +585,17 @@ errorfamilytest.AssertContext(t, err, "user_id", "42")
 errorfamilytest.AssertContextMissing(t, sentinelErr, "field")
 ```
 
-Test files and scope:
+Test files by area (run `find . -name '*_test.go'` for the canonical list):
 
-- `errorfamily_test.go` — Family, ParseFamily, Error, constructors, Classify, RegisterClassification, errors.Is/As integration
-- `benchmark_test.go` — Performance baselines for Classify, HandleError, ExitCode, ParseFamily, etc.
-- `handle_test.go` — HandleError, HandleErrorWithConfig, diagnostics wiring, template overrides
-- `handle_context_test.go` — HandleErrorWithContext, HandleErrorDetailed, context propagation, template overrides
-- `template_test.go` — MessageTemplate rendering, RegisterTemplate, case-insensitive matching
-- `fuzz_test.go` — FuzzParseFamily, FuzzClassify, FuzzErrorFormatting
-- `example_test.go` — ExampleNewTransient, ExampleClassify, ExampleWrapRejection, ExampleParseFamily
-- `diagnose/helpers_test.go` — HasContextKey, ContextValue, HasContextSubstring, FamilyIs, ErrorCodeContains, RuleSpec
-- `diagnose/rules_test.go` — FilesystemRule and NetworkRule Applicable/Run
-- `diagnose/runner_test.go` — Runner, context cancellation, confidence sorting, error handling
-- `diagnose/benchmark_test.go` — Benchmarks for Runner.Run, RuleSpec.Matches, DefaultRunner
-- `diagnose/git/scenario_test.go` — GitRule with MockCommandRunner (repo, working tree, remote)
-- `diagnose/git/mock_test.go` — MockCommandRunner integration for git scenarios
-- `diagnose/git/integration_test.go` — GitRule against real git repos
-- `diagnose/postgres/rules_postgres_test.go` — PostgresRule Applicable, Run, resolveHost, IsPostgresRunning
-- `agent/agent_test.go` — Analyze (enabled/disabled/with diagnosis/empty/timeout), extractCommand
-- `bridge/wrap_test.go` — Wrap, family classification, Coded interface, errors.Is, fmt.Formatter, ErrorContext
-- `bridge/autowrap_test.go` — AutoWrap, tag overrides, domain defaults, integration, benchmarks, examples
-- `bridge/infer_test.go` — InferFamily, all tag overrides, all domain defaults, edge cases
-- `bridge/fuzz_test.go` — FuzzInferFamily, FuzzAutoWrap, FuzzWrapRoundTrip, FuzzWrapOopsRoundTrip, FuzzFormat
+- **Root:** `error_test.go`, `family_test.go`, `classify_test.go`, `registry_test.go`, `handle_test.go`, `handle_context_test.go`, `template_test.go`, `http_test.go`, `log_test.go`, `retry_test.go`, `stdlib_test.go`, `example_test.go`, `benchmark_test.go`, `fuzz_test.go`
+- **errorfamilytest:** `errorfamilytest_test.go` — tests all assert helpers (happy + failure paths)
+- **agent:** `agent_test.go`
+- **bridge:** `wrap_test.go`, `autowrap_test.go`, `infer_test.go`, `fuzz_test.go`
+- **diagnose:** `helpers_test.go`, `rules_test.go`, `rules_integration_test.go`, `rules_network_test.go`, `runner_test.go`, `mock_test.go`, `benchmark_test.go`
+- **diagnose/git:** `scenario_test.go`, `mock_test.go`, `integration_test.go`
+- **diagnose/postgres:** `rules_postgres_test.go`
 
-**Coverage:** root 95.9% | agent 100% | diagnose core 67.1% | git 98.5% | postgres 81.0%
+**Coverage:** root 97.3% | errorfamilytest 95.2% | agent 100% | bridge 94.1% | diagnose 83.9% | git 98.5% | postgres 80.3%
 (rules that shell out to system commands are tested via `CommandRunner` mocks in git/postgres; diagnose core coverage reflects shell-out rules tested via integration)
 
 ### Test Style
@@ -601,7 +628,7 @@ func TestExample(t *testing.T) {
 - **No external dependencies** — stdlib only
 - **Interfaces embed `error`** — for `errors.AsType[T]()` compatibility
 - **Data-driven patterns** — `familyData` array, `defaultMessages` map, `ruleSpec` structs
-- **Thread-safe registries** — `sync.RWMutex` for classification and template registries; RLock iteration for reads
+- **Thread-safe registries** — `Registry.sentinels` and `Registry.classifiers` are `atomic.Pointer` to immutable snapshots: reads (the `Classify` hot path) load the pointer once and iterate lock-free/allocation-free; rare writers serialize under `r.mu` (write lock) and publish a new snapshot via copy-on-write. Templates use `r.mu` directly (RWLock).
 - **Nil-safe** — `Wrap(nil, ...)` returns nil; `Classify(nil)` returns `Rejection`
 - **`maps.Clone`** for defensive copies in `ErrorContext()`
 - **Constructors set `timestamp: time.Now().UTC()`**
@@ -613,17 +640,21 @@ func TestExample(t *testing.T) {
 
 ## Key Files for Common Tasks
 
-| Task                           | File(s)                                                                       |
-| ------------------------------ | ----------------------------------------------------------------------------- |
-| Add a new Family               | `family.go` (const + familyData entry)                                        |
-| Add a new constructor shortcut | `constructors.go`                                                             |
-| Change classification logic    | `classify.go`                                                                 |
-| Add/modify message templates   | `handle.go` (defaultMessages) or use `RegisterTemplate()`                     |
-| Add a diagnostic rule          | New file in `diagnose/`, implement `DiagnosticRule`, add to `DefaultRunner()` |
-| Change CLI boundary behavior   | `handle.go`                                                                   |
-| Modify agent analysis          | `agent/agent.go`                                                              |
-| Understand the Error struct    | `error.go`                                                                    |
-| Understand consumer interfaces | `interfaces.go`                                                               |
+| Task                           | File(s)                                                                                  |
+| ------------------------------ | ---------------------------------------------------------------------------------------- |
+| Add a new Family               | `family.go` — one entry in `familyData` slice (const + metadata + methods auto-derived)  |
+| Add a new constructor shortcut | `constructors.go`                                                                        |
+| Change classification logic    | `classify.go` (pipeline) + `registry.go` (Registry.Classify)                             |
+| Add/modify message templates   | `handle.go` (`defaultMessages`) or `RegisterTemplate()` / `Registry.RegisterTemplates()` |
+| Register stdlib error taxonomy | `stdlib.go` — `RegisterStdlibDefaults(reg)`                                              |
+| Add a diagnostic rule          | New file in `diagnose/`, implement `DiagnosticRule`, add to `DefaultRunner()`            |
+| Change CLI boundary behavior   | `handle.go`                                                                              |
+| HTTP error responses           | `http.go`                                                                                |
+| Structured error logging       | `log.go`                                                                                 |
+| Test assertion helpers         | `errorfamilytest/errorfamilytest.go`                                                     |
+| Modify agent analysis          | `agent/agent.go`                                                                         |
+| Understand the Error struct    | `error.go`                                                                               |
+| Understand consumer interfaces | `interfaces.go`                                                                          |
 
 ---
 
@@ -648,9 +679,13 @@ type MessageTemplate struct {
 agent → errorfamily (root)
 agent → diagnose
 
+bridge → errorfamily (root)
+bridge → samber/oops
+
 diagnose → errorfamily (root)
 
 errorfamily → (stdlib only)
+errorfamilytest → errorfamily (root)
 ```
 
-The root package has no dependency on `diagnose` or `agent`. `DiagnosticFunc` in `handle.go` is a function type to avoid circular imports — the consumer wires `diagnose.Runner` to it.
+The root package has no dependency on `diagnose`, `agent`, or `bridge`. `DiagnosticFunc` in `handle.go` is a function type to avoid circular imports — the consumer wires `diagnose.Runner` to it. The `bridge/` module is the only one with an external dependency (`samber/oops`); it exists for consumers who already use oops for enrichment and want go-error-family's behavioral classification on top.

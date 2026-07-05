@@ -432,3 +432,23 @@ func TestPackageLevelRegisterClassifier(t *testing.T) {
 		t.Errorf("marker error = %v, want Corruption", got)
 	}
 }
+
+// pkgLevelSingularError is a distinct marker type for the singular
+// RegisterClassifier test — kept separate so the batch test above doesn't
+// already satisfy coverage for the singular variant.
+type pkgLevelSingularError struct{}
+
+func (pkgLevelSingularError) Error() string { return "singular marker" }
+
+func TestPackageLevelRegisterClassifierSingular(t *testing.T) {
+	RegisterClassifier(func(err error) (Family, bool) {
+		var m pkgLevelSingularError
+		if errors.As(err, &m) {
+			return Infrastructure, true
+		}
+		return Transient, false
+	})
+	if got := Classify(pkgLevelSingularError{}); got != Infrastructure {
+		t.Errorf("singular marker = %v, want Infrastructure", got)
+	}
+}
