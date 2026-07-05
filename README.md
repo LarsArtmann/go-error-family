@@ -87,14 +87,21 @@ See [examples/](examples/) for runnable CLI, HTTP, and custom diagnostic rule de
 
 - **`Family`** — behavioral classification (Rejection, Conflict, Transient, Corruption, Infrastructure) that maps to retry decisions, exit codes, HTTP status codes, and user-facing tone
 - **Small interfaces** — `Coded`, `Classified`, `Contextual`, `Retryable` — each error type implements what it needs; the `Error` struct is just a reference implementation
-- **`Classify(err)`** — universal classification for any error (multi-error → interface → registered sentinels → default)
+- **`Classify(err)`** — universal classification for any error (multi-error → interface → sentinels → classifiers → default)
 - **Multi-error support** — `errors.Join` + `Classify` picks the **worst** Family by severity, deterministically regardless of argument order
 - **`ExitCode(err)`** — BSD sysexits.h exit codes derived from Family
+- **`Code(err)`** — one-liner error-code extraction (walks the unwrap chain for the `Coded` interface)
+- **`IsRetryable(err)`** — binary retry decision derived from Family
 - **`Family.HTTPStatus()`** — canonical family→HTTP status mapping (Rejection→400, Conflict→409, Transient→503, …)
+- **`HTTPStatus(err)` / `HTTPHandler(fn)`** — classify→status-code helper and a ready-made net/http middleware writing safe JSON responses
 - **`Family.RetryPolicy()`** — advisory retry defaults (attempts + backoff); the library does not run the loop
 - **`Error.JSON()`** — canonical JSON view for API boundaries
+- **`RegisterClassifier(func(error) (Family, bool))`** — predicate-based classification for dynamic third-party errors (e.g. `*sqlite.Error`) that can't be registered as sentinels
 - **`Registry`** — injectable registry with `Clone()` for inherit-and-extend; test isolation and scoped error handling (no `t.Cleanup` needed)
 - **`RegisterStdlibDefaults(reg)`** — pre-registered classifications for common stdlib errors (context/sql/os) with documented rationale
+- **`TemplateForCode(code)`** — look up a registered message template without the full CLI pipeline (for HTTP/gRPC boundaries)
+- **`LogError(err, logger)`** — structured `log/slog` logging with family/code/retryable/context fields
+- **`errorfamilytest`** — test assertion helpers (`AssertFamily`, `AssertCode`, `AssertRetryable`, `AssertContext`)
 - **`HandleError(err)`** — CLI boundary handler with structured messages (What / Why / Fix / WayOut)
 - **Diagnostic rules** — deterministic checks (PostgreSQL, filesystem, network, git) that auto-discover why an error occurred and emit structured `Fix{Summary, Command}`
 - **AI debug agent** — root cause analysis and `FixStep` suggestions from diagnostic context
@@ -132,7 +139,7 @@ err := errorfamily.Newf(errorfamily.Rejection, "file.not_found", "missing: %s", 
 err := errors.Join(err1, err2, err3)
 ```
 
-Family-specific constructors: `NewRejection`, `NewConflict`, `NewTransient`, `NewCorruption`, `NewInfrastructure`. Wrap variants: `WrapRejection`, `WrapConflict`, `WrapTransient`, `WrapCorruption`, `WrapInfrastructure`.
+Family-specific constructors: `NewRejection`, `NewConflict`, `NewTransient`, `NewCorruption`, `NewInfrastructure`. Wrap variants: `WrapRejection`, `WrapConflict`, `WrapTransient`, `WrapCorruption`, `WrapInfrastructure`. Formatted wrap variants: `WrapRejectionf`, `WrapConflictf`, `WrapTransientf`, `WrapCorruptionf`, `WrapInfrastructuref`.
 
 ## Classification
 
@@ -154,15 +161,31 @@ family := errorfamily.ParseFamily("transient") // defaults to Transient for unkn
 
 Classification precedence — first match wins:
 
-1. **Multi-error** (`errors.Join`) → classify each sub-error, first non-Transient wins
+1. **Multi-error** (`errors.Join`) → classify each sub-error, worst severity wins
 2. `Classified` interface → `ErrorFamily()`
 3. `Retryable` interface → infer Transient (true) or Rejection (false)
 4. Registered sentinels via `errors.Is` chain walk
-5. Default → Transient (fail-open for retry)
+5. Registered classifiers (`RegisterClassifier`) — predicate-based, for dynamic errors
+6. Default → Transient (fail-open for retry)
 
 ## Registering Third-Party Errors
 
-For errors you don't own (stdlib, libraries):
+### Decision tree: which classification mechanism?
+
+```
+Do you OWN the error type?
+├── YES → Implement the Classified interface (ErrorFamily()) on your type.
+├         (Or use NewRejection/NewConflict/.../WrapRejection/... constructors.)
+└── NO  → Is it a SENTINEL (a single, stable value compared by errors.Is)?
+          ├── YES → RegisterClassification(sentinel, family)
+          └── NO  → Is it a DYNAMIC type (new instance per error, e.g. *sqlite.Error)?
+                    ├── YES → RegisterClassifier(func(error) (Family, bool))
+                    └── NO  → Let Classify default to Transient (fail-open for retry)
+```
+
+### Sentinels (stable values)
+
+For errors you don't own that are stable sentinel values (stdlib, libraries):
 
 ```go
 func init() {
@@ -176,6 +199,31 @@ func init() {
     })
 }
 ```
+
+### Classifiers (dynamic errors)
+
+Some third-party errors are **dynamic** — each occurrence is a fresh instance
+(e.g. `*sqlite.Error`, `*pgconn.PgError`), so they can't be matched by
+`errors.Is` identity. Register a predicate-based classifier instead:
+
+```go
+func init() {
+    errorfamily.RegisterClassifier(func(err error) (errorfamily.Family, bool) {
+        var sqliteErr *sqlite.Error
+        if errors.As(err, &sqliteErr) {
+            switch sqliteErr.Code() {
+            case 5, 6: return errorfamily.Transient, true // BUSY, LOCKED
+            case 19:   return errorfamily.Conflict, true  // CONSTRAINT
+            }
+        }
+        return errorfamily.Transient, false
+    })
+}
+```
+
+Classifiers run only after sentinels miss, in registration order; the first
+returning `ok=true` wins. For test isolation, construct a `NewRegistry()` and
+call its `RegisterClassifier` method instead of polluting `DefaultRegistry`.
 
 ## Implementing Your Own Error Type
 
@@ -278,6 +326,70 @@ errorfamily.RegisterTemplate("db.timeout", errorfamily.MessageTemplate{
     Why:  "The database server did not respond within the deadline.",
     Fix:  "Check database health and network connectivity.",
 })
+```
+
+## HTTP Boundary
+
+`HTTPStatus(err)` maps any error to its status code. `HTTPHandler` wraps an
+error-returning handler and writes a **safe** JSON response (no internal leakage):
+
+```go
+func createOrder(w http.ResponseWriter, r *http.Request) error {
+    order, err := parseOrder(r)
+    if err != nil {
+        return errorfamily.WrapRejectionf(err, "order.parse", "invalid field %s", field)
+    }
+    if err := repo.Save(order); err != nil {
+        return errorfamily.WrapConflict(err, "order.duplicate", "order already exists")
+    }
+    json.NewEncoder(w).Encode(order)
+    return nil
+}
+
+mux.Handle("/api/orders", errorfamily.HTTPHandler(createOrder))
+// Rejection → 400, Conflict → 409, Transient → 503, ...
+```
+
+The response body contains only `family`, `code`, and a user-facing `message`
+(from a registered template) — never the raw `err.Error()`:
+
+```json
+{ "family": "conflict", "code": "order.duplicate", "message": "A conflict was detected." }
+```
+
+For a custom response shape, write your own response and use `HTTPStatus(err)`
+directly.
+
+## Structured Logging
+
+`LogError` logs classified fields (`family`, `code`, `retryable`, and each
+context key prefixed with `context.`) at Warn for Transient errors and Error
+for everything else:
+
+```go
+if err := run(); err != nil {
+    errorfamily.LogError(err, slog.Default())
+    // → level=WARN msg="db timeout" family=transient code=db.timeout retryable=true
+}
+```
+
+`LogErrorContext(ctx, err, logger)` propagates a context for trace correlation.
+
+## Test Helpers
+
+The `errorfamilytest` subpackage mirrors `net/http/httptest` — it keeps
+`testing` out of the production package:
+
+```go
+import "github.com/larsartmann/go-error-family/errorfamilytest"
+
+func TestHandler(t *testing.T) {
+    err := handler(req)
+    errorfamilytest.AssertFamily(t, err, errorfamily.Rejection)
+    errorfamilytest.AssertCode(t, err, "user.not_found")
+    errorfamilytest.AssertRetryable(t, err, false)
+    errorfamilytest.AssertContext(t, err, "user_id", "42")
+}
 ```
 
 ## Diagnostic Rules
@@ -399,9 +511,12 @@ go-error-family/
 ├── family.go               — Family enum + data-driven familyData
 ├── interfaces.go           — Coded, Classified, Contextual, Retryable (each embeds error)
 ├── error.go                — Reference Error struct (Is, Unwrap, Format, WithContext, accessors)
-├── classify.go             — Classify, IsRetryable, ExitCode, RegisterClassification(s)
-├── constructors.go         — New, Wrap, Newf, Wrapf + family-specific shortcuts
-├── handle.go               — HandleError, HandleErrorWithContext, template system
+├── classify.go             — Classify, Code, IsRetryable, ExitCode, Classifier, RegisterClassifier(s)
+├── constructors.go         — New, Wrap, Newf, Wrapf + family-specific shortcuts (incl. Wrap{Family}f)
+├── handle.go               — HandleError, HandleErrorWithContext, template system, TemplateForCode
+├── http.go                 — HTTPStatus, HTTPHandler (classify→status-code net/http middleware)
+├── log.go                  — LogError, LogErrorContext (structured slog logging)
+├── errorfamilytest/        — test assertion helpers (AssertFamily, AssertCode, ...)
 ├── diagnose/
 │   ├── diagnose.go         — Runner, DiagnosticRule, RuleSpec, CommandRunner, ContextKey
 │   ├── context.go          — RunCommand, CommandExists (exported for rule authors)

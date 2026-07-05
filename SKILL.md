@@ -16,10 +16,13 @@ errorfamily/          ← root module: types, constructors, classification, CLI 
   error.go              Error struct (reference implementation)
   family.go             Family enum + Audience/Tone metadata
   interfaces.go         Coded, Classified, Contextual, Retryable
-  constructors.go       New/Wrap + family shortcuts
-  classify.go           Classify(), IsRetryable, ExitCode, RegisterClassification(s)
-  registry.go           Registry type (injectable sentinels + templates), DefaultRegistry, NewRegistry()
+  constructors.go       New/Wrap + family shortcuts (incl. Wrap{Family}f formatted variants)
+  classify.go           Classify(), Code(), IsRetryable, ExitCode, Classifier, RegisterClassification(s), RegisterClassifier(s)
+  registry.go           Registry type (injectable sentinels + classifiers + templates), DefaultRegistry, NewRegistry(), TemplateForCode()
   handle.go             HandleError(), HandleErrorWithContext(), HandleErrorDetailed(), template system
+  http.go               HTTPStatus(), HTTPHandler() — classify→status-code net/http middleware
+  log.go                LogError(), LogErrorContext() — structured slog logging
+  errorfamilytest/      test assertion helpers (AssertFamily, AssertCode, ...) — mirrors httptest
 
 diagnose/             ← OWN MODULE (v0.x experimental): concurrent diagnostic rules
   go.mod                independent module (depends on root)
@@ -164,23 +167,38 @@ errorfamily.Newf(family, code, format, args...) *Error
 errorfamily.Wrap(err, family, code, message) *Error    // nil-safe: returns nil if err is nil
 errorfamily.Wrapf(err, family, code, format, args...) *Error
 
-// Family shortcuts (New + Wrap for each)
+// Family shortcuts (New + Wrap + formatted Wrap for each)
 NewRejection / NewConflict / NewTransient / NewCorruption / NewInfrastructure
 WrapRejection / WrapConflict / WrapTransient / WrapCorruption / WrapInfrastructure
+WrapRejectionf / WrapConflictf / WrapTransientf / WrapCorruptionf / WrapInfrastructuref  // printf-style
 ```
 
 ### Classification
 
 ```go
 family := errorfamily.Classify(err)     // always returns a Family (never panics)
+code := errorfamily.Code(err)           // extract code from any error in the chain ("" if none)
 retryable := errorfamily.IsRetryable(err)
 exitCode := errorfamily.ExitCode(err)
+httpStatus := errorfamily.HTTPStatus(err)  // classify → status code
 
 family := errorfamily.ParseFamily("transient")  // parse from string (case-insensitive, defaults to Transient if unrecognized)
 
-// Register third-party sentinels (call from init())
+// Register third-party sentinels (call from init()) — for stable error VALUES
 errorfamily.RegisterClassification(sql.ErrConnDone, errorfamily.Transient)
 errorfamily.RegisterClassifications(map[error]errorfamily.Family{...})
+
+// Register a classifier (call from init()) — for DYNAMIC errors (new instance each time)
+errorfamily.RegisterClassifier(func(err error) (errorfamily.Family, bool) {
+    var sq *sqlite.Error
+    if errors.As(err, &sq) {
+        switch sq.Code() {
+        case 5, 6: return errorfamily.Transient, true // BUSY, LOCKED
+        case 19:   return errorfamily.Conflict, true  // CONSTRAINT
+        }
+    }
+    return errorfamily.Transient, false
+})
 
 // Combine errors for partial-success patterns — use stdlib errors.Join
 combined := errors.Join(err1, err2)  // Classify picks the worst Family automatically
@@ -188,11 +206,12 @@ combined := errors.Join(err1, err2)  // Classify picks the worst Family automati
 
 **Classification precedence** (first match wins):
 
-1. **Multi-error** (`errors.Join`) → classify each sub-error, first non-Transient wins
+1. **Multi-error** (`errors.Join`) → classify each sub-error, worst severity wins
 2. `Classified` interface → `ErrorFamily()`
 3. `Retryable` interface → infer `Transient` (true) or `Rejection` (false)
-4. Registered sentinels via `errors.Is` chain walk (RLock-protected iteration)
-5. Default → `Transient` (fail-open)
+4. Registered sentinels via `errors.Is` chain walk (lock-free, atomic.Pointer)
+5. Registered classifiers (`RegisterClassifier`) — predicate funcs for dynamic errors
+6. Default → `Transient` (fail-open)
 
 ### Injectable Registry (test isolation, scoped handling)
 
@@ -240,6 +259,40 @@ result := errorfamily.HandleErrorDetailed(err)
 
 // Template-aware structured result
 result := errorfamily.HandleErrorDetailedWithConfig(err, cfg)
+```
+
+### HTTP Middleware (net/http)
+
+```go
+// Thin helper: classify → status code
+w.WriteHeader(errorfamily.HTTPStatus(err))  // Rejection→400, Conflict→409, Transient→503, ...
+
+// Ready-made middleware: wrap an error-returning handler, write safe JSON
+mux.Handle("/api/orders", errorfamily.HTTPHandler(func(w http.ResponseWriter, r *http.Request) error {
+    if err := createOrder(r); err != nil {
+        return errorfamily.WrapConflict(err, "order.duplicate", "already exists")
+    }
+    return nil
+}))
+```
+
+`HTTPHandler` writes `{"family","code","message"}` where `message` comes only from a
+registered `MessageTemplate` — it NEVER includes the raw `err.Error()` (no internal leak).
+
+### Look Up a Template Without the CLI Pipeline
+
+```go
+tmpl, ok := errorfamily.TemplateForCode("db.timeout")  // registry → built-in defaults
+// tmpl.What / Why / Fix / WayOut
+```
+
+### Structured Logging (log/slog)
+
+```go
+errorfamily.LogError(err, slog.Default())
+// Transient → WARN; all others → ERROR
+// attrs: family, code, retryable, context.<key>...
+errorfamily.LogErrorContext(ctx, err, logger)  // propagates context
 ```
 
 ### Configurable Handler
@@ -478,6 +531,18 @@ go test -cover ./...                             # with coverage
 go test -coverprofile=cover.out ./... && go tool cover -func=cover.out  # detailed coverage
 go test -run TestName ./...                      # specific test
 go test -bench=. -run=^$ ./...                    # benchmarks only
+```
+
+**Test assertion helpers** — import the `errorfamilytest` subpackage (mirrors `net/http/httptest`, keeps `testing` out of production code):
+
+```go
+import "github.com/larsartmann/go-error-family/errorfamilytest"
+
+errorfamilytest.AssertFamily(t, err, errorfamily.Rejection)
+errorfamilytest.AssertCode(t, err, "user.not_found")
+errorfamilytest.AssertRetryable(t, err, false)
+errorfamilytest.AssertContext(t, err, "user_id", "42")
+errorfamilytest.AssertContextMissing(t, sentinelErr, "field")
 ```
 
 Test files and scope:

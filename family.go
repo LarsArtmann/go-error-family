@@ -191,6 +191,28 @@ func (f Family) ExitCode() int {
 //	Corruption → 500, Infrastructure → 503.
 //
 // Invalid families return 500 (Internal Server Error).
+//
+// # Rationale
+//
+// The mapping reflects "whose fault is it, and what can the client do?":
+//
+//   - Rejection → 400 (Bad Request): the client sent bad input, lacked
+//     authorization, or asked for a missing resource. The client can fix this.
+//   - Conflict → 409 (Conflict): the request conflicts with current state
+//     (duplicate, version mismatch). The client must refresh and reconcile.
+//   - Transient → 503 (Service Unavailable): a temporary, retryable failure.
+//     The client SHOULD retry, ideally with backoff.
+//   - Corruption → 500 (Internal Server Error): stored data is damaged — a
+//     data-integrity break that is the server's problem, not the client's.
+//     The client did nothing wrong and cannot fix it by retrying. (Earlier
+//     revisions mapped this to 422; 500 is correct because 422 implies the
+//     CLIENT submitted unprocessable data, which is not the case here.)
+//   - Infrastructure → 503 (Service Unavailable): the system cannot serve the
+//     request right now (closed, misconfigured, starting up). Retryable in
+//     principle, though possibly requiring operator action.
+//
+// Corruption and Infrastructure are distinguished by severity and audience
+// (see [Family.Severity] and [Family.DefaultAudience]), not by HTTP status.
 func (f Family) HTTPStatus() int {
 	if f.IsValid() {
 		return familyData[f].HTTP

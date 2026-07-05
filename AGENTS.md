@@ -2,8 +2,8 @@
 
 Structured error protocol library. Library only — no `main`, no build system, no external deps. Full API reference: `SKILL.md`.
 
-**Last Updated:** 2026-06-22
-**Version:** v0.5.0
+**Last Updated:** 2026-07-05
+**Version:** v0.5.1 (unreleased: consumer-feedback-driven API additions)
 **Status:** All tests pass (root + bridge + submodules), 0 lint issues, 0 race conditions
 **Workspace modules:** root (zero-dep), `agent`, `bridge` (oops integration), `diagnose`, `diagnose/git`, `diagnose/postgres`
 
@@ -51,6 +51,18 @@ The classification protocol is the **four interfaces** (`Coded`/`Classified`/`Co
 
 **Stdlib taxonomy** (`stdlib.go`): `RegisterStdlibDefaults(reg)` — maps context/sql/os errors with documented rationale for ambiguous cases (DeadlineExceeded→Transient, Canceled→Rejection, etc.).
 
+## Consumer-Feedback APIs (added 2026-07-05)
+
+Driven by SEC and browser-history integration feedback. All use stdlib only (`net/http`, `log/slog`, `testing`); the root stays zero-dep.
+
+- **`Code(err) string`** (`classify.go`) — public code extraction (wraps `errors.AsType[Coded]`). `handle.go`'s `extractCode` delegates to it.
+- **`RegisterClassifier` / `RegisterClassifiers`** (`classify.go` + `Registry.RegisterClassifier` in `registry.go`) — predicate-based classification for dynamic errors (`*sqlite.Error`). Stored in `Registry.classifiers atomic.Pointer[[]Classifier]`, copy-on-write, lock-free reads. `Registry.Clone()` copies them. No `UnregisterClassifier` exists (Go funcs aren't comparable) — use a custom `Registry` for isolation.
+- **`TemplateForCode(code) (MessageTemplate, bool)`** (`registry.go` + package-level in `handle.go`) — registry-then-builtin template lookup, for HTTP/gRPC consumers.
+- **`Wrap{Family}f`** (`constructors.go`) — `WrapRejectionf`, `WrapConflictf`, `WrapTransientf`, `WrapCorruptionf`, `WrapInfrastructuref`. Nil-safe.
+- **`HTTPStatus(err)` / `HTTPHandler(fn)`** (`http.go`) — net/http middleware. **`HTTPHandler` NEVER leaks `err.Error()`** — the response message comes only from a registered `MessageTemplate`; otherwise just family+code. This is deliberate (consumers value no internal leakage).
+- **`LogError(err, *slog.Logger)` / `LogErrorContext`** (`log.go`) — Transient→Warn, others→Error; nil error is no-op; nil logger→`slog.Default`. Logs `family`, `code`, `retryable`, and `context.<key>` attrs.
+- **`errorfamilytest`** subpackage — `AssertFamily`/`AssertCode`/`AssertRetryable`/`AssertContext`/`AssertContextMissing`. Mirrors `httptest`: keeps `testing` out of the production package.
+
 ## Classification Precedence
 
 `Classify(err)` checks in order — first match wins:
@@ -59,9 +71,10 @@ The classification protocol is the **four interfaces** (`Coded`/`Classified`/`Co
 2. `Classified` interface → `ErrorFamily()`
 3. `Retryable` interface → infer `Transient` (true) or `Rejection` (false)
 4. Registered sentinels via `errors.Is` chain walk (atomic.Pointer to immutable map — lock-free, allocation-free iteration)
-5. Default → `Transient`
+5. Registered classifiers (`RegisterClassifier`) — predicate funcs for dynamic errors (e.g. `*sqlite.Error`); stored lock-free behind `atomic.Pointer[[]Classifier]`, copy-on-write; run in registration order, first `ok=true` wins
+6. Default → `Transient`
 
-This means a type implementing both `Classified` and `Retryable` will use `Classified` and ignore `Retryable`. Registering a sentinel for an error that already implements `Classified` has no effect.
+This means a type implementing both `Classified` and `Retryable` will use `Classified` and ignore `Retryable`. Registering a sentinel for an error that already implements `Classified` has no effect. Classifiers only run when all earlier steps miss, so the hot path is unaffected.
 
 **Multi-error behavior:** For `errors.Join(err1, err2, ...)`, each sub-error is classified recursively and the result is the **highest-severity** sub-error (`Family.Severity()` total order: Transient(1) < Rejection(2) < Conflict(3) < Infrastructure(4) < Corruption(5)). This is deterministic regardless of join argument order and remains fail-closed: if any sub-error is non-Transient (severity > 1), the joined result is non-Transient.
 
@@ -92,18 +105,19 @@ Not a library type — partial success is a consumption pattern, not a classific
 
 ## Test Coverage
 
-**Updated:** 2026-06-22
+**Updated:** 2026-07-05
 
 | Package              | Coverage |
 | -------------------- | -------- |
-| root (`errorfamily`) | 97.7%    |
+| root (`errorfamily`) | 97.1%    |
+| `errorfamilytest`    | 66.7%    |
 | `agent`              | 100.0%   |
 | `bridge`             | 94.1%    |
 | `diagnose` (core)    | 83.9%    |
 | `diagnose/git`       | 98.5%    |
 | `diagnose/postgres`  | 80.3%    |
 
-All packages at 80%+; root and `diagnose/git` near-complete.
+All packages at 80%+; root and `diagnose/git` near-complete. (`errorfamilytest` is intentionally thin — assertion helpers delegating to the main package.)
 
 ## Fuzz Tests
 

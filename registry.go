@@ -29,9 +29,10 @@ type sentinelMap map[error]Family
 // hot read path (every Classify) is lock-free and allocation-free, while rare
 // writes serialize under the write lock and publish a new snapshot via copy-on-write.
 type Registry struct {
-	mu        sync.RWMutex // serializes writers (templates direct + sentinels copy-on-write)
-	sentinels atomic.Pointer[sentinelMap]
-	templates map[string]MessageTemplate
+	mu          sync.RWMutex // serializes writers (templates direct + sentinels/classifiers copy-on-write)
+	sentinels   atomic.Pointer[sentinelMap]
+	classifiers atomic.Pointer[[]Classifier]
+	templates   map[string]MessageTemplate
 }
 
 // NewRegistry creates an empty Registry ready for use.
@@ -41,6 +42,8 @@ func NewRegistry() *Registry {
 	}
 	empty := make(sentinelMap)
 	r.sentinels.Store(&empty)
+	emptyC := make([]Classifier, 0)
+	r.classifiers.Store(&emptyC)
 	return r
 }
 
@@ -58,7 +61,8 @@ var DefaultRegistry = NewRegistry()
 //  2. Classified interface — the error itself declares its family
 //  3. Retryable interface — infer from retryability
 //  4. Registered sentinels in this registry
-//  5. Default — Transient (fail-open for retry)
+//  5. Registered classifiers (predicate-based, for dynamic third-party errors)
+//  6. Default — Transient (fail-open for retry)
 //
 // Returns Rejection for nil errors.
 func (r *Registry) Classify(err error) Family {
@@ -98,7 +102,12 @@ func (r *Registry) Classify(err error) Family {
 		return family
 	}
 
-	// 5. Default: Transient (fail-open so unknown errors get retried).
+	// 5. Run registered classifiers (for dynamic third-party errors).
+	if family, ok := r.runClassifiers(err); ok {
+		return family
+	}
+
+	// 6. Default: Transient (fail-open so unknown errors get retried).
 	return Transient
 }
 
@@ -131,6 +140,58 @@ func (r *Registry) RegisterClassifications(classifications map[error]Family) {
 	r.mu.Lock()
 	defer r.mu.Unlock()
 	r.swapSentinels(func(m sentinelMap) { maps.Copy(m, classifications) })
+}
+
+// RegisterClassifier adds a predicate-based [Classifier] for dynamic third-party
+// errors that cannot be registered as sentinels (e.g. *sqlite.Error).
+// Thread-safe. Classifiers run after sentinel matching fails, in registration
+// order; the first returning ok=true wins.
+//
+// Because Go func values are not comparable, individual classifiers cannot be
+// unregistered. For test isolation or scoped handling, construct a [NewRegistry]
+// rather than polluting [DefaultRegistry].
+func (r *Registry) RegisterClassifier(c Classifier) {
+	r.mu.Lock()
+	defer r.mu.Unlock()
+	r.swapClassifiers(func(cs []Classifier) []Classifier { return append(cs, c) })
+}
+
+// RegisterClassifiers adds multiple predicate-based [Classifier] funcs at once.
+// Thread-safe. Classifiers run in registration order.
+func (r *Registry) RegisterClassifiers(cs ...Classifier) {
+	r.mu.Lock()
+	defer r.mu.Unlock()
+	r.swapClassifiers(func(existing []Classifier) []Classifier { return append(existing, cs...) })
+}
+
+// swapClassifiers performs copy-on-write on the immutable classifier slice:
+// clones the current snapshot, applies fn, and atomically publishes the result.
+// Callers must hold r.mu (write lock) so concurrent writers never lose updates;
+// readers remain fully lock-free.
+func (r *Registry) swapClassifiers(fn func(cs []Classifier) []Classifier) {
+	old := r.classifiers.Load()
+	var newList []Classifier
+	if old != nil {
+		newList = make([]Classifier, len(*old), len(*old)+1)
+		copy(newList, *old)
+	}
+	newList = fn(newList)
+	r.classifiers.Store(&newList)
+}
+
+// runClassifiers loads the immutable classifier snapshot once (lock-free) and
+// runs each classifier in registration order; the first ok=true wins.
+func (r *Registry) runClassifiers(err error) (Family, bool) {
+	cs := r.classifiers.Load()
+	if cs == nil {
+		return Rejection, false
+	}
+	for _, c := range *cs {
+		if family, ok := c(err); ok {
+			return family, true
+		}
+	}
+	return Rejection, false
 }
 
 // swapSentinels performs copy-on-write: clones the current immutable sentinel
@@ -189,6 +250,13 @@ func (r *Registry) Clone() *Registry {
 		clone.sentinels.Store(&copied)
 	}
 
+	// Copy classifiers from the current immutable snapshot (lock-free read).
+	if cur := r.classifiers.Load(); cur != nil {
+		copied := make([]Classifier, len(*cur))
+		copy(copied, *cur)
+		clone.classifiers.Store(&copied)
+	}
+
 	// Copy templates under the read lock.
 	r.mu.RLock()
 	maps.Copy(clone.templates, r.templates)
@@ -220,4 +288,21 @@ func (r *Registry) lookupTemplate(code string) (MessageTemplate, bool) {
 	defer r.mu.RUnlock()
 	tmpl, ok := r.templates[strings.ToLower(code)]
 	return tmpl, ok
+}
+
+// TemplateForCode resolves a [MessageTemplate] for an error code using this
+// registry, checking registered templates first, then built-in defaults.
+// Returns (zero, false) when no template exists for the code.
+//
+// This is the public counterpart to the internal resolution used by
+// [HandleError]: it lets HTTP/REST consumers look up a registered template
+// without reimplementing the lookup or wiring the full CLI pipeline.
+func (r *Registry) TemplateForCode(code string) (MessageTemplate, bool) {
+	if tmpl, ok := r.lookupTemplate(code); ok {
+		return tmpl, true
+	}
+	if tmpl, ok := lookupDefault(code); ok {
+		return tmpl, true
+	}
+	return MessageTemplate{}, false
 }

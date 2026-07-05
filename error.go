@@ -50,6 +50,11 @@ func (e *Error) Is(target error) bool {
 }
 
 // ErrorCode returns the machine-readable error code.
+//
+// This is the canonical accessor: it satisfies the [Coded] interface, which is
+// the public contract for code extraction (used by [Code], [HandleError],
+// metrics, and log fields). Prefer this over [Error.Code] when you need the
+// interface behavior. See [Error.Code] for the difference.
 func (e *Error) ErrorCode() string { return e.code }
 
 // ErrorFamily returns the behavioral classification.
@@ -74,7 +79,13 @@ func (e *Error) Timestamp() time.Time { return e.timestamp }
 func (e *Error) Family() Family { return e.family }
 
 // Code returns the machine-readable error code.
-// Convenience accessor for direct use without interface assertion.
+//
+// This is a direct accessor — a convenience sibling of [Error.Family] and
+// [Error.Message] for use when you already hold a concrete *Error and want the
+// field without an interface assertion. It returns the SAME value as
+// [Error.ErrorCode]; the two exist because ErrorCode is the [Coded] interface
+// contract (used via errors.AsType / [Code](err)), while Code is the ergonomic
+// accessor on the concrete type. Neither is deprecated.
 func (e *Error) Code() string { return e.code }
 
 // Message returns the human-readable technical message.

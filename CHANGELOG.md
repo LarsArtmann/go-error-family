@@ -4,6 +4,28 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
+## [Unreleased]
+
+Driven by consumer feedback from SEC and browser-history integrations. The root
+package remains zero-dependency (all new features use only the Go standard
+library: `net/http`, `log/slog`, `testing`).
+
+### Added
+
+- **`RegisterClassifier(func(error) (Family, bool))`** (`classify.go`/`registry.go`) — predicate-based classification for dynamic third-party errors (e.g. `*sqlite.Error`, `*pgconn.PgError`) that cannot be registered as sentinels because each occurrence is a fresh instance. Classifiers run after sentinel matching fails, in registration order; first match wins. Stored lock-free behind an `atomic.Pointer` (copy-on-write), mirroring the sentinel design. Includes package-level `RegisterClassifier`/`RegisterClassifiers` and `Registry.RegisterClassifier`/`RegisterClassifiers`; `Registry.Clone()` now copies classifiers too.
+- **`Code(err) string`** (`classify.go`) — public one-liner for extracting a machine-readable error code from any error (walks the unwrap chain for the `Coded` interface). Replaces the 5-line `errors.As` boilerplate. `HandleError`'s internal `extractCode` now delegates to it.
+- **`TemplateForCode(code) (MessageTemplate, bool)`** (`registry.go`/`handle.go`) — resolves a registered message template by code without wiring the full CLI pipeline. Lets HTTP/gRPC consumers look up user-facing messages directly. Available as both a `Registry` method and a package-level convenience function.
+- **`Wrap{Family}f` formatted variants** (`constructors.go`) — `WrapRejectionf`, `WrapConflictf`, `WrapTransientf`, `WrapCorruptionf`, `WrapInfrastructuref`, completing the symmetry with `Newf`/`Wrapf`. All are nil-safe.
+- **`HTTPStatus(err) int`** and **`HTTPHandler(fn) http.Handler`** (`http.go`) — classify→status-code helper and a ready-made net/http middleware. `HTTPHandler` wraps an error-returning handler and writes a **safe** JSON response (family/code/message) — it never leaks the raw `err.Error()`; the message comes from a registered `MessageTemplate` when available.
+- **`LogError(err, *slog.Logger)`** and **`LogErrorContext(ctx, err, logger)`** (`log.go`) — structured `log/slog` logging with `family`, `code`, `retryable`, and each context key (prefixed `context.`). Transient errors log at Warn; all others at Error. Nil error is a no-op; nil logger falls back to `slog.Default`.
+- **`errorfamilytest` subpackage** — test assertion helpers (`AssertFamily`, `AssertCode`, `AssertRetryable`, `AssertContext`, `AssertContextMissing`) mirroring `net/http/httptest`, keeping the `testing` import out of the production package.
+
+### Changed
+
+- **Classification pipeline** now has six steps (was five): registered classifiers run as step 5, before the Transient default. This is additive — errors that already declare a family (via `Classified`) bypass classifiers entirely, so the hot path is unaffected. Doc comments on `Classify` (both package-level and `Registry` method) updated.
+- **`HTTPStatus` doc** now documents the rationale for each family→status mapping (notably why Corruption→500 rather than 422: a data-integrity break is the server's problem, not the client's).
+- **`Code()` vs `ErrorCode()` clarified**: doc comments now explain that `ErrorCode()` is the canonical `Coded` interface contract while `Code()` is an ergonomic accessor on `*Error` (sibling of `Family()`/`Message()`); both are intentional, neither is deprecated.
+
 ## [0.5.0] - 2026-06-22
 
 First release since `v0.4.0`. Consolidates the copy-on-write error refactor, module extraction, severity-ordered multi-error classification, lock-free sentinel lookup, structured diagnostic fixes, new family adapters, and the bridge `%s` format fix.

@@ -192,10 +192,7 @@ func HandleErrorDetailedWithConfig(err error, cfg HandleConfig) *HandleResult {
 }
 
 func extractCode(err error) string {
-	if coded, ok := errors.AsType[Coded](err); ok {
-		return coded.ErrorCode()
-	}
-	return ""
+	return Code(err)
 }
 
 func extractContext(err error) map[string]string {
@@ -365,4 +362,14 @@ func RegisterTemplate(code string, tmpl MessageTemplate) {
 // Thread-safe. No-op if the code has no registered template.
 func UnregisterTemplate(code string) {
 	DefaultRegistry.UnregisterTemplate(code)
+}
+
+// TemplateForCode resolves a [MessageTemplate] for an error code, checking
+// registered templates on [DefaultRegistry] first, then built-in defaults.
+// Returns (zero, false) when no template exists for the code.
+//
+// Delegates to [DefaultRegistry]. For scoped lookups, use
+// [Registry.TemplateForCode] on a custom Registry.
+func TemplateForCode(code string) (MessageTemplate, bool) {
+	return DefaultRegistry.TemplateForCode(code)
 }

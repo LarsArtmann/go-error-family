@@ -254,6 +254,54 @@ func TestWrapf(t *testing.T) {
 	}
 }
 
+func TestWrapFamilyFormattedVariants(t *testing.T) {
+	cause := errors.New("root")
+
+	tests := []struct {
+		name    string
+		err     *Error
+		family  Family
+		message string
+	}{
+		{
+			"WrapRejectionf",
+			WrapRejectionf(cause, "r", "field %s empty", "url"),
+			Rejection,
+			"field url empty",
+		},
+		{"WrapConflictf", WrapConflictf(cause, "c", "v%d vs v%d", 1, 2), Conflict, "v1 vs v2"},
+		{"WrapTransientf", WrapTransientf(cause, "t", "retry in %ds", 5), Transient, "retry in 5s"},
+		{"WrapCorruptionf", WrapCorruptionf(cause, "cr", "bad %s", "json"), Corruption, "bad json"},
+		{
+			"WrapInfrastructuref",
+			WrapInfrastructuref(cause, "i", "no %s", "db"),
+			Infrastructure,
+			"no db",
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			assertFamily(t, tt.err, tt.family)
+			if tt.err.Message() != tt.message {
+				t.Errorf("%s message = %q, want %q", tt.name, tt.err.Message(), tt.message)
+			}
+			if !errors.Is(tt.err.Unwrap(), cause) {
+				t.Error("should wrap cause")
+			}
+		})
+	}
+}
+
+func TestWrapFamilyFormattedNil(t *testing.T) {
+	// All formatted family wrappers must be nil-safe, matching Wrap(nil, ...).
+	if e := WrapRejectionf(nil, "r", "msg"); e != nil {
+		t.Error("WrapRejectionf(nil, ...) should return nil")
+	}
+	if e := WrapTransientf(nil, "t", "msg"); e != nil {
+		t.Error("WrapTransientf(nil, ...) should return nil")
+	}
+}
+
 func TestErrorTimestamp(t *testing.T) {
 	before := time.Now().UTC()
 	err := NewRejection("test", "msg")

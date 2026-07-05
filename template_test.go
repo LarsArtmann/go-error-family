@@ -74,6 +74,52 @@ func TestRegisterTemplateCaseInsensitive(t *testing.T) {
 	}
 }
 
+func TestTemplateForCode(t *testing.T) {
+	// Built-in default lookup.
+	tmpl, ok := TemplateForCode("file.not_found")
+	if !ok {
+		t.Fatal("expected built-in template for file.not_found")
+	}
+	if tmpl.What == "" {
+		t.Error("built-in template should have a non-empty What")
+	}
+
+	// Case-insensitive lookup of built-ins.
+	if _, ok := TemplateForCode("FILE.NOT_FOUND"); !ok {
+		t.Error("built-in lookup should be case-insensitive")
+	}
+
+	// Registered template overrides built-in.
+	RegisterTemplate("file.not_found", MessageTemplate{What: "overridden"})
+	t.Cleanup(func() { UnregisterTemplate("file.not_found") })
+
+	tmpl, ok = TemplateForCode("file.not_found")
+	if !ok || tmpl.What != "overridden" {
+		t.Errorf("registered override = %+v, ok=%v", tmpl, ok)
+	}
+
+	// Unknown code returns false.
+	if _, ok := TemplateForCode("does.not.exist"); ok {
+		t.Error("unknown code should return false")
+	}
+}
+
+func TestRegistryTemplateForCode(t *testing.T) {
+	reg := NewRegistry()
+	if _, ok := reg.TemplateForCode("no.such.code"); ok {
+		t.Error("empty registry should not find unknown code")
+	}
+	reg.RegisterTemplate("custom.code", MessageTemplate{What: "scoped"})
+	tmpl, ok := reg.TemplateForCode("custom.code")
+	if !ok || tmpl.What != "scoped" {
+		t.Errorf("registry lookup = %+v, ok=%v", tmpl, ok)
+	}
+	// Registry also falls back to built-in defaults.
+	if _, ok := reg.TemplateForCode("db.timeout"); !ok {
+		t.Error("registry should fall back to built-in defaults")
+	}
+}
+
 func TestDefaultMessagesTable(t *testing.T) {
 	tests := []struct {
 		code     string

@@ -261,3 +261,174 @@ func TestRegistryRegisterTemplatesBatch(t *testing.T) {
 		t.Errorf("batch template code.two (case-insensitive) missing: %+v ok=%v", two, ok)
 	}
 }
+
+// fakeSQLiteError mimics a dynamic third-party error type (like *sqlite.Error)
+// where each instance is distinct — impossible to register as a sentinel.
+type fakeSQLiteError struct{ code int }
+
+func (e *fakeSQLiteError) Error() string { return fmt.Sprintf("sqlite: code %d", e.code) }
+
+func TestRegistryRegisterClassifierDynamic(t *testing.T) {
+	reg := NewRegistry()
+	reg.RegisterClassifier(func(err error) (Family, bool) {
+		var sq *fakeSQLiteError
+		if errors.As(err, &sq) {
+			switch sq.code {
+			case 5, 6:
+				return Transient, true // BUSY, LOCKED
+			case 19:
+				return Conflict, true // CONSTRAINT
+			}
+		}
+		return Transient, false
+	})
+
+	// Dynamic errors are classified by the predicate, not sentinel identity.
+	if got := reg.Classify(&fakeSQLiteError{code: 5}); got != Transient {
+		t.Errorf("locked = %v, want Transient", got)
+	}
+	if got := reg.Classify(&fakeSQLiteError{code: 19}); got != Conflict {
+		t.Errorf("constraint = %v, want Conflict", got)
+	}
+	// Unmatched code → predicate returns false → default Transient.
+	if got := reg.Classify(&fakeSQLiteError{code: 999}); got != Transient {
+		t.Errorf("unknown code = %v, want Transient (default)", got)
+	}
+}
+
+func TestRegisterClassifiersBatch(t *testing.T) {
+	reg := NewRegistry()
+	reg.RegisterClassifiers(
+		func(err error) (Family, bool) {
+			if err.Error() == "conflict-ish" {
+				return Conflict, true
+			}
+			return Transient, false
+		},
+		func(err error) (Family, bool) {
+			if err.Error() == "reject-me" {
+				return Rejection, true
+			}
+			return Transient, false
+		},
+	)
+	if got := reg.Classify(errors.New("conflict-ish")); got != Conflict {
+		t.Errorf("first classifier = %v, want Conflict", got)
+	}
+	if got := reg.Classify(errors.New("reject-me")); got != Rejection {
+		t.Errorf("second classifier = %v, want Rejection", got)
+	}
+}
+
+func TestClassifierFirstMatchWins(t *testing.T) {
+	reg := NewRegistry()
+	// Two classifiers both claim to match — the earlier-registered one wins.
+	reg.RegisterClassifier(func(err error) (Family, bool) { return Corruption, true })
+	reg.RegisterClassifier(func(err error) (Family, bool) { return Rejection, true })
+
+	if got := reg.Classify(errors.New("anything")); got != Corruption {
+		t.Errorf("first-match = %v, want Corruption", got)
+	}
+}
+
+func TestClassifierDoesNotShadowExplicitClassification(t *testing.T) {
+	reg := NewRegistry()
+	reg.RegisterClassifier(func(err error) (Family, bool) { return Corruption, true })
+
+	// An error that already declares its family must bypass classifiers.
+	err := NewTransient("db.timeout", "timed out")
+	if got := reg.Classify(err); got != Transient {
+		t.Errorf("explicit Classified should bypass classifier: got %v, want Transient", got)
+	}
+}
+
+func TestClassifierDoesNotShadowSentinel(t *testing.T) {
+	reg := NewRegistry()
+	sentinel := errors.New("known sentinel")
+	reg.RegisterClassification(sentinel, Conflict)
+	reg.RegisterClassifier(func(err error) (Family, bool) { return Corruption, true })
+
+	if got := reg.Classify(sentinel); got != Conflict {
+		t.Errorf("sentinel should beat classifier: got %v, want Conflict", got)
+	}
+}
+
+func TestClassifierCloneIndependence(t *testing.T) {
+	original := NewRegistry()
+	original.RegisterClassifier(func(err error) (Family, bool) {
+		if err.Error() == "match" {
+			return Corruption, true
+		}
+		return Transient, false
+	})
+
+	clone := original.Clone()
+	// Add a classifier only to the clone.
+	clone.RegisterClassifier(func(err error) (Family, bool) { return Infrastructure, true })
+
+	// Clone classifies "match" via the inherited classifier.
+	if got := clone.Classify(errors.New("match")); got != Corruption {
+		t.Errorf("clone lost inherited classifier: got %v, want Corruption", got)
+	}
+	// Original does not gain the clone-only classifier.
+	if got := original.Classify(errors.New("nope")); got != Transient {
+		t.Errorf("original gained clone-only classifier: got %v, want Transient", got)
+	}
+}
+
+func TestClassifierConcurrentRegisterAndClassify(t *testing.T) {
+	reg := NewRegistry()
+	reg.RegisterClassifier(func(err error) (Family, bool) {
+		if err.Error() == "stable" {
+			return Rejection, true
+		}
+		return Transient, false
+	})
+
+	done := make(chan struct{})
+	go func() {
+		defer close(done)
+		for i := range 500 {
+			reg.RegisterClassifier(func(err error) (Family, bool) {
+				if err.Error() == fmt.Sprintf("w-%d", i) {
+					return Conflict, true
+				}
+				return Transient, false
+			})
+		}
+	}()
+
+	for range 500 {
+		if got := reg.Classify(errors.New("stable")); got != Rejection {
+			t.Fatalf("concurrent classify unstable: got %v, want Rejection", got)
+		}
+	}
+	<-done
+}
+
+// pkgLevelClassifierError is a unique type used only by the package-level
+// RegisterClassifier test so it cannot interfere with other tests' expectations.
+type pkgLevelClassifierError struct{}
+
+func (pkgLevelClassifierError) Error() string { return "package-level-classifier-marker" }
+
+func TestPackageLevelRegisterClassifier(t *testing.T) {
+	RegisterClassifiers(
+		// Highly specific — only matches our marker type. Stays registered but
+		// cannot affect other tests because nothing else returns this type.
+		func(err error) (Family, bool) {
+			var m pkgLevelClassifierError
+			if errors.As(err, &m) {
+				return Corruption, true
+			}
+			return Transient, false
+		},
+	)
+	// Plain errors unrelated to the marker must still classify as the default.
+	if got := Classify(errors.New("unrelated")); got != Transient {
+		t.Errorf("unrelated error = %v, want Transient", got)
+	}
+	if got := Classify(pkgLevelClassifierError{}); got != Corruption {
+		t.Errorf("marker error = %v, want Corruption", got)
+	}
+}

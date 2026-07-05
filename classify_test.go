@@ -131,6 +131,24 @@ func TestIsRetryable(t *testing.T) {
 	}
 }
 
+func TestCode(t *testing.T) {
+	if got := Code(nil); got != "" {
+		t.Errorf("Code(nil) = %q, want empty", got)
+	}
+	if got := Code(errors.New("plain")); got != "" {
+		t.Errorf("Code(plain error) = %q, want empty", got)
+	}
+	want := "db.timeout"
+	if got := Code(NewTransient(want, "msg")); got != want {
+		t.Errorf("Code(classified) = %q, want %q", got, want)
+	}
+	// Code is preserved through fmt.Errorf wrapping.
+	wrapped := fmt.Errorf("call: %w", NewRejection(want, "msg"))
+	if got := Code(wrapped); got != want {
+		t.Errorf("Code(wrapped) = %q, want %q", got, want)
+	}
+}
+
 func TestExitCode(t *testing.T) {
 	if ExitCode(nil) != 0 {
 		t.Error("nil should have exit code 0")

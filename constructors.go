@@ -98,3 +98,31 @@ func WrapCorruption(err error, code, message string) *Error {
 func WrapInfrastructure(err error, code, message string) *Error {
 	return Wrap(err, Infrastructure, code, message)
 }
+
+// Formatted Wrap variants for each family.
+// These mirror the Newf/Wrapf family: they accept a printf-style format string.
+
+// WrapRejectionf wraps an error as Rejection with a formatted message.
+func WrapRejectionf(err error, code, format string, args ...any) *Error {
+	return Wrap(err, Rejection, code, fmt.Sprintf(format, args...))
+}
+
+// WrapConflictf wraps an error as Conflict with a formatted message.
+func WrapConflictf(err error, code, format string, args ...any) *Error {
+	return Wrap(err, Conflict, code, fmt.Sprintf(format, args...))
+}
+
+// WrapTransientf wraps an error as Transient (retryable) with a formatted message.
+func WrapTransientf(err error, code, format string, args ...any) *Error {
+	return Wrap(err, Transient, code, fmt.Sprintf(format, args...))
+}
+
+// WrapCorruptionf wraps an error as Corruption with a formatted message.
+func WrapCorruptionf(err error, code, format string, args ...any) *Error {
+	return Wrap(err, Corruption, code, fmt.Sprintf(format, args...))
+}
+
+// WrapInfrastructuref wraps an error as Infrastructure with a formatted message.
+func WrapInfrastructuref(err error, code, format string, args ...any) *Error {
+	return Wrap(err, Infrastructure, code, fmt.Sprintf(format, args...))
+}

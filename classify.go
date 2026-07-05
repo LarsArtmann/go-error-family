@@ -2,13 +2,55 @@ package errorfamily
 
 import "errors"
 
+// Classifier is a predicate-based error classifier for dynamic third-party errors
+// that cannot be registered as sentinels — each error is a fresh instance not
+// matchable by errors.Is identity (e.g. *sqlite.Error, *pgconn.PgError).
+//
+// Register one via [RegisterClassifier] or [Registry.RegisterClassifier]. During
+// [Classify], after the Classified interface, Retryable inference, and registered
+// sentinels all miss, each registered Classifier runs in registration order; the
+// first to return ok=true wins. Classifiers only run on otherwise-unclassified
+// errors, so the hot path (errors that already declare a family) is untouched.
+//
+// Example — classifying modernc.org/sqlite dynamic errors:
+//
+//	errorfamily.RegisterClassifier(func(err error) (errorfamily.Family, bool) {
+//	    var sqliteErr *sqlite.Error
+//	    if errors.As(err, &sqliteErr) {
+//	        switch sqliteErr.Code() {
+//	        case 5, 6: return errorfamily.Transient, true // BUSY, LOCKED
+//	        case 19:   return errorfamily.Conflict, true  // CONSTRAINT
+//	        }
+//	    }
+//	    return errorfamily.Transient, false
+//	})
+type Classifier func(error) (Family, bool)
+
+// Code extracts the machine-readable error code from any error in the chain.
+// It walks the unwrap chain via errors.AsType looking for the [Coded] interface.
+// Returns "" if the error (or any wrapped cause) does not implement Coded.
+//
+// This is the one-liner replacement for:
+//
+//	var coded errorfamily.Coded
+//	if errors.As(err, &coded) {
+//	    code = coded.ErrorCode()
+//	}
+func Code(err error) string {
+	if coded, ok := errors.AsType[Coded](err); ok {
+		return coded.ErrorCode()
+	}
+	return ""
+}
+
 // Classify returns the Family of any error by checking multiple sources:
 //
 //  1. Multi-error support (errors.Join) — first non-Transient wins
 //  2. Classified interface — the error itself declares its family
 //  3. Retryable interface — infer from retryability if no family
 //  4. Registered sentinels — known third-party errors mapped via RegisterClassification
-//  5. Default — Transient (fail-open for retry)
+//  5. Registered classifiers — predicate-based matching for dynamic errors (RegisterClassifier)
+//  6. Default — Transient (fail-open for retry)
 //
 // Returns Rejection for nil errors.
 //
@@ -65,4 +107,26 @@ func UnregisterClassification(sentinel error) {
 // Thread-safe. Call from init() in external packages.
 func RegisterClassifications(classifications map[error]Family) {
 	DefaultRegistry.RegisterClassifications(classifications)
+}
+
+// RegisterClassifier adds a predicate-based [Classifier] for dynamic third-party
+// errors that cannot be registered as sentinels (e.g. *sqlite.Error).
+// Thread-safe. Classifiers run after sentinel matching fails, in registration
+// order; the first returning ok=true wins.
+//
+// Because Go func values are not comparable, individual classifiers cannot be
+// unregistered. For test isolation or scoped handling, construct a [NewRegistry]
+// and call [Registry.RegisterClassifier] instead of polluting [DefaultRegistry].
+//
+// Delegates to [DefaultRegistry].
+func RegisterClassifier(c Classifier) {
+	DefaultRegistry.RegisterClassifier(c)
+}
+
+// RegisterClassifiers adds multiple predicate-based [Classifier] funcs at once.
+// Thread-safe. Classifiers run in registration order. See [RegisterClassifier].
+//
+// Delegates to [DefaultRegistry].
+func RegisterClassifiers(cs ...Classifier) {
+	DefaultRegistry.RegisterClassifiers(cs...)
 }
