@@ -3,7 +3,7 @@
 Structured error protocol library. Library only — no `main`, no build system, no external deps. Full API reference: `SKILL.md`.
 
 **Last Updated:** 2026-07-05
-**Version:** v0.5.1 (unreleased: consumer-feedback-driven API additions)
+**Version:** v0.6.0
 **Status:** All tests pass (root + bridge + submodules), 0 lint issues, 0 race conditions
 **Workspace modules:** root (zero-dep), `agent`, `bridge` (oops integration), `diagnose`, `diagnose/git`, `diagnose/postgres`
 
