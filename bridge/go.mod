@@ -4,7 +4,7 @@ go 1.26.4
 
 require (
 	github.com/larsartmann/go-error-family v0.6.1
-	github.com/samber/oops v1.22.0
+	github.com/samber/oops v1.23.0
 )
 
 require (
@@ -15,5 +15,5 @@ require (
 	github.com/samber/lo v1.53.0 // indirect
 	go.opentelemetry.io/otel v1.44.0 // indirect
 	go.opentelemetry.io/otel/trace v1.44.0 // indirect
-	golang.org/x/text v0.39.0 // indirect
+	golang.org/x/text v0.40.0 // indirect
 )
