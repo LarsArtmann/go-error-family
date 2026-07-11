@@ -2,7 +2,7 @@
 
 Structured error protocol library. Library only — no `main`, no build system, no external deps. Full API reference: `SKILL.md`.
 
-**Last Updated:** 2026-07-05
+**Last Updated:** 2026-07-11
 **Version:** v0.6.1
 **Status:** All tests pass (root + bridge + submodules), 0 lint issues, 0 race conditions
 **Workspace modules:** root (zero-dep), `agent`, `bridge` (oops integration), `diagnose`, `diagnose/git`, `diagnose/postgres`, `examples`
@@ -10,10 +10,12 @@ Structured error protocol library. Library only — no `main`, no build system, 
 ## Quick Start
 
 ```bash
-go test ./... -count=1 -timeout 120s -race   # all tests
-golangci-lint run ./...                        # lint (all modules)
-go build ./...                                 # build check
+GOEXPERIMENT=jsonv2 go test ./... -count=1 -timeout 120s -race   # all tests
+GOEXPERIMENT=jsonv2 golangci-lint run ./...                        # lint (all modules)
+GOEXPERIMENT=jsonv2 go build ./...                                 # build check
 ```
+
+> **GOEXPERIMENT=jsonv2 is required** — the root module uses `encoding/json/v2` (Go 1.26 experimental). The nix devShell sets this automatically; non-nix users must `export GOEXPERIMENT=jsonv2`.
 
 ## Architecture Decision: Libraries Classify, Applications Enrich
 
@@ -152,6 +154,7 @@ Connects go-error-family with `samber/oops`. Separate module with its own `go.mo
 - `gochecknoglobals` is enabled but suppressed via `//nolint:gochecknoglobals` on each legitimate package-level var (mutex-protected registries, immutable lookup tables, rule specs) — the BuildFlow pre-commit auto-configure hook re-enables it if disabled in `.golangci.yml`.
 - `exhaustruct` is enabled but most project types are excluded via `.golangci.yml` because they have intentional optional fields (HandleConfig, MessageTemplate, DiagnosticResult, etc.). Test files also exclude exhaustruct.
 - `flake.nix` uses `pkgs.go_1_26` as `goPkg` — do NOT use `let goPkg = goPkg;` (infinite recursion).
+- `GOEXPERIMENT=jsonv2` is set in flake.nix (devShells, checks, apps) because the root module uses `encoding/json/v2`. Consumers importing this library MUST also set `GOEXPERIMENT=jsonv2` until json/v2 becomes non-experimental in a future Go release.
 - `lookupRegistered` is now `Registry.lookupSentinel` — still snapshots the map before iterating, `errors.Is` runs lock-free. No deadlock possible.
 - `HandleConfig.Registry` field added — when nil, falls back to `DefaultRegistry`. `resolveSuggestedFix` checks registry templates alongside built-in defaults.
 - `Registry` is excluded from `exhaustruct` via `.golangci.yml` — the `mu` field (sync.RWMutex) has a correct zero value set by `NewRegistry()`.
@@ -172,3 +175,4 @@ Connects go-error-family with `samber/oops`. Separate module with its own `go.mo
 - **`agent.Config.Enabled` is now honest:** A disabled agent returns `(nil, error)` instead of a synthetic `AgentResult`. Calling `Analyze` on a disabled agent is a programming error, not a silent result.
 - **`ClassifiedError` value-embeds `oops.OopsError`:** The zero value has nil internals. Methods like `Error()` and `Is()` guard against this, but future methods added to `ClassifiedError` must handle the zero-OopsError case.
 - **Examples are a separate module:** `examples/` has its own `go.mod` (requires root + diagnose). This keeps the root module truly zero-dependency — no `replace` directives, no phantom requires. CI builds it via `working-directory: ./examples`.
+- **json/v2 consumer requirement:** The root module imports `encoding/json/v2`, which requires `GOEXPERIMENT=jsonv2` on Go 1.26. Every consumer must set this environment variable when building. The nix devShell handles this automatically; non-nix consumers must export it manually.

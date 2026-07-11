@@ -41,7 +41,15 @@
 
           mkApp = name: runtimeInputs: text: {
             type = "app";
-            program = "${pkgs.writeShellApplication { inherit name runtimeInputs text; }}/bin/${name}";
+            program = "${
+              pkgs.writeShellApplication {
+                inherit name runtimeInputs;
+                text = ''
+                  export GOEXPERIMENT=jsonv2
+                  ${text}
+                '';
+              }
+            }/bin/${name}";
           };
         in
         {
@@ -65,6 +73,8 @@
                 pkgs.trash-cli
               ];
 
+              GOEXPERIMENT = "jsonv2";
+
               shellHook = ''
                 echo "go-error-family dev shell — $(go version)"
               '';
@@ -75,6 +85,8 @@
                 goPkg
                 pkgs.golangci-lint
               ];
+
+              GOEXPERIMENT = "jsonv2";
             };
           };
 
@@ -82,6 +94,7 @@
             build = pkgs.runCommand "go-error-family-build" { nativeBuildInputs = [ goPkg ]; } ''
               export HOME=$TMPDIR
               export CGO_ENABLED=0
+              export GOEXPERIMENT=jsonv2
               cp -r ${./.} src && chmod -R u+w src && cd src
               ${goPkg}/bin/go build ./...
               touch $out
@@ -92,6 +105,7 @@
                 ''
                   export HOME=$TMPDIR
                   export CGO_ENABLED=0
+                  export GOEXPERIMENT=jsonv2
                   export GOWORK=off
                   cp -r ${./.} src && chmod -R u+w src && cd src
                   ${goPkg}/bin/go build ./...
@@ -109,6 +123,7 @@
                 ''
                   export HOME=$TMPDIR
                   export CGO_ENABLED=0
+                  export GOEXPERIMENT=jsonv2
                   cp -r ${./.} src && chmod -R u+w src && cd src
                   ${pkgs.golangci-lint}/bin/golangci-lint run ./...
                   touch $out

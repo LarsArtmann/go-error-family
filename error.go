@@ -1,7 +1,7 @@
 package errorfamily
 
 import (
-	"encoding/json"
+	"encoding/json/v2"
 	"fmt"
 	"maps"
 	"time"

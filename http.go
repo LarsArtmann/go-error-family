@@ -1,7 +1,7 @@
 package errorfamily
 
 import (
-	"encoding/json"
+	"encoding/json/v2"
 	"net/http"
 )
 
@@ -68,7 +68,7 @@ func writeHTTPError(w http.ResponseWriter, err error) {
 
 	w.Header().Set("Content-Type", "application/json; charset=utf-8")
 	w.WriteHeader(family.HTTPStatus())
-	if err := json.NewEncoder(w).Encode(body); err != nil {
+	if err := json.MarshalWrite(w, body); err != nil {
 		// Client disconnected or connection broke — nothing actionable.
 		return
 	}
