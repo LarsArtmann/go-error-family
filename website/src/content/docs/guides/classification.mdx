@@ -1,0 +1,116 @@
+---
+title: Classification
+description: The 6-step classification pipeline and how to register third-party errors.
+---
+
+## How Classify Works
+
+`Classify(err)` checks in order — first match wins:
+
+1. **Multi-error** (`errors.Join`) — classify each sub-error, pick the **worst by severity**
+2. **`Classified` interface** → `ErrorFamily()`
+3. **`Retryable` interface** → infer `Transient` (true) or `Rejection` (false)
+4. **Registered sentinels** via `errors.Is` chain walk
+5. **Registered classifiers** — predicate funcs for dynamic errors
+6. **Default** → `Transient` (fail-open for retry)
+
+## Multi-Error Severity
+
+For `errors.Join(err1, err2, ...)`, each sub-error is classified recursively and the result is the **highest-severity** sub-error:
+
+```
+Transient(1) < Rejection(2) < Conflict(3) < Infrastructure(4) < Corruption(5)
+```
+
+This is deterministic regardless of join argument order and remains fail-closed: if any sub-error is non-Transient, the joined result is non-Transient.
+
+## Registering Third-Party Errors
+
+### Decision Tree
+
+```
+Do you OWN the error type?
+├── YES → Implement the Classified interface (ErrorFamily()) on your type.
+└── NO  → Is it a SENTINEL (a single, stable value compared by errors.Is)?
+          ├── YES → RegisterClassification(sentinel, family)
+          └── NO  → Is it a DYNAMIC type (new instance per error)?
+                    ├── YES → RegisterClassifier(func(error) (Family, bool))
+                    └── NO  → Let Classify default to Transient
+```
+
+### Sentinels (stable values)
+
+For errors you don't own that are stable sentinel values:
+
+```go
+func init() {
+    errorfamily.RegisterClassification(sql.ErrConnDone, errorfamily.Transient)
+    errorfamily.RegisterClassification(os.ErrPermission, errorfamily.Rejection)
+
+    // Batch registration
+    errorfamily.RegisterClassifications(map[error]errorfamily.Family{
+        sql.ErrConnDone: errorfamily.Transient,
+        sql.ErrTxDone:   errorfamily.Transient,
+    })
+}
+```
+
+### Classifiers (dynamic errors)
+
+Some third-party errors are **dynamic** — each occurrence is a fresh instance (e.g. `*sqlite.Error`), so they can't be matched by `errors.Is` identity. Register a predicate-based classifier:
+
+```go
+func init() {
+    errorfamily.RegisterClassifier(func(err error) (errorfamily.Family, bool) {
+        var sqliteErr *sqlite.Error
+        if errors.As(err, &sqliteErr) {
+            switch sqliteErr.Code() {
+            case 5, 6: return errorfamily.Transient, true // BUSY, LOCKED
+            case 19:   return errorfamily.Conflict, true  // CONSTRAINT
+            }
+        }
+        return errorfamily.Transient, false
+    })
+}
+```
+
+Classifiers run only after sentinels miss, in registration order. The first returning `ok=true` wins.
+
+## Stdlib Defaults
+
+Register common stdlib errors with documented rationale:
+
+```go
+func init() {
+    errorfamily.RegisterStdlibDefaults(nil) // nil → DefaultRegistry
+}
+```
+
+Maps `context.DeadlineExceeded` → Transient, `context.Canceled` → Rejection, `sql.ErrNoRows` → Rejection, `os.ErrPermission` → Rejection, `os.ErrNotExist` → Rejection, and more.
+
+## Injectable Registry
+
+For test isolation or scoped error handling, construct a `NewRegistry()`:
+
+```go
+reg := errorfamily.NewRegistry()
+reg.RegisterClassification(sql.ErrNoRows, errorfamily.Rejection)
+
+// Pass to HandleConfig
+exitCode := errorfamily.HandleErrorWithContext(ctx, err, errorfamily.HandleConfig{
+    Registry: reg,
+})
+
+// Clone for inherit-and-extend
+child := reg.Clone()
+child.RegisterClassification(myErr, errorfamily.Corruption)
+```
+
+## Parse from String
+
+For config files, HTTP headers, or CLI flags:
+
+```go
+family := errorfamily.ParseFamily("transient") // → Transient
+family := errorfamily.ParseFamily("unknown")   // → Transient (fail-open default)
+```

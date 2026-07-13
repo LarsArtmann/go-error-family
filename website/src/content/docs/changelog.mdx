@@ -1,0 +1,96 @@
+---
+title: Changelog
+description: All notable changes to go-error-family.
+---
+
+## [0.7.0] — 2026-07-11
+
+### Changed
+
+- **Migrated root module from `encoding/json` to `encoding/json/v2`** — requires `GOEXPERIMENT=jsonv2` on Go 1.26. The root module remains zero-dependency (json/v2 is stdlib).
+
+## [0.6.1] — 2026-07-05
+
+### Fixed
+
+- **Removed local `replace` directives and phantom `require`** from published `go.mod` files. Root module is now genuinely zero-dependency.
+- **Examples extracted to separate module** — `examples/` has its own `go.mod` (requires root + diagnose). This keeps the root module truly zero-dependency.
+
+## [0.6.0] — 2026-07-05
+
+### Added
+
+- **`RegisterClassifier` / `RegisterClassifiers`** — predicate-based classification for dynamic third-party errors (`*sqlite.Error`). Stored lock-free behind `atomic.Pointer[[]Classifier]`, copy-on-write.
+- **`Code(err) string`** — public code extraction wrapping `errors.AsType[Coded]`.
+- **`TemplateForCode(code)`** — registry-then-builtin template lookup for HTTP/gRPC boundaries.
+- **`Wrap{Family}f`** variants — `WrapRejectionf`, `WrapConflictf`, `WrapTransientf`, `WrapCorruptionf`, `WrapInfrastructuref`. Nil-safe.
+- **`HTTPStatus(err)` / `HTTPHandler(fn)`** — net/http middleware writing safe JSON responses. Never leaks `err.Error()`.
+- **`LogError(err, logger)` / `LogErrorContext`** — structured `log/slog` logging with family/code/retryable/context fields.
+- **`errorfamilytest` subpackage** — `AssertFamily`, `AssertCode`, `AssertRetryable`, `AssertContext`, `AssertContextMissing`.
+- **Classification pipeline now 6 steps** — classifiers added as step 5.
+
+## [0.5.0] — 2026-06-22
+
+### Added
+
+- **`Registry` type** with `Clone()` for inherit-and-extend, test isolation, and scoped error handling.
+- **`Family.Severity()`** — total order for multi-error classification.
+- **`Family.HTTPStatus()`** — canonical family to HTTP status mapping.
+- **`Family.RetryPolicy()`** — advisory retry defaults (Transient: 3 attempts, 100ms-5s).
+- **`Error.JSON()`** — canonical JSON view for API boundaries.
+- **`RegisterStdlibDefaults(reg)`** — pre-registered classifications for common stdlib errors.
+
+### Changed
+
+- **Copy-on-write errors** — `WithContext`/`WithCause`/`WithTimestamp` return a NEW `*Error`.
+- **`{key}` template syntax** — replaced `{{.key}}` to avoid collision with Go's `text/template`.
+- **Severity-ordered multi-error classification** — worst family wins, deterministic regardless of argument order.
+- **Lock-free sentinel lookup** — `atomic.Pointer[sentinelMap]`, ~5x faster, zero allocations.
+
+## [0.4.0] — 2026-06-17
+
+### Added
+
+- **`TextMarshaler`/`TextUnmarshaler`** for `Family`/`Audience` — enables YAML/JSON config integration.
+- **`ParseAudience` / `ParseStatus`** — case-insensitive string parsing for all enums.
+- **`Family.Audience()`** — User / Ops / All for presentation-layer decisions.
+- Integration tests.
+
+### Changed
+
+- **`HandleConfig.Diagnose` bool removed** — diagnostics run whenever `DiagnosticFunc` is set.
+- **`agent.Config.Enabled` returns error** — calling `Analyze` on a disabled agent is a programming error.
+
+## [0.3.0] — 2026-06-01
+
+### Added
+
+- **`HandleErrorWithContext`** — context-propagating handler (canonical entry point).
+- **`HandleErrorDetailedWithConfig`** — configurable structured result.
+- **`CommandRunner` interface** — mock injection for testable diagnostic rules.
+- **`ContextKey` typed strings** — replaces raw strings in rule specs.
+- **`WithTimestamp`** — copy-on-write timestamp setter.
+
+## [0.2.0] — 2026-05-26
+
+### Changed
+
+- **Modularized diagnostic rules** — git moved to `diagnose/git`, postgres to `diagnose/postgres`.
+
+### Added
+
+- Fuzz tests and benchmarks.
+
+## [0.1.1] — 2026-05-16
+
+### Changed
+
+- License changed to MIT.
+- README rewritten (removed fabricated API docs).
+
+## [0.1.0] — 2026-05-10
+
+### Added
+
+- Initial release.
+- Family enum, interfaces, Error struct, constructors, Classify, HandleError, diagnostic rules, debug agent, templates.

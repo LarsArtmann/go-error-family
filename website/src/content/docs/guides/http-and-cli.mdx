@@ -1,0 +1,128 @@
+---
+title: HTTP & CLI Boundaries
+description: Program boundary handlers for HTTP APIs and CLI tools.
+---
+
+## CLI Boundary: HandleError
+
+`HandleError` is the top-of-main handler that classifies the error, picks an exit code, formats a user-facing message, and writes to stderr:
+
+```go
+func main() {
+    if err := run(); err != nil {
+        os.Exit(errorfamily.HandleError(err))
+    }
+}
+```
+
+The output follows a structured format: What / Why / Fix / WayOut.
+
+### Structured Result (No stderr Write)
+
+For HTTP handlers, gRPC interceptors, or programmatic use:
+
+```go
+result := errorfamily.HandleErrorDetailed(err)
+fmt.Printf("exit=%d msg=%q fix=%q\n", result.ExitCode, result.Message, result.SuggestedFix)
+```
+
+### Context-Propagating Handler
+
+The canonical entry point when you have a `context.Context`:
+
+```go
+exitCode := errorfamily.HandleErrorWithContext(ctx, err, errorfamily.HandleConfig{
+    DiagnosticFunc: myDiagnoseFunc,
+    Output:         myWriter,
+    TemplateOverride: map[string]errorfamily.MessageTemplate{
+        "file.not_found": {
+            What:   "Could not find {path}",
+            Why:    "The file doesn't exist at the expected location.",
+            Fix:    "Check that {path} exists and is readable.",
+            WayOut: "Run with --verbose for more details.",
+        },
+    },
+})
+```
+
+### Template Resolution
+
+Messages resolve in this order (first match wins):
+
+1. `HandleConfig.TemplateOverride[code]` — per-call override
+2. `RegisterTemplate(code, tmpl)` — global registry
+3. Built-in `defaultMessages[code]` — exact-match defaults
+4. `Family.DefaultMessage()` — generic fallback
+
+All lookups are exact code matches (case-insensitive). Template placeholders use `{key}` syntax.
+
+## HTTP Boundary
+
+`HTTPStatus(err)` maps any error to its status code. `HTTPHandler` wraps an error-returning handler and writes a **safe** JSON response (no internal leakage):
+
+```go
+func createOrder(w http.ResponseWriter, r *http.Request) error {
+    order, err := parseOrder(r)
+    if err != nil {
+        return errorfamily.WrapRejectionf(err, "order.parse", "invalid field")
+    }
+    if err := repo.Save(order); err != nil {
+        return errorfamily.WrapConflict(err, "order.duplicate", "order already exists")
+    }
+    json.NewEncoder(w).Encode(order)
+    return nil
+}
+
+mux.Handle("/api/orders", errorfamily.HTTPHandler(createOrder))
+```
+
+### Safe JSON Responses
+
+`HTTPHandler` **never leaks `err.Error()`**. The response body contains only `family`, `code`, and a user-facing `message` from a registered template:
+
+```json
+{
+  "family": "conflict",
+  "code": "order.duplicate",
+  "message": "A conflict was detected."
+}
+```
+
+### Status Code Mapping
+
+| Family         | HTTP Status |
+| -------------- | ----------- |
+| Rejection      | 400         |
+| Conflict       | 409         |
+| Transient      | 503         |
+| Corruption     | 500         |
+| Infrastructure | 503         |
+
+### Custom Response Shape
+
+For a custom response, write your own response and use `HTTPStatus(err)` directly:
+
+```go
+func handler(w http.ResponseWriter, r *http.Request) {
+    err := doWork(r)
+    if err != nil {
+        status := errorfamily.HTTPStatus(err)
+        w.WriteHeader(status)
+        json.NewEncoder(w).Encode(map[string]any{
+            "error": errorfamily.Code(err),
+            "type":  errorfamily.Classify(err).String(),
+        })
+    }
+}
+```
+
+## Structured Logging
+
+`LogError` logs classified fields at Warn for Transient and Error for everything else:
+
+```go
+if err := run(); err != nil {
+    errorfamily.LogError(err, slog.Default())
+    // → level=WARN msg="db timeout" family=transient code=db.timeout retryable=true
+}
+```

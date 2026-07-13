@@ -1,0 +1,16 @@
+{
+  "name": "go-error-family",
+  "short_name": "go-error-family",
+  "description": "Structured error protocol for Go",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#0c0a09",
+  "theme_color": "#7c3aed",
+  "icons": [
+    {
+      "src": "/favicon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml"
+    }
+  ]
+}

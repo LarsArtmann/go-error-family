@@ -1,0 +1,93 @@
+---
+title: Custom Error Types
+description: Implement the four interfaces on your own error types.
+---
+
+## The Four Interfaces
+
+You don't have to use the built-in `Error` struct. Implement the interfaces you need:
+
+| Interface    | Method                             | Purpose                     |
+| ------------ | ---------------------------------- | --------------------------- |
+| `Coded`      | `ErrorCode() string`               | Machine-readable error code |
+| `Classified` | `ErrorFamily() Family`             | Behavioral classification   |
+| `Contextual` | `ErrorContext() map[string]string` | Structured context          |
+| `Retryable`  | `IsRetryable() bool`               | Binary retry decision       |
+
+All four embed `error` (required for Go 1.26's `errors.AsType[T]()`).
+
+## Full Example
+
+```go
+package mypkg
+
+import (
+    "fmt"
+
+    "github.com/larsartmann/go-error-family"
+)
+
+type FindingError struct {
+    Category string
+    Message  string
+    File     string
+    Line     int
+    Cause    error
+}
+
+func (e *FindingError) Error() string          { return e.Message }
+func (e *FindingError) Unwrap() error          { return e.Cause }
+func (e *FindingError) ErrorCode() string      { return e.Category }
+func (e *FindingError) ErrorFamily() errorfamily.Family {
+    switch e.Category {
+    case "validation":
+        return errorfamily.Rejection
+    case "io":
+        return errorfamily.Transient
+    default:
+        return errorfamily.Infrastructure
+    }
+}
+func (e *FindingError) ErrorContext() map[string]string {
+    return map[string]string{"file": e.File, "line": fmt.Sprintf("%d", e.Line)}
+}
+```
+
+Now `Classify()`, `IsRetryable()`, `ExitCode()`, and `HandleError()` all work with your type.
+
+## Classification Precedence
+
+If a type implements both `Classified` and `Retryable`, `Classified` wins:
+
+- `Classified` interface checked first (step 2)
+- `Retryable` interface checked next (step 3)
+
+So implementing `Classified` is the canonical way to classify your errors. `Retryable` is a fallback for types that only know "can retry?" but not the full family.
+
+## Partial Implementation
+
+Implement only what you need:
+
+```go
+// Only code + retry — no family, no context
+type RateLimitError struct {
+    RetryAfter time.Duration
+}
+
+func (e *RateLimitError) Error() string         { return "rate limited" }
+func (e *RateLimitError) ErrorCode() string     { return "rate.limit" }
+func (e *RateLimitError) IsRetryable() bool     { return true }
+// Classify → Transient (via Retryable=true), no context
+```
+
+## The Error Struct
+
+The built-in `Error` struct implements all four interfaces. It's a reference implementation, not a requirement:
+
+```go
+err := errorfamily.NewRejection("file.not_found", "config missing").
+    WithContext("path", "/etc/app/config.yaml").
+    WithCause(originalErr)
+```
+
+`WithContext`, `WithCause`, and `WithTimestamp` are **copy-on-write** — they return a new `*Error`, not the same pointer. This makes them safe to chain from shared/sentinel errors.

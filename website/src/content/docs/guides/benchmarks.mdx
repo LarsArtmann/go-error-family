@@ -1,0 +1,41 @@
+---
+title: Performance
+description: Benchmark results for the classification hot path.
+---
+
+## Zero-Allocation Hot Paths
+
+The classification pipeline is designed for zero allocations on the hot path.
+
+**Hardware:** AMD Ryzen 9 7950X, Go 1.26.4
+
+| Operation                    | Time    | Allocs |
+| ---------------------------- | ------- | ------ |
+| `Classify` (built-in Error)  | ~9 ns   | 0      |
+| `Classify` (plain error)     | ~30 ns  | 0      |
+| `IsRetryable`                | ~9 ns   | 0      |
+| `ExitCode`                   | ~9 ns   | 0      |
+| `WithContext`                | ~8 ns   | 0      |
+| `ParseFamily`                | ~12 ns  | 0      |
+| `HandleError` (with context) | ~450 ns | 5      |
+| `Runner.Run` (1 rule)        | ~420 ns | 5      |
+
+## Interpretation
+
+- **`Classify` on a built-in `*Error`** is ~9ns because it reads the `family` field directly (step 2: `Classified` interface).
+- **`Classify` on a plain `error`** is ~30ns because it walks the sentinel map (step 4). At 50 registered sentinels, this is ~285ns/0 allocs.
+- **`HandleError`** includes template resolution and stderr write. Use `HandleErrorDetailed` when you only need the structured result.
+
+## Registry Performance
+
+The `Registry` uses `atomic.Pointer[sentinelMap]` for lock-free reads:
+
+- **Reads** (the `Classify` hot path) load the pointer once and iterate lock-free and allocation-free
+- **Writes** serialize under the write lock and publish a new snapshot via copy-on-write
+- At 50 registered sentinels: ~285 ns/0 allocs (was ~1330 ns/3 allocs/1.8KB under the old RLock+copy approach)
+
+## Reproducing
+
+```bash
+GOEXPERIMENT=jsonv2 go test -bench=. -benchmem -count=1 ./...
+```

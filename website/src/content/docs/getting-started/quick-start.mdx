@@ -1,0 +1,109 @@
+---
+title: Quick Start
+description: Get started with go-error-family in under a minute.
+---
+
+## The Core Concept: Family
+
+Every error gets classified into one of five families. Each family maps to retry decisions, exit codes, HTTP status codes, and user-facing tone.
+
+| Family         | Retryable | Exit Code | HTTP Status | Whose Fault    |
+| -------------- | --------- | --------- | ----------- | -------------- |
+| Rejection      | no        | 1         | 400         | User           |
+| Conflict       | no        | 1         | 409         | User (resolve) |
+| Transient      | yes       | 75        | 503         | System         |
+| Corruption     | no        | 65        | 500         | Data damage    |
+| Infrastructure | no        | 69        | 503         | System         |
+
+## Classify Any Error
+
+```go
+package main
+
+import (
+    "errors"
+    "os"
+
+    "github.com/larsartmann/go-error-family"
+)
+
+func main() {
+    err := errors.New("connection refused")
+
+    family := errorfamily.Classify(err)
+    // → Transient (default: unknown errors are retryable)
+
+    if errorfamily.IsRetryable(err) {
+        retry()
+    }
+
+    os.Exit(errorfamily.ExitCode(err))
+    // → 75 (EX_TEMPFAIL)
+}
+```
+
+## Create Classified Errors
+
+Attach a Family at creation time:
+
+```go
+err := errorfamily.NewRejection("file.not_found", "config file missing").
+    WithContext("path", "/etc/app/config.yaml")
+
+os.Exit(errorfamily.HandleError(err))
+// stderr: "A required resource was not found."
+// stderr: "Check that the path and resource name are correct."
+// exit: 1
+```
+
+## Constructors
+
+```go
+// Simple
+err := errorfamily.NewRejection("config.invalid", "bad config")
+
+// With cause
+err := errorfamily.WrapTransient(dbErr, "db.timeout", "query timed out")
+
+// With context (chainable, copy-on-write)
+err := errorfamily.NewRejection("file.not_found", "config missing").
+    WithContext("path", "/etc/app/config.yaml").
+    WithContext("format", "yaml")
+
+// Formatted
+err := errorfamily.Newf(errorfamily.Rejection, "file.not_found", "missing: %s", path)
+
+// Multi-error (partial success)
+err := errors.Join(err1, err2, err3)
+// Classify picks the worst family by severity
+```
+
+## The Five Families in Action
+
+```go
+// Rejection — user error, instruct them
+err := errorfamily.NewRejection("user.not_found", "user does not exist")
+// IsRetryable → false, ExitCode → 1, HTTPStatus → 400
+
+// Conflict — user needs to resolve
+err := errorfamily.NewConflict("order.duplicate", "order already exists")
+// IsRetryable → false, ExitCode → 1, HTTPStatus → 409
+
+// Transient — system error, retry
+err := errorfamily.NewTransient("db.timeout", "query timed out")
+// IsRetryable → true, ExitCode → 75, HTTPStatus → 503
+
+// Corruption — data damage, urgent
+err := errorfamily.NewCorruption("data.crc", "checksum mismatch")
+// IsRetryable → false, ExitCode → 65, HTTPStatus → 500
+
+// Infrastructure — system misconfiguration
+err := errorfamily.NewInfrastructure("config.missing", "no config file")
+// IsRetryable → false, ExitCode → 69, HTTPStatus → 503
+```
+
+## Next Steps
+
+- [Classification](/guides/classification/) — the full 6-step pipeline
+- [Custom Error Types](/guides/error-types/) — implement your own
+- [HTTP & CLI Boundaries](/guides/http-and-cli/) — program boundaries

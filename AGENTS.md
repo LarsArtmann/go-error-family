@@ -5,7 +5,7 @@ Structured error protocol library. Library only — no `main`, no build system, 
 **Last Updated:** 2026-07-11
 **Version:** v0.7.0
 **Status:** All tests pass (root + bridge + submodules), 0 lint issues, 0 race conditions
-**Workspace modules:** root (zero-dep), `agent`, `bridge` (oops integration), `diagnose`, `diagnose/git`, `diagnose/postgres`, `examples`
+**Workspace modules:** root (zero-dep), `agent`, `bridge` (oops integration), `diagnose`, `diagnose/git`, `diagnose/postgres`, `examples`, `website`
 
 ## Quick Start
 
@@ -176,3 +176,4 @@ Connects go-error-family with `samber/oops`. Separate module with its own `go.mo
 - **`ClassifiedError` value-embeds `oops.OopsError`:** The zero value has nil internals. Methods like `Error()` and `Is()` guard against this, but future methods added to `ClassifiedError` must handle the zero-OopsError case.
 - **Examples are a separate module:** `examples/` has its own `go.mod` (requires root + diagnose). This keeps the root module truly zero-dependency — no `replace` directives, no phantom requires. CI builds it via `working-directory: ./examples`.
 - **json/v2 consumer requirement:** The root module imports `encoding/json/v2`, which requires `GOEXPERIMENT=jsonv2` on Go 1.26. Every consumer must set this environment variable when building. The nix devShell handles this automatically; non-nix consumers must export it manually.
+- **Website (`website/`):** Astro 7 + Starlight + Tailwind v4 documentation site. Firebase Hosting target `errorfamily` in the `lars-software` project. Domain: `errorfamily.lars.software`. Deploy with `nix run .#deploy` from the `website/` directory (runs `npm run build && firebase deploy --only hosting`). The website is NOT part of the Go workspace or CI — it's a separate Node.js project with its own `flake.nix`.

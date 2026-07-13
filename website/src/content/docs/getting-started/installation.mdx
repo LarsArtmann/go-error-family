@@ -1,0 +1,59 @@
+---
+title: Installation
+description: Install go-error-family in your Go project.
+---
+
+## Requirements
+
+- Go 1.26 or later (uses `errors.AsType`)
+- An active Go module (`go.mod`)
+- `GOEXPERIMENT=jsonv2` environment variable (the root module uses `encoding/json/v2`)
+
+## Install
+
+Run this in your project directory:
+
+```bash
+go get github.com/larsartmann/go-error-family@latest
+```
+
+## Workspace Modules
+
+This is a Go workspace. The root module (classification core, zero third-party deps) is stable. Experimental submodules have their own `go.mod` and require separate imports:
+
+| Module            | Import Path                                                | Purpose                       |
+| ----------------- | ---------------------------------------------------------- | ----------------------------- |
+| Root              | `github.com/larsartmann/go-error-family`                   | Classification core, zero-dep |
+| Agent             | `github.com/larsartmann/go-error-family/agent`             | AI debug agent                |
+| Bridge            | `github.com/larsartmann/go-error-family/bridge`            | samber/oops integration       |
+| Diagnose          | `github.com/larsartmann/go-error-family/diagnose`          | Diagnostic rules (core)       |
+| Diagnose/Git      | `github.com/larsartmann/go-error-family/diagnose/git`      | Git diagnostic rule           |
+| Diagnose/Postgres | `github.com/larsartmann/go-error-family/diagnose/postgres` | PostgreSQL diagnostic rule    |
+
+## GOEXPERIMENT=jsonv2
+
+The root module imports `encoding/json/v2`, which requires `GOEXPERIMENT=jsonv2` on Go 1.26. Set it before building:
+
+```bash
+export GOEXPERIMENT=jsonv2
+```
+
+Or in `flake.nix` devShells (if using Nix):
+
+```nix
+GOEXPERIMENT = "jsonv2";
+```
+
+This will become non-experimental in a future Go release.
+
+## Verify Installation
+
+```bash
+go list -m github.com/larsartmann/go-error-family
+```
+
+## Next Steps
+
+- Follow the [Quick Start](/getting-started/quick-start/) for complete examples
+- Learn about [Classification](/guides/classification/) for the full pipeline
+- See [HTTP & CLI Boundaries](/guides/http-and-cli/) for program boundaries

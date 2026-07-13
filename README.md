@@ -8,6 +8,8 @@ Structured error protocol for Go — behavioral classification, exit codes, and 
 
 **Share the protocol, not the implementation.**
 
+**[Documentation](https://errorfamily.lars.software)** &middot; **[pkg.go.dev](https://pkg.go.dev/github.com/larsartmann/go-error-family)** &middot; **[Changelog](CHANGELOG.md)**
+
 ---
 
 ## The Problem

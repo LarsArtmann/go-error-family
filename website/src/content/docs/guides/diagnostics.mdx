@@ -1,0 +1,119 @@
+---
+title: Diagnostics
+description: Auto-discover root causes with diagnostic rules and AI debug agents.
+---
+
+## Diagnostic Rules
+
+Auto-discover **why** an error occurred:
+
+```go
+runner := diagnose.DefaultRunner()
+results := runner.Run(ctx, err)
+
+for _, r := range results {
+    if r.Status == diagnose.StatusFailed {
+        fmt.Println(r.Summary)
+        fmt.Println("  Fix:", r.SuggestedFix)
+    }
+}
+```
+
+Results include `Confidence` (0.0–1.0) and are sorted by confidence descending.
+
+## Built-in Rules
+
+Zero-dependency rules included in `DefaultRunner`:
+
+- **FilesystemRule** — checks path existence, permissions, writability
+- **NetworkRule** — checks DNS resolution, TCP connectivity
+
+## Opt-in Submodules
+
+Import explicitly for specialized rules:
+
+```go
+import (
+    "github.com/larsartmann/go-error-family/diagnose"
+    "github.com/larsartmann/go-error-family/diagnose/git"
+    "github.com/larsartmann/go-error-family/diagnose/postgres"
+)
+
+runner := diagnose.NewRunner(
+    &git.GitRule{},
+    &postgres.PostgresRule{},
+    &diagnose.FilesystemRule{},
+)
+```
+
+| Rule         | Module              | Checks                                           |
+| ------------ | ------------------- | ------------------------------------------------ |
+| GitRule      | `diagnose/git`      | Repo state, merge conflicts, remote reachability |
+| PostgresRule | `diagnose/postgres` | `pg_isready`, TCP connectivity                   |
+
+## Structured Fixes
+
+`DiagnosticResult` carries a structured `Fix` (not freeform prose):
+
+```go
+type Fix struct {
+    Summary  string
+    Command  string
+}
+```
+
+Rules populate both fields at construction time. The consumer reads `Fix.Command` directly — no prose-parsing heuristic.
+
+## Writing Custom Rules
+
+Use `RuleSpec` for data-driven matching:
+
+```go
+type RateLimitRule struct{}
+
+var rateLimitSpec = diagnose.RuleSpec{
+    ContextKeys:  []diagnose.ContextKey{"retry_after"},
+    CodeContains: []string{"rate.limit", "too_many_requests"},
+}
+
+func (r *RateLimitRule) Name() string              { return "rate_limit" }
+func (r *RateLimitRule) Applicable(err error) bool { return rateLimitSpec.Matches(err) }
+
+func (r *RateLimitRule) Run(ctx context.Context, err error) (*diagnose.DiagnosticResult, error) {
+    return &diagnose.DiagnosticResult{
+        Status:       diagnose.StatusDegraded,
+        Confidence:   diagnose.ConfidenceHigh,
+        Summary:      "Rate limited by API",
+        SuggestedFix: "Wait for the Retry-After duration before retrying",
+    }, nil
+}
+```
+
+### Testable Rules with CommandRunner
+
+For rules that shell out, accept a `CommandRunner`:
+
+```go
+type MyRule struct {
+    Runner diagnose.CommandRunner // inject mock in tests
+}
+```
+
+Rules run concurrently via `Runner.Run` and results sort by confidence descending.
+
+## AI Debug Agent
+
+Root cause analysis and fix suggestions from diagnostic context:
+
+```go
+ag := agent.New(agent.Config{Enabled: true})
+result, _ := ag.Analyze(ctx, err, diagnosis)
+
+fmt.Println("Root cause:", result.RootCause)
+fmt.Println("Confidence:", result.Confidence)
+for _, step := range result.FixSteps {
+    fmt.Printf("  - %s\n    Command: %s\n", step.Description, step.Command)
+}
+```
+
+The agent produces analysis but does **not** execute fixes — the consumer decides what to do with `FixStep.Command`.

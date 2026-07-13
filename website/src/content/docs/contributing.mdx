@@ -1,0 +1,72 @@
+---
+title: Contributing
+description: How to contribute to go-error-family.
+---
+
+## Development Setup
+
+**Requirements:** Go 1.26+, `GOEXPERIMENT=jsonv2`
+
+```bash
+git clone https://github.com/LarsArtmann/go-error-family.git
+cd go-error-family
+go mod download
+```
+
+## Building
+
+```bash
+GOEXPERIMENT=jsonv2 go build ./...
+```
+
+## Testing
+
+```bash
+# All tests (root + submodules) with race detection
+GOEXPERIMENT=jsonv2 go test ./... -count=1 -timeout 120s -race
+```
+
+## Linting
+
+Uses golangci-lint with strict defaults. Configuration lives in `.golangci.yml`.
+
+```bash
+GOEXPERIMENT=jsonv2 golangci-lint run ./...
+```
+
+## GOEXPERIMENT=jsonv2
+
+The root module uses `encoding/json/v2` (Go 1.26 experimental). You must set:
+
+```bash
+export GOEXPERIMENT=jsonv2
+```
+
+before any `go build`, `go test`, or `golangci-lint` command. The nix devShell sets this automatically.
+
+## Code Style
+
+- Standard `testing` package — no testify or other test utilities
+- `t.Parallel()` on most tests
+- Early returns over nested conditionals
+- Strong types over runtime checks
+- No one-letter variable names
+- Consumer interfaces embed `error` (required for Go 1.26's `errors.AsType[T]()`)
+- Template placeholders use `{key}` syntax (not `{{.key}}`)
+
+## Architecture: Libraries Classify, Applications Enrich
+
+go-error-family (classification) and samber/oops (enrichment) are complementary:
+
+- **Library code** imports go-error-family only — returns classified errors
+- **Application code** imports oops for enrichment and wraps via the `bridge/` package
+
+The four interfaces (`Coded`/`Classified`/`Contextual`/`Retryable`) are the sole public contract.
+
+## Pull Requests
+
+- Ensure all tests pass: `GOEXPERIMENT=jsonv2 go test ./... -count=1 -timeout 120s -race`
+- Ensure linting passes: `GOEXPERIMENT=jsonv2 golangci-lint run ./...`
+- Add tests for new functionality
+- Keep changes focused and atomic
+- Do not add third-party dependencies to the root module (it must stay zero-dependency)

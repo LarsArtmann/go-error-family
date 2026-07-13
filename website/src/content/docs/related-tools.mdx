@@ -1,0 +1,35 @@
+---
+title: Related Tools
+description: Tools that complement go-error-family in your Go toolchain.
+---
+
+## samber/oops
+
+[samber/oops](https://github.com/samber/oops) enriches errors with stack traces, trace IDs, and request context. go-error-family and oops are **complementary, not competing**:
+
+- **Libraries** import go-error-family only — they know their domain contract but must not presume the app's observability stack.
+- **Applications** import oops for enrichment and, if they also need behavioral decisions, wrap library errors via the `bridge/` package.
+
+The `bridge/` submodule provides:
+
+| API                        | Purpose                                                    |
+| -------------------------- | ---------------------------------------------------------- |
+| `bridge.Wrap(err, family)` | Attach a Family to any error, preserving OopsError context |
+| `bridge.AutoWrap(err)`     | Infer Family from oops metadata (tags + domain)            |
+| `bridge.InferFamily(err)`  | Derive Family from oops tags then domain                   |
+
+## go-atomic-write
+
+[go-atomic-write](https://github.com/larsartmann/go-atomic-write) provides crash-safe, race-free file writes for Go. Use it alongside go-error-family in CLI tools and services that need both safe I/O and structured error handling.
+
+## gogenfilter
+
+[gogenfilter](https://github.com/LarsArtmann/gogenfilter) detects and filters auto-generated Go code files. Useful in linters and static analysis tools that also need error classification.
+
+## stdlib errors package
+
+Go's standard library `errors` package (`errors.Is`, `errors.As`, `errors.Join`, `fmt.Errorf` with `%w`) is the foundation. go-error-family builds on top of it — all errors are standard `error` values that participate in unwrap chains. `errors.Join` is the recommended way to create multi-errors (go-error-family classifies them by worst severity).
+
+## Go 1.26 errors.AsType
+
+The consumer interfaces embed `error` specifically for Go 1.26's `errors.AsType[T]()` generic type assertion. This replaces `errors.As` boilerplate for typed error inspection.

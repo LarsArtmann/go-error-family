@@ -1,0 +1,174 @@
+---
+title: API Reference
+description: Public API for go-error-family.
+---
+
+## Family
+
+The core enum — behavioral classification for any error.
+
+```go
+type Family int
+
+const (
+    Rejection      Family = iota // User error
+    Conflict                     // User must resolve
+    Transient                    // System error, retryable
+    Corruption                   // Data damage
+    Infrastructure               // System misconfiguration
+)
+```
+
+### Family Methods
+
+| Method             | Returns       | Description                                |
+| ------------------ | ------------- | ------------------------------------------ |
+| `String()`         | `string`      | Human-readable name                        |
+| `IsRetryable()`    | `bool`        | Whether the caller should retry            |
+| `IsValid()`        | `bool`        | Whether the family is a valid known value  |
+| `Severity()`       | `int`         | Total order for multi-error classification |
+| `ExitCode()`       | `int`         | BSD sysexits.h exit code                   |
+| `HTTPStatus()`     | `int`         | Canonical HTTP status code                 |
+| `RetryPolicy()`    | `RetryPolicy` | Advisory retry defaults                    |
+| `Audience()`       | `Audience`    | User / Ops / All                           |
+| `Tone()`           | `Tone`        | Presentation-layer tone                    |
+| `DefaultMessage()` | `string`      | Generic user-facing message                |
+| `DefaultWhy()`     | `string`      | Generic explanation                        |
+| `DefaultFix()`     | `string`      | Generic fix suggestion                     |
+
+## Consumer Interfaces
+
+Each error type implements what it needs. All embed `error`.
+
+```go
+type Coded interface {
+    error
+    ErrorCode() string
+}
+
+type Classified interface {
+    error
+    ErrorFamily() Family
+}
+
+type Contextual interface {
+    error
+    ErrorContext() map[string]string
+}
+
+type Retryable interface {
+    error
+    IsRetryable() bool
+}
+```
+
+## Functions
+
+### Classification
+
+| Function                     | Description                                |
+| ---------------------------- | ------------------------------------------ |
+| `Classify(err) Family`       | Universal classification (6-step pipeline) |
+| `Code(err) string`           | Extract error code from unwrap chain       |
+| `IsRetryable(err) bool`      | Binary retry decision from Family          |
+| `ExitCode(err) int`          | BSD sysexits.h exit code from Family       |
+| `HTTPStatus(err) int`        | HTTP status code from Family               |
+| `ParseFamily(string) Family` | Parse from string (fail-open to Transient) |
+
+### Registration
+
+| Function                                        | Description                        |
+| ----------------------------------------------- | ---------------------------------- |
+| `RegisterClassification(err, Family)`           | Register a sentinel error          |
+| `RegisterClassifications(map)`                  | Batch register sentinels           |
+| `UnregisterClassification(err)`                 | Remove a sentinel                  |
+| `RegisterClassifier(func)`                      | Predicate-based for dynamic errors |
+| `RegisterClassifiers([]func)`                   | Batch register classifiers         |
+| `RegisterStdlibDefaults(reg)`                   | Pre-register common stdlib errors  |
+| `RegisterTemplate(code, tmpl)`                  | Register a message template        |
+| `UnregisterTemplate(code)`                      | Remove a template                  |
+| `TemplateForCode(code) (MessageTemplate, bool)` | Look up template                   |
+
+### Constructors
+
+| Function                                          | Description                   |
+| ------------------------------------------------- | ----------------------------- |
+| `New(Family, code, msg) *Error`                   | Create a new classified error |
+| `Newf(Family, code, format, args) *Error`         | Formatted constructor         |
+| `Wrap(cause, Family, code, msg) *Error`           | Wrap with cause               |
+| `Wrapf(cause, Family, code, format, args) *Error` | Formatted wrap                |
+| `NewRejection(code, msg)`                         | Family shortcut               |
+| `NewConflict(code, msg)`                          | Family shortcut               |
+| `NewTransient(code, msg)`                         | Family shortcut               |
+| `NewCorruption(code, msg)`                        | Family shortcut               |
+| `NewInfrastructure(code, msg)`                    | Family shortcut               |
+| `WrapRejection(cause, code, msg)`                 | Family wrap shortcut          |
+| `WrapConflictf(cause, code, format, args)`        | Formatted family wrap         |
+| (and all 5 families × New/Wrap/Wrapf)             | 20 total constructors         |
+
+### CLI Boundary
+
+| Function                                                        | Description                                              |
+| --------------------------------------------------------------- | -------------------------------------------------------- |
+| `HandleError(err) int`                                          | Top-of-main handler (classifies, formats, writes stderr) |
+| `HandleErrorWithConfig(err, HandleConfig) int`                  | Configurable handler                                     |
+| `HandleErrorWithContext(ctx, err, HandleConfig) int`            | Context-propagating handler                              |
+| `HandleErrorDetailed(err) HandleResult`                         | Structured result (no stderr write)                      |
+| `HandleErrorDetailedWithConfig(err, HandleConfig) HandleResult` | Configurable structured result                           |
+
+### HTTP
+
+| Function                                | Description                            |
+| --------------------------------------- | -------------------------------------- |
+| `HTTPStatus(err) int`                   | Map error to HTTP status code          |
+| `HTTPHandler(HandlerFunc) http.Handler` | Middleware writing safe JSON responses |
+
+### Logging
+
+| Function                                  | Description                                               |
+| ----------------------------------------- | --------------------------------------------------------- |
+| `LogError(err, *slog.Logger)`             | Structured logging (Warn for Transient, Error for others) |
+| `LogErrorContext(ctx, err, *slog.Logger)` | Context-propagating logging                               |
+
+## Types
+
+### Error
+
+The reference implementation. Not required — implement the interfaces instead if you prefer.
+
+### HandleConfig
+
+```go
+type HandleConfig struct {
+    Registry         *Registry
+    Output           io.Writer
+    DiagnosticFunc   DiagnosticFunc
+    OnDiagnosed      func(error, []DiagnosticFinding)
+    TemplateOverride map[string]MessageTemplate
+}
+```
+
+### MessageTemplate
+
+```go
+type MessageTemplate struct {
+    What   string // What happened
+    Why    string // Why it happened
+    Fix    string // How to fix it
+    WayOut string // How to escape
+}
+```
+
+### Registry
+
+Injectable registry for test isolation and scoped error handling:
+
+```go
+reg := errorfamily.NewRegistry()
+reg.RegisterClassification(sql.ErrNoRows, errorfamily.Rejection)
+child := reg.Clone() // deep-copy, inherit-and-extend
+```
+
+## Full API on pkg.go.dev
+
+For the complete, always-up-to-date API documentation, see [pkg.go.dev](https://pkg.go.dev/github.com/larsartmann/go-error-family).
