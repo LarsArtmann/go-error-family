@@ -1,7 +1,7 @@
 # go-error-family — AI Agent Context
 
 **Module:** `github.com/larsartmann/go-error-family`
-**Go:** 1.26+ | **External deps:** zero | **Kind:** library (no `main`, no build system)
+**Go:** 1.26+ (`GOEXPERIMENT=jsonv2` required — root uses `encoding/json/v2`) | **Third-party deps:** zero | **Kind:** library (no `main`, no build system)
 
 ---
 
@@ -364,7 +364,7 @@ results := runner.Run(ctx, err)
 // results sorted by confidence desc; nil if no rules applicable
 ```
 
-**DiagnosticResult fields:** `RuleName`, `Status` (Healthy/Degraded/Failed/Unknown), `Summary`, `Details` (map[string]string), `SuggestedFix`, `Confidence` (0.0–1.0), `Duration`, `Context` (the error context that triggered the rule, `map[string]string`).
+**DiagnosticResult fields:** `RuleName`, `Status` (Healthy/Degraded/Failed/Unknown), `Summary`, `Details` (map[string]string), `Fix` (struct with `Summary` and `Command`), `Confidence` (0.0–1.0), `Duration`, `Context` (the error context that triggered the rule, `map[string]string`).
 
 **Standalone helpers (postgres submodule):**
 
@@ -566,6 +566,7 @@ import "github.com/larsartmann/go-error-family/bridge"
 ## Testing
 
 ```bash
+export GOEXPERIMENT=jsonv2              # required — root uses encoding/json/v2
 go test ./...                                    # all tests
 go test -cover ./...                             # with coverage
 go test -coverprofile=cover.out ./... && go tool cover -func=cover.out  # detailed coverage
@@ -625,7 +626,7 @@ func TestExample(t *testing.T) {
 
 ## Code Conventions
 
-- **No external dependencies** — stdlib only
+- **Zero third-party dependencies** — stdlib only (`encoding/json/v2` is Go stdlib experimental, requires `GOEXPERIMENT=jsonv2`)
 - **Interfaces embed `error`** — for `errors.AsType[T]()` compatibility
 - **Data-driven patterns** — `familyData` array, `defaultMessages` map, `ruleSpec` structs
 - **Thread-safe registries** — `Registry.sentinels` and `Registry.classifiers` are `atomic.Pointer` to immutable snapshots: reads (the `Classify` hot path) load the pointer once and iterate lock-free/allocation-free; rare writers serialize under `r.mu` (write lock) and publish a new snapshot via copy-on-write. Templates use `r.mu` directly (RWLock).

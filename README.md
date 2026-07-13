@@ -31,7 +31,7 @@ go-error-family answers all of these with a single concept: **Family**.
 go get github.com/larsartmann/go-error-family
 ```
 
-Requires Go 1.26+ (uses `errors.AsType`).
+Requires Go 1.26+ with `GOEXPERIMENT=jsonv2` (uses `errors.AsType` and `encoding/json/v2`).
 
 This is a Go workspace. The root module (classification core, zero third-party deps) is stable. Experimental submodules — `agent`, `bridge` (samber/oops integration), `diagnose`, `diagnose/git`, `diagnose/postgres` — have their own `go.mod` and require separate imports.
 
@@ -292,7 +292,6 @@ result := errorfamily.HandleErrorDetailedWithConfig(err, cfg)
 
 // Context-propagating handler — preferred when you have a context.Context
 exitCode := errorfamily.HandleErrorWithContext(ctx, err, errorfamily.HandleConfig{
-    Diagnose:    true,
     Output:      myWriter,
     DiagnosticFunc: myDiagnoseFunc,
     OnDiagnosed: func(err error, findings []errorfamily.DiagnosticFinding) {
@@ -405,7 +404,10 @@ results := runner.Run(ctx, err)
 for _, r := range results {
     if r.Status == diagnose.StatusFailed {
         fmt.Println(r.Summary)
-        fmt.Println("  Fix:", r.SuggestedFix)
+        fmt.Println("  Fix:", r.Fix.Summary)
+        if r.Fix.Command != "" {
+            fmt.Println("  Run:", r.Fix.Command)
+        }
     }
 }
 ```
@@ -452,10 +454,12 @@ func (r *RateLimitRule) Run(ctx context.Context, err error) (*diagnose.Diagnosti
     retryAfter := diagnose.ResolveContextKey(err, []string{"retry_after"}, "unknown")
     // ... check system state ...
     return &diagnose.DiagnosticResult{
-        Status:       diagnose.StatusDegraded,
-        Confidence:   diagnose.ConfidenceHigh,
-        Summary:      "Rate limited — retry after " + retryAfter,
-        SuggestedFix: "Wait for the duration specified in the Retry-After header",
+        Status:     diagnose.StatusDegraded,
+        Confidence: diagnose.ConfidenceHigh,
+        Summary:    "Rate limited — retry after " + retryAfter,
+        Fix: diagnose.Fix{
+            Summary: "Wait for the duration specified in the Retry-After header",
+        },
     }, nil
 }
 ```
@@ -521,7 +525,7 @@ go-error-family/
 ├── errorfamilytest/        — test assertion helpers (AssertFamily, AssertCode, ...)
 ├── diagnose/
 │   ├── diagnose.go         — Runner, DiagnosticRule, RuleSpec, CommandRunner, ContextKey
-│   ├── context.go          — RunCommand, CommandExists (exported for rule authors)
+│   ├── command.go          — RunCommand, CommandExists (exported for rule authors)
 │   ├── rules_filesystem.go — FilesystemRule
 │   ├── rules_network.go    — NetworkRule
 │   ├── git/                — submodule: GitRule

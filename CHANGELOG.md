@@ -4,6 +4,13 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
+## [0.7.0] - 2026-07-09
+
+### Changed (BREAKING)
+
+- **Root module migrated to `encoding/json/v2`** — `error.go` (`JSON()` method) and `http.go` (`HTTPHandler` response writer) now use `encoding/json/v2` instead of `encoding/json`. This requires consumers to set `GOEXPERIMENT=jsonv2` when building on Go 1.26 (the nix devShell sets this automatically). The JSON output shape is unchanged.
+- **Bridge dependencies bumped** — `samber/oops` v1.22.0 → v1.23.0, `golang.org/x/text` v0.39.0 → v0.40.0.
+
 ## [0.6.1] - 2026-07-05
 
 Hotfix: the published `go.mod` files in 0.6.0 contained local `replace` directives plus phantom `require ... v0.0.0-00010101000000-000000000000` versions. Go strips `replace` when a module is fetched, so consumers hit unresolvable module-graph edges. `go.work` masked the defect locally.
