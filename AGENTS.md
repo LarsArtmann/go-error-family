@@ -2,8 +2,6 @@
 
 Structured error protocol library. Library only — no `main`, no build system, no external deps. Full API reference: `SKILL.md`.
 
-**Last Updated:** 2026-07-11
-**Version:** v0.7.0
 **Status:** All tests pass (root + bridge + submodules), 0 lint issues, 0 race conditions
 **Workspace modules:** root (zero-dep), `agent`, `bridge` (oops integration), `diagnose`, `diagnose/git`, `diagnose/postgres`, `examples`, `website`
 
@@ -107,8 +105,6 @@ Not a library type — partial success is a consumption pattern, not a classific
 
 ## Test Coverage
 
-**Updated:** 2026-07-05
-
 | Package              | Coverage |
 | -------------------- | -------- |
 | root (`errorfamily`) | 97.3%    |
@@ -142,8 +138,6 @@ Connects go-error-family with `samber/oops`. Separate module with its own `go.mo
 **Surprising:** `Wrap(nil, family)` returns a ClassifiedError with zero OopsError — `Error()` returns `[family]`, `Unwrap()` returns nil. This is intentional: nil is still classifiable.
 
 ## Lint Configuration
-
-**Updated:** 2026-06-22
 
 - `bridge` package-level lookup tables (`domainDefaults`, `tagOverrides`) suppress `gochecknoglobals` via inline `//nolint` — same pattern as root's immutable lookup tables.
 

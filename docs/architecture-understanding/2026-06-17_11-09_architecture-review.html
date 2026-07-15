@@ -530,8 +530,7 @@ agent/    → diagnose/ → root (errorfamily)
 bridge/   → root (errorfamily)
 git/      → root + diagnose
 postgres/ → root + diagnose
-examples/ → root (leaf nodes)</pre
-          >
+examples/ → root (leaf nodes)</pre>
           <div class="ref">go.work · all go.mod files</div>
         </div>
 
@@ -747,8 +746,7 @@ root go.mod
 ├── errorfamily/     ← STABLE: should be v1.0
 ├── diagnose/        ← EXPERIMENTAL: should be own module
 ├── agent/           ← EXPERIMENTAL: should be own module
-└── examples/cmd/    ← LEAF: stays in root, compiled by CI</pre
-          >
+└── examples/cmd/    ← LEAF: stays in root, compiled by CI</pre>
           <div class="ref">go.mod (root) · go.work</div>
         </div>
 
@@ -868,8 +866,7 @@ root go.mod
           <pre>
 agent/agent.go:26  import ".../diagnose"
 agent/agent.go:73  diagnosis []*diagnose.DiagnosticResult
-agent/agent.go:120 if d.Status == diagnose.StatusFailed</pre
-          >
+agent/agent.go:120 if d.Status == diagnose.StatusFailed</pre>
           <div class="ref">agent/agent.go · diagnose/diagnose.go</div>
         </div>
 

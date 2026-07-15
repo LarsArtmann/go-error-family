@@ -618,8 +618,7 @@ go.work
 ├── .                  root: zero-dep, classification core
 ├── bridge/            opt-in: samber/oops integration
 ├── diagnose/git/      opt-in: GitRule
-└── diagnose/postgres/ opt-in: PostgresRule</pre
-          >
+└── diagnose/postgres/ opt-in: PostgresRule</pre>
           <div class="ref">go.mod · go.work · bridge/go.mod · diagnose/git/go.mod</div>
         </div>
 
@@ -661,8 +660,7 @@ go.work
 BenchmarkClassifyErrorStruct   8.3 ns/op    0 allocs   (struct-based)
 BenchmarkClassifyPlainError     30 ns/op    0 allocs   (any error)
 BenchmarkExitCode               9.3 ns/op    0 allocs
-BenchmarkIsRetryable            8.0 ns/op    0 allocs</pre
-          >
+BenchmarkIsRetryable            8.0 ns/op    0 allocs</pre>
           <div class="ref">classify.go · benchmark_test.go · fuzz_test.go · .golangci.yml</div>
         </div>
 
@@ -756,8 +754,7 @@ BenchmarkIsRetryable            8.0 ns/op    0 allocs</pre
           <pre>
 // classify.go — pervasively used, no fallback
 if c, ok := errors.AsType[Classified](err); ok { ... }
-if r, ok := errors.AsType[Retryable](err); ok { ... }</pre
-          >
+if r, ok := errors.AsType[Retryable](err); ok { ... }</pre>
           <div class="ref">go.mod (go 1.26.3) · classify.go · handle.go · diagnose/helpers.go</div>
         </div>
 
@@ -807,8 +804,7 @@ func (e *Error) WithContext(key, value string) *Error {
     if e.context == nil { e.context = make(map[string]string) }
     e.context[key] = value  // mutates receiver in place
     return e                // returns same pointer
-}</pre
-          >
+}</pre>
           <div class="ref">error.go:122-128 · benchmark_test.go:94 (0 allocs = no copy)</div>
         </div>
 
@@ -909,8 +905,7 @@ func applyContext(template string, context map[string]string) string {
         s = strings.ReplaceAll(s, "{{."+k+"}}", v) // no escaping
     }
     return s
-}</pre
-          >
+}</pre>
           <div class="ref">handle.go:255-261 · AGENTS.md “Known Limitations” (XSS)</div>
         </div>
 
@@ -968,8 +963,7 @@ func applyContext(template string, context map[string]string) string {
           <pre>
 func Compose(errs ...error) error {
     return errors.Join(errs...) // zero added logic
-}</pre
-          >
+}</pre>
           <div class="ref">classify.go:83-85 · AGENTS.md “Partial Success”</div>
         </div>
 
