@@ -67,40 +67,40 @@ jobs:
       - name: Run golangci-lint
         uses: golangci/golangci-lint-action@v7
         with:
-          version: latest
+          version: v2.12.2
           args: --timeout=5m
 
       - name: Run golangci-lint (diagnose module)
         uses: golangci/golangci-lint-action@v7
         with:
-          version: latest
+          version: v2.12.2
           args: --timeout=5m
           working-directory: ./diagnose
 
       - name: Run golangci-lint (agent module)
         uses: golangci/golangci-lint-action@v7
         with:
-          version: latest
+          version: v2.12.2
           args: --timeout=5m
           working-directory: ./agent
 
       - name: Run golangci-lint (bridge submodule)
         uses: golangci/golangci-lint-action@v7
         with:
-          version: latest
+          version: v2.12.2
           args: --timeout=5m
           working-directory: ./bridge
 
       - name: Run golangci-lint (git submodule)
         uses: golangci/golangci-lint-action@v7
         with:
-          version: latest
+          version: v2.12.2
           args: --timeout=5m
           working-directory: ./diagnose/git
 
       - name: Run golangci-lint (postgres submodule)
         uses: golangci/golangci-lint-action@v7
         with:
-          version: latest
+          version: v2.12.2
           args: --timeout=5m
           working-directory: ./diagnose/postgres
