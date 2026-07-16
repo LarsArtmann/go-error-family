@@ -30,12 +30,15 @@ The classification protocol is the **four interfaces** (`Coded`/`Classified`/`Co
 - **`Classify` defaults unknown errors to `Transient`** (retryable). Fail-open design — unknown errors get retried. Same for `ParseFamily` with unrecognized strings.
 - **`errors.Is` matches on `code + family` only**, ignoring message. Two `*Error`s with different messages but same code and family will match.
 - **`Wrap(nil, ...)` returns `nil`** — nil-safe, but means you can't construct an error wrapping nil.
-- **`WithContext`/`WithCause`/`WithTimestamp` are copy-on-write** — they return a NEW `*Error`, not the same pointer. Safe to chain from shared/sentinel errors. Do NOT assume identity preservation.
+- **`WithContext`/`WithCause`/`WithTimestamp`/`WithExitCode` are copy-on-write** — they return a NEW `*Error`, not the same pointer. Safe to chain from shared/sentinel errors. Do NOT assume identity preservation.
 - **Template placeholders use `{key}`, not `{{.key}}`** — the old syntax collided with Go's `text/template`. Migration: replace all `{{.key}}` with `{key}` in registered templates.
-- **Consumer interfaces (`Coded`, `Classified`, `Contextual`, `Retryable`) embed `error`** — required for Go 1.26's `errors.AsType[T]()`. Don't remove the embedding.
+- **Consumer interfaces (`Coded`, `Classified`, `Contextual`, `Retryable`, `ExitCoder`) embed `error`** — required for Go 1.26's `errors.AsType[T]()`. Don't remove the embedding.
 - **`HandleErrorWithContext` is the canonical entry point** — `HandleError` and `HandleErrorWithConfig` delegate to it. Always prefer the context-accepting variant when you have a `context.Context`.
 - **Package-level `Classify`/`RegisterClassification`/`RegisterTemplate` delegate to `DefaultRegistry`** — backward compatible. For test isolation or scoped handling, construct a `NewRegistry()` and pass it via `HandleConfig.Registry`.
 - **`CommandRunner` defaults to `DefaultCommandRunner{}`** — rules with a nil `Runner` field use the real system commands. Tests inject mocks.
+- **`Error()`/`Summary()` use `safeCauseString` for panic recovery** — if a wrapped cause's `Error()` method panics (e.g. nil internal values in third-party error types), the panic is caught and the cause message is omitted rather than crashing the process.
+- **`ExitCode(err)` checks `ExitCoder` before family** — an error implementing `ExitCoder` with a non-zero code overrides the family-based BSD exit code. `*Error` always implements `ExitCoder`, but returns 0 (meaning "use family default") unless `WithExitCode` was called.
+- **`WrapOnce` is idempotent** — if the error chain already contains a `*Error`, it is returned unchanged. This prevents double-wrapping at API boundaries.
 
 ## API Surface (v0.5.0)
 
@@ -45,7 +48,9 @@ The classification protocol is the **four interfaces** (`Coded`/`Classified`/`Co
 - `Family.HTTPStatus() int` — canonical family→HTTP status (Rejection→400, Conflict→409, Transient→503, Corruption→500, Infrastructure→503).
 - `Family.RetryPolicy() RetryPolicy` — advisory defaults (Transient: 3 attempts, 100ms-5s; others: single attempt). Library does not run the loop.
 
-**Error methods** (`error.go`): `WithContextMap(map)`, `WithContextf(key, fmt, args)`, `JSON() ([]byte, error)` (canonical `{family,code,message,context,retryable,timestamp}` for API boundaries).
+**Error methods** (`error.go`): `WithContextMap(map)`, `WithContextf(key, fmt, args)`, `WithContextAny(key, any)` (type-switched to string), `WithExitCode(int)` (overrides family-based exit code), `ExitCode() int` (satisfies `ExitCoder`), `JSON() ([]byte, error)` (canonical `{family,code,message,context,retryable,timestamp}` for API boundaries). All `With*` methods are copy-on-write.
+
+**Constructors** (`constructors.go`): `WrapOnce(err, family, code, msg)` — idempotent wrapping; returns the existing `*Error` unchanged if the error chain already contains one. Prevents double-wrapping at API boundaries.
 
 **Registry** (`registry.go`): `Clone()` (deep-copy, inherit-and-extend), `RegisterTemplates(map)` (batch, parity with `RegisterClassifications`).
 
@@ -62,6 +67,15 @@ Driven by SEC and browser-history integration feedback. All use stdlib only (`ne
 - **`HTTPStatus(err)` / `HTTPHandler(fn)`** (`http.go`) — net/http middleware. **`HTTPHandler` NEVER leaks `err.Error()`** — the response message comes only from a registered `MessageTemplate`; otherwise just family+code. This is deliberate (consumers value no internal leakage).
 - **`LogError(err, *slog.Logger)` / `LogErrorContext`** (`log.go`) — Transient→Warn, others→Error; nil error is no-op; nil logger→`slog.Default`. Logs `family`, `code`, `retryable`, and `context.<key>` attrs.
 - **`errorfamilytest`** subpackage — `AssertFamily`/`AssertCode`/`AssertRetryable`/`AssertContext`/`AssertContextMissing`. Mirrors `httptest`: keeps `testing` out of the production package.
+
+## BuildFlow-Inspired APIs (added 2026-07-16)
+
+Learned from BuildFlow's `modules/errors/` package — patterns proven in a production CLI build tool:
+
+- **`ExitCoder` interface** (`interfaces.go`) — `error` + `ExitCode() int`. When `ExitCode(err)` or `HandleError*` encounters an error implementing this with a non-zero code, that code overrides the family-based BSD exit code. Allows per-error exit code overrides without changing the family classification. `*Error` satisfies this via `WithExitCode(code)`.
+- **`WrapOnce(err, family, code, msg)`** (`constructors.go`) — idempotent wrapping. Uses `errors.AsType[*Error]` to detect existing classified errors in the chain. Prevents the `[transient:db.timeout] outer: [transient:db.timeout] inner: cause` double-wrap anti-pattern at API boundaries. Nil-safe.
+- **`WithContextAny(key, value any)`** (`error.go`) — typed context values. Accepts `any` and converts via a type switch (string, int, int64, uint, uint64, float64, bool, nil → empty, fallback `fmt.Sprint`). Ergonomic alternative to `fmt.Sprintf` for scalar values.
+- **`safeCauseString`** (`error.go`) — panic recovery in `Error()`, `Summary()`, and `formatVerbose()`. Uses `defer/recover` around `cause.Error()` to guard against misbehaving third-party error types that panic on nil internal values. The error message renders without the cause instead of crashing.
 
 ## Classification Precedence
 

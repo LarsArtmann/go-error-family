@@ -4,6 +4,7 @@ import (
 	"encoding/json/v2"
 	"fmt"
 	"maps"
+	"strconv"
 	"time"
 )
 
@@ -17,7 +18,7 @@ import (
 // Projects with domain-specific needs (e.g., FindingError with Position/File)
 // can build their own struct and implement the Coded/Classified/Contextual interfaces.
 //
-// Implements: error, Coded, Classified, Contextual, Retryable, fmt.Formatter.
+// Implements: error, Coded, Classified, Contextual, Retryable, ExitCoder, fmt.Formatter.
 type Error struct {
 	code      string            // machine-readable identity (e.g. "db.timeout")
 	message   string            // human-readable technical message
@@ -25,13 +26,19 @@ type Error struct {
 	context   map[string]string // factual details about the error
 	cause     error             // underlying error in the chain
 	timestamp time.Time         // when the error occurred
+	exitCode  int               // optional override; 0 = use family default
 }
 
 // Error implements the error interface.
-// Returns a compact format: [family:code] message
+// Returns a compact format: [family:code] message.
+// The cause string is extracted via [safeCauseString] to guard against
+// panics from misbehaving wrapped error types.
 func (e *Error) Error() string {
 	if e.cause != nil {
-		return fmt.Sprintf("[%s:%s] %s: %v", e.family, e.code, e.message, e.cause)
+		causeMsg := safeCauseString(e.cause)
+		if causeMsg != "" {
+			return fmt.Sprintf("[%s:%s] %s: %s", e.family, e.code, e.message, causeMsg)
+		}
 	}
 	return fmt.Sprintf("[%s:%s] %s", e.family, e.code, e.message)
 }
@@ -129,7 +136,10 @@ func (e *Error) formatVerbose(f fmt.State) {
 	}
 
 	if e.cause != nil {
-		_, _ = fmt.Fprintf(f, "\n  caused by: %+v", e.cause)
+		causeMsg := safeCauseString(e.cause)
+		if causeMsg != "" {
+			_, _ = fmt.Fprintf(f, "\n  caused by: %s", causeMsg)
+		}
 	}
 }
 
@@ -159,6 +169,15 @@ func (e *Error) WithContextf(key, format string, args ...any) *Error {
 	return clone
 }
 
+// WithContextAny adds a key-value pair to the error's context where the value
+// can be of any type. The value is converted to string via a type switch for
+// common types (string, int, int64, uint, uint64, float64, bool) and falls back
+// to fmt.Sprint for everything else.
+// Returns a new Error, leaving the original unchanged — safe for shared/sentinel errors.
+func (e *Error) WithContextAny(key string, value any) *Error {
+	return e.WithContext(key, contextValueToString(value))
+}
+
 // WithCause sets the underlying cause and returns a new error for chaining.
 func (e *Error) WithCause(cause error) *Error {
 	clone := e.clone()
@@ -174,6 +193,16 @@ func (e *Error) WithTimestamp(ts time.Time) *Error {
 	return clone
 }
 
+// WithExitCode sets a custom process exit code that overrides the family-based
+// default from [Family.ExitCode]. A value of 0 means "not set" — callers should
+// fall back to the family's canonical exit code.
+// Returns a new Error, leaving the original unchanged — safe for shared/sentinel errors.
+func (e *Error) WithExitCode(code int) *Error {
+	clone := e.clone()
+	clone.exitCode = code
+	return clone
+}
+
 // clone returns a shallow copy of the error with a deep-copied context map.
 func (e *Error) clone() *Error {
 	c := &Error{
@@ -182,6 +211,7 @@ func (e *Error) clone() *Error {
 		family:    e.family,
 		cause:     e.cause,
 		timestamp: e.timestamp,
+		exitCode:  e.exitCode,
 		context:   make(map[string]string, len(e.context)),
 	}
 	maps.Copy(c.context, e.context)
@@ -190,11 +220,61 @@ func (e *Error) clone() *Error {
 
 // Summary returns a one-line human-readable summary suitable for logs and CLI output.
 // Format: "code: message" without family prefix.
+// The cause string is extracted via [safeCauseString] to guard against panics.
 func (e *Error) Summary() string {
 	if e.cause != nil {
-		return fmt.Sprintf("%s: %s — %v", e.code, e.message, e.cause)
+		causeMsg := safeCauseString(e.cause)
+		if causeMsg != "" {
+			return fmt.Sprintf("%s: %s — %s", e.code, e.message, causeMsg)
+		}
 	}
 	return fmt.Sprintf("%s: %s", e.code, e.message)
+}
+
+// ExitCode returns the custom process exit code if one was set via [WithExitCode].
+// Returns 0 when no custom code is set, signaling callers to fall back to the
+// family-based default from [Family.ExitCode].
+//
+// This satisfies the [ExitCoder] interface so that [ExitCode] (the package-level
+// function) can discover per-error overrides.
+func (e *Error) ExitCode() int { return e.exitCode }
+
+// safeCauseString calls cause.Error() with panic recovery.
+// Certain third-party error types panic when their Error() method encounters
+// nil internal values. This guard prevents the panic from propagating through
+// fmt.Sprintf callers, returning an empty string instead.
+func safeCauseString(cause error) (result string) {
+	defer func() {
+		if r := recover(); r != nil {
+			result = ""
+		}
+	}()
+	return cause.Error()
+}
+
+// contextValueToString converts any context value to its string representation.
+// Uses a type switch for common scalar types and falls back to fmt.Sprint.
+func contextValueToString(v any) string {
+	switch val := v.(type) {
+	case string:
+		return val
+	case int:
+		return strconv.Itoa(val)
+	case int64:
+		return strconv.FormatInt(val, 10)
+	case uint:
+		return strconv.FormatUint(uint64(val), 10)
+	case uint64:
+		return strconv.FormatUint(val, 10)
+	case float64:
+		return strconv.FormatFloat(val, 'f', -1, 64)
+	case bool:
+		return strconv.FormatBool(val)
+	case nil:
+		return ""
+	default:
+		return fmt.Sprint(v)
+	}
 }
 
 // HasContext reports whether the error has a specific context key.

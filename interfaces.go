@@ -39,3 +39,14 @@ type Retryable interface {
 	error
 	IsRetryable() bool
 }
+
+// ExitCoder errors carry a custom process exit code that overrides the
+// family-based default from [Family.ExitCode]. When [ExitCode] encounters
+// an error implementing this interface with a non-zero code, that code wins.
+//
+// This allows individual errors to deviate from their family's canonical
+// exit code without changing the family classification itself.
+type ExitCoder interface {
+	error
+	ExitCode() int
+}

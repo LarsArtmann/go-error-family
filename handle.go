@@ -136,7 +136,7 @@ func HandleErrorWithContext(ctx context.Context, err error, cfg HandleConfig) in
 	}
 
 	family := reg.Classify(err)
-	exitCode := family.ExitCode()
+	exitCode := resolveExitCode(err, family)
 
 	code := extractCode(err)
 	errCtx := extractContext(err)
@@ -180,7 +180,7 @@ func HandleErrorDetailedWithConfig(err error, cfg HandleConfig) *HandleResult {
 	errCtx := extractContext(err)
 
 	result := &HandleResult{
-		ExitCode: family.ExitCode(),
+		ExitCode: resolveExitCode(err, family),
 		Message:  renderCLI(code, errCtx, family, cfg, reg),
 	}
 
@@ -189,6 +189,17 @@ func HandleErrorDetailedWithConfig(err error, cfg HandleConfig) *HandleResult {
 	}
 
 	return result
+}
+
+// resolveExitCode checks for a custom [ExitCoder] override on the error chain
+// first, then falls back to the family-based default.
+func resolveExitCode(err error, family Family) int {
+	if ec, ok := errors.AsType[ExitCoder](err); ok {
+		if code := ec.ExitCode(); code != 0 {
+			return code
+		}
+	}
+	return family.ExitCode()
 }
 
 func extractCode(err error) string {

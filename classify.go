@@ -68,10 +68,20 @@ func IsRetryable(err error) bool {
 }
 
 // ExitCode returns the appropriate process exit code for an error.
-// Nil errors return 0. Other errors are classified and mapped to BSD sysexits.h codes.
+// Nil errors return 0.
+//
+// If the error (or any error in its chain) implements [ExitCoder] with a non-zero
+// code, that code is returned — allowing individual errors to override their
+// family's canonical exit code. Otherwise, the error is classified and mapped to
+// BSD sysexits.h codes via [Family.ExitCode].
 func ExitCode(err error) int {
 	if err == nil {
 		return 0
+	}
+	if ec, ok := errors.AsType[ExitCoder](err); ok {
+		if code := ec.ExitCode(); code != 0 {
+			return code
+		}
 	}
 	return Classify(err).ExitCode()
 }

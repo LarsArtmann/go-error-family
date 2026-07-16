@@ -1,6 +1,7 @@
 package errorfamily
 
 import (
+	"errors"
 	"fmt"
 	"time"
 )
@@ -14,6 +15,7 @@ func New(family Family, code, message string) *Error {
 		cause:     nil,
 		context:   make(map[string]string),
 		timestamp: time.Now().UTC(),
+		exitCode:  0,
 	}
 }
 
@@ -35,6 +37,7 @@ func Wrap(err error, family Family, code, message string) *Error {
 		cause:     err,
 		context:   make(map[string]string),
 		timestamp: time.Now().UTC(),
+		exitCode:  0,
 	}
 }
 
@@ -125,4 +128,22 @@ func WrapCorruptionf(err error, code, format string, args ...any) *Error {
 // WrapInfrastructuref wraps an error as Infrastructure with a formatted message.
 func WrapInfrastructuref(err error, code, format string, args ...any) *Error {
 	return Wrap(err, Infrastructure, code, fmt.Sprintf(format, args...))
+}
+
+// WrapOnce wraps an error only if it is not already a *Error.
+// Use this at API boundaries where errors may have been classified by
+// an inner layer. Prevents double-wrapping chains like:
+//
+//	[transient:db.timeout] outer: [transient:db.timeout] inner: cause
+//
+// If err is already a *Error, it is returned unchanged.
+// If err is nil, returns nil (same nil-safety as [Wrap]).
+func WrapOnce(err error, family Family, code, message string) *Error {
+	if err == nil {
+		return nil
+	}
+	if existing, ok := errors.AsType[*Error](err); ok {
+		return existing
+	}
+	return Wrap(err, family, code, message)
 }
