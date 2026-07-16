@@ -4,6 +4,30 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
+## [0.8.0] - 2026-07-16
+
+Inspired by studying BuildFlow's `modules/errors/` package. All additions are
+non-breaking and use only the Go standard library.
+
+### Added
+
+- **`ExitCoder` interface** (`interfaces.go`) — fifth consumer interface alongside `Coded`/`Classified`/`Contextual`/`Retryable`. Errors implementing `ExitCode() int` can override the family-based exit code on a per-error basis. Embeds `error` for `errors.AsType[T]` compatibility.
+- **`Error.WithExitCode(code int) *Error`** (`error.go`) — copy-on-write mutator that sets a custom exit code. Zero means "unset, use family default."
+- **`Error.WithContextAny(key string, value any) *Error`** (`error.go`) — type-safe context attachment for non-string values. Uses a type switch for common scalars (string, int, int64, uint, uint64, float64, bool) and falls back to `fmt.Sprint`.
+- **`WrapOnce(err, family, code, msg) *Error`** (`constructors.go`) — idempotent wrap: returns the existing `*Error` unchanged if the error chain already contains one. Prevents double-wrapping at API boundaries.
+- **`WrapOncef(err, family, code, format, args...) *Error`** (`constructors.go`) — formatted variant of `WrapOnce`.
+- **`errorfamilytest.AssertExitCode(tb, err, want)`** — test assertion for exit codes (checks ExitCoder override first, then family default).
+- **`safeCauseString`** (`error.go`) — panic-recovery guard around `cause.Error()`. Defense-in-depth against third-party error types that panic on nil internal values. Applied to `Error()`, `Summary()`, and `formatVerbose()`.
+- **`formatVerbose` now shows `exit_code` when non-zero** — improved `%+v` debug output.
+- **Benchmarks**: `BenchmarkWrapOnceWrap`, `BenchmarkWrapOnceIdempotent`, `BenchmarkWithExitCode`, `BenchmarkExitCodeOverride`.
+- **Examples**: `ExampleWrapOnce`, `ExampleError_WithExitCode`, `ExampleError_WithContextAny`, `ExampleExitCode`.
+
+### Changed
+
+- **`ExitCode(err)` checks `ExitCoder` interface first** — a non-zero custom exit code wins over the family default. Zero falls back to `Family.ExitCode()`.
+- **`HandleErrorWithContext` and `HandleErrorDetailedWithConfig`** now resolve exit codes via a shared `resolveExitCode` helper that respects the `ExitCoder` interface.
+- **`Error.Error()`, `Error.Summary()`, `Error.formatVerbose()`** use `safeCauseString` instead of `%v` format for cause rendering.
+
 ## [0.7.0] - 2026-07-09
 
 ### Changed (BREAKING)

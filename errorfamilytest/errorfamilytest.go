@@ -79,3 +79,14 @@ func AssertContextMissing(tb testing.TB, err error, key string) {
 		tb.Errorf("ErrorContext(%v) unexpectedly contains key %q", err, key)
 	}
 }
+
+// AssertExitCode asserts that err resolves to the expected process exit code
+// via [errorfamily.ExitCode]. This checks the ExitCoder interface first (for
+// per-error overrides set via WithExitCode), then falls back to the family
+// default. A nil err yields exit code 0.
+func AssertExitCode(tb testing.TB, err error, want int) {
+	tb.Helper()
+	if got := errorfamily.ExitCode(err); got != want {
+		tb.Errorf("ExitCode(%v) = %d, want %d", err, got, want)
+	}
+}

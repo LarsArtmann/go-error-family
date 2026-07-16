@@ -135,6 +135,10 @@ func (e *Error) formatVerbose(f fmt.State) {
 		_, _ = fmt.Fprintf(f, "\n  at: %s", e.timestamp.Format(time.RFC3339))
 	}
 
+	if e.exitCode != 0 {
+		_, _ = fmt.Fprintf(f, "\n  exit_code: %d", e.exitCode)
+	}
+
 	if e.cause != nil {
 		causeMsg := safeCauseString(e.cause)
 		if causeMsg != "" {
@@ -295,6 +299,9 @@ func (e *Error) ContextValue(key string) string {
 }
 
 // jsonError is the JSON view of an Error for API responses.
+// exitCode is intentionally excluded: it is a CLI/POSIX concept. API consumers
+// use HTTP status codes (via Family.HTTPStatus) or the family/code fields for
+// behavioral decisions, not process exit codes.
 type jsonError struct {
 	Family    string            `json:"family"`
 	Code      string            `json:"code"`

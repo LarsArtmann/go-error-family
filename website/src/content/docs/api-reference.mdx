@@ -60,20 +60,25 @@ type Retryable interface {
     error
     IsRetryable() bool
 }
+
+type ExitCoder interface {
+    error
+    ExitCode() int
+}
 ```
 
 ## Functions
 
 ### Classification
 
-| Function                     | Description                                |
-| ---------------------------- | ------------------------------------------ |
-| `Classify(err) Family`       | Universal classification (6-step pipeline) |
-| `Code(err) string`           | Extract error code from unwrap chain       |
-| `IsRetryable(err) bool`      | Binary retry decision from Family          |
-| `ExitCode(err) int`          | BSD sysexits.h exit code from Family       |
-| `HTTPStatus(err) int`        | HTTP status code from Family               |
-| `ParseFamily(string) Family` | Parse from string (fail-open to Transient) |
+| Function                     | Description                                                             |
+| ---------------------------- | ----------------------------------------------------------------------- |
+| `Classify(err) Family`       | Universal classification (6-step pipeline)                              |
+| `Code(err) string`           | Extract error code from unwrap chain                                    |
+| `IsRetryable(err) bool`      | Binary retry decision from Family                                       |
+| `ExitCode(err) int`          | BSD sysexits.h exit code (checks ExitCoder override first, then Family) |
+| `HTTPStatus(err) int`        | HTTP status code from Family                                            |
+| `ParseFamily(string) Family` | Parse from string (fail-open to Transient)                              |
 
 ### Registration
 
@@ -91,20 +96,22 @@ type Retryable interface {
 
 ### Constructors
 
-| Function                                          | Description                   |
-| ------------------------------------------------- | ----------------------------- |
-| `New(Family, code, msg) *Error`                   | Create a new classified error |
-| `Newf(Family, code, format, args) *Error`         | Formatted constructor         |
-| `Wrap(cause, Family, code, msg) *Error`           | Wrap with cause               |
-| `Wrapf(cause, Family, code, format, args) *Error` | Formatted wrap                |
-| `NewRejection(code, msg)`                         | Family shortcut               |
-| `NewConflict(code, msg)`                          | Family shortcut               |
-| `NewTransient(code, msg)`                         | Family shortcut               |
-| `NewCorruption(code, msg)`                        | Family shortcut               |
-| `NewInfrastructure(code, msg)`                    | Family shortcut               |
-| `WrapRejection(cause, code, msg)`                 | Family wrap shortcut          |
-| `WrapConflictf(cause, code, format, args)`        | Formatted family wrap         |
-| (and all 5 families × New/Wrap/Wrapf)             | 20 total constructors         |
+| Function                                              | Description                      |
+| ----------------------------------------------------- | -------------------------------- |
+| `New(Family, code, msg) *Error`                       | Create a new classified error    |
+| `Newf(Family, code, format, args) *Error`             | Formatted constructor            |
+| `Wrap(cause, Family, code, msg) *Error`               | Wrap with cause                  |
+| `Wrapf(cause, Family, code, format, args) *Error`     | Formatted wrap                   |
+| `WrapOnce(cause, Family, code, msg) *Error`           | Idempotent wrap (no double-wrap) |
+| `WrapOncef(cause, Family, code, format, args) *Error` | Formatted idempotent wrap        |
+| `NewRejection(code, msg)`                             | Family shortcut                  |
+| `NewConflict(code, msg)`                              | Family shortcut                  |
+| `NewTransient(code, msg)`                             | Family shortcut                  |
+| `NewCorruption(code, msg)`                            | Family shortcut                  |
+| `NewInfrastructure(code, msg)`                        | Family shortcut                  |
+| `WrapRejection(cause, code, msg)`                     | Family wrap shortcut             |
+| `WrapConflictf(cause, code, format, args)`            | Formatted family wrap            |
+| (and all 5 families × New/Wrap/Wrapf)                 | 20 total constructors            |
 
 ### CLI Boundary
 

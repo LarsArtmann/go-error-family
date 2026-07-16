@@ -1,6 +1,7 @@
 # go-error-family
 
 [![Go Reference](https://pkg.go.dev/badge/github.com/larsartmann/go-error-family.svg)](https://pkg.go.dev/github.com/larsartmann/go-error-family)
+[![Go Report Card](https://goreportcard.com/badge/github.com/larsartmann/go-error-family)](https://goreportcard.com/report/github.com/larsartmann/go-error-family)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
 Structured error protocol for Go — behavioral classification, exit codes, and diagnostic rules.
@@ -87,10 +88,10 @@ See [examples/](examples/) for runnable CLI, HTTP, and custom diagnostic rule de
 ## What It Gives You
 
 - **`Family`** — behavioral classification (Rejection, Conflict, Transient, Corruption, Infrastructure) that maps to retry decisions, exit codes, HTTP status codes, and user-facing tone
-- **Small interfaces** — `Coded`, `Classified`, `Contextual`, `Retryable` — each error type implements what it needs; the `Error` struct is just a reference implementation
+- **Small interfaces** — `Coded`, `Classified`, `Contextual`, `Retryable`, `ExitCoder` — each error type implements what it needs; the `Error` struct is just a reference implementation
 - **`Classify(err)`** — universal classification for any error (multi-error → interface → sentinels → classifiers → default)
 - **Multi-error support** — `errors.Join` + `Classify` picks the **worst** Family by severity, deterministically regardless of argument order
-- **`ExitCode(err)`** — BSD sysexits.h exit codes derived from Family
+- **`ExitCode(err)`** — BSD sysexits.h exit codes derived from Family (overridable per-error via `ExitCoder` interface)
 - **`Code(err)`** — one-liner error-code extraction (walks the unwrap chain for the `Coded` interface)
 - **`IsRetryable(err)`** — binary retry decision derived from Family
 - **`Family.HTTPStatus()`** — canonical family→HTTP status mapping (Rejection→400, Conflict→409, Transient→503, …)
@@ -102,10 +103,11 @@ See [examples/](examples/) for runnable CLI, HTTP, and custom diagnostic rule de
 - **`RegisterStdlibDefaults(reg)`** — pre-registered classifications for common stdlib errors (context/sql/os) with documented rationale
 - **`TemplateForCode(code)`** — look up a registered message template without the full CLI pipeline (for HTTP/gRPC boundaries)
 - **`LogError(err, logger)`** — structured `log/slog` logging with family/code/retryable/context fields
-- **`errorfamilytest`** — test assertion helpers (`AssertFamily`, `AssertCode`, `AssertRetryable`, `AssertContext`)
+- **`errorfamilytest`** — test assertion helpers (`AssertFamily`, `AssertCode`, `AssertRetryable`, `AssertContext`, `AssertExitCode`)
 - **`HandleError(err)`** — CLI boundary handler with structured messages (What / Why / Fix / WayOut)
 - **Diagnostic rules** — deterministic checks (PostgreSQL, filesystem, network, git) that auto-discover why an error occurred and emit structured `Fix{Summary, Command}`
-- **AI debug agent** — root cause analysis and `FixStep` suggestions from diagnostic context
+- **`WrapOnce(err, family, code, msg)`** — idempotent wrap that prevents double-wrapping at API boundaries
+- **`WithExitCode(code)` / `WithContextAny(key, value)`** — per-error exit code override and type-safe context attachment
 
 ## The Five Families
 

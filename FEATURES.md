@@ -3,7 +3,7 @@
 Honest inventory of what exists, what works, and what doesn't. Every claim is
 verifiable against the code — citations point at the source.
 
-**Last verified:** 2026-07-13 against v0.7.0
+**Last verified:** 2026-07-16 against v0.8.0
 
 ---
 
@@ -38,7 +38,7 @@ experimental `encoding/json/v2` which requires `GOEXPERIMENT=jsonv2`).
 | `Classify(nil)` → Rejection (intentional: nil = caller's fault)                                      | FULLY_FUNCTIONAL | `registry.go:Classify`       |
 | Multi-error (`errors.Join`) → worst-severity wins, order-independent                                 | FULLY_FUNCTIONAL | `registry.go:Classify`       |
 | `IsRetryable(err)` — binary retry signal                                                             | FULLY_FUNCTIONAL | `classify.go`                |
-| `ExitCode(err)` — BSD exit codes from Family                                                         | FULLY_FUNCTIONAL | `classify.go`                |
+| `ExitCode(err)` — checks ExitCoder interface first, then family default                              | FULLY_FUNCTIONAL | `classify.go`                |
 | `Code(err)` — one-liner code extraction via `Coded` interface                                        | FULLY_FUNCTIONAL | `classify.go`                |
 | `Compose(errs...)` — thin wrapper around `errors.Join` (kept for backward compatibility)             | FULLY_FUNCTIONAL | `classify.go`                |
 | `ParseFamily(string)` — case-insensitive, defaults to Transient                                      | FULLY_FUNCTIONAL | `family.go`                  |
@@ -53,6 +53,7 @@ experimental `encoding/json/v2` which requires `GOEXPERIMENT=jsonv2`).
 | `Wrap(err, family, code, msg)` / `Wrapf(...)` — nil-safe (returns nil for nil err)                                       | FULLY_FUNCTIONAL | `constructors.go` |
 | Family-specific `Wrap*`: `WrapRejection`, `WrapConflict`, `WrapTransient`, `WrapCorruption`, `WrapInfrastructure`        | FULLY_FUNCTIONAL | `constructors.go` |
 | Formatted `Wrap{Family}f`: `WrapRejectionf`, `WrapConflictf`, `WrapTransientf`, `WrapCorruptionf`, `WrapInfrastructuref` | FULLY_FUNCTIONAL | `constructors.go` |
+| `WrapOnce(err, family, code, msg)` / `WrapOncef(...)` — idempotent wrap (prevents double-wrapping)                       | FULLY_FUNCTIONAL | `constructors.go` |
 
 ### Error Struct (Reference Implementation)
 
@@ -60,7 +61,8 @@ experimental `encoding/json/v2` which requires `GOEXPERIMENT=jsonv2`).
 | -------------------------------------------------------------------------------------------------- | ---------------- | ---------- |
 | `Error` type implementing `Coded`, `Classified`, `Contextual`, `Retryable`, `fmt.Formatter`        | FULLY_FUNCTIONAL | `error.go` |
 | `WithContext(key, value)` / `WithContextf(key, fmt, args)` / `WithContextMap(map)` — copy-on-write | FULLY_FUNCTIONAL | `error.go` |
-| `WithCause(err)` / `WithTimestamp(ts)` — copy-on-write                                             | FULLY_FUNCTIONAL | `error.go` |
+| `WithContextAny(key, value any)` — type-safe context for non-string values                         | FULLY_FUNCTIONAL | `error.go` |
+| `WithCause(err)` / `WithTimestamp(ts)` / `WithExitCode(code)` — copy-on-write                      | FULLY_FUNCTIONAL | `error.go` |
 | `Error.Is(target)` — matches on code + family (not message)                                        | FULLY_FUNCTIONAL | `error.go` |
 | `Error.JSON()` — canonical `{family,code,message,context,retryable,timestamp}`                     | FULLY_FUNCTIONAL | `error.go` |
 | `Error.Summary()` — structured one-liner                                                           | FULLY_FUNCTIONAL | `error.go` |
@@ -107,13 +109,14 @@ experimental `encoding/json/v2` which requires `GOEXPERIMENT=jsonv2`).
 
 ### Consumer Interfaces
 
-| Feature                                                    | Status           | Evidence        |
-| ---------------------------------------------------------- | ---------------- | --------------- |
-| `Coded` (`ErrorCode() string`)                             | FULLY_FUNCTIONAL | `interfaces.go` |
-| `Classified` (`ErrorFamily() Family`)                      | FULLY_FUNCTIONAL | `interfaces.go` |
-| `Contextual` (`ErrorContext() map[string]string`)          | FULLY_FUNCTIONAL | `interfaces.go` |
-| `Retryable` (`IsRetryable() bool`)                         | FULLY_FUNCTIONAL | `interfaces.go` |
-| All four embed `error` (required for `errors.AsType[T]()`) | FULLY_FUNCTIONAL | `interfaces.go` |
+| Feature                                                       | Status           | Evidence        |
+| ------------------------------------------------------------- | ---------------- | --------------- |
+| `Coded` (`ErrorCode() string`)                                | FULLY_FUNCTIONAL | `interfaces.go` |
+| `Classified` (`ErrorFamily() Family`)                         | FULLY_FUNCTIONAL | `interfaces.go` |
+| `Contextual` (`ErrorContext() map[string]string`)             | FULLY_FUNCTIONAL | `interfaces.go` |
+| `Retryable` (`IsRetryable() bool`)                            | FULLY_FUNCTIONAL | `interfaces.go` |
+| `ExitCoder` (`ExitCode() int`) — per-error exit code override | FULLY_FUNCTIONAL | `interfaces.go` |
+| All five embed `error` (required for `errors.AsType[T]()`)    | FULLY_FUNCTIONAL | `interfaces.go` |
 
 ---
 
@@ -128,6 +131,7 @@ Test assertion helpers mirroring `net/http/httptest`. Keeps `testing` out of pro
 | `AssertRetryable(tb, err, want)`     | FULLY_FUNCTIONAL | `errorfamilytest/errorfamilytest.go` |
 | `AssertContext(tb, err, key, want)`  | FULLY_FUNCTIONAL | `errorfamilytest/errorfamilytest.go` |
 | `AssertContextMissing(tb, err, key)` | FULLY_FUNCTIONAL | `errorfamilytest/errorfamilytest.go` |
+| `AssertExitCode(tb, err, want)`      | FULLY_FUNCTIONAL | `errorfamilytest/errorfamilytest.go` |
 
 ---
 

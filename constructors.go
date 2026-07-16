@@ -147,3 +147,11 @@ func WrapOnce(err error, family Family, code, message string) *Error {
 	}
 	return Wrap(err, family, code, message)
 }
+
+// WrapOncef is the formatted-message variant of [WrapOnce].
+// Wraps an error only if it is not already a *Error, using a printf-style
+// format string for the message.
+// Returns nil if err is nil. Returns the existing *Error unchanged if already classified.
+func WrapOncef(err error, family Family, code, format string, args ...any) *Error {
+	return WrapOnce(err, family, code, fmt.Sprintf(format, args...))
+}

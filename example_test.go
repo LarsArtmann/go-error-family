@@ -100,3 +100,47 @@ func ExampleError_JSON() {
 	fmt.Println(string(data))
 	// Output: {"family":"transient","code":"db.timeout","message":"query timed out","context":{"host":"db1"},"retryable":true,"timestamp":"2026-01-01T00:00:00Z"}
 }
+
+func ExampleWrapOnce() {
+	// Inner layer already classified the error.
+	inner := NewTransient("db.timeout", "database timed out")
+
+	// API boundary: WrapOnce returns the existing *Error unchanged
+	// instead of creating a double-wrapped chain.
+	err := WrapOnce(inner, Infrastructure, "api.error", "API failed")
+
+	fmt.Println(err == inner)
+	// Output: true
+}
+
+func ExampleError_WithExitCode() {
+	// Override the family-based exit code for a specific error.
+	// Useful when a transient error should exit with a code that
+	// differs from the BSD sysexits default (75).
+	err := NewTransient("rate.limited", "too many requests").WithExitCode(88)
+	fmt.Println(err.ExitCode())
+	// Output: 88
+}
+
+func ExampleError_WithContextAny() {
+	// Add context values of any type — they are converted to strings.
+	err := NewRejection("validation.failed", "invalid input").
+		WithContextAny("count", 3).
+		WithContextAny("enabled", true)
+
+	fmt.Println(err.ContextValue("count"))
+	fmt.Println(err.ContextValue("enabled"))
+	// Output: 3
+	// true
+}
+
+func ExampleExitCode() {
+	// ExitCode checks the ExitCoder interface first (per-error override),
+	// then falls back to the family's canonical exit code.
+	fmt.Println(ExitCode(NewTransient("db.timeout", "msg")))
+	fmt.Println(ExitCode(NewRejection("bad.input", "msg")))
+	fmt.Println(ExitCode(NewTransient("custom", "msg").WithExitCode(5)))
+	// Output: 75
+	// 1
+	// 5
+}

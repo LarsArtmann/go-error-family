@@ -15,7 +15,7 @@ A structured error protocol for Go. Every error gets a behavioral **Family** (re
 errorfamily/          ← root module: types, constructors, classification, CLI boundary
   error.go              Error struct (reference implementation)
   family.go             Family enum + Audience/Tone metadata
-  interfaces.go         Coded, Classified, Contextual, Retryable
+  interfaces.go         Coded, Classified, Contextual, Retryable, ExitCoder
   constructors.go       New/Wrap + family shortcuts (incl. Wrap{Family}f formatted variants)
   classify.go           Classify(), Code(), IsRetryable, ExitCode, Classifier, RegisterClassification(s), RegisterClassifier(s)
   registry.go           Registry type (injectable sentinels + classifiers + templates), DefaultRegistry, NewRegistry(), TemplateForCode()
@@ -123,9 +123,14 @@ type Retryable interface {    // retry hint (consulted only when Classified is a
     error
     IsRetryable() bool
 }
+
+type ExitCoder interface {    // per-error exit code override (0 = use family default)
+    error
+    ExitCode() int
+}
 ```
 
-`*Error` implements all four. Third-party error types can implement whichever subset makes sense.
+`*Error` implements all five. Third-party error types can implement whichever subset makes sense.
 
 ---
 
@@ -151,8 +156,10 @@ err.Timestamp() time.Time               // when the error was created
 err.WithContext(key, value string) *Error
 err.WithContextMap(ctx map[string]string) *Error    // bulk set from a map
 err.WithContextf(key, format string, args ...any) *Error  // printf-style context value
+err.WithContextAny(key string, value any) *Error   // type-safe: int, bool, float64, etc.
 err.WithCause(cause error) *Error
 err.WithTimestamp(ts time.Time) *Error   // deterministic timestamp for tests
+err.WithExitCode(code int) *Error        // override family exit code (0 = use default)
 
 // Serialization
 err.JSON() ([]byte, error)              // canonical JSON for API boundaries: {family,code,message,context,retryable,timestamp}
@@ -185,6 +192,8 @@ errorfamily.New(family, code, message) *Error
 errorfamily.Newf(family, code, format, args...) *Error
 errorfamily.Wrap(err, family, code, message) *Error    // nil-safe: returns nil if err is nil
 errorfamily.Wrapf(err, family, code, format, args...) *Error
+errorfamily.WrapOnce(err, family, code, message) *Error  // idempotent: returns existing *Error if already classified
+errorfamily.WrapOncef(err, family, code, format, args...) *Error
 
 // Family shortcuts (New + Wrap + formatted Wrap for each)
 NewRejection / NewConflict / NewTransient / NewCorruption / NewInfrastructure

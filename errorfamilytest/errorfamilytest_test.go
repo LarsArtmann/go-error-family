@@ -100,6 +100,23 @@ func TestAssertContextMissingButPresent(t *testing.T) {
 	}
 }
 
+func TestAssertExitCode(t *testing.T) {
+	errorfamilytest.AssertExitCode(t, errorfamily.NewRejection("c", "m"), 1)
+	errorfamilytest.AssertExitCode(t, errorfamily.NewTransient("c", "m"), 75)
+	errorfamilytest.AssertExitCode(t, errorfamily.NewRejection("c", "m").WithExitCode(42), 42)
+	errorfamilytest.AssertExitCode(t, nil, 0)
+}
+
+func TestAssertExitCodeMismatch(t *testing.T) {
+	rec := newFailureRecorder(t)
+	rec.run(func() {
+		errorfamilytest.AssertExitCode(rec, errorfamily.NewRejection("c", "m"), 99)
+	})
+	if !rec.failed {
+		t.Fatal("expected AssertExitCode to fail on mismatch")
+	}
+}
+
 // --- failureRecorder: intercepts test failures without failing the outer test ---
 
 type fatalSentinel struct{}

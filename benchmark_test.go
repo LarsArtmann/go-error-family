@@ -176,3 +176,31 @@ func BenchmarkErrorJSON(b *testing.B) {
 		_, _ = e.JSON()
 	}
 }
+
+func BenchmarkWrapOnceWrap(b *testing.B) {
+	cause := errors.New("plain error")
+	for b.Loop() {
+		_ = WrapOnce(cause, Transient, "bench.wrap", "wrapping")
+	}
+}
+
+func BenchmarkWrapOnceIdempotent(b *testing.B) {
+	classified := NewTransient("db.timeout", "already classified")
+	for b.Loop() {
+		_ = WrapOnce(classified, Infrastructure, "other", "msg")
+	}
+}
+
+func BenchmarkWithExitCode(b *testing.B) {
+	e := NewTransient("db.timeout", "msg")
+	for b.Loop() {
+		_ = e.WithExitCode(42)
+	}
+}
+
+func BenchmarkExitCodeOverride(b *testing.B) {
+	e := NewTransient("db.timeout", "msg").WithExitCode(42)
+	for b.Loop() {
+		_ = ExitCode(e)
+	}
+}

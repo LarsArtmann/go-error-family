@@ -50,7 +50,7 @@ The classification protocol is the **four interfaces** (`Coded`/`Classified`/`Co
 
 **Error methods** (`error.go`): `WithContextMap(map)`, `WithContextf(key, fmt, args)`, `WithContextAny(key, any)` (type-switched to string), `WithExitCode(int)` (overrides family-based exit code), `ExitCode() int` (satisfies `ExitCoder`), `JSON() ([]byte, error)` (canonical `{family,code,message,context,retryable,timestamp}` for API boundaries). All `With*` methods are copy-on-write.
 
-**Constructors** (`constructors.go`): `WrapOnce(err, family, code, msg)` — idempotent wrapping; returns the existing `*Error` unchanged if the error chain already contains one. Prevents double-wrapping at API boundaries.
+**Constructors** (`constructors.go`): `WrapOnce(err, family, code, msg)` / `WrapOncef(...)` — idempotent wrapping; returns the existing `*Error` unchanged if the error chain already contains one. Prevents double-wrapping at API boundaries.
 
 **Registry** (`registry.go`): `Clone()` (deep-copy, inherit-and-extend), `RegisterTemplates(map)` (batch, parity with `RegisterClassifications`).
 
@@ -66,7 +66,7 @@ Driven by SEC and browser-history integration feedback. All use stdlib only (`ne
 - **`Wrap{Family}f`** (`constructors.go`) — `WrapRejectionf`, `WrapConflictf`, `WrapTransientf`, `WrapCorruptionf`, `WrapInfrastructuref`. Nil-safe.
 - **`HTTPStatus(err)` / `HTTPHandler(fn)`** (`http.go`) — net/http middleware. **`HTTPHandler` NEVER leaks `err.Error()`** — the response message comes only from a registered `MessageTemplate`; otherwise just family+code. This is deliberate (consumers value no internal leakage).
 - **`LogError(err, *slog.Logger)` / `LogErrorContext`** (`log.go`) — Transient→Warn, others→Error; nil error is no-op; nil logger→`slog.Default`. Logs `family`, `code`, `retryable`, and `context.<key>` attrs.
-- **`errorfamilytest`** subpackage — `AssertFamily`/`AssertCode`/`AssertRetryable`/`AssertContext`/`AssertContextMissing`. Mirrors `httptest`: keeps `testing` out of the production package.
+- **`errorfamilytest`** subpackage — `AssertFamily`/`AssertCode`/`AssertRetryable`/`AssertContext`/`AssertContextMissing`/`AssertExitCode`. Mirrors `httptest`: keeps `testing` out of the production package.
 
 ## BuildFlow-Inspired APIs (added 2026-07-16)
 
