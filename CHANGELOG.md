@@ -13,7 +13,7 @@ non-breaking and use only the Go standard library.
 
 - **`ExitCoder` interface** (`interfaces.go`) — fifth consumer interface alongside `Coded`/`Classified`/`Contextual`/`Retryable`. Errors implementing `ExitCode() int` can override the family-based exit code on a per-error basis. Embeds `error` for `errors.AsType[T]` compatibility.
 - **`Error.WithExitCode(code int) *Error`** (`error.go`) — copy-on-write mutator that sets a custom exit code. Zero means "unset, use family default."
-- **`Error.WithContextAny(key string, value any) *Error`** (`error.go`) — type-safe context attachment for non-string values. Uses a type switch for common scalars (string, int, int64, uint, uint64, float64, bool) and falls back to `fmt.Sprint`.
+- **`Error.WithContextAny(key string, value any) *Error`** (`error.go`) — type-safe context attachment for non-string values. Uses a type switch for common scalars (string, int, int64, uint, uint64, float64, bool, []byte, time.Time, error) and falls back to `fmt.Sprint`.
 - **`WrapOnce(err, family, code, msg) *Error`** (`constructors.go`) — idempotent wrap: returns the existing `*Error` unchanged if the error chain already contains one. Prevents double-wrapping at API boundaries.
 - **`WrapOncef(err, family, code, format, args...) *Error`** (`constructors.go`) — formatted variant of `WrapOnce`.
 - **`errorfamilytest.AssertExitCode(tb, err, want)`** — test assertion for exit codes (checks ExitCoder override first, then family default).
@@ -21,6 +21,7 @@ non-breaking and use only the Go standard library.
 - **`formatVerbose` now shows `exit_code` when non-zero** — improved `%+v` debug output.
 - **Benchmarks**: `BenchmarkWrapOnceWrap`, `BenchmarkWrapOnceIdempotent`, `BenchmarkWithExitCode`, `BenchmarkExitCodeOverride`.
 - **Examples**: `ExampleWrapOnce`, `ExampleError_WithExitCode`, `ExampleError_WithContextAny`, `ExampleExitCode`.
+- **Fuzz tests**: `FuzzWrapOnce`, `FuzzContextValueToString`, `FuzzWithExitCode`.
 
 ### Changed
 

@@ -1,5 +1,9 @@
 # Status Report: BuildFlow Learnings Integration
 
+> **SUPERSEDED** — All items marked as incomplete here were resolved in the
+> follow-up session. See `2026-07-16_05-30_buildflow-learnings-polish-pass.md`
+> for the final status. This report is retained for historical context only.
+
 **Date:** 2026-07-16 04:32  
 **Session Goal:** Learn from BuildFlow's `modules/errors/` and apply improvements to go-error-family  
 **Result:** Core implementation COMPLETE, documentation/test/docs INCOMPLETE

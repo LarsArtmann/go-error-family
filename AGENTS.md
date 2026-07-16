@@ -74,7 +74,7 @@ Learned from BuildFlow's `modules/errors/` package — patterns proven in a prod
 
 - **`ExitCoder` interface** (`interfaces.go`) — `error` + `ExitCode() int`. When `ExitCode(err)` or `HandleError*` encounters an error implementing this with a non-zero code, that code overrides the family-based BSD exit code. Allows per-error exit code overrides without changing the family classification. `*Error` satisfies this via `WithExitCode(code)`.
 - **`WrapOnce(err, family, code, msg)`** (`constructors.go`) — idempotent wrapping. Uses `errors.AsType[*Error]` to detect existing classified errors in the chain. Prevents the `[transient:db.timeout] outer: [transient:db.timeout] inner: cause` double-wrap anti-pattern at API boundaries. Nil-safe.
-- **`WithContextAny(key, value any)`** (`error.go`) — typed context values. Accepts `any` and converts via a type switch (string, int, int64, uint, uint64, float64, bool, nil → empty, fallback `fmt.Sprint`). Ergonomic alternative to `fmt.Sprintf` for scalar values.
+- **`WithContextAny(key, value any)`** (`error.go`) — typed context values. Accepts `any` and converts via a type switch (string, int, int64, uint, uint64, float64, bool, []byte, time.Time, error, nil → empty, fallback `fmt.Sprint`). Ergonomic alternative to `fmt.Sprintf` for scalar values.
 - **`safeCauseString`** (`error.go`) — panic recovery in `Error()`, `Summary()`, and `formatVerbose()`. Uses `defer/recover` around `cause.Error()` to guard against misbehaving third-party error types that panic on nil internal values. The error message renders without the cause instead of crashing.
 
 ## Classification Precedence
@@ -133,7 +133,7 @@ All packages at 80%+; root and `diagnose/git` near-complete. (`errorfamilytest` 
 
 ## Fuzz Tests
 
-`fuzz_test.go` (root) contains: `FuzzParseFamily`, `FuzzParseFamilyRoundTrip`, `FuzzClassify`, `FuzzClassifyPlainError`, `FuzzErrorFormatting`. `bridge/fuzz_test.go` contains: `FuzzFormat`.
+`fuzz_test.go` (root) contains: `FuzzParseFamily`, `FuzzParseFamilyRoundTrip`, `FuzzClassify`, `FuzzClassifyPlainError`, `FuzzErrorFormatting`, `FuzzApplyContext`, `FuzzWrapOnce`, `FuzzContextValueToString`, `FuzzWithExitCode`. `bridge/fuzz_test.go` contains: `FuzzFormat`.
 
 ## Bridge Submodule (`bridge/`)
 

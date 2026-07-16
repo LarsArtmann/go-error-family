@@ -3,17 +3,20 @@
 Long-term direction and raw ideas not yet refined into actionable tasks.
 When an idea becomes bounded and actionable, it moves to `TODO_LIST.md`.
 
-**Last updated:** 2026-07-13
+**Last updated:** 2026-07-16
 
 ---
 
 ## Direction
 
-go-error-family is a stable classification core (v0.7.0) with a growing ecosystem
+go-error-family is a stable classification core (v0.8.0) with a growing ecosystem
 of opt-in modules (`diagnose`, `agent`, `bridge`). The taxonomy is proven across
-multiple consumers (DiscordSync, browser-history, SwettySwipperWeb). The focus
-now is: hardening the release pipeline, improving discoverability (godoc), and
-resolving the few open design tensions from consumer feedback.
+multiple consumers (DiscordSync, browser-history, SwettySwipperWeb). The CLI
+story was strengthened in v0.8.0 with per-error exit code overrides (`ExitCoder`),
+idempotent wrapping (`WrapOnce`), typed context values (`WithContextAny`), and
+panic-safe cause rendering (`safeCauseString`). The focus now is: hardening the
+release pipeline, improving discoverability (godoc), and resolving the few open
+design tensions from consumer feedback.
 
 ## Themes
 

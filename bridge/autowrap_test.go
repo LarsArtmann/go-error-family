@@ -95,24 +95,21 @@ func TestBridge_Integration_FullStack(t *testing.T) {
 
 func BenchmarkWrap(b *testing.B) {
 	base := oops.With("host", "db1").With("port", "5432").Errorf("test")
-	b.ResetTimer()
-	for range b.N {
+	for b.Loop() {
 		Wrap(base, errorfamily.Transient)
 	}
 }
 
 func BenchmarkInferFamily(b *testing.B) {
 	err := oops.In("database").Tags("timeout").With("host", "db1").Errorf("test")
-	b.ResetTimer()
-	for range b.N {
+	for b.Loop() {
 		InferFamily(err)
 	}
 }
 
 func BenchmarkAutoWrap(b *testing.B) {
 	err := oops.In("database").Tags("timeout").With("host", "db1").Errorf("test")
-	b.ResetTimer()
-	for range b.N {
+	for b.Loop() {
 		AutoWrap(err)
 	}
 }
@@ -124,8 +121,7 @@ func BenchmarkErrorContext(b *testing.B) {
 		With("user", "admin").
 		Errorf("test")
 	classified := Wrap(base, errorfamily.Transient)
-	b.ResetTimer()
-	for range b.N {
+	for b.Loop() {
 		_ = classified.ErrorContext()
 	}
 }

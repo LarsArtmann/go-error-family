@@ -29,7 +29,7 @@ Every term below should mean the **same thing** to everyone who reads it.
 | **FixStep**                   | A single actionable suggestion from the agent: description, shell command, rationale                                                                                               | Belongs to the consumer, not the library                                                                        |
 | **Tone**                      | A presentation hint for error messages: instructional, explanatory, reassuring, urgent, apologetic                                                                                 | Determined by Family                                                                                            |
 | **Audience**                  | Who should be notified about an error: User, Ops, or All                                                                                                                           | Rejection/Conflict → User, Corruption/Infrastructure → Ops, Transient → All                                     |
-| **Exit Code**                 | BSD sysexits.h compatible process exit code for CLI boundary                                                                                                                       | Mapped from Family (e.g., Transient=75, Corruption=65)                                                          |
+| **Exit Code**                 | BSD sysexits.h compatible process exit code for CLI boundary                                                                                                                       | Mapped from Family (e.g., Transient=75, Corruption=65); overridable per-error via `ExitCoder` interface         |
 | **Fail-open**                 | The design decision that unknown errors default to Transient (retryable)                                                                                                           | Unknown errors get retried rather than rejected                                                                 |
 
 ## Value Objects
@@ -50,6 +50,7 @@ Every term below should mean the **same thing** to everyone who reads it.
 | **Classified**     | `ErrorFamily() Family`                       | `error` | Behavioral classification         |
 | **Contextual**     | `ErrorContext() map[string]string`           | `error` | Factual key-value details         |
 | **Retryable**      | `IsRetryable() bool`                         | `error` | Explicit retry hint               |
+| **ExitCoder**      | `ExitCode() int`                             | `error` | Per-error exit code override      |
 | **DiagnosticRule** | `Name()`, `Applicable(err)`, `Run(ctx, err)` | —       | Deterministic error investigation |
 | **DebugAgent**     | `Analyze(ctx, err, diagnosis)`               | —       | Root cause analysis               |
 

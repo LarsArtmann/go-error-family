@@ -113,6 +113,23 @@ func TestHandleErrorDetailedRespectsExitCoder(t *testing.T) {
 	}
 }
 
+func TestHandleErrorRespectsExitCoder(t *testing.T) {
+	t.Parallel()
+
+	err := NewTransient("db.timeout", "db timed out").WithExitCode(42)
+	got := HandleErrorWithConfig(err, HandleConfig{Output: &strings.Builder{}})
+
+	if got != 42 {
+		t.Errorf("HandleErrorWithConfig exit code = %d, want 42 (ExitCoder override)", got)
+	}
+
+	plain := NewTransient("db.timeout", "db timed out")
+	defaultCode := HandleErrorWithConfig(plain, HandleConfig{Output: &strings.Builder{}})
+	if defaultCode != 75 {
+		t.Errorf("default exit code = %d, want 75 (Transient family default)", defaultCode)
+	}
+}
+
 func TestFormatVerboseShowsExitCode(t *testing.T) {
 	t.Parallel()
 

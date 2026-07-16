@@ -1,7 +1,9 @@
 package errorfamily
 
 import (
+	"errors"
 	"testing"
+	"time"
 )
 
 func TestWithContextAny(t *testing.T) {
@@ -22,6 +24,9 @@ func TestWithContextAny(t *testing.T) {
 		{"bool_true", "b", true, "true"},
 		{"bool_false", "b", false, "false"},
 		{"nil", "x", nil, ""},
+		{"byte_slice", "b", []byte("hello"), "hello"},
+		{"time", "t", time.Date(2026, 1, 2, 3, 4, 5, 0, time.UTC), "2026-01-02T03:04:05Z"},
+		{"error", "e", errors.New("inner failure"), "inner failure"},
 		{"struct", "o", struct{ X int }{X: 5}, "{5}"},
 	}
 

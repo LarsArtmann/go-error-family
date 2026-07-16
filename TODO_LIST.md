@@ -4,7 +4,7 @@ Short- and mid-term actionable improvement tasks. Each item is bounded and
 traceable to its source. When an item ships, remove it here and update
 `FEATURES.md` + `CHANGELOG.md`.
 
-**Last updated:** 2026-07-13
+**Last updated:** 2026-07-16
 
 ---
 

@@ -258,6 +258,8 @@ func safeCauseString(cause error) (result string) {
 
 // contextValueToString converts any context value to its string representation.
 // Uses a type switch for common scalar types and falls back to fmt.Sprint.
+//
+//nolint:cyclop // type switch with trivial one-liner cases; not cognitively complex
 func contextValueToString(v any) string {
 	switch val := v.(type) {
 	case string:
@@ -274,6 +276,12 @@ func contextValueToString(v any) string {
 		return strconv.FormatFloat(val, 'f', -1, 64)
 	case bool:
 		return strconv.FormatBool(val)
+	case []byte:
+		return string(val)
+	case time.Time:
+		return val.Format(time.RFC3339)
+	case error:
+		return safeCauseString(val)
 	case nil:
 		return ""
 	default:

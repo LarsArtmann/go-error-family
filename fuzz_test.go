@@ -112,3 +112,61 @@ func FuzzApplyContext(f *testing.F) {
 		_ = applyContext(template, map[string]string{key: value})
 	})
 }
+
+// FuzzWrapOnce verifies that WrapOnce never panics and is idempotent:
+// wrapping an already-wrapped error returns the same pointer.
+func FuzzWrapOnce(f *testing.F) {
+	f.Add("db.timeout", "query failed")
+	f.Add("", "")
+	f.Add("code", "msg\nwith\nnewlines")
+
+	f.Fuzz(func(t *testing.T, code, msg string) {
+		base := errors.New(msg)
+		wrapped := WrapOnce(base, Transient, code, msg)
+		if wrapped == nil {
+			t.Fatal("WrapOnce returned nil for non-nil input")
+		}
+		doubleWrapped := WrapOnce(wrapped, Rejection, "other.code", "other msg")
+		if doubleWrapped != wrapped {
+			t.Error("WrapOnce is not idempotent: double-wrap produced a different pointer")
+		}
+	})
+}
+
+// FuzzContextValueToString verifies that WithContextAny never panics on
+// arbitrary string input and round-trips the value correctly.
+func FuzzContextValueToString(f *testing.F) {
+	f.Add("count", "42")
+	f.Add("host", "localhost:5432")
+	f.Add("", "")
+	f.Add("path", "/var/log/app\n.log")
+
+	f.Fuzz(func(t *testing.T, key, val string) {
+		err := NewTransient("test", "msg").WithContextAny(key, val)
+		if err.ContextValue(key) != val {
+			t.Errorf("ContextValue(%q) = %q, want %q", key, err.ContextValue(key), val)
+		}
+	})
+}
+
+// FuzzWithExitCode verifies that WithExitCode never panics and that the
+// package-level ExitCode function resolves the override correctly.
+func FuzzWithExitCode(f *testing.F) {
+	f.Add(1)
+	f.Add(42)
+	f.Add(0)
+	f.Add(-1)
+	f.Add(255)
+
+	f.Fuzz(func(t *testing.T, code int) {
+		err := NewTransient("test", "msg").WithExitCode(code)
+		if got := err.ExitCode(); got != code {
+			t.Errorf("ExitCode() = %d, want %d", got, code)
+		}
+		if code != 0 {
+			if got := ExitCode(err); got != code {
+				t.Errorf("package ExitCode = %d, want %d (override)", got, code)
+			}
+		}
+	})
+}
