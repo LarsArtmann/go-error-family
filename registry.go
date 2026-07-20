@@ -151,17 +151,17 @@ func (r *Registry) RegisterClassifications(classifications map[error]Family) {
 // unregistered. For test isolation or scoped handling, construct a [NewRegistry]
 // rather than polluting [DefaultRegistry].
 func (r *Registry) RegisterClassifier(c Classifier) {
-	r.mu.Lock()
-	defer r.mu.Unlock()
-	r.swapClassifiers(func(cs []Classifier) []Classifier { return append(cs, c) })
+	r.RegisterClassifiers(c)
 }
 
 // RegisterClassifiers adds multiple predicate-based [Classifier] funcs at once.
 // Thread-safe. Classifiers run in registration order.
-func (r *Registry) RegisterClassifiers(cs ...Classifier) {
+func (r *Registry) RegisterClassifiers(classifiers ...Classifier) {
 	r.mu.Lock()
 	defer r.mu.Unlock()
-	r.swapClassifiers(func(existing []Classifier) []Classifier { return append(existing, cs...) })
+	r.swapClassifiers(func(existing []Classifier) []Classifier {
+		return append(existing, classifiers...)
+	})
 }
 
 // swapClassifiers performs copy-on-write on the immutable classifier slice:
