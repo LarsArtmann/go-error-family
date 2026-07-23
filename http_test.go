@@ -2,7 +2,7 @@ package errorfamily
 
 import (
 	"context"
-	"encoding/json/v2"
+	"encoding/json"
 	"errors"
 	"net/http"
 	"net/http/httptest"
@@ -137,4 +137,84 @@ func (f *failingResponseWriter) WriteHeader(statusCode int) {}
 func TestWriteHTTPErrorMarshalFailure(t *testing.T) {
 	w := &failingResponseWriter{}
 	writeHTTPError(w, NewTransient("test.fail", "connection will break"))
+}
+
+func TestHTTPStatusWithOverride(t *testing.T) {
+	tests := []struct {
+		name string
+		err  error
+		want int
+	}{
+		{
+			"rejection default 400",
+			NewRejection("battle.invalid", "invalid"),
+			400,
+		},
+		{
+			"rejection overridden to 404",
+			NewRejection("battle.not_found", "not found").WithHTTPStatus(http.StatusNotFound),
+			404,
+		},
+		{
+			"conflict overridden to 422",
+			NewConflict("state.stale", "stale").WithHTTPStatus(http.StatusUnprocessableEntity),
+			422,
+		},
+		{
+			"transient default 503",
+			NewTransient("db.timeout", "timed out"),
+			503,
+		},
+		{
+			"transient overridden to 502",
+			NewTransient("db.timeout", "timed out").WithHTTPStatus(http.StatusBadGateway),
+			502,
+		},
+		{
+			"override zero means family default",
+			NewRejection("c", "m").WithHTTPStatus(0),
+			400,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			if got := HTTPStatus(tt.err); got != tt.want {
+				t.Errorf("HTTPStatus(%v) = %d, want %d", tt.err, got, tt.want)
+			}
+		})
+	}
+}
+
+func TestWithHTTPStatusCopyOnWrite(t *testing.T) {
+	original := NewRejection("battle.not_found", "not found")
+	modified := original.WithHTTPStatus(http.StatusNotFound)
+
+	if original.HTTPStatus() != 0 {
+		t.Errorf("original HTTPStatus = %d, want 0 (unchanged)", original.HTTPStatus())
+	}
+
+	if modified.HTTPStatus() != http.StatusNotFound {
+		t.Errorf("modified HTTPStatus = %d, want %d", modified.HTTPStatus(), http.StatusNotFound)
+	}
+}
+
+func TestHTTPHandlerWithStatusOverride(t *testing.T) {
+	handler := HTTPHandler(func(_ http.ResponseWriter, _ *http.Request) error {
+		return NewRejection("battle.not_found", "battle not found").
+			WithHTTPStatus(http.StatusNotFound)
+	})
+
+	rec := httptest.NewRecorder()
+	handler.ServeHTTP(
+		rec,
+		httptest.NewRequestWithContext(context.Background(), http.MethodGet, "/", nil),
+	)
+
+	if rec.Code != http.StatusNotFound {
+		t.Errorf("status = %d, want 404 (override)", rec.Code)
+	}
+}
+
+func TestErrorImplementsHTTPStatuser(t *testing.T) {
+	var _ HTTPStatuser = NewRejection("test", "msg")
 }

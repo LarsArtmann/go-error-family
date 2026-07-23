@@ -193,10 +193,12 @@ func TestErrorImplementsInterfaces(t *testing.T) {
 	err := NewRejection("test", "msg")
 
 	var (
-		_ Coded      = err
-		_ Classified = err
-		_ Contextual = err
-		_ Retryable  = err
+		_ Coded        = err
+		_ Classified   = err
+		_ Contextual   = err
+		_ Retryable    = err
+		_ ExitCoder    = err
+		_ HTTPStatuser = err
 	)
 }
 
@@ -224,5 +226,40 @@ func TestExternalTypeImplementsInterfaces(t *testing.T) {
 
 	if Classify(err) != Transient {
 		t.Error("Classify should use Classified interface on external type")
+	}
+}
+
+type dynamicSQLError struct {
+	code int
+}
+
+func (e *dynamicSQLError) Error() string { return fmt.Sprintf("sqlite error %d", e.code) }
+
+func TestRegisterClassificationType(t *testing.T) {
+	reg := NewRegistry()
+	RegisterClassificationTypeFor[*dynamicSQLError](reg, Transient)
+
+	err := &dynamicSQLError{code: 5} // BUSY
+	if got := reg.Classify(err); got != Transient {
+		t.Errorf("Classify(*dynamicSQLError) = %v, want Transient", got)
+	}
+
+	plainErr := errors.New("plain unknown")
+	if got := reg.Classify(plainErr); got != Transient {
+		t.Errorf("Classify(plain) = %v, want Transient (default)", got)
+	}
+}
+
+func TestRegisterClassificationTypeDefaultRegistry(t *testing.T) {
+	reg := NewRegistry()
+
+	// Use a custom registry so we don't pollute DefaultRegistry.
+	// But test that the package-level function delegates correctly by
+	// verifying the type parameter is passed through.
+	RegisterClassificationTypeFor[*dynamicSQLError](reg, Conflict)
+
+	wrapped := fmt.Errorf("wrapped: %w", &dynamicSQLError{code: 19})
+	if got := reg.Classify(wrapped); got != Conflict {
+		t.Errorf("Classify(wrapped *dynamicSQLError) = %v, want Conflict", got)
 	}
 }

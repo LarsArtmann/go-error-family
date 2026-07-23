@@ -153,12 +153,30 @@ func RegisterClassifiers(cs ...Classifier) {
 // [RegisterClassifier] for the common case where the classification rule is
 // simply "type T → Family F", without field-level inspection.
 //
-//,errorfamily.RegisterClassificationType[*sqlite.Error](errorfamily.Transient)
+//	errorfamily.RegisterClassificationType[*sqlite.Error](errorfamily.Transient)
 //
 // For errors that need field-level logic (e.g. different sqlite error codes
 // mapping to different families), use [RegisterClassifier] with a closure.
 //
+// For a custom [Registry], use [RegisterClassificationTypeFor].
+//
 // Delegates to [DefaultRegistry].
 func RegisterClassificationType[T error](family Family) { //nolint:hierarchical-errors // generic constraint, must embed error
-	DefaultRegistry.RegisterClassificationType[T](family)
+	RegisterClassificationTypeFor[T](DefaultRegistry, family)
+}
+
+// RegisterClassificationTypeFor registers a type-based classifier on a specific
+// [Registry]. It is the generic counterpart to [Registry.RegisterClassifier]:
+//
+//	errorfamily.RegisterClassificationTypeFor[*sqlite.Error](myRegistry, errorfamily.Transient)
+//
+// Go does not permit type parameters on methods, so this is a top-level
+// function rather than a method on [Registry].
+func RegisterClassificationTypeFor[T error](r *Registry, family Family) { //nolint:hierarchical-errors // generic constraint, must embed error
+	r.RegisterClassifier(func(err error) (Family, bool) {
+		if _, ok := errors.AsType[T](err); ok {
+			return family, true
+		}
+		return Rejection, false
+	})
 }
