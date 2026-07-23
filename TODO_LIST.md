@@ -16,6 +16,8 @@ traceable to its source. When an item ships, remove it here and record it in
 
 ### Medium Priority
 
+- [ ] **Create reference implementation for oops + bridge stack** — the `bridge/` module has zero external consumers. Root cause: near-zero `samber/oops` adoption and no project demonstrating the classify→enrich→handle flow. Pick one real application, wire it through oops + bridge + error-family end-to-end, and document the pattern. This is the #1 unblocker for bridge adoption. Source: adoption audit 2026-07-23.
+
 - [ ] **Verify full `buildflow` pipeline passes** — individual tools pass (go test, golangci-lint, nix flake check, hierarchical-errors), but the actual `buildflow` command was never run end-to-end. Source: status report 2026-07-23_15-52 section d.3.
 
 - [ ] **Reduce hierarchical-errors nolint noise** — 50 `//nolint:hierarchical-errors` directives across the codebase, and golangci-lint warns "unknown linters: hierarchical-errors" on every run. Investigate config-file support (`.hierarchical-errors.toml`) or type-aware exemptions for `fmt.Formatter` and cleanup patterns. Source: status report 2026-07-23_15-52 section d.2.

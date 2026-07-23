@@ -45,7 +45,7 @@ custom layers.
 
 **Raw ideas:**
 
-- Per-error HTTP status override (`WithHTTPStatus`) — pending design decision
+- ~~Per-error HTTP status override (`WithHTTPStatus`)~~ — **SHIPPED (v0.8.0)**, mirrors `ExitCoder`/`WithExitCode` pattern. Update: still under-adopted (~5 consumers for `HTTPHandler`); needs discoverability work.
 - Error code in JSON responses is solved for `HTTPHandler` but not for consumers using their own HTTP layer
 - Consider an `httperror` subpackage with richer response shaping
 - OpenAPI/schema generation for the error JSON shape
@@ -66,9 +66,22 @@ tooling-level.
 
 ### 4. Ecosystem Growth
 
+The library has 50+ consumers importing the root classification core, but
+higher-level APIs are under-adopted: `LogError` (~3 consumers), `HTTPHandler`
+(~5), `errorfamilytest` (~3), `diagnose` (~3). The bridge module has **zero**
+external consumers despite being correct, tested (95.6%), and fuzzed.
+
+The bridge gap is demand and demonstration, not quality. The root cause is
+that `samber/oops` adoption is near-zero across the ecosystem, and consumers
+skip the enrichment layer entirely (classify→handle, not classify→enrich→
+handle). Before building more bridge packages, the existing oops bridge needs
+a **reference implementation** showing the full classify→enrich→handle flow
+in a real application.
+
 **Raw ideas:**
 
+- **Reference implementation for oops + bridge + error-family stack** — the #1 unblocker for bridge adoption. Pick one real application and wire it end-to-end as the living example.
 - More diagnostic submodules (`redis`, `docker`, `kubectl`)
-- Bridge packages for other error enrichment libraries beyond oops
+- Bridge packages for other error enrichment libraries beyond oops (only after oops bridge has proven consumers)
 - Integration guides for common frameworks (Echo, Gin, Chi, gRPC interceptors)
 - Benchmark suite comparing classification overhead across versions

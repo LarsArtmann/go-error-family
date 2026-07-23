@@ -184,9 +184,11 @@ Analysis-only debug agent. Separate Go module (depends on root + diagnose).
 
 ---
 
-## `bridge` Module — FULLY_FUNCTIONAL
+## `bridge` Module — FULLY_FUNCTIONAL (Zero Consumers)
 
 Connects go-error-family with `samber/oops`. Separate Go module (depends on both).
+
+The code is correct, tested (95.6%), and fuzzed — but has **zero external consumers**. Root cause: `samber/oops` adoption is near-zero across the ecosystem, and consumers skip the enrichment layer in practice. See ROADMAP.md "Ecosystem Growth" and AGENTS.md "Bridge Submodule" for details.
 
 | Feature                                                                                         | Status           | Evidence             |
 | ----------------------------------------------------------------------------------------------- | ---------------- | -------------------- |
@@ -231,7 +233,7 @@ All packages at 80%+. Fuzz tests (14 total):
 
 ## Known Gaps
 
-- **No per-error HTTP status override** — `Family.HTTPStatus()` is family-level only. Consumers needing 404 vs 400 within Rejection must handle it in their HTTP layer. (Design decision pending — see consumer feedback.)
+- ~~**No per-error HTTP status override**~~ — **SHIPPED (v0.8.0).** `WithHTTPStatus(int)` + `HTTPStatuser` interface provide per-error overrides of family-level defaults. Mirrors `ExitCoder`/`WithExitCode` pattern exactly.
 - **`Classify(nil)` returns Rejection** — intentional but debated. Some consumers argue it should be Transient (fail-open) or Infrastructure (programming error). This is a design decision, not a bug.
 - **Constructor context ergonomics** — `.WithContext().WithContext()` chains are verbose. No builder pattern or variadic context yet. Consumers build `errkit`-style helpers.
 - **`encoding/json` (stdlib)** — the root module uses standard `encoding/json`. The v0.7.0 json/v2 experiment was reverted in [Unreleased]; no `GOEXPERIMENT` required.
