@@ -11,30 +11,30 @@ The core idea: logs are **event streams**, not files. The app produces; the plat
 
 ## How go-error-family Aligns
 
-go-error-family and 12-factor operate on **different layers** — complementary, not competing. 12-factor governs *how logs travel* (transport); go-error-family governs *what error telemetry goes into them* (semantics).
+go-error-family and 12-factor operate on **different layers** — complementary, not competing. 12-factor governs _how logs travel_ (transport); go-error-family governs _what error telemetry goes into them_ (semantics).
 
-| Dimension | 12-Factor Logs (Factor XI) | go-error-family |
-| --- | --- | --- |
-| **Primary concern** | Log delivery & routing | Log content & severity derivation |
-| **Layer** | Transport (event streams) | Semantics (structured error metadata) |
-| **Owns log destination?** | No — app must NOT manage logfiles | No — delegates to a caller-supplied `*slog.Logger` |
-| **Stdout/stderr?** | Mandates `stdout`, unbuffered | `LogError` never touches stdout/stderr; `HandleError` writes to `stderr` (still a 12-factor stream) |
-| **Routing/forwarding?** | Forbidden in-app; delegated to runtime | None — no sink/router/buffer concept |
-| **Log as file?** | Explicitly rejects logfiles | Never writes files |
-| **Structure** | "typically text, one event per line" | Emits structured `slog.Attr`s: `family`, `code`, `retryable`, `context.<key>` |
-| **Severity** | Not addressed | Family-driven: Transient → `Warn`, others → `Error` |
-| **Collation** | Runtime collates multi-process streams | Per-error, single logger call |
-| **Archival/alerting** | Runtime's job (Splunk/Hadoop) | Out of scope |
+| Dimension                 | 12-Factor Logs (Factor XI)             | go-error-family                                                                                     |
+| ------------------------- | -------------------------------------- | --------------------------------------------------------------------------------------------------- |
+| **Primary concern**       | Log delivery & routing                 | Log content & severity derivation                                                                   |
+| **Layer**                 | Transport (event streams)              | Semantics (structured error metadata)                                                               |
+| **Owns log destination?** | No — app must NOT manage logfiles      | No — delegates to a caller-supplied `*slog.Logger`                                                  |
+| **Stdout/stderr?**        | Mandates `stdout`, unbuffered          | `LogError` never touches stdout/stderr; `HandleError` writes to `stderr` (still a 12-factor stream) |
+| **Routing/forwarding?**   | Forbidden in-app; delegated to runtime | None — no sink/router/buffer concept                                                                |
+| **Log as file?**          | Explicitly rejects logfiles            | Never writes files                                                                                  |
+| **Structure**             | "typically text, one event per line"   | Emits structured `slog.Attr`s: `family`, `code`, `retryable`, `context.<key>`                       |
+| **Severity**              | Not addressed                          | Family-driven: Transient → `Warn`, others → `Error`                                                 |
+| **Collation**             | Runtime collates multi-process streams | Per-error, single logger call                                                                       |
+| **Archival/alerting**     | Runtime's job (Splunk/Hadoop)          | Out of scope                                                                                        |
 
 ## Compliance Checklist
 
-| 12-Factor requirement | go-error-family behavior | Verdict |
-| --- | --- | --- |
-| "never concerns itself with routing/storage" | No routing, no files, no sink abstraction | ✅ Aligned |
-| "writes event stream to stdout" | `LogError` emits to whatever logger you wire — a 12-factor app wires that to stdout | ✅ Compatible |
-| "no fixed beginning/end, flows continuously" | Stateless per-call; no buffering/batching | ✅ Aligned |
-| "logs as text format, one event/line" | Emits structured attrs — but `slog.TextHandler` produces exactly this | ✅ Enhances (structured text is still text) |
-| Runtime handles archival/analysis | Library is silent on this | ✅ Neutral |
+| 12-Factor requirement                        | go-error-family behavior                                                            | Verdict                                     |
+| -------------------------------------------- | ----------------------------------------------------------------------------------- | ------------------------------------------- |
+| "never concerns itself with routing/storage" | No routing, no files, no sink abstraction                                           | ✅ Aligned                                  |
+| "writes event stream to stdout"              | `LogError` emits to whatever logger you wire — a 12-factor app wires that to stdout | ✅ Compatible                               |
+| "no fixed beginning/end, flows continuously" | Stateless per-call; no buffering/batching                                           | ✅ Aligned                                  |
+| "logs as text format, one event/line"        | Emits structured attrs — but `slog.TextHandler` produces exactly this               | ✅ Enhances (structured text is still text) |
+| Runtime handles archival/analysis            | Library is silent on this                                                           | ✅ Neutral                                  |
 
 ## Putting It Together
 

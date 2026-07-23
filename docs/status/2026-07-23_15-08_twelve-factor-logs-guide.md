@@ -8,30 +8,30 @@ User asked: "How does go-error-family compare to https://12factor.net/logs?" —
 
 ## a) FULLY DONE
 
-| # | Task | Status |
-|---|------|--------|
-| 1 | Fetched and read 12factor.net/logs content | ✅ Done |
-| 2 | Researched go-error-family's `log.go`, `handle.go`, `http.go` logging behavior | ✅ Done |
-| 3 | Provided table-view comparison answer in chat | ✅ Done |
-| 4 | Placed guide at `website/src/content/docs/guides/twelve-factor-logs.mdx` (correct location — matches existing guides pattern) | ✅ Done |
-| 5 | Registered guide in sidebar (`astro.config.mjs`, Guides group) | ✅ Done |
+| #   | Task                                                                                                                          | Status  |
+| --- | ----------------------------------------------------------------------------------------------------------------------------- | ------- |
+| 1   | Fetched and read 12factor.net/logs content                                                                                    | ✅ Done |
+| 2   | Researched go-error-family's `log.go`, `handle.go`, `http.go` logging behavior                                                | ✅ Done |
+| 3   | Provided table-view comparison answer in chat                                                                                 | ✅ Done |
+| 4   | Placed guide at `website/src/content/docs/guides/twelve-factor-logs.mdx` (correct location — matches existing guides pattern) | ✅ Done |
+| 5   | Registered guide in sidebar (`astro.config.mjs`, Guides group)                                                                | ✅ Done |
 
 ## b) PARTIALLY DONE
 
-| # | Task | Status | What Remains |
-|---|------|--------|--------------|
-| 1 | Guide content written | 90% | Code example is simplified; could add a JSON-handler example and a Docker/Kubernetes routing example |
-| 2 | Sidebar integration | 90% | Placement is after "Performance" — may belong nearer "HTTP & CLI Boundaries" (both operational/boundary topics) |
+| #   | Task                  | Status | What Remains                                                                                                    |
+| --- | --------------------- | ------ | --------------------------------------------------------------------------------------------------------------- |
+| 1   | Guide content written | 90%    | Code example is simplified; could add a JSON-handler example and a Docker/Kubernetes routing example            |
+| 2   | Sidebar integration   | 90%    | Placement is after "Performance" — may belong nearer "HTTP & CLI Boundaries" (both operational/boundary topics) |
 
 ## c) NOT STARTED
 
-| # | Task |
-|---|------|
-| 1 | **Never verified the website builds** — no `npx astro build` or `npx astro check` was run after adding the .mdx and editing `astro.config.mjs` |
-| 2 | No cross-links added from `http-and-cli.mdx` or `related-tools.mdx` to the new guide |
-| 3 | No `AGENTS.md` update noting the new guide exists |
-| 4 | Go code snippet in the .mdx is untested / not compiled |
-| 5 | No verification that frontmatter style matches other guides exactly |
+| #   | Task                                                                                                                                           |
+| --- | ---------------------------------------------------------------------------------------------------------------------------------------------- |
+| 1   | **Never verified the website builds** — no `npx astro build` or `npx astro check` was run after adding the .mdx and editing `astro.config.mjs` |
+| 2   | No cross-links added from `http-and-cli.mdx` or `related-tools.mdx` to the new guide                                                           |
+| 3   | No `AGENTS.md` update noting the new guide exists                                                                                              |
+| 4   | Go code snippet in the .mdx is untested / not compiled                                                                                         |
+| 5   | No verification that frontmatter style matches other guides exactly                                                                            |
 
 ## d) TOTALLY FUCKED UP
 
@@ -152,14 +152,14 @@ This session only covered Factor XI (Logs). But go-error-family intersects with 
 
 ## Summary
 
-| Category | Count |
-|----------|-------|
-| Fully done | 5 |
-| Partially done | 2 |
-| Not started | 5 |
-| Totally fucked up | 0 |
-| Improvements identified | 10 |
-| Next steps | 50 |
-| Blocking questions | 3 |
+| Category                | Count |
+| ----------------------- | ----- |
+| Fully done              | 5     |
+| Partially done          | 2     |
+| Not started             | 5     |
+| Totally fucked up       | 0     |
+| Improvements identified | 10    |
+| Next steps              | 50    |
+| Blocking questions      | 3     |
 
 **Biggest risk:** The website has not been verified to build after adding the new page and editing the sidebar config. This should be the very first thing done in the next session.
