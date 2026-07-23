@@ -7,12 +7,12 @@ description: Implement the five interfaces on your own error types.
 
 You don't have to use the built-in `Error` struct. Implement the interfaces you need:
 
-| Interface    | Method                             | Purpose                     |
-| ------------ | ---------------------------------- | --------------------------- |
-| `Coded`      | `ErrorCode() string`               | Machine-readable error code |
-| `Classified` | `ErrorFamily() Family`             | Behavioral classification   |
-| `Contextual` | `ErrorContext() map[string]string` | Structured context          |
-| `Retryable`  | `IsRetryable() bool`               | Binary retry decision       |
+| Interface    | Method                             | Purpose                      |
+| ------------ | ---------------------------------- | ---------------------------- |
+| `Coded`      | `ErrorCode() string`               | Machine-readable error code  |
+| `Classified` | `ErrorFamily() Family`             | Behavioral classification    |
+| `Contextual` | `ErrorContext() map[string]string` | Structured context           |
+| `Retryable`  | `IsRetryable() bool`               | Binary retry decision        |
 | `ExitCoder`  | `ExitCode() int`                   | Per-error exit code override |
 
 All five embed `error` (required for Go 1.26's `errors.AsType[T]()`).
@@ -95,12 +95,12 @@ err := errorfamily.NewRejection("file.not_found", "config missing").
 
 All `With*` methods are **copy-on-write** — they return a new `*Error`, not the same pointer. This makes them safe to chain from shared/sentinel errors.
 
-| Method             | Purpose                                              |
-| ------------------ | ---------------------------------------------------- |
-| `WithContext`      | Set a single `string` context value                  |
-| `WithContextMap`   | Bulk-set from `map[string]string`                    |
-| `WithContextf`     | Printf-style context value                           |
-| `WithContextAny`   | Type-safe context from `any` (int, bool, time, etc.) |
-| `WithCause`        | Attach an underlying error                            |
-| `WithTimestamp`    | Override timestamp (deterministic for tests)         |
-| `WithExitCode`     | Override family-based exit code (0 = use default)    |
+| Method           | Purpose                                              |
+| ---------------- | ---------------------------------------------------- |
+| `WithContext`    | Set a single `string` context value                  |
+| `WithContextMap` | Bulk-set from `map[string]string`                    |
+| `WithContextf`   | Printf-style context value                           |
+| `WithContextAny` | Type-safe context from `any` (int, bool, time, etc.) |
+| `WithCause`      | Attach an underlying error                           |
+| `WithTimestamp`  | Override timestamp (deterministic for tests)         |
+| `WithExitCode`   | Override family-based exit code (0 = use default)    |
