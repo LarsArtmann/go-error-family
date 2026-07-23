@@ -37,7 +37,10 @@ func TestHTTPHandlerSuccess(t *testing.T) {
 	})
 
 	rec := httptest.NewRecorder()
-	handler.ServeHTTP(rec, httptest.NewRequestWithContext(context.Background(), http.MethodGet, "/", nil))
+	handler.ServeHTTP(
+		rec,
+		httptest.NewRequestWithContext(context.Background(), http.MethodGet, "/", nil),
+	)
 
 	if rec.Code != http.StatusOK {
 		t.Errorf("status = %d, want 200", rec.Code)
@@ -98,7 +101,10 @@ func TestHTTPHandlerPlainErrorNoLeak(t *testing.T) {
 	})
 
 	rec := httptest.NewRecorder()
-	handler.ServeHTTP(rec, httptest.NewRequestWithContext(context.Background(), http.MethodGet, "/", nil))
+	handler.ServeHTTP(
+		rec,
+		httptest.NewRequestWithContext(context.Background(), http.MethodGet, "/", nil),
+	)
 
 	if rec.Code != http.StatusServiceUnavailable {
 		t.Errorf("status = %d, want 503 (Transient)", rec.Code)
