@@ -20,8 +20,7 @@ verifiable against the code — citations point at the source.
 
 ## Root Package (`errorfamily`) — FULLY_FUNCTIONAL
 
-The classification core. Zero third-party dependencies (stdlib only, including
-experimental `encoding/json/v2` which requires `GOEXPERIMENT=jsonv2`).
+The classification core. Zero third-party dependencies (stdlib only).
 
 ### Classification
 
@@ -235,4 +234,4 @@ All packages at 80%+. Fuzz tests (14 total):
 - **No per-error HTTP status override** — `Family.HTTPStatus()` is family-level only. Consumers needing 404 vs 400 within Rejection must handle it in their HTTP layer. (Design decision pending — see consumer feedback.)
 - **`Classify(nil)` returns Rejection** — intentional but debated. Some consumers argue it should be Transient (fail-open) or Infrastructure (programming error). This is a design decision, not a bug.
 - **Constructor context ergonomics** — `.WithContext().WithContext()` chains are verbose. No builder pattern or variadic context yet. Consumers build `errkit`-style helpers.
-- **`encoding/json/v2` requirement** — the root module uses Go's experimental json/v2, requiring `GOEXPERIMENT=jsonv2`. This will drop when json/v2 becomes stable in a future Go release.
+- **`encoding/json` (stdlib)** — the root module uses standard `encoding/json`. The v0.7.0 json/v2 experiment was reverted in [Unreleased]; no `GOEXPERIMENT` required.

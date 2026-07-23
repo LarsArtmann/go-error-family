@@ -8,12 +8,10 @@ Structured error protocol library. Library only — no `main`, no build system, 
 ## Quick Start
 
 ```bash
-GOEXPERIMENT=jsonv2 go test ./... -count=1 -timeout 120s -race   # all tests
-GOEXPERIMENT=jsonv2 golangci-lint run ./...                        # lint (all modules)
-GOEXPERIMENT=jsonv2 go build ./...                                 # build check
+go test ./... -count=1 -timeout 120s -race   # all tests
+golangci-lint run ./...                        # lint (all modules)
+go build ./...                                 # build check
 ```
-
-> **GOEXPERIMENT=jsonv2 is required** — the root module uses `encoding/json/v2` (Go 1.26 experimental). The nix devShell sets this automatically; non-nix users must `export GOEXPERIMENT=jsonv2`.
 
 ## Architecture Decision: Libraries Classify, Applications Enrich
 
@@ -48,7 +46,7 @@ The classification protocol is the **four interfaces** (`Coded`/`Classified`/`Co
 - `Family.HTTPStatus() int` — canonical family→HTTP status (Rejection→400, Conflict→409, Transient→503, Corruption→500, Infrastructure→503).
 - `Family.RetryPolicy() RetryPolicy` — advisory defaults (Transient: 3 attempts, 100ms-5s; others: single attempt). Library does not run the loop.
 
-**Error methods** (`error.go`): `WithContextMap(map)`, `WithContextf(key, fmt, args)`, `WithContextAny(key, any)` (type-switched to string), `WithExitCode(int)` (overrides family-based exit code), `ExitCode() int` (satisfies `ExitCoder`), `JSON() ([]byte, error)` (canonical `{family,code,message,context,retryable,timestamp}` for API boundaries). All `With*` methods are copy-on-write.
+**Error methods** (`error.go`): `WithContextMap(map)`, `WithContextf(key, fmt, args)`, `WithContextAny(key, any)` (type-switched to string), `WithExitCode(int)` (overrides family-based exit code), `WithHTTPStatus(int)` (overrides family-based HTTP status), `ExitCode() int` (satisfies `ExitCoder`), `HTTPStatus() int` (satisfies `HTTPStatuser`), `JSON() ([]byte, error)` (canonical `{family,code,message,context,retryable,timestamp}` for API boundaries). All `With*` methods are copy-on-write.
 
 **Constructors** (`constructors.go`): `WrapOnce(err, family, code, msg)` / `WrapOncef(...)` — idempotent wrapping; returns the existing `*Error` unchanged if the error chain already contains one. Prevents double-wrapping at API boundaries.
 
@@ -62,9 +60,10 @@ Driven by SEC and browser-history integration feedback. All use stdlib only (`ne
 
 - **`Code(err) string`** (`classify.go`) — public code extraction (wraps `errors.AsType[Coded]`). `handle.go`'s `extractCode` delegates to it.
 - **`RegisterClassifier` / `RegisterClassifiers`** (`classify.go` + `Registry.RegisterClassifier` in `registry.go`) — predicate-based classification for dynamic errors (`*sqlite.Error`). Stored in `Registry.classifiers atomic.Pointer[[]Classifier]`, copy-on-write, lock-free reads. `Registry.Clone()` copies them. No `UnregisterClassifier` exists (Go funcs aren't comparable) — use a custom `Registry` for isolation.
+- **`RegisterClassificationType[T error]` / `RegisterClassificationTypeFor[T error]`** (`classify.go`) — generic type-based classifier sugar over `RegisterClassifier`. Two top-level functions because Go doesn't allow type parameters on methods: `RegisterClassificationType[T](family)` delegates to `DefaultRegistry`, `RegisterClassificationTypeFor[T](r, family)` targets a custom `Registry`.
 - **`TemplateForCode(code) (MessageTemplate, bool)`** (`registry.go` + package-level in `handle.go`) — registry-then-builtin template lookup, for HTTP/gRPC consumers.
 - **`Wrap{Family}f`** (`constructors.go`) — `WrapRejectionf`, `WrapConflictf`, `WrapTransientf`, `WrapCorruptionf`, `WrapInfrastructuref`. Nil-safe.
-- **`HTTPStatus(err)` / `HTTPHandler(fn)`** (`http.go`) — net/http middleware. **`HTTPHandler` NEVER leaks `err.Error()`** — the response message comes only from a registered `MessageTemplate`; otherwise just family+code. This is deliberate (consumers value no internal leakage).
+- **`HTTPStatus(err)` / `HTTPHandler(fn)`** (`http.go`) — net/http middleware. Checks `HTTPStatuser` interface first (per-error override via `WithHTTPStatus`), then falls back to `Classify(err).HTTPStatus()`. **`HTTPHandler` NEVER leaks `err.Error()`** — the response message comes only from a registered `MessageTemplate`; otherwise just family+code. This is deliberate (consumers value no internal leakage).
 - **`LogError(err, *slog.Logger)` / `LogErrorContext`** (`log.go`) — Transient→Warn, others→Error; nil error is no-op; nil logger→`slog.Default`. Logs `family`, `code`, `retryable`, and `context.<key>` attrs.
 - **`errorfamilytest`** subpackage — `AssertFamily`/`AssertCode`/`AssertRetryable`/`AssertContext`/`AssertContextMissing`/`AssertExitCode`. Mirrors `httptest`: keeps `testing` out of the production package.
 
@@ -73,6 +72,7 @@ Driven by SEC and browser-history integration feedback. All use stdlib only (`ne
 Learned from BuildFlow's `modules/errors/` package — patterns proven in a production CLI build tool:
 
 - **`ExitCoder` interface** (`interfaces.go`) — `error` + `ExitCode() int`. When `ExitCode(err)` or `HandleError*` encounters an error implementing this with a non-zero code, that code overrides the family-based BSD exit code. Allows per-error exit code overrides without changing the family classification. `*Error` satisfies this via `WithExitCode(code)`.
+- **`HTTPStatuser` interface** (`interfaces.go`) — `error` + `HTTPStatus() int`. When `HTTPStatus(err)` encounters an error implementing this with a non-zero status, that status overrides the family-based HTTP default. Allows per-error HTTP status overrides (e.g. 404 for a not-found Rejection instead of the family default 400). `*Error` satisfies this via `WithHTTPStatus(status)`. Mirrors the `ExitCoder`/`WithExitCode` pattern exactly.
 - **`WrapOnce(err, family, code, msg)`** (`constructors.go`) — idempotent wrapping. Uses `errors.AsType[*Error]` to detect existing classified errors in the chain. Prevents the `[transient:db.timeout] outer: [transient:db.timeout] inner: cause` double-wrap anti-pattern at API boundaries. Nil-safe.
 - **`WithContextAny(key, value any)`** (`error.go`) — typed context values. Accepts `any` and converts via a type switch (string, int, int64, uint, uint64, float64, bool, []byte, time.Time, error, nil → empty, fallback `fmt.Sprint`). Ergonomic alternative to `fmt.Sprintf` for scalar values.
 - **`safeCauseString`** (`error.go`) — panic recovery in `Error()`, `Summary()`, and `formatVerbose()`. Uses `defer/recover` around `cause.Error()` to guard against misbehaving third-party error types that panic on nil internal values. The error message renders without the cause instead of crashing.
@@ -162,7 +162,7 @@ Connects go-error-family with `samber/oops`. Separate module with its own `go.mo
 - `gochecknoglobals` is enabled but suppressed via `//nolint:gochecknoglobals` on each legitimate package-level var (mutex-protected registries, immutable lookup tables, rule specs) — the BuildFlow pre-commit auto-configure hook re-enables it if disabled in `.golangci.yml`.
 - `exhaustruct` is enabled but most project types are excluded via `.golangci.yml` because they have intentional optional fields (HandleConfig, MessageTemplate, DiagnosticResult, etc.). Test files also exclude exhaustruct.
 - `flake.nix` uses `pkgs.go_1_26` as `goPkg` — do NOT use `let goPkg = goPkg;` (infinite recursion).
-- `GOEXPERIMENT=jsonv2` is set in flake.nix (devShells, checks, apps) because the root module uses `encoding/json/v2`. Consumers importing this library MUST also set `GOEXPERIMENT=jsonv2` until json/v2 becomes non-experimental in a future Go release.
+- The root module uses stdlib `encoding/json` (not json/v2). The json/v2 experiment was reverted — the library requires no special environment variables.
 - `lookupRegistered` is now `Registry.lookupSentinel` — still snapshots the map before iterating, `errors.Is` runs lock-free. No deadlock possible.
 - `HandleConfig.Registry` field added — when nil, falls back to `DefaultRegistry`. `resolveSuggestedFix` checks registry templates alongside built-in defaults.
 - `Registry` is excluded from `exhaustruct` via `.golangci.yml` — the `mu` field (sync.RWMutex) has a correct zero value set by `NewRegistry()`.
@@ -187,5 +187,5 @@ Connects go-error-family with `samber/oops`. Separate module with its own `go.mo
 - **`agent.Config.Enabled` is now honest:** A disabled agent returns `(nil, error)` instead of a synthetic `AgentResult`. Calling `Analyze` on a disabled agent is a programming error, not a silent result.
 - **`ClassifiedError` value-embeds `oops.OopsError`:** The zero value has nil internals. Methods like `Error()` and `Is()` guard against this, but future methods added to `ClassifiedError` must handle the zero-OopsError case.
 - **Examples are a separate module:** `examples/` has its own `go.mod` (requires root + diagnose). This keeps the root module truly zero-dependency — no `replace` directives, no phantom requires. CI builds it via `working-directory: ./examples`.
-- **json/v2 consumer requirement:** The root module imports `encoding/json/v2`, which requires `GOEXPERIMENT=jsonv2` on Go 1.26. Every consumer must set this environment variable when building. The nix devShell handles this automatically; non-nix consumers must export it manually.
+- **json/v2 reverted (2026-07-23):** The root module previously used `encoding/json/v2` (v0.7.0) but has been reverted to stdlib `encoding/json`. No `GOEXPERIMENT` required. The library is now a pure stdlib consumer with zero adoption friction.
 - **Website (`website/`):** Astro 7 + Starlight + Tailwind v4 documentation site. Firebase Hosting target `errorfamily` in the `lars-software` project. Domain: `errorfamily.lars.software`. Deploy with `nix run .#deploy` from the `website/` directory (runs `npm run build && firebase deploy --only hosting`). The website is NOT part of the Go workspace or CI — it's a separate Node.js project with its own `flake.nix`.

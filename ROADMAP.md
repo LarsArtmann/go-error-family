@@ -64,18 +64,7 @@ tooling-level.
 - Deprecation notes for broken tags (v0.6.0 family)
 - Pin-bump hygiene: submodules should bump root pins in lockstep on releases
 
-### 4. json/v2 Strategy
-
-The root module uses `encoding/json/v2` (Go 1.26 experimental). This requires
-`GOEXPERIMENT=jsonv2` from every consumer. Options:
-
-- **Keep** until json/v2 becomes stable in a future Go release (then drop the GOEXPERIMENT requirement)
-- **Revert** to `encoding/json` until json/v2 is stable (removes the consumer friction)
-- **Centralize** behind a wrapper package so the choice is isolated
-
-This needs a deliberate decision based on how long json/v2 stays experimental.
-
-### 5. Ecosystem Growth
+### 4. Ecosystem Growth
 
 **Raw ideas:**
 

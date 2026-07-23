@@ -11,6 +11,10 @@ non-breaking and use only the Go standard library.
 
 ### Added
 
+- **`HTTPStatuser` interface** (`interfaces.go`) — sixth consumer interface alongside `Coded`/`Classified`/`Contextual`/`Retryable`/`ExitCoder`. Errors implementing `HTTPStatus() int` can override the family-based HTTP status on a per-error basis. Mirrors the `ExitCoder` pattern.
+- **`Error.WithHTTPStatus(status int) *Error`** (`error.go`) — copy-on-write mutator that sets a custom HTTP status code. Zero means "unset, use family default." Example: `NewRejection("battle.not_found", "...").WithHTTPStatus(404)` returns 404 instead of the family default 400.
+- **`RegisterClassificationType[T error](family Family)`** (`classify.go`) — generic type-based classifier sugar over `RegisterClassifier`. One-liner for the common "type T → Family F" case.
+- **`RegisterClassificationTypeFor[T error](r *Registry, family Family)`** (`classify.go`) — variant targeting a custom `Registry`. Two top-level functions because Go doesn't allow type parameters on methods.
 - **`ExitCoder` interface** (`interfaces.go`) — fifth consumer interface alongside `Coded`/`Classified`/`Contextual`/`Retryable`. Errors implementing `ExitCode() int` can override the family-based exit code on a per-error basis. Embeds `error` for `errors.AsType[T]` compatibility.
 - **`Error.WithExitCode(code int) *Error`** (`error.go`) — copy-on-write mutator that sets a custom exit code. Zero means "unset, use family default."
 - **`Error.WithContextAny(key string, value any) *Error`** (`error.go`) — type-safe context attachment for non-string values. Uses a type switch for common scalars (string, int, int64, uint, uint64, float64, bool, []byte, time.Time, error) and falls back to `fmt.Sprint`.
@@ -29,6 +33,8 @@ non-breaking and use only the Go standard library.
 
 ### Changed
 
+- **Root module reverted from `encoding/json/v2` to `encoding/json`** — the `GOEXPERIMENT=jsonv2` requirement (introduced in v0.7.0) has been removed. The library is now a pure stdlib consumer with zero adoption friction. Only 2 call sites were affected (`Error.JSON()` and `writeHTTPError`); JSON output is byte-identical.
+- **`HTTPStatus(err)` checks `HTTPStatuser` interface first** — a non-zero per-error HTTP status (via `WithHTTPStatus`) wins over the family default. Zero falls back to `Family.HTTPStatus()`. `HTTPHandler` now uses this, so per-error overrides take effect in HTTP responses.
 - **`ExitCode(err)` checks `ExitCoder` interface first** — a non-zero custom exit code wins over the family default. Zero falls back to `Family.ExitCode()`.
 - **`HandleErrorWithContext` and `HandleErrorDetailedWithConfig`** now resolve exit codes via a shared `resolveExitCode` helper that respects the `ExitCoder` interface.
 - **`Error.Error()`, `Error.Summary()`, `Error.formatVerbose()`** use `safeCauseString` instead of `%v` format for cause rendering.

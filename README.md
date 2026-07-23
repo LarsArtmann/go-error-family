@@ -31,7 +31,7 @@ go-error-family answers all of these with a single concept: **Family**.
 go get github.com/larsartmann/go-error-family
 ```
 
-Requires Go 1.26+ with `GOEXPERIMENT=jsonv2` (uses `errors.AsType` and `encoding/json/v2`).
+Requires Go 1.26+ (uses `errors.AsType`). Zero third-party dependencies.
 
 This is a Go workspace. The root module (classification core, zero third-party deps) is stable. Experimental submodules — `agent`, `bridge` (samber/oops integration), `diagnose`, `diagnose/git`, `diagnose/postgres` — have their own `go.mod` and require separate imports.
 
