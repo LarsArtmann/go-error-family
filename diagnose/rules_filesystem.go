@@ -34,10 +34,10 @@ var filesystemSpec = RuleSpec{ //nolint:gochecknoglobals // Immutable rule match
 	CodeContains: []string{"file", "dir", "path", "config", "permission"}, //nolint:goconst
 }
 
-func (r *FilesystemRule) Run(
+func (r *FilesystemRule) Run( //nolint:hierarchical-errors // DiagnosticRule interface
 	ctx context.Context,
 	err error,
-) (*DiagnosticResult, error) { //nolint:hierarchical-errors // DiagnosticRule interface
+) (*DiagnosticResult, error) {
 	path := r.resolvePath(err)
 	errCtx := ErrorContext(err)
 	if path == "" {

@@ -190,41 +190,41 @@ func (c *ClassifiedError) Format(f fmt.State, verb rune) {
 	switch verb {
 	case 's':
 		if c.OopsError.Error() != "" {
-			_, _ = fmt.Fprintf(
+			_, _ = fmt.Fprintf( //nolint:hierarchical-errors // fmt.Formatter
 				f,
 				"%s",
 				c.OopsError.Error(),
-			) //nolint:hierarchical-errors // fmt.Formatter
+			)
 		} else if c.original != nil && c.original.Error() != "" {
-			_, _ = fmt.Fprintf(
+			_, _ = fmt.Fprintf( //nolint:hierarchical-errors // fmt.Formatter
 				f,
 				"%s",
 				c.original.Error(),
-			) //nolint:hierarchical-errors // fmt.Formatter
+			)
 		} else {
 			_, _ = fmt.Fprintf(f, "[%s]", c.family) //nolint:hierarchical-errors // fmt.Formatter
 		}
 	case 'v':
 		if f.Flag('+') {
 			if c.OopsError.Error() != "" {
-				_, _ = fmt.Fprintf(
+				_, _ = fmt.Fprintf( //nolint:hierarchical-errors // fmt.Formatter
 					f,
 					"%+v",
 					&c.OopsError,
-				) //nolint:hierarchical-errors // fmt.Formatter
+				)
 			} else if c.original != nil {
-				_, _ = fmt.Fprintf(
+				_, _ = fmt.Fprintf( //nolint:hierarchical-errors // fmt.Formatter
 					f,
 					"[%s] %+v",
 					c.family,
 					c.original,
-				) //nolint:hierarchical-errors // fmt.Formatter
+				)
 			} else {
-				_, _ = fmt.Fprintf(
+				_, _ = fmt.Fprintf( //nolint:hierarchical-errors // fmt.Formatter
 					f,
 					"[%s]",
 					c.family,
-				) //nolint:hierarchical-errors // fmt.Formatter
+				)
 			}
 
 			return

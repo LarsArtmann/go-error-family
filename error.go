@@ -116,10 +116,10 @@ func (e *Error) Cause() error { //nolint:hierarchical-errors // returns cause er
 func (e *Error) Format(f fmt.State, verb rune) {
 	switch verb {
 	case 's':
-		_, _ = fmt.Fprint(
+		_, _ = fmt.Fprint( //nolint:hierarchical-errors // fmt.Formatter
 			f,
 			e.message,
-		) //nolint:hierarchical-errors // fmt.Formatter: fmt.State handles write errors
+		)
 	case 'v':
 		if f.Flag('+') {
 			e.formatVerbose(f)
@@ -134,50 +134,50 @@ func (e *Error) Format(f fmt.State, verb rune) {
 }
 
 func (e *Error) formatVerbose(f fmt.State) {
-	_, _ = fmt.Fprintf(
+	_, _ = fmt.Fprintf( //nolint:hierarchical-errors // fmt.Formatter
 		f,
 		"[%s] %s: %s",
 		e.family,
 		e.code,
 		e.message,
-	) //nolint:hierarchical-errors // fmt.Formatter
+	)
 
 	if len(e.context) > 0 {
 		_, _ = fmt.Fprint(f, "\n  context:") //nolint:hierarchical-errors // fmt.Formatter
 		for k, v := range e.context {
-			_, _ = fmt.Fprintf(
+			_, _ = fmt.Fprintf( //nolint:hierarchical-errors // fmt.Formatter
 				f,
 				"\n    %s: %s",
 				k,
 				v,
-			) //nolint:hierarchical-errors // fmt.Formatter
+			)
 		}
 	}
 
 	if !e.timestamp.IsZero() {
-		_, _ = fmt.Fprintf(
+		_, _ = fmt.Fprintf( //nolint:hierarchical-errors // fmt.Formatter
 			f,
 			"\n  at: %s",
 			e.timestamp.Format(time.RFC3339),
-		) //nolint:hierarchical-errors
+		)
 	}
 
 	if e.exitCode != 0 {
-		_, _ = fmt.Fprintf(
+		_, _ = fmt.Fprintf( //nolint:hierarchical-errors // fmt.Formatter
 			f,
 			"\n  exit_code: %d",
 			e.exitCode,
-		) //nolint:hierarchical-errors // fmt.Formatter
+		)
 	}
 
 	if e.cause != nil {
 		causeMsg := safeCauseString(e.cause)
 		if causeMsg != "" {
-			_, _ = fmt.Fprintf(
+			_, _ = fmt.Fprintf( //nolint:hierarchical-errors // fmt.Formatter
 				f,
 				"\n  caused by: %s",
 				causeMsg,
-			) //nolint:hierarchical-errors // fmt.Formatter
+			)
 		}
 	}
 }

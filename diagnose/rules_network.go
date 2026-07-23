@@ -28,10 +28,10 @@ var networkSpec = RuleSpec{ //nolint:gochecknoglobals // Immutable rule matching
 	ContextSubstr: []string{"connection refused", "no such host", "i/o timeout"},
 }
 
-func (r *NetworkRule) Run(
+func (r *NetworkRule) Run( //nolint:hierarchical-errors // DiagnosticRule interface
 	ctx context.Context,
 	err error,
-) (*DiagnosticResult, error) { //nolint:hierarchical-errors // DiagnosticRule interface
+) (*DiagnosticResult, error) {
 	host := r.resolveHost(err)
 	port := r.resolvePort(err)
 
