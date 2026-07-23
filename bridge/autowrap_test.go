@@ -17,9 +17,11 @@ func TestAutoWrap_InfersAndWraps(t *testing.T) {
 	if family != errorfamily.Transient {
 		t.Errorf("AutoWrap(database domain) classify = %v, want Transient", family)
 	}
+
 	if classified.Family() != errorfamily.Transient {
 		t.Errorf("AutoWrap(database domain).Family() = %v, want Transient", classified.Family())
 	}
+
 	if !errorfamily.IsRetryable(classified) {
 		t.Error("AutoWrap(database domain) should be retryable")
 	}
@@ -32,6 +34,7 @@ func TestAutoWrap_ValidationDomainIsRejection(t *testing.T) {
 	if errorfamily.IsRetryable(classified) {
 		t.Error("validation domain should not be retryable")
 	}
+
 	if classified.Family() != errorfamily.Rejection {
 		t.Errorf("validation domain should be Rejection, got %v", classified.Family())
 	}
@@ -53,6 +56,7 @@ func TestAutoWrap_PlainError(t *testing.T) {
 	if classified.Family() != errorfamily.Transient {
 		t.Errorf("plain error should infer Transient (fail-open), got %v", classified.Family())
 	}
+
 	if !errors.Is(classified, err) {
 		t.Error("plain error should be reachable via errors.Is")
 	}
@@ -76,6 +80,7 @@ func TestBridge_Integration_FullStack(t *testing.T) {
 	if ctx["host"] != "db1" {
 		t.Errorf("context host = %q, want %q", ctx["host"], "db1")
 	}
+
 	if ctx["domain"] != "database" {
 		t.Errorf("context domain = %q, want %q", ctx["domain"], "database")
 	}
@@ -120,6 +125,7 @@ func BenchmarkErrorContext(b *testing.B) {
 		With("port", "5432").
 		With("user", "admin").
 		Errorf("test")
+
 	classified := Wrap(base, errorfamily.Transient)
 	for b.Loop() {
 		_ = classified.ErrorContext()

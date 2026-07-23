@@ -20,14 +20,18 @@ func getUser(w http.ResponseWriter, r *http.Request) error {
 	if id == "" {
 		return errorfamily.NewRejection("user.missing_id", "id query parameter is required")
 	}
+
 	if id == "notfound" {
 		return errorfamily.NewRejection("user.not_found", "user not found").
 			WithContext("id", id)
 	}
+
 	if id == "dbfail" {
 		return errorfamily.NewTransient("db.timeout", "database connection timed out")
 	}
+
 	_, _ = fmt.Fprintf(w, `{"user": {"id": %q}}`+"\n", id)
+
 	return nil
 }
 
@@ -45,5 +49,6 @@ func main() {
 	fmt.Println("curl 'http://localhost:8080/user'             → 400 (Rejection)")
 	fmt.Println("curl 'http://localhost:8080/user?id=notfound' → 400 (Rejection)")
 	fmt.Println("curl 'http://localhost:8080/user?id=dbfail'   → 503 (Transient)")
+
 	_ = http.ListenAndServe(":8080", mux)
 }

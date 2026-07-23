@@ -124,6 +124,7 @@ func (f Family) String() string {
 	if f.IsValid() {
 		return familyData[f].Name
 	}
+
 	return strUnknown
 }
 
@@ -136,6 +137,7 @@ func ParseFamily(s string) Family {
 			return Family(i)
 		}
 	}
+
 	return Transient
 }
 
@@ -148,6 +150,7 @@ func (f Family) MarshalText() ([]byte, error) {
 // Unknown values are parsed as Transient (fail-open).
 func (f *Family) UnmarshalText(text []byte) error {
 	*f = ParseFamily(string(text))
+
 	return nil
 }
 
@@ -173,6 +176,7 @@ func (f Family) Severity() int {
 	if f.IsValid() {
 		return familyData[f].Severity
 	}
+
 	return 0
 }
 
@@ -181,6 +185,7 @@ func (f Family) ExitCode() int {
 	if f.IsValid() {
 		return familyData[f].Exit
 	}
+
 	return 70 // EX_SOFTWARE — internal software error
 }
 
@@ -217,6 +222,7 @@ func (f Family) HTTPStatus() int {
 	if f.IsValid() {
 		return familyData[f].HTTP
 	}
+
 	return 500
 }
 
@@ -225,6 +231,7 @@ func (f Family) DefaultMessage() string {
 	if f.IsValid() {
 		return familyData[f].Message
 	}
+
 	return "An unexpected error occurred."
 }
 
@@ -233,6 +240,7 @@ func (f Family) DefaultWhy() string {
 	if f.IsValid() {
 		return familyData[f].Why
 	}
+
 	return ""
 }
 
@@ -241,6 +249,7 @@ func (f Family) DefaultFix() string {
 	if f.IsValid() {
 		return familyData[f].Fix
 	}
+
 	return "Try again or contact support."
 }
 
@@ -268,6 +277,7 @@ func (a Audience) String() string {
 	if a.IsValid() {
 		return audienceNames[a]
 	}
+
 	return strUnknown
 }
 
@@ -280,6 +290,7 @@ func ParseAudience(s string) Audience {
 			return a
 		}
 	}
+
 	return AudienceUser
 }
 
@@ -292,6 +303,7 @@ func (a Audience) MarshalText() ([]byte, error) {
 // Unknown values are parsed as AudienceUser (safest default).
 func (a *Audience) UnmarshalText(text []byte) error {
 	*a = ParseAudience(string(text))
+
 	return nil
 }
 
@@ -306,6 +318,7 @@ func (f Family) Audience() Audience {
 	if f.IsValid() {
 		return familyData[f].Audience
 	}
+
 	return AudienceOps
 }
 
@@ -331,5 +344,6 @@ func (f Family) Tone() Tone {
 	if f.IsValid() {
 		return familyData[f].Tone
 	}
+
 	return ToneApologetic
 }

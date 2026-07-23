@@ -80,6 +80,7 @@ func New(cfg Config) DebugAgent {
 	if cfg.Timeout == 0 {
 		cfg.Timeout = 60 * time.Second
 	}
+
 	return &agent{cfg: cfg}
 }
 
@@ -116,6 +117,7 @@ func (a *agent) deterministicAnalyze(
 	}
 
 	var parts []string
+
 	for _, d := range diagnosis {
 		if d.Status == diagnose.StatusFailed {
 			result.Confidence = max(result.Confidence, d.Confidence)

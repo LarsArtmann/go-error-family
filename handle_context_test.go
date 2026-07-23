@@ -21,9 +21,11 @@ func TestHandleErrorDetailedRejection(t *testing.T) {
 	result := HandleErrorDetailed(err)
 
 	assertExitCode(t, result, 1)
+
 	if result.Message == "" {
 		t.Error("Message should not be empty")
 	}
+
 	if result.SuggestedFix == "" {
 		t.Error("SuggestedFix should not be empty for non-retryable errors")
 	}
@@ -34,6 +36,7 @@ func TestHandleErrorDetailedTransient(t *testing.T) {
 	result := HandleErrorDetailed(err)
 
 	assertExitCode(t, result, 75)
+
 	if result.SuggestedFix != "" {
 		t.Errorf("SuggestedFix should be empty for retryable errors, got %q", result.SuggestedFix)
 	}
@@ -58,8 +61,10 @@ type testContextKey string
 
 func TestHandleErrorWithContextPropagatesContext(t *testing.T) {
 	var receivedCtx context.Context
+
 	diagFunc := func(ctx context.Context, _ error) []DiagnosticFinding {
-		receivedCtx = ctx
+		receivedCtx := ctx
+
 		return nil
 	}
 
@@ -67,6 +72,7 @@ func TestHandleErrorWithContextPropagatesContext(t *testing.T) {
 	err := NewTransient("db.timeout", "timed out")
 
 	var buf bytes.Buffer
+
 	code := HandleErrorWithContext(ctx, err, HandleConfig{
 		Output:         &buf,
 		DiagnosticFunc: diagFunc,
@@ -74,9 +80,11 @@ func TestHandleErrorWithContextPropagatesContext(t *testing.T) {
 	if code != 75 {
 		t.Errorf("exit code = %d, want 75", code)
 	}
+
 	if receivedCtx == nil {
 		t.Fatal("DiagnosticFunc was never called")
 	}
+
 	if receivedCtx.Value(testContextKey("test-key")) != "test-value" {
 		t.Error("context not propagated to DiagnosticFunc")
 	}
@@ -89,15 +97,19 @@ func TestHandleErrorWithContextCancelled(t *testing.T) {
 	called := false
 	diagFunc := func(_ context.Context, _ error) []DiagnosticFinding {
 		called = true
+
 		return nil
 	}
 
 	err := NewTransient("db.timeout", "timed out")
+
 	var buf bytes.Buffer
+
 	_ = HandleErrorWithContext(ctx, err, HandleConfig{
 		Output:         &buf,
 		DiagnosticFunc: diagFunc,
 	})
+
 	if !called {
 		t.Error("DiagnosticFunc should still be called even with cancelled context")
 	}
@@ -115,6 +127,7 @@ func TestHandleErrorDetailedWithConfigTemplateOverride(t *testing.T) {
 	})
 
 	assertExitCode(t, result, 1)
+
 	if !strings.Contains(result.Message, "Custom: /etc/config not found") {
 		t.Errorf("Message should use template override: %q", result.Message)
 	}

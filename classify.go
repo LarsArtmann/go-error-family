@@ -40,6 +40,7 @@ func Code(err error) string {
 	if coded, ok := errors.AsType[Coded](err); ok {
 		return coded.ErrorCode()
 	}
+
 	return ""
 }
 
@@ -78,11 +79,13 @@ func ExitCode(err error) int {
 	if err == nil {
 		return 0
 	}
+
 	if ec, ok := errors.AsType[ExitCoder](err); ok {
 		if code := ec.ExitCode(); code != 0 {
 			return code
 		}
 	}
+
 	return Classify(err).ExitCode()
 }
 

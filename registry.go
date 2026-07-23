@@ -42,8 +42,10 @@ func NewRegistry() *Registry {
 	}
 	empty := make(sentinelMap)
 	r.sentinels.Store(&empty)
+
 	emptyC := make([]Classifier, 0)
 	r.classifiers.Store(&emptyC)
+
 	return r
 }
 
@@ -81,6 +83,7 @@ func (r *Registry) Classify(err error) Family {
 				worst = f
 			}
 		}
+
 		return worst
 	}
 
@@ -94,6 +97,7 @@ func (r *Registry) Classify(err error) Family {
 		if rl.IsRetryable() {
 			return Transient
 		}
+
 		return Rejection
 	}
 
@@ -123,6 +127,7 @@ func (r *Registry) Classify(err error) Family {
 func (r *Registry) RegisterClassification(sentinel error, family Family) {
 	r.mu.Lock()
 	defer r.mu.Unlock()
+
 	r.swapSentinels(func(m sentinelMap) { m[sentinel] = family })
 }
 
@@ -131,6 +136,7 @@ func (r *Registry) RegisterClassification(sentinel error, family Family) {
 func (r *Registry) UnregisterClassification(sentinel error) {
 	r.mu.Lock()
 	defer r.mu.Unlock()
+
 	r.swapSentinels(func(m sentinelMap) { delete(m, sentinel) })
 }
 
@@ -139,6 +145,7 @@ func (r *Registry) UnregisterClassification(sentinel error) {
 func (r *Registry) RegisterClassifications(classifications map[error]Family) {
 	r.mu.Lock()
 	defer r.mu.Unlock()
+
 	r.swapSentinels(func(m sentinelMap) { maps.Copy(m, classifications) })
 }
 
@@ -159,6 +166,7 @@ func (r *Registry) RegisterClassifier(c Classifier) {
 func (r *Registry) RegisterClassifiers(classifiers ...Classifier) {
 	r.mu.Lock()
 	defer r.mu.Unlock()
+
 	r.swapClassifiers(func(existing []Classifier) []Classifier {
 		return append(existing, classifiers...)
 	})
@@ -170,11 +178,13 @@ func (r *Registry) RegisterClassifiers(classifiers ...Classifier) {
 // readers remain fully lock-free.
 func (r *Registry) swapClassifiers(fn func(cs []Classifier) []Classifier) {
 	old := r.classifiers.Load()
+
 	var newList []Classifier
 	if old != nil {
 		newList = make([]Classifier, len(*old), len(*old)+1)
 		copy(newList, *old)
 	}
+
 	newList = fn(newList)
 	r.classifiers.Store(&newList)
 }
@@ -186,11 +196,13 @@ func (r *Registry) runClassifiers(err error) (Family, bool) {
 	if cs == nil {
 		return Rejection, false
 	}
+
 	for _, c := range *cs {
 		if family, ok := c(err); ok {
 			return family, true
 		}
 	}
+
 	return Rejection, false
 }
 
@@ -200,11 +212,13 @@ func (r *Registry) runClassifiers(err error) (Family, bool) {
 // remain fully lock-free.
 func (r *Registry) swapSentinels(fn func(m sentinelMap)) {
 	old := r.sentinels.Load()
+
 	newMap := make(sentinelMap, 1)
 	if old != nil {
 		newMap = make(sentinelMap, len(*old)+1)
 		maps.Copy(newMap, *old)
 	}
+
 	fn(newMap)
 	r.sentinels.Store(&newMap)
 }
@@ -214,6 +228,7 @@ func (r *Registry) swapSentinels(fn func(m sentinelMap)) {
 func (r *Registry) RegisterTemplate(code string, tmpl MessageTemplate) {
 	r.mu.Lock()
 	defer r.mu.Unlock()
+
 	r.templates[strings.ToLower(code)] = tmpl
 }
 
@@ -222,6 +237,7 @@ func (r *Registry) RegisterTemplate(code string, tmpl MessageTemplate) {
 func (r *Registry) UnregisterTemplate(code string) {
 	r.mu.Lock()
 	defer r.mu.Unlock()
+
 	delete(r.templates, strings.ToLower(code))
 }
 
@@ -231,6 +247,7 @@ func (r *Registry) UnregisterTemplate(code string) {
 func (r *Registry) RegisterTemplates(templates map[string]MessageTemplate) {
 	r.mu.Lock()
 	defer r.mu.Unlock()
+
 	for code, tmpl := range templates {
 		r.templates[strings.ToLower(code)] = tmpl
 	}
@@ -286,7 +303,9 @@ func (r *Registry) lookupSentinel(err error) (Family, bool) {
 func (r *Registry) lookupTemplate(code string) (MessageTemplate, bool) {
 	r.mu.RLock()
 	defer r.mu.RUnlock()
+
 	tmpl, ok := r.templates[strings.ToLower(code)]
+
 	return tmpl, ok
 }
 
@@ -301,8 +320,10 @@ func (r *Registry) TemplateForCode(code string) (MessageTemplate, bool) {
 	if tmpl, ok := r.lookupTemplate(code); ok {
 		return tmpl, true
 	}
+
 	if tmpl, ok := lookupDefault(code); ok {
 		return tmpl, true
 	}
+
 	return MessageTemplate{}, false
 }

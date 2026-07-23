@@ -46,6 +46,7 @@ func HTTPHandler(h HandlerFunc) http.Handler {
 		if err == nil {
 			return
 		}
+
 		writeHTTPError(w, err)
 	})
 }
@@ -68,6 +69,7 @@ func writeHTTPError(w http.ResponseWriter, err error) {
 
 	w.Header().Set("Content-Type", "application/json; charset=utf-8")
 	w.WriteHeader(family.HTTPStatus())
+
 	if err := json.MarshalWrite(w, body); err != nil {
 		// Client disconnected or connection broke — nothing actionable.
 		return

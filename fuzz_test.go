@@ -34,6 +34,7 @@ func FuzzParseFamilyRoundTrip(f *testing.F) {
 
 	f.Fuzz(func(t *testing.T, input string) {
 		first := ParseFamily(input)
+
 		second := ParseFamily(first.String())
 		if first != second {
 			t.Errorf("ParseFamily(%q) = %v, but ParseFamily(%q) = %v",
@@ -51,6 +52,7 @@ func FuzzClassify(f *testing.F) {
 
 	f.Fuzz(func(t *testing.T, msg string) {
 		err := NewTransient("fuzz.code", msg)
+
 		got := Classify(err)
 		if got != Transient {
 			t.Errorf("Classify(NewTransient(...)) = %v, want Transient", got)
@@ -66,6 +68,7 @@ func FuzzClassifyPlainError(f *testing.F) {
 
 	f.Fuzz(func(t *testing.T, msg string) {
 		err := errors.New(msg)
+
 		got := Classify(err)
 		if got != Transient {
 			t.Errorf("Classify(errors.New(%q)) = %v, want Transient (default)", msg, got)
@@ -81,14 +84,17 @@ func FuzzErrorFormatting(f *testing.F) {
 
 	f.Fuzz(func(t *testing.T, code, message string) {
 		err := New(Transient, code, message)
+
 		s := err.Error()
 		if s == "" {
 			t.Error("Error() returned empty string")
 		}
+
 		verbose := fmt.Sprintf("%+v", err)
 		if verbose == "" {
 			t.Errorf("%%+v formatting returned empty string")
 		}
+
 		plain := fmt.Sprintf("%s", err)
 		if plain != message {
 			t.Errorf("%%s = %q, want %q", plain, message)
@@ -122,10 +128,12 @@ func FuzzWrapOnce(f *testing.F) {
 
 	f.Fuzz(func(t *testing.T, code, msg string) {
 		base := errors.New(msg)
+
 		wrapped := WrapOnce(base, Transient, code, msg)
 		if wrapped == nil {
 			t.Fatal("WrapOnce returned nil for non-nil input")
 		}
+
 		doubleWrapped := WrapOnce(wrapped, Rejection, "other.code", "other msg")
 		if doubleWrapped != wrapped {
 			t.Error("WrapOnce is not idempotent: double-wrap produced a different pointer")
@@ -163,6 +171,7 @@ func FuzzWithExitCode(f *testing.F) {
 		if got := err.ExitCode(); got != code {
 			t.Errorf("ExitCode() = %d, want %d", got, code)
 		}
+
 		if code != 0 {
 			if got := ExitCode(err); got != code {
 				t.Errorf("package ExitCode = %d, want %d (override)", got, code)

@@ -25,6 +25,7 @@ func BenchmarkClassifyRegistered(b *testing.B) {
 	e := errors.New("registered sentinel")
 	RegisterClassification(e, Transient)
 	b.ResetTimer()
+
 	for b.Loop() {
 		_ = Classify(e)
 	}
@@ -125,11 +126,14 @@ func (r *retryablePlainError) IsRetryable() bool { return r.retryable }
 func BenchmarkClassifyManySentinels(b *testing.B) {
 	reg := NewRegistry()
 	target := errors.New("target sentinel")
+
 	for i := range 50 {
 		reg.RegisterClassification(fmt.Errorf("sentinel-%d", i), Transient)
 	}
+
 	reg.RegisterClassification(target, Rejection)
 	b.ResetTimer()
+
 	for b.Loop() {
 		_ = reg.Classify(target)
 	}

@@ -24,6 +24,7 @@ func TestInferFamily_PlainError(t *testing.T) {
 
 func TestInferFamily_ExplicitTagsOverrideDomain(t *testing.T) {
 	err := oops.In("database").Tags("rejection").Errorf("test")
+
 	family := InferFamily(err)
 	if family != errorfamily.Rejection {
 		t.Errorf("tag 'rejection' should override domain 'database' (Transient), got %v", family)
@@ -32,6 +33,7 @@ func TestInferFamily_ExplicitTagsOverrideDomain(t *testing.T) {
 
 func TestInferFamily_TagRetryable(t *testing.T) {
 	err := oops.In("validation").Tags("retryable").Errorf("test")
+
 	family := InferFamily(err)
 	if family != errorfamily.Transient {
 		t.Errorf("tag 'retryable' should force Transient regardless of domain, got %v", family)
@@ -57,6 +59,7 @@ func TestInferFamily_AllTagOverrides(t *testing.T) {
 	for _, tc := range cases {
 		t.Run(tc.tag, func(t *testing.T) {
 			err := oops.Tags(tc.tag).Errorf("test")
+
 			got := InferFamily(err)
 			if got != tc.wantFamily {
 				t.Errorf("tag %q → %v, want %v", tc.tag, got, tc.wantFamily)
@@ -90,6 +93,7 @@ func TestInferFamily_AllDomainDefaults(t *testing.T) {
 	for _, tc := range cases {
 		t.Run(tc.domain, func(t *testing.T) {
 			err := oops.In(tc.domain).Errorf("test")
+
 			got := InferFamily(err)
 			if got != tc.wantFamily {
 				t.Errorf("domain %q → %v, want %v", tc.domain, got, tc.wantFamily)
@@ -100,6 +104,7 @@ func TestInferFamily_AllDomainDefaults(t *testing.T) {
 
 func TestInferFamily_UnknownDomainFailsOpen(t *testing.T) {
 	err := oops.In("unknown_domain").Errorf("test")
+
 	family := InferFamily(err)
 	if family != errorfamily.Transient {
 		t.Errorf("unknown domain should default to Transient (fail-open), got %v", family)
@@ -108,6 +113,7 @@ func TestInferFamily_UnknownDomainFailsOpen(t *testing.T) {
 
 func TestInferFamily_NoDomainNoTags(t *testing.T) {
 	err := oops.Errorf("plain error")
+
 	family := InferFamily(err)
 	if family != errorfamily.Transient {
 		t.Errorf("no domain, no tags should default to Transient, got %v", family)
@@ -116,6 +122,7 @@ func TestInferFamily_NoDomainNoTags(t *testing.T) {
 
 func TestInferFamily_MultipleTagsFirstMatchWins(t *testing.T) {
 	err := oops.Tags("rejection", "retryable").Errorf("test")
+
 	family := InferFamily(err)
 	if family != errorfamily.Rejection {
 		t.Errorf("first matching tag 'rejection' should win, got %v", family)

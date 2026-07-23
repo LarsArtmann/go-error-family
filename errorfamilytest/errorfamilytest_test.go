@@ -18,6 +18,7 @@ func TestAssertFamilyMismatch(t *testing.T) {
 	rec.run(func() {
 		errorfamilytest.AssertFamily(rec, errorfamily.NewRejection("c", "m"), errorfamily.Transient)
 	})
+
 	if !rec.failed {
 		t.Fatal("expected AssertFamily to fail on family mismatch")
 	}
@@ -34,6 +35,7 @@ func TestAssertCodeMismatch(t *testing.T) {
 	rec.run(func() {
 		errorfamilytest.AssertCode(rec, errorfamily.NewRejection("want.this", "m"), "got.that")
 	})
+
 	if !rec.failed {
 		t.Fatal("expected AssertCode to fail on code mismatch")
 	}
@@ -49,6 +51,7 @@ func TestAssertRetryableMismatch(t *testing.T) {
 	rec.run(func() {
 		errorfamilytest.AssertRetryable(rec, errorfamily.NewTransient("c", "m"), false)
 	})
+
 	if !rec.failed {
 		t.Fatal("expected AssertRetryable to fail on retryable mismatch")
 	}
@@ -65,6 +68,7 @@ func TestAssertContextWrongValue(t *testing.T) {
 	rec.run(func() {
 		errorfamilytest.AssertContext(rec, err, "field", "phone")
 	})
+
 	if !rec.failed {
 		t.Fatal("expected AssertContext to fail on value mismatch")
 	}
@@ -75,6 +79,7 @@ func TestAssertContextNotContextual(t *testing.T) {
 	rec.run(func() {
 		errorfamilytest.AssertContext(rec, errors.New("plain"), "key", "val")
 	})
+
 	if !rec.failed {
 		t.Fatal("expected AssertContext to fail when error is not Contextual")
 	}
@@ -95,6 +100,7 @@ func TestAssertContextMissingButPresent(t *testing.T) {
 	rec.run(func() {
 		errorfamilytest.AssertContextMissing(rec, err, "field")
 	})
+
 	if !rec.failed {
 		t.Fatal("expected AssertContextMissing to fail when key is unexpectedly present")
 	}
@@ -112,6 +118,7 @@ func TestAssertExitCodeMismatch(t *testing.T) {
 	rec.run(func() {
 		errorfamilytest.AssertExitCode(rec, errorfamily.NewRejection("c", "m"), 99)
 	})
+
 	if !rec.failed {
 		t.Fatal("expected AssertExitCode to fail on mismatch")
 	}
@@ -123,11 +130,13 @@ type fatalSentinel struct{}
 
 type failureRecorder struct {
 	testing.TB
+
 	failed bool
 }
 
 func newFailureRecorder(tb testing.TB) *failureRecorder {
 	tb.Helper()
+
 	return &failureRecorder{TB: tb}
 }
 
@@ -147,5 +156,6 @@ func (r *failureRecorder) run(fn func()) {
 			}
 		}
 	}()
+
 	fn()
 }

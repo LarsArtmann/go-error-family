@@ -15,6 +15,7 @@ func TestHandleErrorNil(t *testing.T) {
 
 func TestHandleErrorRejection(t *testing.T) {
 	err := NewRejection("file.not_found", "config missing")
+
 	code := HandleError(err)
 	if code != 1 {
 		t.Errorf("HandleError(rejection) = %d, want 1", code)
@@ -23,6 +24,7 @@ func TestHandleErrorRejection(t *testing.T) {
 
 func TestHandleErrorTransient(t *testing.T) {
 	err := NewTransient("db.timeout", "database timed out")
+
 	code := HandleError(err)
 	if code != 75 {
 		t.Errorf("HandleError(transient) = %d, want 75", code)
@@ -31,6 +33,7 @@ func TestHandleErrorTransient(t *testing.T) {
 
 func TestHandleErrorWithConfigCustomOutput(t *testing.T) {
 	var buf bytes.Buffer
+
 	err := NewRejection("file.not_found", "config missing")
 
 	code := HandleErrorWithConfig(err, HandleConfig{Output: &buf})
@@ -46,6 +49,7 @@ func TestHandleErrorWithConfigCustomOutput(t *testing.T) {
 
 func TestHandleErrorWithConfigTemplateOverride(t *testing.T) {
 	var buf bytes.Buffer
+
 	err := NewRejection("file.not_found", "missing")
 
 	code := HandleErrorWithConfig(err, HandleConfig{
@@ -86,6 +90,7 @@ func testOnDiagnosedPtr(called *bool) func(error, []DiagnosticFinding) {
 
 func assertExitCode(t *testing.T, result *HandleResult, want int) {
 	t.Helper()
+
 	if result.ExitCode != want {
 		t.Errorf("ExitCode = %d, want %d", result.ExitCode, want)
 	}
@@ -93,6 +98,7 @@ func assertExitCode(t *testing.T, result *HandleResult, want int) {
 
 func TestHandleErrorWithConfigDiagnostics(t *testing.T) {
 	var buf bytes.Buffer
+
 	called := false
 	err := NewTransient("db.timeout", "timed out")
 
@@ -104,6 +110,7 @@ func TestHandleErrorWithConfigDiagnostics(t *testing.T) {
 	if code != 75 {
 		t.Errorf("exit code = %d, want 75", code)
 	}
+
 	if !called {
 		t.Error("OnDiagnosed should have been called")
 	}
@@ -111,6 +118,7 @@ func TestHandleErrorWithConfigDiagnostics(t *testing.T) {
 
 func TestHandleErrorWithConfigNoDiagnoseWhenFuncNil(t *testing.T) {
 	var buf bytes.Buffer
+
 	err := NewTransient("test", "msg")
 
 	code := HandleErrorWithConfig(err, HandleConfig{

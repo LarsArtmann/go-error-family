@@ -123,9 +123,11 @@ func TestIsRetryable(t *testing.T) {
 	if IsRetryable(nil) {
 		t.Error("nil should not be retryable")
 	}
+
 	if !IsRetryable(NewTransient("code", "msg")) {
 		t.Error("Transient should be retryable")
 	}
+
 	if IsRetryable(NewRejection("code", "msg")) {
 		t.Error("Rejection should not be retryable")
 	}
@@ -135,9 +137,11 @@ func TestCode(t *testing.T) {
 	if got := Code(nil); got != "" {
 		t.Errorf("Code(nil) = %q, want empty", got)
 	}
+
 	if got := Code(errors.New("plain")); got != "" {
 		t.Errorf("Code(plain error) = %q, want empty", got)
 	}
+
 	want := "db.timeout"
 	if got := Code(NewTransient(want, "msg")); got != want {
 		t.Errorf("Code(classified) = %q, want %q", got, want)
@@ -153,9 +157,11 @@ func TestExitCode(t *testing.T) {
 	if ExitCode(nil) != 0 {
 		t.Error("nil should have exit code 0")
 	}
+
 	if ExitCode(NewTransient("code", "msg")) != 75 {
 		t.Error("Transient should have exit code 75")
 	}
+
 	if ExitCode(NewRejection("code", "msg")) != 1 {
 		t.Error("Rejection should have exit code 1")
 	}
@@ -177,6 +183,7 @@ func TestRegisterClassifications(t *testing.T) {
 	if Classify(s1) != Conflict {
 		t.Error("batch-registered s1 should classify as Conflict")
 	}
+
 	if Classify(s2) != Infrastructure {
 		t.Error("batch-registered s2 should classify as Infrastructure")
 	}
@@ -185,10 +192,12 @@ func TestRegisterClassifications(t *testing.T) {
 func TestErrorImplementsInterfaces(t *testing.T) {
 	err := NewRejection("test", "msg")
 
-	var _ Coded = err
-	var _ Classified = err
-	var _ Contextual = err
-	var _ Retryable = err
+	var (
+		_ Coded      = err
+		_ Classified = err
+		_ Contextual = err
+		_ Retryable  = err
+	)
 }
 
 func TestExternalTypeImplementsInterfaces(t *testing.T) {
@@ -202,10 +211,12 @@ func TestExternalTypeImplementsInterfaces(t *testing.T) {
 	if !ok || coded.ErrorCode() != "ext.code" {
 		t.Error("external type should satisfy Coded")
 	}
+
 	classified, ok := errors.AsType[Classified](err)
 	if !ok || classified.ErrorFamily() != Transient {
 		t.Error("external type should satisfy Classified")
 	}
+
 	contextual, ok := errors.AsType[Contextual](err)
 	if !ok || contextual.ErrorContext()["key"] != "value" {
 		t.Error("external type should satisfy Contextual")

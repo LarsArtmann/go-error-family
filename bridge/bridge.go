@@ -54,6 +54,7 @@ import (
 // an OopsError — Wrap never discards the input.
 type ClassifiedError struct {
 	oops.OopsError
+
 	original error
 	family   errorfamily.Family
 }
@@ -66,6 +67,7 @@ type ClassifiedError struct {
 // from error-family, and retains all oops methods when the input is an OopsError.
 func Wrap(err error, f errorfamily.Family) *ClassifiedError {
 	oopsErr, _ := oops.AsOops(err)
+
 	return &ClassifiedError{OopsError: oopsErr, original: err, family: f}
 }
 
@@ -76,9 +78,11 @@ func (c *ClassifiedError) Error() string {
 	if msg := c.OopsError.Error(); msg != "" {
 		return msg
 	}
+
 	if c.original != nil {
 		return fmt.Sprintf("[%s] %s", c.family, c.original.Error())
 	}
+
 	return fmt.Sprintf("[%s]", c.family)
 }
 
@@ -89,6 +93,7 @@ func (c *ClassifiedError) Unwrap() error {
 	if inner := c.OopsError.Unwrap(); inner != nil {
 		return inner
 	}
+
 	return c.original
 }
 
@@ -100,9 +105,11 @@ func (c *ClassifiedError) Is(target error) bool {
 			return true
 		}
 	}
+
 	if c.original != nil && errors.Is(c.original, target) {
 		return true
 	}
+
 	return false
 }
 
@@ -118,9 +125,11 @@ func (c *ClassifiedError) ErrorCode() string {
 	if code == nil {
 		return ""
 	}
+
 	if s, ok := code.(string); ok {
 		return s
 	}
+
 	return fmt.Sprint(code)
 }
 
@@ -133,18 +142,22 @@ func (c *ClassifiedError) IsRetryable() bool { return c.family.IsRetryable() }
 // Non-string values are converted via fmt.Sprint.
 func (c *ClassifiedError) ErrorContext() map[string]string {
 	raw := c.Context()
+
 	entries := len(raw)
 	if domain := c.Domain(); domain != "" {
 		entries++
 	}
+
 	if tags := c.Tags(); len(tags) > 0 {
 		entries++
 	}
+
 	if entries == 0 {
 		return map[string]string{}
 	}
 
 	out := make(map[string]string, entries)
+
 	for k, v := range raw {
 		if s, ok := v.(string); ok {
 			out[k] = s
@@ -152,12 +165,15 @@ func (c *ClassifiedError) ErrorContext() map[string]string {
 			out[k] = fmt.Sprint(v)
 		}
 	}
+
 	if domain := c.Domain(); domain != "" {
 		out["domain"] = domain
 	}
+
 	if tags := c.Tags(); len(tags) > 0 {
 		out["tags"] = strings.Join(tags, ",")
 	}
+
 	return out
 }
 
@@ -189,8 +205,10 @@ func (c *ClassifiedError) Format(f fmt.State, verb rune) {
 			} else {
 				_, _ = fmt.Fprintf(f, "[%s]", c.family)
 			}
+
 			return
 		}
+
 		_, _ = fmt.Fprint(f, c.Error())
 	default:
 		_, _ = fmt.Fprint(f, c.Error())

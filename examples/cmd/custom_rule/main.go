@@ -66,6 +66,7 @@ func main() {
 	results := runner.Run(context.Background(), err)
 	for _, r := range results {
 		fmt.Printf("[%s] %s: %s\n", r.RuleName, r.Status, r.Summary)
+
 		if r.Fix.Summary != "" {
 			fmt.Printf("  Fix: %s\n", r.Fix.Summary)
 		}

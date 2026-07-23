@@ -17,7 +17,9 @@ func TestSafeCauseString(t *testing.T) {
 
 	t.Run("normal cause", func(t *testing.T) {
 		t.Parallel()
+
 		cause := errors.New("disk full")
+
 		got := safeCauseString(cause)
 		if got != "disk full" {
 			t.Errorf("safeCauseString = %q, want %q", got, "disk full")
@@ -26,6 +28,7 @@ func TestSafeCauseString(t *testing.T) {
 
 	t.Run("panicking cause returns empty", func(t *testing.T) {
 		t.Parallel()
+
 		got := safeCauseString(&panickingError{})
 		if got != "" {
 			t.Errorf("safeCauseString = %q, want empty string", got)
@@ -38,15 +41,18 @@ func TestErrorPanicRecovery(t *testing.T) {
 
 	t.Run("Error does not propagate cause panic", func(t *testing.T) {
 		t.Parallel()
+
 		err := Wrap(&panickingError{}, Transient, "test.panic", "something went wrong")
 
 		var got string
+
 		func() {
 			defer func() {
 				if r := recover(); r != nil {
 					t.Errorf("Error() should not panic, got: %v", r)
 				}
 			}()
+
 			got = err.Error()
 		}()
 
@@ -57,15 +63,18 @@ func TestErrorPanicRecovery(t *testing.T) {
 
 	t.Run("Summary does not propagate cause panic", func(t *testing.T) {
 		t.Parallel()
+
 		err := Wrap(&panickingError{}, Transient, "test.panic", "boom")
 
 		var got string
+
 		func() {
 			defer func() {
 				if r := recover(); r != nil {
 					t.Errorf("Summary() should not panic, got: %v", r)
 				}
 			}()
+
 			got = err.Summary()
 		}()
 
@@ -76,6 +85,7 @@ func TestErrorPanicRecovery(t *testing.T) {
 
 	t.Run("formatVerbose does not propagate cause panic", func(t *testing.T) {
 		t.Parallel()
+
 		err := Wrap(&panickingError{}, Transient, "test.panic", "boom")
 
 		func() {
@@ -84,6 +94,7 @@ func TestErrorPanicRecovery(t *testing.T) {
 					t.Errorf("formatVerbose should not panic, got: %v", r)
 				}
 			}()
+
 			_ = fmt.Sprintf("%+v", err)
 		}()
 	})

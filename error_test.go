@@ -15,18 +15,23 @@ func TestErrorBasic(t *testing.T) {
 	if err.Error() != "[rejection:test.not_found] something was not found" {
 		t.Errorf("Error() = %q", err.Error())
 	}
+
 	if err.ErrorCode() != "test.not_found" {
 		t.Errorf("ErrorCode() = %q", err.ErrorCode())
 	}
+
 	if err.ErrorFamily() != Rejection {
 		t.Errorf("ErrorFamily() = %v", err.ErrorFamily())
 	}
+
 	if err.Message() != "something was not found" {
 		t.Errorf("Message() = %q", err.Message())
 	}
+
 	if err.Code() != "test.not_found" {
 		t.Errorf("Code() = %q", err.Code())
 	}
+
 	if err.IsRetryable() {
 		t.Error("Rejection should not be retryable")
 	}
@@ -39,9 +44,11 @@ func TestErrorWithCause(t *testing.T) {
 	if !errors.Is(err.Cause(), cause) {
 		t.Error("Cause() should return the wrapped error")
 	}
+
 	if !errors.Is(err.Unwrap(), cause) {
 		t.Error("Unwrap() should return the wrapped error")
 	}
+
 	if !strings.Contains(err.Error(), "root cause") {
 		t.Errorf("Error() should contain cause: %q", err.Error())
 	}
@@ -56,9 +63,11 @@ func TestErrorIs(t *testing.T) {
 	if !errors.Is(err1, err2) {
 		t.Error("errors.Is should match same code+family")
 	}
+
 	if errors.Is(err1, err3) {
 		t.Error("errors.Is should not match different family")
 	}
+
 	if errors.Is(err1, err4) {
 		t.Error("errors.Is should not match different code")
 	}
@@ -73,6 +82,7 @@ func TestErrorWithContext(t *testing.T) {
 	if ctx["path"] != "/etc/app/config.yaml" {
 		t.Errorf("context path = %q", ctx["path"])
 	}
+
 	if ctx["format"] != "yaml" {
 		t.Errorf("context format = %q", ctx["format"])
 	}
@@ -80,9 +90,11 @@ func TestErrorWithContext(t *testing.T) {
 	if !err.HasContext("path") {
 		t.Error("HasContext(path) should be true")
 	}
+
 	if err.HasContext("nonexistent") {
 		t.Error("HasContext(nonexistent) should be false")
 	}
+
 	if err.ContextValue("path") != "/etc/app/config.yaml" {
 		t.Errorf("ContextValue(path) = %q", err.ContextValue("path"))
 	}
@@ -107,12 +119,15 @@ func TestErrorWithContextCopyOnWrite(t *testing.T) {
 	if original.ContextValue("key2") != "" {
 		t.Error("WithContext should not mutate the original error")
 	}
+
 	if original.ContextValue("key1") != "val1" {
 		t.Error("original context should be preserved after WithContext on derived")
 	}
+
 	if derived.ContextValue("key1") != "val1" {
 		t.Error("derived should inherit existing context")
 	}
+
 	if derived.ContextValue("key2") != "val2" {
 		t.Error("derived should have the new context key")
 	}
@@ -129,6 +144,7 @@ func TestErrorWithCauseCopyOnWrite(t *testing.T) {
 	if !errors.Is(original.Cause(), cause1) {
 		t.Error("WithCause should not mutate the original error's cause")
 	}
+
 	if !errors.Is(derived.Cause(), cause2) {
 		t.Error("derived should have the new cause")
 	}
@@ -145,6 +161,7 @@ func TestErrorWithTimestampCopyOnWrite(t *testing.T) {
 	if original.Timestamp() != originalTS {
 		t.Error("WithTimestamp should not mutate the original error")
 	}
+
 	if derived.Timestamp() != newTS {
 		t.Error("derived should have the new timestamp")
 	}
@@ -167,6 +184,7 @@ func TestErrorFormat(t *testing.T) {
 	if !strings.Contains(verbose, "context:") {
 		t.Errorf("%%+v should contain context: %q", verbose)
 	}
+
 	if !strings.Contains(verbose, "host: localhost") {
 		t.Errorf("%%+v should contain host: %q", verbose)
 	}
@@ -181,6 +199,7 @@ func TestErrorSummary(t *testing.T) {
 
 func assertFamily(t *testing.T, err *Error, want Family) {
 	t.Helper()
+
 	if err.ErrorFamily() != want {
 		t.Errorf("family = %v, want %v", err.ErrorFamily(), want)
 	}
@@ -202,6 +221,7 @@ func TestConstructors(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			assertFamily(t, tt.err, tt.family)
+
 			if tt.err.ErrorCode() != tt.code {
 				t.Errorf("code = %q, want %q", tt.err.ErrorCode(), tt.code)
 			}
@@ -226,6 +246,7 @@ func TestWrapConstructors(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			assertFamily(t, tt.err, tt.family)
+
 			if !errors.Is(tt.err.Unwrap(), cause) {
 				t.Error("should wrap cause")
 			}
@@ -248,6 +269,7 @@ func TestNewf(t *testing.T) {
 
 func TestWrapf(t *testing.T) {
 	cause := errors.New("root")
+
 	err := Wrapf(cause, Transient, "code", "failed: %s", "reason")
 	if !strings.Contains(err.Message(), "failed: reason") {
 		t.Errorf("Wrapf message = %q", err.Message())
@@ -282,9 +304,11 @@ func TestWrapFamilyFormattedVariants(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			assertFamily(t, tt.err, tt.family)
+
 			if tt.err.Message() != tt.message {
 				t.Errorf("%s message = %q, want %q", tt.name, tt.err.Message(), tt.message)
 			}
+
 			if !errors.Is(tt.err.Unwrap(), cause) {
 				t.Error("should wrap cause")
 			}
@@ -297,6 +321,7 @@ func TestWrapFamilyFormattedNil(t *testing.T) {
 	if e := WrapRejectionf(nil, "r", "msg"); e != nil {
 		t.Error("WrapRejectionf(nil, ...) should return nil")
 	}
+
 	if e := WrapTransientf(nil, "t", "msg"); e != nil {
 		t.Error("WrapTransientf(nil, ...) should return nil")
 	}
@@ -345,6 +370,7 @@ func TestErrorWithCauseBuilder(t *testing.T) {
 	if !errors.Is(err.Cause(), cause) {
 		t.Error("WithCause should set the cause")
 	}
+
 	if !errors.Is(err.Unwrap(), cause) {
 		t.Error("Unwrap should return cause set by WithCause")
 	}
@@ -352,6 +378,7 @@ func TestErrorWithCauseBuilder(t *testing.T) {
 
 func TestErrorIsNonErrorTarget(t *testing.T) {
 	err := NewRejection("test", "msg")
+
 	target := errors.New("plain error")
 	if errors.Is(err, target) {
 		t.Error("errors.Is should not match non-*Error target")
@@ -366,6 +393,7 @@ func TestErrorFormatVerboseWithCause(t *testing.T) {
 	if !strings.Contains(verbose, "caused by:") {
 		t.Errorf("%%+v with cause should contain 'caused by:': %q", verbose)
 	}
+
 	if !strings.Contains(verbose, "db.timeout") {
 		t.Errorf("%%+v should show cause chain: %q", verbose)
 	}
@@ -379,6 +407,7 @@ func TestErrorSummaryWithCause(t *testing.T) {
 	if !strings.Contains(summary, "test.code") {
 		t.Errorf("Summary() should contain code: %q", summary)
 	}
+
 	if !strings.Contains(summary, "root") {
 		t.Errorf("Summary() should contain cause: %q", summary)
 	}
@@ -393,10 +422,12 @@ func TestErrorContextValueMissing(t *testing.T) {
 
 func TestErrorContextEmptyOrNil(t *testing.T) {
 	err := NewRejection("test", "msg")
+
 	ctx := err.ErrorContext()
 	if len(ctx) != 0 {
 		t.Errorf("ErrorContext() on error without context should be empty, got %v", ctx)
 	}
+
 	if err.HasContext("anything") {
 		t.Error("HasContext should be false for error without context")
 	}
@@ -427,6 +458,7 @@ func testFamilyProperty[T comparable](t *testing.T, name string, cases []struct 
 }, get func(Family) T,
 ) {
 	t.Helper()
+
 	for _, tt := range cases {
 		t.Run(tt.family.String(), func(t *testing.T) {
 			if got := get(tt.family); got != tt.want {
@@ -443,6 +475,7 @@ func TestErrorWithContextMap(t *testing.T) {
 	if e.ContextValue("host") != "db1" {
 		t.Errorf("host = %q, want db1", e.ContextValue("host"))
 	}
+
 	if e.ContextValue("port") != "5432" {
 		t.Errorf("port = %q, want 5432", e.ContextValue("port"))
 	}
@@ -450,6 +483,7 @@ func TestErrorWithContextMap(t *testing.T) {
 
 func TestErrorWithContextMapNilIsSafe(t *testing.T) {
 	original := NewTransient("code", "msg").WithContext("keep", "yes")
+
 	e := original.WithContextMap(nil)
 	if e.ContextValue("keep") != "yes" {
 		t.Error("WithContextMap(nil) clobbered existing context")
@@ -472,6 +506,7 @@ func TestErrorWithContextMapImmutable(t *testing.T) {
 
 	// Mutating the input map after the call must not affect the error.
 	mutated["b"] = "changed"
+
 	if derived.ContextValue("b") != "2" {
 		t.Errorf("WithContextMap stored a reference: b = %q, want 2", derived.ContextValue("b"))
 	}
@@ -496,15 +531,19 @@ func TestErrorJSON(t *testing.T) {
 	if err := json.Unmarshal(data, &got); err != nil {
 		t.Fatalf("invalid JSON output: %v", err)
 	}
+
 	if got["family"] != "rejection" {
 		t.Errorf("family = %v, want rejection", got["family"])
 	}
+
 	if got["code"] != "auth.invalid" {
 		t.Errorf("code = %v, want auth.invalid", got["code"])
 	}
+
 	if got["retryable"] != false {
 		t.Errorf("retryable = %v, want false", got["retryable"])
 	}
+
 	if got["timestamp"] != "2026-01-01T00:00:00Z" {
 		t.Errorf("timestamp = %v, want RFC3339", got["timestamp"])
 	}

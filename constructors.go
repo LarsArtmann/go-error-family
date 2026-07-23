@@ -30,6 +30,7 @@ func Wrap(err error, family Family, code, message string) *Error {
 	if err == nil {
 		return nil
 	}
+
 	return &Error{
 		code:      code,
 		message:   message,
@@ -142,9 +143,11 @@ func WrapOnce(err error, family Family, code, message string) *Error {
 	if err == nil {
 		return nil
 	}
+
 	if existing, ok := errors.AsType[*Error](err); ok {
 		return existing
 	}
+
 	return Wrap(err, family, code, message)
 }
 

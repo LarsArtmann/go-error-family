@@ -19,6 +19,7 @@ func TestMessageTemplateApply(t *testing.T) {
 		WithContext("port", "5432")
 
 	var buf bytes.Buffer
+
 	code := HandleErrorWithConfig(err, HandleConfig{
 		Output: &buf,
 		TemplateOverride: map[string]MessageTemplate{
@@ -33,6 +34,7 @@ func TestMessageTemplateApply(t *testing.T) {
 	if !strings.Contains(output, "localhost") {
 		t.Errorf("template should have host substituted: %q", output)
 	}
+
 	if !strings.Contains(output, "5432") {
 		t.Errorf("template should have port substituted: %q", output)
 	}
@@ -46,15 +48,19 @@ func TestRegisterTemplateAndLookup(t *testing.T) {
 	t.Cleanup(func() { UnregisterTemplate("test.registered") })
 
 	var buf bytes.Buffer
+
 	err := NewRejection("test.registered", "msg").WithContext("key", "value")
+
 	code := HandleErrorWithConfig(err, HandleConfig{Output: &buf})
 	if code != 1 {
 		t.Errorf("exit code = %d, want 1", code)
 	}
+
 	output := buf.String()
 	if !strings.Contains(output, "Custom message for value") {
 		t.Errorf("should use registered template: %q", output)
 	}
+
 	if !strings.Contains(output, "Do the thing") {
 		t.Errorf("should include fix from template: %q", output)
 	}
@@ -67,8 +73,10 @@ func TestRegisterTemplateCaseInsensitive(t *testing.T) {
 	t.Cleanup(func() { UnregisterTemplate("Test.CASE_Code") })
 
 	var buf bytes.Buffer
+
 	err := NewRejection("test.case_code", "msg")
 	HandleErrorWithConfig(err, HandleConfig{Output: &buf})
+
 	if !strings.Contains(buf.String(), "Case insensitive template") {
 		t.Errorf("should match case-insensitively: %q", buf.String())
 	}
@@ -80,6 +88,7 @@ func TestTemplateForCode(t *testing.T) {
 	if !ok {
 		t.Fatal("expected built-in template for file.not_found")
 	}
+
 	if tmpl.What == "" {
 		t.Error("built-in template should have a non-empty What")
 	}
@@ -109,7 +118,9 @@ func TestRegistryTemplateForCode(t *testing.T) {
 	if _, ok := reg.TemplateForCode("no.such.code"); ok {
 		t.Error("empty registry should not find unknown code")
 	}
+
 	reg.RegisterTemplate("custom.code", MessageTemplate{What: "scoped"})
+
 	tmpl, ok := reg.TemplateForCode("custom.code")
 	if !ok || tmpl.What != "scoped" {
 		t.Errorf("registry lookup = %+v, ok=%v", tmpl, ok)
@@ -141,8 +152,10 @@ func TestDefaultMessagesTable(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.code, func(t *testing.T) {
 			var buf bytes.Buffer
+
 			err := NewRejection(tt.code, "msg")
 			HandleErrorWithConfig(err, HandleConfig{Output: &buf})
+
 			output := buf.String()
 			if !strings.Contains(output, tt.wantWhat) {
 				t.Errorf("code %q: output %q should contain %q", tt.code, output, tt.wantWhat)

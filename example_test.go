@@ -70,6 +70,7 @@ func ExampleFamily_MarshalText() {
 
 func ExampleFamily_UnmarshalText() {
 	var f Family
+
 	_ = f.UnmarshalText([]byte("rejection"))
 	fmt.Println(f)
 	// Output: rejection

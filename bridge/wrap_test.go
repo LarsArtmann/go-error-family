@@ -90,6 +90,7 @@ func TestWrap_ErrorContext_BridgesStrings(t *testing.T) {
 	if ctx["host"] != "db1.example.com" {
 		t.Errorf("ErrorContext()[host] = %q, want %q", ctx["host"], "db1.example.com")
 	}
+
 	if ctx["port"] != "5432" {
 		t.Errorf("ErrorContext()[port] = %q, want %q (converted from int)", ctx["port"], "5432")
 	}
@@ -185,9 +186,11 @@ func TestWrap_NilError(t *testing.T) {
 	if classified.Error() != "[transient]" {
 		t.Errorf("Error() on nil = %q, want [transient]", classified.Error())
 	}
+
 	if classified.Unwrap() != nil {
 		t.Error("Unwrap() on nil = non-nil, want nil")
 	}
+
 	ctx := classified.ErrorContext()
 	if len(ctx) != 0 {
 		t.Errorf("ErrorContext() on nil = %v, want empty", ctx)
@@ -201,12 +204,15 @@ func TestWrap_PlainError_PreservesEverything(t *testing.T) {
 	if classified.Family() != errorfamily.Rejection {
 		t.Errorf("Family() = %v, want Rejection", classified.Family())
 	}
+
 	if errorfamily.IsRetryable(classified) {
 		t.Error("Rejection should not be retryable")
 	}
+
 	if !errors.Is(classified, plain) {
 		t.Error("original plain error not reachable via errors.Is")
 	}
+
 	if classified.ErrorCode() != "" {
 		t.Errorf("ErrorCode() = %q, want empty for plain error", classified.ErrorCode())
 	}
@@ -233,6 +239,7 @@ func TestWrap_CodedInterface(t *testing.T) {
 	if !ok {
 		t.Error("AsType[Coded](classified) = false, want true")
 	}
+
 	if coded.ErrorCode() != "db.timeout" {
 		t.Errorf("Coded.ErrorCode() = %q, want %q", coded.ErrorCode(), "db.timeout")
 	}
@@ -281,10 +288,12 @@ func TestWrap_Format(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			classified := Wrap(tt.base, tt.family)
+
 			got := fmt.Sprintf(tt.verb, classified)
 			if tt.wantNonEmpty && got == "" {
 				t.Errorf("%s produced empty string", tt.verb)
 			}
+
 			if tt.want != "" && got != tt.want {
 				t.Errorf("%s = %q, want %q", tt.verb, got, tt.want)
 			}

@@ -30,6 +30,7 @@ import (
 // the Classified interface) all apply. A nil err classifies as Rejection.
 func AssertFamily(tb testing.TB, err error, want errorfamily.Family) {
 	tb.Helper()
+
 	if got := errorfamily.Classify(err); got != want {
 		tb.Errorf("Classify(%v) = %v, want %v", err, got, want)
 	}
@@ -40,6 +41,7 @@ func AssertFamily(tb testing.TB, err error, want errorfamily.Family) {
 // interface). want may be "" to assert the error has no code.
 func AssertCode(tb testing.TB, err error, want string) {
 	tb.Helper()
+
 	if got := errorfamily.Code(err); got != want {
 		tb.Errorf("Code(%v) = %q, want %q", err, got, want)
 	}
@@ -48,6 +50,7 @@ func AssertCode(tb testing.TB, err error, want string) {
 // AssertRetryable asserts the retryability of err via [errorfamily.IsRetryable].
 func AssertRetryable(tb testing.TB, err error, want bool) {
 	tb.Helper()
+
 	if got := errorfamily.IsRetryable(err); got != want {
 		tb.Errorf("IsRetryable(%v) = %v, want %v", err, got, want)
 	}
@@ -58,10 +61,12 @@ func AssertRetryable(tb testing.TB, err error, want bool) {
 // does not expose context at all or lacks the key.
 func AssertContext(tb testing.TB, err error, key, want string) {
 	tb.Helper()
-	var ctx errorfamily.Contextual
-	if !errors.As(err, &ctx) {
+
+	ctx, ok := errors.AsType[errorfamily.Contextual](err)
+	if !ok {
 		tb.Fatalf("AssertContext: %v does not implement errorfamily.Contextual", err)
 	}
+
 	if got := ctx.ErrorContext()[key]; got != want {
 		tb.Errorf("ErrorContext(%v)[%q] = %q, want %q", err, key, got, want)
 	}
@@ -71,10 +76,12 @@ func AssertContext(tb testing.TB, err error, key, want string) {
 // Useful to confirm a sentinel stays pristine (no leaked context).
 func AssertContextMissing(tb testing.TB, err error, key string) {
 	tb.Helper()
-	var ctx errorfamily.Contextual
-	if !errors.As(err, &ctx) {
+
+	ctx, ok := errors.AsType[errorfamily.Contextual](err)
+	if !ok {
 		return
 	}
+
 	if _, ok := ctx.ErrorContext()[key]; ok {
 		tb.Errorf("ErrorContext(%v) unexpectedly contains key %q", err, key)
 	}
@@ -86,6 +93,7 @@ func AssertContextMissing(tb testing.TB, err error, key string) {
 // default. A nil err yields exit code 0.
 func AssertExitCode(tb testing.TB, err error, want int) {
 	tb.Helper()
+
 	if got := errorfamily.ExitCode(err); got != want {
 		tb.Errorf("ExitCode(%v) = %d, want %d", err, got, want)
 	}

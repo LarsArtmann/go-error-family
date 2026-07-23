@@ -69,7 +69,9 @@ func TestRegistryTemplateIsolation(t *testing.T) {
 	})
 
 	var buf bytes.Buffer
+
 	err := NewRejection("custom.code", "msg")
+
 	code := HandleErrorWithConfig(err, HandleConfig{
 		Output:   &buf,
 		Registry: reg,
@@ -86,6 +88,7 @@ func TestRegistryTemplateIsolation(t *testing.T) {
 	// DefaultRegistry should NOT see this template.
 	var defaultBuf bytes.Buffer
 	HandleErrorWithConfig(err, HandleConfig{Output: &defaultBuf})
+
 	if strings.Contains(defaultBuf.String(), "Custom message from isolated registry") {
 		t.Error("DefaultRegistry should not see isolated registry's template")
 	}
@@ -103,6 +106,7 @@ func TestRegistryTwoRegistriesIndependent(t *testing.T) {
 	if regA.Classify(sentinel) != Corruption {
 		t.Error("regA should classify as Corruption")
 	}
+
 	if regB.Classify(sentinel) != Conflict {
 		t.Error("regB should classify as Conflict")
 	}
@@ -121,11 +125,13 @@ func TestRegistryBatchRegistration(t *testing.T) {
 	if reg.Classify(s1) != Transient {
 		t.Error("batch-registered s1 should be Transient")
 	}
+
 	if reg.Classify(s2) != Rejection {
 		t.Error("batch-registered s2 should be Rejection")
 	}
 
 	reg.UnregisterClassification(s1)
+
 	if reg.Classify(s1) != Transient {
 		t.Error("after unregister, s1 should fall back to Transient default")
 	}
@@ -137,6 +143,7 @@ func TestRegistryUnregisterTemplate(t *testing.T) {
 	reg.UnregisterTemplate("temp.code")
 
 	var buf bytes.Buffer
+
 	err := NewRejection("temp.code", "msg")
 	HandleErrorWithConfig(err, HandleConfig{Output: &buf, Registry: reg})
 
@@ -154,7 +161,9 @@ func TestRegistryNilInConfigFallsBackToDefault(t *testing.T) {
 	t.Cleanup(func() { UnregisterClassification(sentinel) })
 
 	var buf bytes.Buffer
+
 	err := NewRejection("test", "msg")
+
 	code := HandleErrorWithConfig(err, HandleConfig{Output: &buf, Registry: nil})
 	if code != 1 {
 		t.Errorf("nil registry should fall back to DefaultRegistry: exit code = %d", code)
@@ -174,6 +183,7 @@ func TestRegistryHandleErrorDetailedWithCustomRegistry(t *testing.T) {
 	if !strings.Contains(result.Message, "Detailed custom message") {
 		t.Errorf("custom registry template not used: %q", result.Message)
 	}
+
 	if result.SuggestedFix != "Detailed custom fix" {
 		t.Errorf("SuggestedFix should use template fix: %q", result.SuggestedFix)
 	}
@@ -193,9 +203,11 @@ func TestRegistryConcurrentRegisterAndClassify(t *testing.T) {
 	// Writers: register/unregister in a tight loop.
 	go func() {
 		defer close(done)
+
 		for i := range 1000 {
 			e := fmt.Errorf("writer-%d", i)
 			reg.RegisterClassification(e, Rejection)
+
 			if i%2 == 0 {
 				reg.UnregisterClassification(e)
 			}
@@ -229,10 +241,12 @@ func TestRegistryCloneIndependence(t *testing.T) {
 	if got := original.Classify(sentinel); got != Rejection {
 		t.Errorf("original mutated by clone: Classify(sentinel) = %v, want Rejection", got)
 	}
+
 	tmpl, ok := original.lookupTemplate("original.code")
 	if !ok || tmpl.What != "original what" {
 		t.Errorf("original template lost after clone mutation: %+v ok=%v", tmpl, ok)
 	}
+
 	if _, ok := original.lookupTemplate("clone.code"); ok {
 		t.Error("original gained clone-only template")
 	}
@@ -280,6 +294,7 @@ func TestRegistryRegisterClassifierDynamic(t *testing.T) {
 				return Conflict, true // CONSTRAINT
 			}
 		}
+
 		return Transient, false
 	})
 
@@ -287,6 +302,7 @@ func TestRegistryRegisterClassifierDynamic(t *testing.T) {
 	if got := reg.Classify(&fakeSQLiteError{code: 5}); got != Transient {
 		t.Errorf("locked = %v, want Transient", got)
 	}
+
 	if got := reg.Classify(&fakeSQLiteError{code: 19}); got != Conflict {
 		t.Errorf("constraint = %v, want Conflict", got)
 	}
@@ -303,18 +319,22 @@ func TestRegisterClassifiersBatch(t *testing.T) {
 			if err.Error() == "conflict-ish" {
 				return Conflict, true
 			}
+
 			return Transient, false
 		},
 		func(err error) (Family, bool) {
 			if err.Error() == "reject-me" {
 				return Rejection, true
 			}
+
 			return Transient, false
 		},
 	)
+
 	if got := reg.Classify(errors.New("conflict-ish")); got != Conflict {
 		t.Errorf("first classifier = %v, want Conflict", got)
 	}
+
 	if got := reg.Classify(errors.New("reject-me")); got != Rejection {
 		t.Errorf("second classifier = %v, want Rejection", got)
 	}
@@ -359,6 +379,7 @@ func TestClassifierCloneIndependence(t *testing.T) {
 		if err.Error() == "match" {
 			return Corruption, true
 		}
+
 		return Transient, false
 	})
 
@@ -382,17 +403,20 @@ func TestClassifierConcurrentRegisterAndClassify(t *testing.T) {
 		if err.Error() == "stable" {
 			return Rejection, true
 		}
+
 		return Transient, false
 	})
 
 	done := make(chan struct{})
 	go func() {
 		defer close(done)
+
 		for i := range 500 {
 			reg.RegisterClassifier(func(err error) (Family, bool) {
 				if err.Error() == fmt.Sprintf("w-%d", i) {
 					return Conflict, true
 				}
+
 				return Transient, false
 			})
 		}
@@ -403,6 +427,7 @@ func TestClassifierConcurrentRegisterAndClassify(t *testing.T) {
 			t.Fatalf("concurrent classify unstable: got %v, want Rejection", got)
 		}
 	}
+
 	<-done
 }
 
@@ -421,6 +446,7 @@ func TestPackageLevelRegisterClassifier(t *testing.T) {
 			if errors.As(err, &m) {
 				return Corruption, true
 			}
+
 			return Transient, false
 		},
 	)
@@ -428,6 +454,7 @@ func TestPackageLevelRegisterClassifier(t *testing.T) {
 	if got := Classify(errors.New("unrelated")); got != Transient {
 		t.Errorf("unrelated error = %v, want Transient", got)
 	}
+
 	if got := Classify(pkgLevelClassifierError{}); got != Corruption {
 		t.Errorf("marker error = %v, want Corruption", got)
 	}
@@ -446,8 +473,10 @@ func TestPackageLevelRegisterClassifierSingular(t *testing.T) {
 		if errors.As(err, &m) {
 			return Infrastructure, true
 		}
+
 		return Transient, false
 	})
+
 	if got := Classify(pkgLevelSingularError{}); got != Infrastructure {
 		t.Errorf("singular marker = %v, want Infrastructure", got)
 	}

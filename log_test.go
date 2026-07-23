@@ -11,6 +11,7 @@ import (
 
 func TestLogError(t *testing.T) {
 	var buf bytes.Buffer
+
 	logger := slog.New(slog.NewTextHandler(&buf, nil))
 
 	err := NewRejection("user.not_found", "no such user").
@@ -33,6 +34,7 @@ func TestLogError(t *testing.T) {
 
 func TestLogErrorTransientLogsAtWarn(t *testing.T) {
 	var buf bytes.Buffer
+
 	logger := slog.New(slog.NewTextHandler(&buf, nil))
 
 	LogError(NewTransient("db.timeout", "timed out"), logger)
@@ -41,6 +43,7 @@ func TestLogErrorTransientLogsAtWarn(t *testing.T) {
 	if !strings.Contains(out, "level=WARN") {
 		t.Errorf("transient should log at WARN:\n%s", out)
 	}
+
 	if !strings.Contains(out, "retryable=true") {
 		t.Errorf("transient should be retryable=true:\n%s", out)
 	}
@@ -48,9 +51,11 @@ func TestLogErrorTransientLogsAtWarn(t *testing.T) {
 
 func TestLogErrorNilIsNoop(t *testing.T) {
 	var buf bytes.Buffer
+
 	logger := slog.New(slog.NewTextHandler(&buf, nil))
 
 	LogError(nil, logger)
+
 	if buf.Len() != 0 {
 		t.Errorf("nil error should produce no log output, got: %q", buf.String())
 	}
@@ -72,6 +77,7 @@ func TestLogErrorContextPropagation(t *testing.T) {
 	if h.lastCtx == nil {
 		t.Fatal("handler did not receive a context")
 	}
+
 	if got := h.lastCtx.Value(ctxKey{}); got != "trace-123" {
 		t.Errorf("context not propagated: got %v, want trace-123", got)
 	}
@@ -86,6 +92,7 @@ type ctxRecordingHandler struct {
 func (h *ctxRecordingHandler) Enabled(_ context.Context, _ slog.Level) bool { return true }
 func (h *ctxRecordingHandler) Handle(ctx context.Context, _ slog.Record) error {
 	h.lastCtx = ctx
+
 	return nil
 }
 func (h *ctxRecordingHandler) WithAttrs(_ []slog.Attr) slog.Handler { return h }

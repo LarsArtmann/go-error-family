@@ -18,10 +18,12 @@ func FuzzInferFamily(f *testing.F) {
 
 	f.Fuzz(func(t *testing.T, domain, tag, contextKey string) {
 		var err error
+
 		builder := oops.Errorf("test error")
 		if domain != "" {
 			builder = oops.In(domain).Errorf("test error")
 		}
+
 		if tag != "" {
 			if domain != "" {
 				err = oops.In(domain).Tags(tag).Errorf("test error")
@@ -53,6 +55,7 @@ func FuzzAutoWrap(f *testing.F) {
 
 	f.Fuzz(func(t *testing.T, domain, tag, code string) {
 		var err error
+
 		switch {
 		case domain != "" && tag != "":
 			err = oops.In(domain).Tags(tag).Code(code).Errorf("test: %s", code)
@@ -68,6 +71,7 @@ func FuzzAutoWrap(f *testing.F) {
 		if !classified.Family().IsValid() {
 			t.Errorf("AutoWrap produced invalid family %v", classified.Family())
 		}
+
 		if classified.Error() == "" {
 			t.Error("AutoWrap produced empty Error()")
 		}
@@ -90,12 +94,15 @@ func FuzzWrapRoundTrip(f *testing.F) {
 		if classified.Error() == "" {
 			t.Error("Wrap produced empty Error()")
 		}
+
 		if classified.Family() != family {
 			t.Errorf("Family() = %v, want %v", classified.Family(), family)
 		}
+
 		if !errors.Is(classified, inner) {
 			t.Error("original error lost in Unwrap chain")
 		}
+
 		if classified.IsRetryable() != family.IsRetryable() {
 			t.Errorf("IsRetryable() = %v, want %v", classified.IsRetryable(), family.IsRetryable())
 		}
@@ -119,9 +126,11 @@ func FuzzWrapOopsRoundTrip(f *testing.F) {
 		if classified.Error() == "" {
 			t.Error("Wrap produced empty Error()")
 		}
+
 		if !errors.Is(classified, oopsErr) {
 			t.Error("original OopsError lost in Unwrap chain")
 		}
+
 		if classified.ErrorCode() != code {
 			t.Errorf("ErrorCode() = %q, want %q", classified.ErrorCode(), code)
 		}

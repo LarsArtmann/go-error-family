@@ -29,6 +29,7 @@ func LogErrorContext(ctx context.Context, err error, logger *slog.Logger) {
 	if err == nil {
 		return
 	}
+
 	if logger == nil {
 		logger = slog.Default()
 	}

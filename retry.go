@@ -31,5 +31,6 @@ func (f Family) RetryPolicy() RetryPolicy {
 			MaxDelay:    defaultRetryMaxDelay,
 		}
 	}
+
 	return RetryPolicy{MaxAttempts: 1}
 }

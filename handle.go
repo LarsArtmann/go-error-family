@@ -199,6 +199,7 @@ func resolveExitCode(err error, family Family) int {
 			return code
 		}
 	}
+
 	return family.ExitCode()
 }
 
@@ -210,6 +211,7 @@ func extractContext(err error) map[string]string {
 	if contextual, ok := errors.AsType[Contextual](err); ok {
 		return contextual.ErrorContext()
 	}
+
 	return map[string]string{}
 }
 
@@ -223,12 +225,15 @@ func resolveTemplate(code string, cfg HandleConfig, reg *Registry) (MessageTempl
 			return tmpl, true
 		}
 	}
+
 	if tmpl, ok := reg.lookupTemplate(code); ok {
 		return tmpl, true
 	}
+
 	if tmpl, ok := lookupDefault(code); ok {
 		return tmpl, true
 	}
+
 	return MessageTemplate{}, false
 }
 
@@ -242,6 +247,7 @@ func renderCLI(
 	if tmpl, ok := resolveTemplate(code, cfg, reg); ok {
 		return applyTemplate(tmpl, context, family)
 	}
+
 	return renderMessage(code, context, family)
 }
 
@@ -259,6 +265,7 @@ func resolveSuggestedFix(
 	if tmpl, ok := resolveTemplate(code, cfg, reg); ok && tmpl.Fix != "" {
 		return applyContext(tmpl.Fix, errCtx)
 	}
+
 	return family.DefaultFix()
 }
 
@@ -274,13 +281,16 @@ func renderMessage(code string, context map[string]string, family Family) string
 
 	// Family fallback with code as header.
 	var parts []string
+
 	parts = append(parts, "Error: "+code)
 	if why := family.DefaultWhy(); why != "" {
 		parts = append(parts, why)
 	}
+
 	if fix := family.DefaultFix(); fix != "" {
 		parts = append(parts, fix)
 	}
+
 	return strings.Join(parts, "\n")
 }
 
@@ -289,17 +299,21 @@ func applyTemplate(tmpl MessageTemplate, context map[string]string, family Famil
 	if tmpl.What != "" {
 		parts = append(parts, applyContext(tmpl.What, context))
 	}
+
 	if why := tmpl.Why; why != "" {
 		parts = append(parts, applyContext(why, context))
 	} else if why := family.DefaultWhy(); why != "" {
 		parts = append(parts, why)
 	}
+
 	if tmpl.Fix != "" {
 		parts = append(parts, applyContext(tmpl.Fix, context))
 	}
+
 	if tmpl.WayOut != "" {
 		parts = append(parts, applyContext(tmpl.WayOut, context))
 	}
+
 	return strings.Join(parts, "\n")
 }
 
@@ -308,11 +322,13 @@ func applyContext(template string, context map[string]string) string {
 	for k, v := range context {
 		s = strings.ReplaceAll(s, "{"+k+"}", v)
 	}
+
 	return s
 }
 
 func lookupDefault(code string) (MessageTemplate, bool) {
 	tmpl, ok := defaultMessages[strings.ToLower(code)]
+
 	return tmpl, ok
 }
 

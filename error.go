@@ -40,6 +40,7 @@ func (e *Error) Error() string {
 			return fmt.Sprintf("[%s:%s] %s: %s", e.family, e.code, e.message, causeMsg)
 		}
 	}
+
 	return fmt.Sprintf("[%s:%s] %s", e.family, e.code, e.message)
 }
 
@@ -53,6 +54,7 @@ func (e *Error) Is(target error) bool {
 	if !ok {
 		return false
 	}
+
 	return e.code == t.code && e.family == t.family
 }
 
@@ -72,6 +74,7 @@ func (e *Error) ErrorContext() map[string]string {
 	if e.context == nil {
 		return map[string]string{}
 	}
+
 	return maps.Clone(e.context)
 }
 
@@ -113,8 +116,10 @@ func (e *Error) Format(f fmt.State, verb rune) {
 	case 'v':
 		if f.Flag('+') {
 			e.formatVerbose(f)
+
 			return
 		}
+
 		_, _ = fmt.Fprint(f, e.Error())
 	default:
 		_, _ = fmt.Fprint(f, e.Error())
@@ -152,6 +157,7 @@ func (e *Error) formatVerbose(f fmt.State) {
 func (e *Error) WithContext(key, value string) *Error {
 	clone := e.clone()
 	clone.context[key] = value
+
 	return clone
 }
 
@@ -161,6 +167,7 @@ func (e *Error) WithContext(key, value string) *Error {
 func (e *Error) WithContextMap(ctx map[string]string) *Error {
 	clone := e.clone()
 	maps.Insert(clone.context, maps.All(ctx))
+
 	return clone
 }
 
@@ -170,6 +177,7 @@ func (e *Error) WithContextMap(ctx map[string]string) *Error {
 func (e *Error) WithContextf(key, format string, args ...any) *Error {
 	clone := e.clone()
 	clone.context[key] = fmt.Sprintf(format, args...)
+
 	return clone
 }
 
@@ -186,6 +194,7 @@ func (e *Error) WithContextAny(key string, value any) *Error {
 func (e *Error) WithCause(cause error) *Error {
 	clone := e.clone()
 	clone.cause = cause
+
 	return clone
 }
 
@@ -194,6 +203,7 @@ func (e *Error) WithCause(cause error) *Error {
 func (e *Error) WithTimestamp(ts time.Time) *Error {
 	clone := e.clone()
 	clone.timestamp = ts
+
 	return clone
 }
 
@@ -204,6 +214,7 @@ func (e *Error) WithTimestamp(ts time.Time) *Error {
 func (e *Error) WithExitCode(code int) *Error {
 	clone := e.clone()
 	clone.exitCode = code
+
 	return clone
 }
 
@@ -219,6 +230,7 @@ func (e *Error) clone() *Error {
 		context:   make(map[string]string, len(e.context)),
 	}
 	maps.Copy(c.context, e.context)
+
 	return c
 }
 
@@ -232,6 +244,7 @@ func (e *Error) Summary() string {
 			return fmt.Sprintf("%s: %s — %s", e.code, e.message, causeMsg)
 		}
 	}
+
 	return fmt.Sprintf("%s: %s", e.code, e.message)
 }
 
@@ -253,6 +266,7 @@ func safeCauseString(cause error) (result string) {
 			result = ""
 		}
 	}()
+
 	return cause.Error()
 }
 
@@ -294,7 +308,9 @@ func (e *Error) HasContext(key string) bool {
 	if e.context == nil {
 		return false
 	}
+
 	_, ok := e.context[key]
+
 	return ok
 }
 
@@ -303,6 +319,7 @@ func (e *Error) ContextValue(key string) string {
 	if e.context == nil {
 		return ""
 	}
+
 	return e.context[key]
 }
 
@@ -334,9 +351,11 @@ func (e *Error) JSON() ([]byte, error) {
 	if !e.timestamp.IsZero() {
 		view.Timestamp = e.timestamp.Format(time.RFC3339)
 	}
+
 	data, err := json.Marshal(view)
 	if err != nil {
 		return nil, fmt.Errorf("marshal error view: %w", err)
 	}
+
 	return data, nil
 }

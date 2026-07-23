@@ -11,6 +11,7 @@ import (
 
 func TestNewAgentDefaults(t *testing.T) {
 	cfg := Config{Enabled: true}
+
 	ag := New(cfg)
 	if ag == nil {
 		t.Fatal("New() returned nil")
@@ -20,10 +21,12 @@ func TestNewAgentDefaults(t *testing.T) {
 func TestNewAgentZeroTimeout(t *testing.T) {
 	cfg := Config{Enabled: true}
 	ag := New(cfg)
+
 	result, err := ag.Analyze(context.Background(), errorfamily.NewTransient("test", "msg"), nil)
 	if err != nil {
 		t.Fatalf("Analyze() error: %v", err)
 	}
+
 	if result.RootCause == "" {
 		t.Error("Expected non-empty RootCause")
 	}
@@ -37,6 +40,7 @@ func TestAnalyzeDisabled(t *testing.T) {
 	if err == nil {
 		t.Fatal("Expected error from disabled agent, got nil")
 	}
+
 	if result != nil {
 		t.Errorf("Result = %v, want nil for disabled agent", result)
 	}
@@ -63,12 +67,15 @@ func TestAnalyzeWithDiagnosis(t *testing.T) {
 	if analyzeErr != nil {
 		t.Fatalf("Analyze() error: %v", analyzeErr)
 	}
+
 	if result.Confidence < 0.9 {
 		t.Errorf("Confidence = %v, expected at least 0.9", result.Confidence)
 	}
+
 	if len(result.FixSteps) == 0 {
 		t.Error("Expected at least one FixStep from failed diagnosis")
 	}
+
 	if result.RootCause == "" {
 		t.Error("Expected non-empty RootCause")
 	}
@@ -87,6 +94,7 @@ func TestAnalyzeNoFailures(t *testing.T) {
 	if analyzeErr != nil {
 		t.Fatalf("Analyze() error: %v", analyzeErr)
 	}
+
 	if result.RootCause != "no specific root cause identified" {
 		t.Errorf("RootCause = %q, want 'no specific root cause identified'", result.RootCause)
 	}
@@ -97,10 +105,12 @@ func TestAnalyzeEmptyDiagnosis(t *testing.T) {
 	ag := New(cfg)
 
 	err := errorfamily.NewTransient("test", "msg")
+
 	result, analyzeErr := ag.Analyze(context.Background(), err, nil)
 	if analyzeErr != nil {
 		t.Fatalf("Analyze() error: %v", analyzeErr)
 	}
+
 	if result.Confidence != 0.5 {
 		t.Errorf("Confidence = %v, want 0.5 for empty diagnosis", result.Confidence)
 	}
@@ -127,15 +137,19 @@ func TestAnalyzeWithContext(t *testing.T) {
 	if analyzeErr != nil {
 		t.Fatalf("Analyze() error: %v", analyzeErr)
 	}
+
 	if result.RootCause != "Cannot connect" {
 		t.Errorf("RootCause = %q, want %q", result.RootCause, "Cannot connect")
 	}
+
 	if result.Confidence < 0.9 {
 		t.Errorf("Confidence = %f, want >= 0.9", result.Confidence)
 	}
+
 	if len(result.FixSteps) != 1 {
 		t.Fatalf("FixSteps len = %d, want 1", len(result.FixSteps))
 	}
+
 	if result.FixSteps[0].Description != "Cannot connect" {
 		t.Errorf(
 			"FixSteps[0].Description = %q, want %q",

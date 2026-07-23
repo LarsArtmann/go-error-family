@@ -10,9 +10,11 @@ func TestFamilyRetryPolicy(t *testing.T) {
 	if tp.MaxAttempts != defaultRetryMaxAttempts {
 		t.Errorf("Transient MaxAttempts = %d, want %d", tp.MaxAttempts, defaultRetryMaxAttempts)
 	}
+
 	if tp.MinDelay != 100*time.Millisecond {
 		t.Errorf("Transient MinDelay = %v, want 100ms", tp.MinDelay)
 	}
+
 	if tp.MaxDelay != 5*time.Second {
 		t.Errorf("Transient MaxDelay = %v, want 5s", tp.MaxDelay)
 	}

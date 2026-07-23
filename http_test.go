@@ -32,6 +32,7 @@ func TestHTTPHandlerSuccess(t *testing.T) {
 	h := HTTPHandler(func(w http.ResponseWriter, _ *http.Request) error {
 		w.WriteHeader(http.StatusOK)
 		_, _ = w.Write([]byte("ok"))
+
 		return nil
 	})
 
@@ -41,6 +42,7 @@ func TestHTTPHandlerSuccess(t *testing.T) {
 	if rec.Code != http.StatusOK {
 		t.Errorf("status = %d, want 200", rec.Code)
 	}
+
 	if rec.Body.String() != "ok" {
 		t.Errorf("body = %q, want ok", rec.Body.String())
 	}
@@ -63,6 +65,7 @@ func TestHTTPHandlerClassifiedError(t *testing.T) {
 	if rec.Code != http.StatusConflict {
 		t.Errorf("status = %d, want 409", rec.Code)
 	}
+
 	if ct := rec.Header().Get("Content-Type"); ct != "application/json; charset=utf-8" {
 		t.Errorf("content-type = %q, want application/json; charset=utf-8", ct)
 	}
@@ -71,15 +74,19 @@ func TestHTTPHandlerClassifiedError(t *testing.T) {
 	if err := json.Unmarshal(rec.Body.Bytes(), &body); err != nil {
 		t.Fatalf("invalid JSON body: %v", err)
 	}
+
 	if body["family"] != "conflict" {
 		t.Errorf("family = %q, want conflict", body["family"])
 	}
+
 	if body["code"] != "http.test" {
 		t.Errorf("code = %q, want http.test", body["code"])
 	}
+
 	if body["message"] != "A test error occurred." {
 		t.Errorf("message = %q, want template message", body["message"])
 	}
+
 	if strings.Contains(rec.Body.String(), "internal details") {
 		t.Errorf("response leaked internal error details: %s", rec.Body.String())
 	}
@@ -96,6 +103,7 @@ func TestHTTPHandlerPlainErrorNoLeak(t *testing.T) {
 	if rec.Code != http.StatusServiceUnavailable {
 		t.Errorf("status = %d, want 503 (Transient)", rec.Code)
 	}
+
 	if strings.Contains(rec.Body.String(), "secret internal failure") {
 		t.Errorf("plain error leaked internal message: %s", rec.Body.String())
 	}

@@ -69,15 +69,19 @@ func TestFamilyIsRetryable(t *testing.T) {
 	if Rejection.IsRetryable() {
 		t.Error("Rejection should not be retryable")
 	}
+
 	if Conflict.IsRetryable() {
 		t.Error("Conflict should not be retryable")
 	}
+
 	if !Transient.IsRetryable() {
 		t.Error("Transient should be retryable")
 	}
+
 	if Corruption.IsRetryable() {
 		t.Error("Corruption should not be retryable")
 	}
+
 	if Infrastructure.IsRetryable() {
 		t.Error("Infrastructure should not be retryable")
 	}
@@ -98,6 +102,7 @@ func TestFamilyTone(t *testing.T) {
 	if Rejection.Tone() != ToneInstructional {
 		t.Error("Rejection should have instructional tone")
 	}
+
 	if Transient.Tone() != ToneReassuring {
 		t.Error("Transient should have reassuring tone")
 	}
@@ -241,6 +246,7 @@ func TestFamilyMarshalText(t *testing.T) {
 		if err != nil {
 			t.Fatalf("MarshalText() error: %v", err)
 		}
+
 		if string(got) != tt.want {
 			t.Errorf("MarshalText() = %q, want %q", got, tt.want)
 		}
@@ -262,6 +268,7 @@ func TestFamilyUnmarshalText(t *testing.T) {
 		if err := f.UnmarshalText([]byte(tt.input)); err != nil {
 			t.Fatalf("UnmarshalText(%q) error: %v", tt.input, err)
 		}
+
 		if f != tt.want {
 			t.Errorf("UnmarshalText(%q) = %v, want %v", tt.input, f, tt.want)
 		}
@@ -273,6 +280,7 @@ func TestAudienceMarshalText(t *testing.T) {
 	if err != nil {
 		t.Fatalf("MarshalText() error: %v", err)
 	}
+
 	if string(got) != "ops" {
 		t.Errorf("MarshalText() = %q, want %q", got, "ops")
 	}
@@ -283,6 +291,7 @@ func TestAudienceUnmarshalText(t *testing.T) {
 	if err := a.UnmarshalText([]byte("ALL")); err != nil {
 		t.Fatalf("UnmarshalText() error: %v", err)
 	}
+
 	if a != AudienceAll {
 		t.Errorf("UnmarshalText() = %v, want %v", a, AudienceAll)
 	}
