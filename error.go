@@ -141,7 +141,7 @@ func (e *Error) formatVerbose(f fmt.State) {
 	}
 
 	if !e.timestamp.IsZero() {
-		_, _ = fmt.Fprintf(f, "\n  at: %s", e.timestamp.Format(time.RFC3339)) //nolint:hierarchical-errors // fmt.Formatter
+		_, _ = fmt.Fprintf(f, "\n  at: %s", e.timestamp.Format(time.RFC3339)) //nolint:hierarchical-errors
 	}
 
 	if e.exitCode != 0 {

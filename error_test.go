@@ -60,7 +60,7 @@ func TestErrorIs(t *testing.T) {
 	err3 := NewConflict("test.code", "msg1")
 	err4 := NewRejection("other.code", "msg1")
 
-	if !errors.Is(err1, err2) { //nolint:legacyerrors // tests *Error.Is() value matching (code+family), not type extraction
+	if !errors.Is(err1, err2) { //nolint:legacyerrors // *Error.Is() value match
 		t.Error("errors.Is should match same code+family")
 	}
 
