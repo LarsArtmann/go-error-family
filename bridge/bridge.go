@@ -66,7 +66,7 @@ type ClassifiedError struct {
 // The returned value satisfies Classified, Coded, Retryable, and Contextual
 // from error-family, and retains all oops methods when the input is an OopsError.
 func Wrap(err error, f errorfamily.Family) *ClassifiedError {
-	oopsErr, _ := oops.AsOops(err) //nolint:hierarchical-errors // non-OopsError input is expected, produces zero OopsError
+	oopsErr, _ := oops.AsOops(err) //nolint:hierarchical-errors // non-OopsError is valid
 
 	return &ClassifiedError{OopsError: oopsErr, original: err, family: f}
 }
@@ -190,20 +190,41 @@ func (c *ClassifiedError) Format(f fmt.State, verb rune) {
 	switch verb {
 	case 's':
 		if c.OopsError.Error() != "" {
-			_, _ = fmt.Fprintf(f, "%s", c.OopsError.Error()) //nolint:hierarchical-errors // fmt.Formatter
+			_, _ = fmt.Fprintf(
+				f,
+				"%s",
+				c.OopsError.Error(),
+			) //nolint:hierarchical-errors // fmt.Formatter
 		} else if c.original != nil && c.original.Error() != "" {
-			_, _ = fmt.Fprintf(f, "%s", c.original.Error()) //nolint:hierarchical-errors // fmt.Formatter
+			_, _ = fmt.Fprintf(
+				f,
+				"%s",
+				c.original.Error(),
+			) //nolint:hierarchical-errors // fmt.Formatter
 		} else {
 			_, _ = fmt.Fprintf(f, "[%s]", c.family) //nolint:hierarchical-errors // fmt.Formatter
 		}
 	case 'v':
 		if f.Flag('+') {
 			if c.OopsError.Error() != "" {
-				_, _ = fmt.Fprintf(f, "%+v", &c.OopsError) //nolint:hierarchical-errors // fmt.Formatter
+				_, _ = fmt.Fprintf(
+					f,
+					"%+v",
+					&c.OopsError,
+				) //nolint:hierarchical-errors // fmt.Formatter
 			} else if c.original != nil {
-				_, _ = fmt.Fprintf(f, "[%s] %+v", c.family, c.original) //nolint:hierarchical-errors // fmt.Formatter
+				_, _ = fmt.Fprintf(
+					f,
+					"[%s] %+v",
+					c.family,
+					c.original,
+				) //nolint:hierarchical-errors // fmt.Formatter
 			} else {
-				_, _ = fmt.Fprintf(f, "[%s]", c.family) //nolint:hierarchical-errors // fmt.Formatter
+				_, _ = fmt.Fprintf(
+					f,
+					"[%s]",
+					c.family,
+				) //nolint:hierarchical-errors // fmt.Formatter
 			}
 
 			return

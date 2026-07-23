@@ -55,7 +55,10 @@ var postgresSpec = diagnose.RuleSpec{ //nolint:gochecknoglobals // Immutable rul
 	},
 }
 
-func (r *PostgresRule) Run(ctx context.Context, err error) (*diagnose.DiagnosticResult, error) { //nolint:hierarchical-errors // DiagnosticRule interface
+func (r *PostgresRule) Run(
+	ctx context.Context,
+	err error,
+) (*diagnose.DiagnosticResult, error) { //nolint:hierarchical-errors // DiagnosticRule interface
 	host := r.resolveHost(err)
 	port := r.resolvePort(err)
 
@@ -69,15 +72,16 @@ func (r *PostgresRule) Run(ctx context.Context, err error) (*diagnose.Diagnostic
 
 	// Check 1: pg_isready
 	if r.cmdRunner().Exists("pg_isready") {
-		stdout, exitCode, _ := r.cmdRunner().Run( //nolint:hierarchical-errors // diagnostic rules use exit codes
-			ctx,
-			5*time.Second,
-			"pg_isready",
-			"-h",
-			host,
-			"-p",
-			port,
-		)
+		stdout, exitCode, _ := r.cmdRunner().
+			Run( //nolint:hierarchical-errors // diagnostic rules use exit codes
+				ctx,
+				5*time.Second,
+				"pg_isready",
+				"-h",
+				host,
+				"-p",
+				port,
+			)
 		result.Details["pg_isready"] = stdout
 		if exitCode == 0 {
 			result.Status = diagnose.StatusHealthy

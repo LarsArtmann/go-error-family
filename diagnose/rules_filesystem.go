@@ -34,7 +34,10 @@ var filesystemSpec = RuleSpec{ //nolint:gochecknoglobals // Immutable rule match
 	CodeContains: []string{"file", "dir", "path", "config", "permission"}, //nolint:goconst
 }
 
-func (r *FilesystemRule) Run(ctx context.Context, err error) (*DiagnosticResult, error) { //nolint:hierarchical-errors // DiagnosticRule interface
+func (r *FilesystemRule) Run(
+	ctx context.Context,
+	err error,
+) (*DiagnosticResult, error) { //nolint:hierarchical-errors // DiagnosticRule interface
 	path := r.resolvePath(err)
 	errCtx := ErrorContext(err)
 	if path == "" {
@@ -132,8 +135,8 @@ func (r *FilesystemRule) checkDirWritable(result *DiagnosticResult, path string)
 		)
 		return
 	}
-	_ = f.Close()                  //nolint:hierarchical-errors // cleanup: close error irrelevant
-	_ = os.Remove(testFile)        //nolint:hierarchical-errors // cleanup: test file removal
+	_ = f.Close()           //nolint:hierarchical-errors // cleanup: close error irrelevant
+	_ = os.Remove(testFile) //nolint:hierarchical-errors // cleanup: test file removal
 	setAccessSuccess(result, "writable", "Path exists and is writable: "+path)
 }
 

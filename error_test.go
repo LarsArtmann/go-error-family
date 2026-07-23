@@ -64,11 +64,17 @@ func TestErrorIs(t *testing.T) {
 		t.Error("errors.Is should match same code+family")
 	}
 
-	if errors.Is(err1, err3) { //nolint:legacyerrors // tests *Error.Is() value matching (code+family)
+	if errors.Is(
+		err1,
+		err3,
+	) { //nolint:legacyerrors // tests *Error.Is() value matching (code+family)
 		t.Error("errors.Is should not match different family")
 	}
 
-	if errors.Is(err1, err4) { //nolint:legacyerrors // tests *Error.Is() value matching (code+family)
+	if errors.Is(
+		err1,
+		err4,
+	) { //nolint:legacyerrors // tests *Error.Is() value matching (code+family)
 		t.Error("errors.Is should not match different code")
 	}
 }
@@ -442,7 +448,10 @@ func TestErrorChain(t *testing.T) {
 		t.Error("Classify should find Family through chain")
 	}
 
-	if !errors.Is(top, mid) { //nolint:legacyerrors // tests *Error.Is() value matching through wrap chain
+	if !errors.Is(
+		top,
+		mid,
+	) { //nolint:legacyerrors // tests *Error.Is() value matching through wrap chain
 		t.Error("errors.Is should match through chain")
 	}
 

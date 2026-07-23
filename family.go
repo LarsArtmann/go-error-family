@@ -148,7 +148,9 @@ func (f Family) MarshalText() ([]byte, error) { //nolint:hierarchical-errors // 
 
 // UnmarshalText implements encoding.TextUnmarshaler for YAML/JSON config.
 // Unknown values are parsed as Transient (fail-open).
-func (f *Family) UnmarshalText(text []byte) error { //nolint:hierarchical-errors // encoding.TextUnmarshaler interface
+func (f *Family) UnmarshalText( //nolint:hierarchical-errors // encoding.TextUnmarshaler interface
+	text []byte,
+) error {
 	*f = ParseFamily(string(text))
 
 	return nil
@@ -301,7 +303,9 @@ func (a Audience) MarshalText() ([]byte, error) { //nolint:hierarchical-errors /
 
 // UnmarshalText implements encoding.TextUnmarshaler for YAML/JSON config.
 // Unknown values are parsed as AudienceUser (safest default).
-func (a *Audience) UnmarshalText(text []byte) error { //nolint:hierarchical-errors // encoding.TextUnmarshaler interface
+func (a *Audience) UnmarshalText( //nolint:hierarchical-errors // encoding.TextUnmarshaler interface
+	text []byte,
+) error {
 	*a = ParseAudience(string(text))
 
 	return nil
