@@ -121,8 +121,8 @@ Not a library type — partial success is a consumption pattern, not a classific
 
 | Package              | Coverage |
 | -------------------- | -------- |
-| root (`errorfamily`) | 97.6%    |
-| `errorfamilytest`    | 95.8%    |
+| root (`errorfamily`) | 97.0%    |
+| `errorfamilytest`    | 96.3%    |
 | `agent`              | 100.0%   |
 | `bridge`             | 95.6%    |
 | `diagnose` (core)    | 83.9%    |
@@ -133,7 +133,7 @@ All packages at 80%+; root and `diagnose/git` near-complete. (`errorfamilytest` 
 
 ## Fuzz Tests
 
-`fuzz_test.go` (root) contains: `FuzzParseFamily`, `FuzzParseFamilyRoundTrip`, `FuzzClassify`, `FuzzClassifyPlainError`, `FuzzErrorFormatting`, `FuzzApplyContext`, `FuzzWrapOnce`, `FuzzContextValueToString`, `FuzzWithExitCode`. `bridge/fuzz_test.go` contains: `FuzzInferFamily`, `FuzzAutoWrap`, `FuzzWrapRoundTrip`, `FuzzWrapOopsRoundTrip`, `FuzzFormat`.
+`fuzz_test.go` (root) contains: `FuzzParseFamily`, `FuzzParseFamilyRoundTrip`, `FuzzClassify`, `FuzzClassifyPlainError`, `FuzzErrorFormatting`, `FuzzApplyContext`, `FuzzWrapOnce`, `FuzzContextValueToString`, `FuzzWithExitCode`, `FuzzWithHTTPStatus`, `FuzzRegisterClassificationType`. `bridge/fuzz_test.go` contains: `FuzzInferFamily`, `FuzzAutoWrap`, `FuzzWrapRoundTrip`, `FuzzWrapOopsRoundTrip`, `FuzzFormat`.
 
 ## Adoption Reality (audited 2026-07-23)
 

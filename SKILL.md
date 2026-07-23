@@ -645,7 +645,7 @@ Test files by area (run `find . -name '*_test.go'` for the canonical list):
 - **diagnose/git:** `scenario_test.go`, `mock_test.go`, `integration_test.go`
 - **diagnose/postgres:** `rules_postgres_test.go`
 
-**Coverage:** root 97.3% | errorfamilytest 95.2% | agent 100% | bridge 94.1% | diagnose 83.9% | git 98.5% | postgres 80.3%
+**Coverage:** root 97.0% | errorfamilytest 96.3% | agent 100% | bridge 94.1% | diagnose 83.9% | git 98.5% | postgres 80.3%
 (rules that shell out to system commands are tested via `CommandRunner` mocks in git/postgres; diagnose core coverage reflects shell-out rules tested via integration)
 
 ### Test Style

@@ -216,6 +216,13 @@ func BenchmarkWithHTTPStatus(b *testing.B) {
 	}
 }
 
+func BenchmarkHTTPStatus(b *testing.B) {
+	e := NewTransient("db.timeout", "msg")
+	for b.Loop() {
+		_ = HTTPStatus(e)
+	}
+}
+
 func BenchmarkHTTPStatusOverride(b *testing.B) {
 	e := NewTransient("db.timeout", "msg").WithHTTPStatus(502)
 	for b.Loop() {

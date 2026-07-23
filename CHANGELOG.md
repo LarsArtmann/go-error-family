@@ -21,11 +21,12 @@ standard library — the root package remains zero-dependency.
 - **`WrapOnce(err, family, code, msg) *Error`** (`constructors.go`) — idempotent wrap: returns the existing `*Error` unchanged if the error chain already contains one. Prevents double-wrapping at API boundaries.
 - **`WrapOncef(err, family, code, format, args...) *Error`** (`constructors.go`) — formatted variant of `WrapOnce`.
 - **`errorfamilytest.AssertExitCode(tb, err, want)`** — test assertion for exit codes (checks ExitCoder override first, then family default).
+- **`errorfamilytest.AssertHTTPStatus(tb, err, want)`** — test assertion for HTTP status codes (checks HTTPStatuser override first, then family default).
 - **`safeCauseString`** (`error.go`) — panic-recovery guard around `cause.Error()`. Defense-in-depth against third-party error types that panic on nil internal values. Applied to `Error()`, `Summary()`, and `formatVerbose()`.
 - **`formatVerbose` now shows `exit_code` when non-zero** — improved `%+v` debug output.
-- **Benchmarks**: `BenchmarkWrapOnceWrap`, `BenchmarkWrapOnceIdempotent`, `BenchmarkWithExitCode`, `BenchmarkExitCodeOverride`.
-- **Examples**: `ExampleWrapOnce`, `ExampleError_WithExitCode`, `ExampleError_WithContextAny`, `ExampleExitCode`.
-- **Fuzz tests**: `FuzzWrapOnce`, `FuzzContextValueToString`, `FuzzWithExitCode`.
+- **Benchmarks**: `BenchmarkWrapOnceWrap`, `BenchmarkWrapOnceIdempotent`, `BenchmarkWithExitCode`, `BenchmarkExitCodeOverride`, `BenchmarkWithHTTPStatus`, `BenchmarkHTTPStatusOverride`.
+- **Examples**: `ExampleWrapOnce`, `ExampleError_WithExitCode`, `ExampleError_WithContextAny`, `ExampleExitCode`, `ExampleError_WithHTTPStatus`, `ExampleHTTPStatus`, `ExampleRegisterClassificationType`.
+- **Fuzz tests**: `FuzzWrapOnce`, `FuzzContextValueToString`, `FuzzWithExitCode`, `FuzzWithHTTPStatus`, `FuzzRegisterClassificationType`.
 - **`Compose(errs...)`** — re-added as backward-compatibility wrapper around `errors.Join` (was removed in v0.5.0, restored per consumer feedback; commit `8cb240a`).
 - **`time.Duration` case in `contextValueToString`** — common context value type (timeouts, retry intervals) now renders via `Duration.String()` instead of `fmt.Sprint`.
 - **Tests**: `TestSafeCauseStringNonStringPanics` (int, nil, struct panic recovery), `TestWriteHTTPErrorMarshalFailure` (failing writer error path).
@@ -35,6 +36,7 @@ standard library — the root package remains zero-dependency.
 
 - **Root module reverted from `encoding/json/v2` to `encoding/json`** — the `GOEXPERIMENT=jsonv2` requirement (introduced in v0.7.0) has been removed. The library is now a pure stdlib consumer with zero adoption friction. Only 2 call sites were affected (`Error.JSON()` and `writeHTTPError`); JSON output is byte-identical.
 - **`HTTPStatus(err)` checks `HTTPStatuser` interface first** — a non-zero per-error HTTP status (via `WithHTTPStatus`) wins over the family default. Zero falls back to `Family.HTTPStatus()`. `HTTPHandler` now uses this, so per-error overrides take effect in HTTP responses.
+- **`writeHTTPError` no longer double-classifies** — the `Classify` result is reused for both the response body and the status code resolution, eliminating a redundant `Classify` call on the HTTP error path.
 - **`ExitCode(err)` checks `ExitCoder` interface first** — a non-zero custom exit code wins over the family default. Zero falls back to `Family.ExitCode()`.
 - **`HandleErrorWithContext` and `HandleErrorDetailedWithConfig`** now resolve exit codes via a shared `resolveExitCode` helper that respects the `ExitCoder` interface.
 - **`Error.Error()`, `Error.Summary()`, `Error.formatVerbose()`** use `safeCauseString` instead of `%v` format for cause rendering.
