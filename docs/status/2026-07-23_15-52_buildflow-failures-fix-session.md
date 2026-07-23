@@ -148,13 +148,13 @@ Nothing was left half-finished in terms of the BuildFlow failures.
 
 This is the most recent session. Its open items are current:
 
-| Open item (this report) | Status | Tracked in |
-| ----------------------- | ------ | ---------- |
-| `gitignore-upserter:repair` failure (c.1) | **Still open** — never investigated | TODO_LIST |
-| Actual `buildflow` command never run (d.3) | **Still open** — individual tools pass, full pipeline unverified | TODO_LIST |
-| `version: latest` in release.yml (c.3) | **Still open** — 3 occurrences unpinned | TODO_LIST |
-| 50 `//nolint:hierarchical-errors` directives (d.2) | **Still open** — count is 50 (not ~60); golangci-lint warns "unknown linters: hierarchical-errors" | TODO_LIST |
-| Domains repo `flake.lock` corruption | **Still open** — pre-existing, cross-repo | Not actionable here |
-| v0.8.0 untagged | **Still open** — latest tag is `v0.7.0`, 36 commits ahead | TODO_LIST "Design Decisions" |
+| Open item (this report)                            | Status                                                                                             | Tracked in                   |
+| -------------------------------------------------- | -------------------------------------------------------------------------------------------------- | ---------------------------- |
+| `gitignore-upserter:repair` failure (c.1)          | **Still open** — never investigated                                                                | TODO_LIST                    |
+| Actual `buildflow` command never run (d.3)         | **Still open** — individual tools pass, full pipeline unverified                                   | TODO_LIST                    |
+| `version: latest` in release.yml (c.3)             | **Still open** — 3 occurrences unpinned                                                            | TODO_LIST                    |
+| 50 `//nolint:hierarchical-errors` directives (d.2) | **Still open** — count is 50 (not ~60); golangci-lint warns "unknown linters: hierarchical-errors" | TODO_LIST                    |
+| Domains repo `flake.lock` corruption               | **Still open** — pre-existing, cross-repo                                                          | Not actionable here          |
+| v0.8.0 untagged                                    | **Still open** — latest tag is `v0.7.0`, 36 commits ahead                                          | TODO_LIST "Design Decisions" |
 
 The auto-commit hook (Q1) and squash question (Q2) remain unresolved design choices — the 11 generic auto-commits stand in git history.

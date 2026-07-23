@@ -20,10 +20,10 @@ Be respectful, inclusive, constructive, and collaborative.
 
 ### Prerequisites
 
-| Tool          | Version | Purpose                                 |
-| ------------- | ------- | --------------------------------------- |
-| Go            | 1.26+   | Language runtime                        |
-| golangci-lint | latest  | Code linting                            |
+| Tool          | Version | Purpose          |
+| ------------- | ------- | ---------------- |
+| Go            | 1.26+   | Language runtime |
+| golangci-lint | latest  | Code linting     |
 
 ### Setup
 

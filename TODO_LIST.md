@@ -40,7 +40,7 @@ All six design decisions from the "Design Decisions Needed" section have been re
 
 1. **Per-error HTTP status override** → **SHIPPED.** `Error.WithHTTPStatus(code int)` + `HTTPStatuser` interface. Mirrors the `ExitCoder`/`WithExitCode` pattern exactly: per-error override of family-level default, 0 = use family default. `HTTPStatus(err)` and `HTTPHandler` both check the interface. Rationale: `WithExitCode` already set the precedent — per-error overrides of family defaults are an accepted pattern. `battle.not_found` = 404 is undeniable.
 
-2. **`Classify(nil)` semantics** → **KEPT Rejection.** Nil = caller bug. Changing to Transient would make `HTTPStatus(nil)` → 503 (success becomes "service unavailable"). The fail-open principle applies to *unknown* errors, not *nil* errors — they are fundamentally different situations. Changing is also breaking.
+2. **`Classify(nil)` semantics** → **KEPT Rejection.** Nil = caller bug. Changing to Transient would make `HTTPStatus(nil)` → 503 (success becomes "service unavailable"). The fail-open principle applies to _unknown_ errors, not _nil_ errors — they are fundamentally different situations. Changing is also breaking.
 
 3. **Constructor context ergonomics** → **WON'T FIX.** `WithContextMap(map[string]string{...})` already exists for multi-value context. Functional options would conflict with copy-on-write design. The chain complaint is cosmetic, not structural.
 

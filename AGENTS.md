@@ -139,14 +139,14 @@ All packages at 80%+; root and `diagnose/git` near-complete. (`errorfamilytest` 
 
 The library is **heavily adopted** — 50+ projects across the ecosystem directly import the root package. Core APIs are deeply embedded:
 
-| API Surface | External Call Sites |
-|---|---|
-| `New`/`Wrap` constructors | ~750 |
-| `Classify()` | ~130 |
-| `IsRetryable()` | ~40 |
-| `HandleError*` | ~35 |
-| `RegisterClassification`/`Template` | ~27 |
-| `ExitCode()` | ~24 |
+| API Surface                         | External Call Sites |
+| ----------------------------------- | ------------------- |
+| `New`/`Wrap` constructors           | ~750                |
+| `Classify()`                        | ~130                |
+| `IsRetryable()`                     | ~40                 |
+| `HandleError*`                      | ~35                 |
+| `RegisterClassification`/`Template` | ~27                 |
+| `ExitCode()`                        | ~24                 |
 
 **But consumer-facing enrichment APIs have minimal adoption:** `LogError` (~3 consumers), `HTTPHandler`/`HTTPStatus` (~5), `errorfamilytest` (~3), `diagnose` (~3). The classification core is the bread and butter; the higher-level boundary handlers haven't spread proportionally.
 
@@ -155,6 +155,7 @@ The library is **heavily adopted** — 50+ projects across the ecosystem directl
 Connects go-error-family with `samber/oops`. Separate module with its own `go.mod` (depends on both libraries). The root package remains zero-dependency.
 
 **Adoption status: ZERO external consumers.** Root causes:
+
 1. **Near-zero oops adoption in the ecosystem** — only ~1 project uses `samber/oops` at all. The bridge connects two libraries, but the second one barely exists.
 2. **The enrichment layer is skipped in practice** — consumers call `HandleError(err)` at the top with whatever error bubbled up, without adding stack traces, trace IDs, or domain context. The typical flow is classify→handle, not classify→enrich→handle.
 3. **No reference implementation** — the "libraries classify, applications enrich" architecture is architecturally sound but no project demonstrates the full classify→enrich→handle flow end-to-end. The one project using both libraries combines them at separate layers that never need the bridge.

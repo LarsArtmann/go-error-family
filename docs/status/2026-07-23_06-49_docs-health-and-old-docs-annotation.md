@@ -213,10 +213,10 @@ _Generated 2026-07-23 06:49 CEST. Waiting for instructions._
 
 ## Resolution (2026-07-23)
 
-| Question | Answer |
-| -------- | ------ |
-| Q1 (commit the 14 changes?) | Resolved — auto-committed by the project hook as `e9c7219` ("ci: harden release pipeline…"). The mega-commit bundled docs + code + CI; see the 07-59 report's section d.1 critique. |
-| Q2 (tag v0.8.0?) | **Still open.** Latest tag is `v0.7.0` (36 commits ahead of HEAD). Tracked in TODO_LIST "Design Decisions Needed" → "v0.8.0 release". |
-| Q3 (does `Compose` exist?) | **Yes** — `func Compose` at `classify.go:95`, re-added in commit `8cb240a`. CHANGELOG `[Unreleased]` records the re-add; FEATURES.md `FULLY_FUNCTIONAL` is correct. The split brain is resolved. |
+| Question                    | Answer                                                                                                                                                                                           |
+| --------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| Q1 (commit the 14 changes?) | Resolved — auto-committed by the project hook as `e9c7219` ("ci: harden release pipeline…"). The mega-commit bundled docs + code + CI; see the 07-59 report's section d.1 critique.              |
+| Q2 (tag v0.8.0?)            | **Still open.** Latest tag is `v0.7.0` (36 commits ahead of HEAD). Tracked in TODO_LIST "Design Decisions Needed" → "v0.8.0 release".                                                            |
+| Q3 (does `Compose` exist?)  | **Yes** — `func Compose` at `classify.go:95`, re-added in commit `8cb240a`. CHANGELOG `[Unreleased]` records the re-add; FEATURES.md `FULLY_FUNCTIONAL` is correct. The split brain is resolved. |
 
 The 8 "Not Started" doc-verification items (DOMAIN_LANGUAGE, README, CONTRIBUTING, SKILL.md, website docs) were addressed in the 07-59 session. The website docs audit (flagged CRITICAL here in section c.1) was completed — stale `SuggestedFix` refs and missing v0.8.0 APIs fixed across 4 `.mdx` files.
