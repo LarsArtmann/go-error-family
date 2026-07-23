@@ -1,0 +1,56 @@
+---
+title: Twelve-Factor Logs
+description: How go-error-family aligns with the Twelve-Factor App logs principle.
+---
+
+## What 12-Factor Says
+
+[Factor XI — Logs](https://12factor.net/logs) mandates that an app **never concerns itself with routing or storage of its output stream.** Instead, each process writes unbuffered to `stdout`, and the execution environment captures, collates, and routes that stream to archival/analysis destinations (Splunk, Fluentd, Hadoop, etc.).
+
+The core idea: logs are **event streams**, not files. The app produces; the platform routes.
+
+## How go-error-family Aligns
+
+go-error-family and 12-factor operate on **different layers** — complementary, not competing. 12-factor governs *how logs travel* (transport); go-error-family governs *what error telemetry goes into them* (semantics).
+
+| Dimension | 12-Factor Logs (Factor XI) | go-error-family |
+| --- | --- | --- |
+| **Primary concern** | Log delivery & routing | Log content & severity derivation |
+| **Layer** | Transport (event streams) | Semantics (structured error metadata) |
+| **Owns log destination?** | No — app must NOT manage logfiles | No — delegates to a caller-supplied `*slog.Logger` |
+| **Stdout/stderr?** | Mandates `stdout`, unbuffered | `LogError` never touches stdout/stderr; `HandleError` writes to `stderr` (still a 12-factor stream) |
+| **Routing/forwarding?** | Forbidden in-app; delegated to runtime | None — no sink/router/buffer concept |
+| **Log as file?** | Explicitly rejects logfiles | Never writes files |
+| **Structure** | "typically text, one event per line" | Emits structured `slog.Attr`s: `family`, `code`, `retryable`, `context.<key>` |
+| **Severity** | Not addressed | Family-driven: Transient → `Warn`, others → `Error` |
+| **Collation** | Runtime collates multi-process streams | Per-error, single logger call |
+| **Archival/alerting** | Runtime's job (Splunk/Hadoop) | Out of scope |
+
+## Compliance Checklist
+
+| 12-Factor requirement | go-error-family behavior | Verdict |
+| --- | --- | --- |
+| "never concerns itself with routing/storage" | No routing, no files, no sink abstraction | ✅ Aligned |
+| "writes event stream to stdout" | `LogError` emits to whatever logger you wire — a 12-factor app wires that to stdout | ✅ Compatible |
+| "no fixed beginning/end, flows continuously" | Stateless per-call; no buffering/batching | ✅ Aligned |
+| "logs as text format, one event/line" | Emits structured attrs — but `slog.TextHandler` produces exactly this | ✅ Enhances (structured text is still text) |
+| Runtime handles archival/analysis | Library is silent on this | ✅ Neutral |
+
+## Putting It Together
+
+```go
+func main() {
+    // 1. Wire slog to stdout — this is the 12-factor stream
+    logger := slog.New(slog.NewTextHandler(os.Stdout, nil))
+
+    // 2. go-error-family adds structured error semantics to that stream
+    if err := run(); err != nil {
+        errorfamily.LogError(err, logger)
+        os.Exit(errorfamily.HandleError(err))
+    }
+}
+```
+
+The `*slog.Logger` goes to stdout. The runtime (Docker, Kubernetes, Heroku, systemd) captures that stream and routes it. go-error-family just makes sure every error in that stream carries `family`, `code`, `retryable`, and context fields — with the correct severity level.
+
+**Bottom line:** A go-error-family app can be a perfect 12-factor app. Wire the `*slog.Logger` to stdout and let the runtime route the structured stream. The library adds error semantics on top of the transport; it never competes with it.

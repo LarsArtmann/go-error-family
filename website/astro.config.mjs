@@ -63,6 +63,7 @@ export default defineConfig({
             { label: "HTTP & CLI Boundaries", slug: "guides/http-and-cli" },
             { label: "Diagnostics", slug: "guides/diagnostics" },
             { label: "Performance", slug: "guides/benchmarks" },
+            { label: "Twelve-Factor Logs", slug: "guides/twelve-factor-logs" },
           ],
         },
         {
