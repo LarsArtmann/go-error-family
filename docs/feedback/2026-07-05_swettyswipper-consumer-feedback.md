@@ -191,16 +191,16 @@ _This feedback is given with gratitude for a clean, zero-dep error library that 
 
 ## Appendix: Resolution Status (2026-07-05)
 
-> **Note:** This feedback document was missed during the initial feedback-implementation session. It was discovered during a self-review. Items below are marked with their current status.
+> **Note:** This feedback document was missed during the initial feedback-implementation session. It was discovered during a self-review. Items below are marked with their current status as of 2026-07-23.
 
 ### What's Confusing or Hard to Discover
 
 | #   | Item                                                                 | Status             | Resolution                                                                                                                    |
 | --- | -------------------------------------------------------------------- | ------------------ | ----------------------------------------------------------------------------------------------------------------------------- |
-| S1  | `Classify(nil)` → Rejection should be in **godoc**                   | ⏳ **NOT STARTED** | Currently documented in SKILL.md and AGENTS.md only. Needs a prominent note on the `Classify` godoc itself.                   |
-| S2  | `errors.Is` matches on code+family — needs **godoc example**         | ⏳ **NOT STARTED** | The `Error.Is` godoc describes the behavior but lacks an example.                                                             |
-| S3  | `Wrap(nil, ...)` → nil should be in **constructor godoc**            | ⏳ **NOT STARTED** | The `Wrap` godoc says "Returns nil if err is nil" but doesn't say "use `New*` constructors to create errors without a cause." |
-| S4  | Template `{key}` substitution should be in **MessageTemplate godoc** | ⏳ **NOT STARTED** | `MessageTemplate` godoc doesn't mention the substitution mechanism or the lack of escaping.                                   |
+| S1  | `Classify(nil)` → Rejection should be in **godoc**                   | ✅ **DONE (v0.8.0)** | `classify.go:56` now reads "Returns Rejection for nil errors."                                                                      |
+| S2  | `errors.Is` matches on code+family — needs **godoc example**         | ✅ **DONE (v0.8.0)** | `error.go:50-51` now reads "Is supports errors.Is by matching error code and family. Two errors match if they have the same code AND family." |
+| S3  | `Wrap(nil, ...)` → nil should be in **constructor godoc**            | ✅ **DONE (v0.8.0)** | `constructors.go:27-28` now reads "Returns nil if err is nil."                                                                      |
+| S4  | Template `{key}` substitution should be in **MessageTemplate godoc** | ✅ **DONE (v0.8.0)** | `handle.go:84-90` documents `{key}` placeholder support on What/Why/Fix/WayOut fields.                                             |
 
 ### What's Missing
 

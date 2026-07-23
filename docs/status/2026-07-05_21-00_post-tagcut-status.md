@@ -6,7 +6,9 @@
 
 ## TL;DR
 
-The phantom-`replace` fix is **committed (`48d7e70`) and tagged with 7 patch releases**. All 7 modules pass tests, BuildFlow passed 26/26. However, two things need attention: (1) the working tree is **dirty again** — BuildFlow's post-commit tooling auto-bumped every cross-module pin to the freshly-cut tags (v0.6.0→v0.6.1, diagnose v0.1.0→v0.1.1), leaving those improvements uncommitted; (2) **`origin/master` already points at `48d7e70`** despite no explicit push from me — likely a BuildFlow post-commit hook or stale ref. **Nothing has been explicitly pushed with tags.**
+~~The phantom-`replace` fix is **committed (`48d7e70`) and tagged with 7 patch releases**. All 7 modules pass tests, BuildFlow passed 26/26. However, two things need attention: (1) the working tree is **dirty again** — BuildFlow's post-commit tooling auto-bumped every cross-module pin to the freshly-cut tags (v0.6.0→v0.6.1, diagnose v0.1.0→v0.1.1), leaving those improvements uncommitted; (2) **`origin/master` already points at `48d7e70`** despite no explicit push from me — likely a BuildFlow post-commit hook or stale ref. **Nothing has been explicitly pushed with tags.**~~
+
+**Resolved:** Dirty pin bumps committed in `e2e0273`. Tags cut (`v0.6.1`, `diagnose/v0.1.1`, `agent/v0.1.1`, `bridge/v0.2.1`, `diagnose/git/v0.4.1`, `diagnose/postgres/v0.4.1`, `examples/v0.1.0`). Project has since progressed through v0.7.0 (tagged) and v0.8.0 code at HEAD (unreleased).
 
 ---
 

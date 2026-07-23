@@ -8,7 +8,9 @@
 
 ## TL;DR
 
-The `v0.6.0` release was **broken for downstream consumers**. Root, `diagnose`, and `agent` modules shipped with `replace` directives pointing at local paths plus phantom `require ... v0.0.0-00010101000000-000000000000` versions. Go strips `replace` when a module is fetched — so consumers (e.g. `project-meta`) hit non-existent versions in their module graph. `go.work` masked this completely for local development. **Now fixed in the working tree, but the published tags remain permanently broken until patch releases are cut.**
+~~The `v0.6.0` release was **broken for downstream consumers**.~~ Fixed and shipped — committed as `48d7e70`, tagged `v0.6.1` / `diagnose/v0.1.1` / `agent/v0.1.1` / `examples/v0.1.0` (commit `e2e0273` committed the post-tagcut pin bumps). Since superseded by v0.7.0 (json/v2 migration, tag `v0.7.0` exists) and v0.8.0 code at HEAD (unreleased). The CI gate (`GOWORK=off go list -m all`) is still NOT added — see TODO_LIST.md.
+
+The `v0.6.0` release **was** broken for downstream consumers. Root, `diagnose`, and `agent` modules shipped with `replace` directives pointing at local paths plus phantom `require ... v0.0.0-00010101000000-000000000000` versions. Go strips `replace` when a module is fetched — so consumers (e.g. `project-meta`) hit non-existent versions in their module graph. `go.work` masked this completely for local development. **Now fixed in the working tree, but the published tags remain permanently broken until patch releases are cut.**
 
 ---
 

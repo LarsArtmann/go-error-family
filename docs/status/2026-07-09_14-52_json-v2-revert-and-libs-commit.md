@@ -1,5 +1,11 @@
 # Status Report: JSON v2 Revert + Libs Commit
 
+> **Update 2026-07-23:** The json/v2 revert described here was **subsequently
+> reversed**. Commit `5a5b3ba` re-adopted `encoding/json/v2` and `bd506da`
+> released it as v0.7.0 (tagged). The root module currently uses
+> `encoding/json/v2` and requires `GOEXPERIMENT=jsonv2`. This report documents
+> the intermediate revert state — it is NOT the current state of the project.
+
 **Date:** Thursday, July 09, 2026 at 14:52
 **Session scope:** Undo the `encoding/json/v2` migration; commit the library dependency updates.
 **Commit produced:** `7336b94` — "Update bridge module dependencies"

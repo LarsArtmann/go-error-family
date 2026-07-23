@@ -1,5 +1,13 @@
 # Status Report: Docs Health Audit
 
+> **Update 2026-07-23:** The 8 uncommitted file changes listed here were
+> committed in subsequent sessions. FEATURES.md, TODO_LIST.md, and ROADMAP.md
+> all exist and have been maintained through v0.8.0. The website docs audit
+> (`website/src/content/docs/`) flagged in section d.1 remains partially
+> unaddressed — stale `SuggestedFix`/`context.go` refs may still exist in
+> website `.mdx` files. Most "next steps" items have been addressed or tracked
+> in TODO_LIST.md. This report is retained for historical context.
+
 **Date:** Sunday, July 13, 2026 at 22:15 CEST
 **Session scope:** Full documentation health audit using the `docs-health` skill. Read 7 feedback/status docs (2026-07-0\*), verified all core docs against code, fixed drift, built missing must-have docs.
 **Working tree:** 5 modified files, 3 new files, **uncommitted** (awaiting user decision).

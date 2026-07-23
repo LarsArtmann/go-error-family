@@ -192,7 +192,7 @@ The skill file (`/home/lars/projects/go-error-family/SKILL.md`) is **excellent o
 
 ## Appendix: Resolution Status (2026-07-05)
 
-> **Note:** This feedback document was missed during the initial feedback-implementation session. It was discovered during a self-review. Items below are marked with their current status.
+> **Note:** This feedback document was missed during the initial feedback-implementation session. It was discovered during a self-review. Items below are marked with their current status as of 2026-07-23.
 
 ### What's Painful
 
@@ -203,7 +203,7 @@ The skill file (`/home/lars/projects/go-error-family/SKILL.md`) is **excellent o
 | D3  | `*Error` has too many methods (Code vs ErrorCode etc.)          | ✅ **PARTIALLY DONE**         | Doc comments now clarify: `ErrorCode()` = interface contract, `Code()` = ergonomic accessor. Broader method-proliferation concern (deprecating accessors in favor of interface-only) deferred to a future major version.                                                   |
 | D4  | `Classify(nil)` returns Rejection (inconsistent with fail-open) | ⏳ **DESIGN DECISION NEEDED** | DiscordSync argues nil should be Infrastructure (programming error) or Transient (fail-open). Current behavior: Rejection. This contradicts the fail-open philosophy for unknown errors. Needs a deliberate product decision — changing it is a breaking change.           |
 | D5  | No `RegisterClassification` for error _types_ (only sentinels)  | ✅ **PARTIALLY DONE**         | `RegisterClassifier(func(error) (Family, bool))` was added — it solves this via predicate functions. Consumers can `errors.As` inside the closure. A dedicated `RegisterClassificationType[T error](family Family)` generic would be more ergonomic but hasn't been added. |
-| D6  | diagnose/ is overkill — skill should say "skip if not needed"   | ⏳ **NOT STARTED**            | One-liner guidance to add to SKILL.md: "Skip diagnose/ unless your failure modes include infrastructure health issues."                                                                                                                                                    |
+| D6  | diagnose/ is overkill — skill should say "skip if not needed"   | ✅ **DONE**        | SKILL.md now says: "diagnose/ and agent/ are separate modules — Opt-in: skip them unless you need infrastructure debugging or AI analysis."                                                                                                                                |
 
 ### What's Missing
 
@@ -220,8 +220,8 @@ The skill file (`/home/lars/projects/go-error-family/SKILL.md`) is **excellent o
 | —   | No guidance on `New*` vs `Wrap*`                   | ⏳ **NOT STARTED** | Needs: "Use `New*` when creating from scratch. Use `Wrap*` when you have an underlying error to chain." |
 | —   | `Newf`/`Wrapf` not prominent enough                | ⏳ **NOT STARTED** | Also: new `Wrap{Family}f` variants added but not yet shown in skill examples.                           |
 | —   | No `errkit` consumer pattern example               | ⏳ **NOT STARTED** | Every non-trivial consumer builds nil-safe wrappers with context. Show the pattern.                     |
-| —   | `RegisterClassifications` map variant not in skill | ⏳ **NOT STARTED** | Only singular `RegisterClassification` is shown. The batch map variant is more ergonomic.               |
-| —   | `ParseFamily` default-to-Transient not in gotchas  | ⏳ **NOT STARTED** | Should be added to the gotchas table.                                                                   |
+| —   | `RegisterClassifications` map variant not in skill | ✅ **DONE**        | The batch map variant is now shown in SKILL.md (line ~222).                                                                                                |
+| —   | `ParseFamily` default-to-Transient not in gotchas  | ✅ **DONE**        | Now in the SKILL.md "Surprising Behaviors" gotchas table.                                                                                                  |
 
 ### Note on Multi-Error Classification
 

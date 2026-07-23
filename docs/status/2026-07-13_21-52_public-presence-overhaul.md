@@ -1,5 +1,12 @@
 # Status Report: Public Presence Overhaul
 
+> **Update 2026-07-23:** The deployment gaps listed below (Firebase site
+> missing, custom domain, SSL) were **resolved** in the website recovery
+> session (`docs/status/2026-07-23_05-07_website-recovery.md`). The Firebase
+> hosting site was created, the website was built and deployed (65 files), and
+> the custom domain `errorfamily.lars.software` is live with a valid SSL cert.
+> Remaining open items: CI/CD pipeline for automated deploys, uptime monitoring.
+
 **Date:** 2026-07-13 21:52
 **Session Goal:** Make README, website, GitHub settings, and DNS/Firebase hosting superb for the public `go-error-family` repo.
 
