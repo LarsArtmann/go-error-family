@@ -4,10 +4,10 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
-## [Unreleased]
+## [0.8.0] - 2026-07-23
 
-Inspired by studying BuildFlow's `modules/errors/` package. All additions are
-non-breaking and use only the Go standard library.
+BuildFlow-inspired error handling additions. All new APIs use only the Go
+standard library — the root package remains zero-dependency.
 
 ### Added
 
@@ -40,6 +40,18 @@ non-breaking and use only the Go standard library.
 - **`Error.Error()`, `Error.Summary()`, `Error.formatVerbose()`** use `safeCauseString` instead of `%v` format for cause rendering.
 - **`contextValueToString` refactored** into `contextValueToString` + `scalarToString` dispatch, eliminating `//nolint:cyclop` suppression.
 - **`WithExitCode` godoc** documents POSIX exit code wrapping behavior (0-255 range, negative values wrap via `os.Exit`).
+
+### Modules
+
+Coordinated multi-module release. Submodule `go.mod` files now reference root **v0.8.0** and diagnose **v0.2.0**.
+
+- `github.com/larsartmann/go-error-family` → **v0.8.0** (new APIs + json/v2 revert)
+- `github.com/larsartmann/go-error-family/diagnose` → **v0.2.0** (diagnostic rule enhancements)
+- `github.com/larsartmann/go-error-family/agent` → **v0.2.0** (refactoring + dep bump)
+- `github.com/larsartmann/go-error-family/bridge` → **v0.3.0** (v0.8.0 hardening + dep bump)
+- `github.com/larsartmann/go-error-family/diagnose/git` → **v0.5.0** (rule enhancements + dep bump)
+- `github.com/larsartmann/go-error-family/diagnose/postgres` → **v0.5.0** (rule enhancements + dep bump)
+- `github.com/larsartmann/go-error-family/examples` → **v0.2.0** (dep bump + lint cleanup)
 
 ## [0.7.0] - 2026-07-09
 

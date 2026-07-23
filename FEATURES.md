@@ -236,4 +236,4 @@ All packages at 80%+. Fuzz tests (14 total):
 - ~~**No per-error HTTP status override**~~ — **SHIPPED (v0.8.0).** `WithHTTPStatus(int)` + `HTTPStatuser` interface provide per-error overrides of family-level defaults. Mirrors `ExitCoder`/`WithExitCode` pattern exactly.
 - **`Classify(nil)` returns Rejection** — intentional but debated. Some consumers argue it should be Transient (fail-open) or Infrastructure (programming error). This is a design decision, not a bug.
 - **Constructor context ergonomics** — `.WithContext().WithContext()` chains are verbose. No builder pattern or variadic context yet. Consumers build `errkit`-style helpers.
-- **`encoding/json` (stdlib)** — the root module uses standard `encoding/json`. The v0.7.0 json/v2 experiment was reverted in [Unreleased]; no `GOEXPERIMENT` required.
+- **`encoding/json` (stdlib)** — the root module uses standard `encoding/json`. The v0.7.0 json/v2 experiment was reverted in v0.8.0; no `GOEXPERIMENT` required.

@@ -38,7 +38,7 @@ The classification protocol is the **four interfaces** (`Coded`/`Classified`/`Co
 - **`ExitCode(err)` checks `ExitCoder` before family** — an error implementing `ExitCoder` with a non-zero code overrides the family-based BSD exit code. `*Error` always implements `ExitCoder`, but returns 0 (meaning "use family default") unless `WithExitCode` was called.
 - **`WrapOnce` is idempotent** — if the error chain already contains a `*Error`, it is returned unchanged. This prevents double-wrapping at API boundaries.
 
-## API Surface (v0.5.0)
+## API Surface (v0.8.0)
 
 **Family adapters** (in `family.go` / `retry.go`, all single-source-of-truth via `familyData`):
 
