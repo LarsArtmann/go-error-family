@@ -3,7 +3,7 @@
 Honest inventory of what exists, what works, and what doesn't. Every claim is
 verifiable against the code — citations point at the source.
 
-**Last verified:** 2026-07-16 against v0.8.0
+**Last verified:** 2026-07-23 against HEAD (v0.8.0 code committed, unreleased)
 
 ---
 
@@ -210,19 +210,23 @@ Separate Go module so root stays zero-dependency.
 
 ---
 
-## Test Coverage (verified 2026-07-13)
+## Test Coverage (verified 2026-07-23)
 
 | Package              | Coverage |
 | -------------------- | -------- |
-| root (`errorfamily`) | 97.3%    |
-| `errorfamilytest`    | 95.2%    |
+| root (`errorfamily`) | 97.6%    |
+| `errorfamilytest`    | 95.8%    |
 | `agent`              | 100.0%   |
-| `bridge`             | 94.1%    |
+| `bridge`             | 95.6%    |
 | `diagnose` (core)    | 83.9%    |
 | `diagnose/git`       | 98.5%    |
 | `diagnose/postgres`  | 80.3%    |
 
-All packages at 80%+. Fuzz tests: `FuzzParseFamily`, `FuzzParseFamilyRoundTrip`, `FuzzClassify`, `FuzzClassifyPlainError`, `FuzzErrorFormatting` (root); `FuzzFormat` (bridge).
+All packages at 80%+. Fuzz tests (14 total):
+
+**Root** (9): `FuzzParseFamily`, `FuzzParseFamilyRoundTrip`, `FuzzClassify`, `FuzzClassifyPlainError`, `FuzzErrorFormatting`, `FuzzApplyContext`, `FuzzWrapOnce`, `FuzzContextValueToString`, `FuzzWithExitCode`.
+
+**Bridge** (5): `FuzzInferFamily`, `FuzzAutoWrap`, `FuzzWrapRoundTrip`, `FuzzWrapOopsRoundTrip`, `FuzzFormat`.
 
 ---
 

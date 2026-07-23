@@ -121,10 +121,10 @@ Not a library type — partial success is a consumption pattern, not a classific
 
 | Package              | Coverage |
 | -------------------- | -------- |
-| root (`errorfamily`) | 97.3%    |
-| `errorfamilytest`    | 95.2%    |
+| root (`errorfamily`) | 97.6%    |
+| `errorfamilytest`    | 95.8%    |
 | `agent`              | 100.0%   |
-| `bridge`             | 94.1%    |
+| `bridge`             | 95.6%    |
 | `diagnose` (core)    | 83.9%    |
 | `diagnose/git`       | 98.5%    |
 | `diagnose/postgres`  | 80.3%    |
@@ -133,7 +133,7 @@ All packages at 80%+; root and `diagnose/git` near-complete. (`errorfamilytest` 
 
 ## Fuzz Tests
 
-`fuzz_test.go` (root) contains: `FuzzParseFamily`, `FuzzParseFamilyRoundTrip`, `FuzzClassify`, `FuzzClassifyPlainError`, `FuzzErrorFormatting`, `FuzzApplyContext`, `FuzzWrapOnce`, `FuzzContextValueToString`, `FuzzWithExitCode`. `bridge/fuzz_test.go` contains: `FuzzFormat`.
+`fuzz_test.go` (root) contains: `FuzzParseFamily`, `FuzzParseFamilyRoundTrip`, `FuzzClassify`, `FuzzClassifyPlainError`, `FuzzErrorFormatting`, `FuzzApplyContext`, `FuzzWrapOnce`, `FuzzContextValueToString`, `FuzzWithExitCode`. `bridge/fuzz_test.go` contains: `FuzzInferFamily`, `FuzzAutoWrap`, `FuzzWrapRoundTrip`, `FuzzWrapOopsRoundTrip`, `FuzzFormat`.
 
 ## Bridge Submodule (`bridge/`)
 
