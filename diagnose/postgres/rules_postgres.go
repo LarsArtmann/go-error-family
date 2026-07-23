@@ -72,17 +72,15 @@ func (r *PostgresRule) Run( //nolint:hierarchical-errors // DiagnosticRule inter
 
 	// Check 1: pg_isready
 	if r.cmdRunner().Exists("pg_isready") {
-		stdout, exitCode, _ := r.cmdRunner().
-			//nolint:hierarchical-errors // diagnostic rules use exit codes
-			Run(
-				ctx,
-				5*time.Second,
-				"pg_isready",
-				"-h",
-				host,
-				"-p",
-				port,
-			)
+		stdout, exitCode, _ := r.cmdRunner().Run( //nolint:hierarchical-errors
+			ctx,
+			5*time.Second,
+			"pg_isready",
+			"-h",
+			host,
+			"-p",
+			port,
+		)
 		result.Details["pg_isready"] = stdout
 		if exitCode == 0 {
 			result.Status = diagnose.StatusHealthy

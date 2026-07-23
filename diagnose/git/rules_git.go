@@ -151,7 +151,9 @@ func (r *GitRule) checkRemote(
 	result *diagnose.DiagnosticResult,
 	repoPath string,
 ) {
-	remotesStdout, _, _ := r.cmdRunner().Run(ctx, 3*time.Second, "git", "-C", repoPath, "remote") //nolint:hierarchical-errors
+	remotesStdout, _, _ := r.cmdRunner().Run( //nolint:hierarchical-errors
+		ctx, 3*time.Second, "git", "-C", repoPath, "remote",
+	)
 	if strings.TrimSpace(remotesStdout) == "" {
 		result.Status = diagnose.StatusHealthy
 		result.Summary = "Git repo is clean, no remotes configured: " + repoPath
@@ -161,14 +163,14 @@ func (r *GitRule) checkRemote(
 
 	_, remoteExitCode, _ := r.cmdRunner().Run( //nolint:hierarchical-errors
 		ctx,
-			10*time.Second,
-			"git",
-			"-C",
-			repoPath,
-			"ls-remote",
-			"--heads",
-			"origin",
-		)
+		10*time.Second,
+		"git",
+		"-C",
+		repoPath,
+		"ls-remote",
+		"--heads",
+		"origin",
+	)
 	if remoteExitCode != 0 {
 		result.Status = diagnose.StatusDegraded
 		result.Summary = "Git repo is clean but remote is unreachable: " + repoPath
