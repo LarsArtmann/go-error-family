@@ -23,7 +23,6 @@ Be respectful, inclusive, constructive, and collaborative.
 | Tool          | Version | Purpose                                 |
 | ------------- | ------- | --------------------------------------- |
 | Go            | 1.26+   | Language runtime                        |
-| GOEXPERIMENT  | jsonv2  | Required — root uses `encoding/json/v2` |
 | golangci-lint | latest  | Code linting                            |
 
 ### Setup
@@ -33,8 +32,8 @@ Be respectful, inclusive, constructive, and collaborative.
 git clone https://github.com/LarsArtmann/go-error-family.git
 cd go-error-family
 
-# Verify (GOEXPERIMENT=jsonv2 is required — the root module uses encoding/json/v2)
-export GOEXPERIMENT=jsonv2
+# Verify
+export PATH="$PATH:$(go env GOPATH)/bin"
 go build ./...
 go test ./... -count=1 -timeout 120s -race
 golangci-lint run ./...
@@ -54,7 +53,7 @@ nix flake check                       # all checks (build + lint)
 
 ### Principles
 
-1. **Zero third-party dependencies** — this is a library; stdlib only (note: `encoding/json/v2` is Go stdlib experimental, requiring `GOEXPERIMENT=jsonv2`)
+1. **Zero third-party dependencies** — this is a library; stdlib only (`encoding/json`)
 2. **Composition over inheritance** — interfaces and struct embedding, not class hierarchies
 3. **Small interfaces** — each error type implements only what it needs (`Coded`, `Classified`, `Contextual`, `Retryable`)
 4. **Early returns** — guard clauses over nested conditionals
@@ -88,8 +87,6 @@ err := errorfamily.New(errorfamily.Rejection, "file.not_found", "config missing"
 
 ```bash
 # All tests (race-detector enabled) — root package only
-# GOEXPERIMENT=jsonv2 is required (root uses encoding/json/v2)
-export GOEXPERIMENT=jsonv2
 go test ./... -count=1 -timeout 120s -race
 
 # Submodule tests (must run from within the submodule)
