@@ -39,7 +39,7 @@ func (m *MockCommandRunner) Set(key, stdout string, exitCode int) {
 }
 
 // Run records the call and returns the matching MockResponse.
-func (m *MockCommandRunner) Run(
+func (m *MockCommandRunner) Run( //nolint:hierarchical-errors // CommandRunner interface
 	_ context.Context,
 	_ time.Duration,
 	name string,

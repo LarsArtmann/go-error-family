@@ -34,7 +34,7 @@ var filesystemSpec = RuleSpec{ //nolint:gochecknoglobals // Immutable rule match
 	CodeContains: []string{"file", "dir", "path", "config", "permission"}, //nolint:goconst
 }
 
-func (r *FilesystemRule) Run(ctx context.Context, err error) (*DiagnosticResult, error) {
+func (r *FilesystemRule) Run(ctx context.Context, err error) (*DiagnosticResult, error) { //nolint:hierarchical-errors // DiagnosticRule interface
 	path := r.resolvePath(err)
 	errCtx := ErrorContext(err)
 	if path == "" {
@@ -76,7 +76,7 @@ func (r *FilesystemRule) Run(ctx context.Context, err error) (*DiagnosticResult,
 	return result, nil
 }
 
-func (r *FilesystemRule) handleStatError(
+func (r *FilesystemRule) handleStatError( //nolint:hierarchical-errors // returns stat errors for diagnosis
 	result *DiagnosticResult,
 	path string,
 	statErr error,
@@ -132,8 +132,8 @@ func (r *FilesystemRule) checkDirWritable(result *DiagnosticResult, path string)
 		)
 		return
 	}
-	_ = f.Close()
-	_ = os.Remove(testFile)
+	_ = f.Close()                  //nolint:hierarchical-errors // cleanup: close error irrelevant
+	_ = os.Remove(testFile)        //nolint:hierarchical-errors // cleanup: test file removal
 	setAccessSuccess(result, "writable", "Path exists and is writable: "+path)
 }
 
@@ -148,7 +148,7 @@ func (r *FilesystemRule) checkFileReadable(result *DiagnosticResult, path string
 		)
 		return
 	}
-	_ = f.Close()
+	_ = f.Close() //nolint:hierarchical-errors // cleanup: close error irrelevant
 	setAccessSuccess(result, "readable", fmt.Sprintf(
 		"File exists and is readable: %s (%s)",
 		path,
