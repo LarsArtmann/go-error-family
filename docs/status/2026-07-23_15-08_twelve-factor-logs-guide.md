@@ -163,3 +163,9 @@ This session only covered Factor XI (Logs). But go-error-family intersects with 
 | Blocking questions      | 3     |
 
 **Biggest risk:** The website has not been verified to build after adding the new page and editing the sidebar config. This should be the very first thing done in the next session.
+
+---
+
+## Resolution (2026-07-23)
+
+The guide was committed at `c9094d5` ("docs(guides): add twelve-factor app logging guide") and registered in the sidebar. **The biggest risk remains open:** the website build (`astro check` / `astro build`) was never run after the `.mdx` + `astro.config.mjs` edits. No subsequent session verified it. The live site at `errorfamily.lars.software` has not been rebuilt since these changes. Tracked in TODO_LIST "Rebuild and deploy website".

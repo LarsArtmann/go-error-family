@@ -12,7 +12,17 @@ traceable to its source. When an item ships, remove it here and record it in
 
 ### High Priority
 
-- [ ] **Rebuild and deploy website** — the live site at `errorfamily.lars.software` is stale. API changes from v0.8.0 (ExitCoder, WrapOnce, WithContextAny) have not been deployed. The website docs have been audited and fixed (stale `SuggestedFix` refs corrected, missing v0.8.0 APIs added to api-reference.mdx, error-types.mdx, and changelog.mdx). Source: status report 2026-07-16_06-30 section c.2.
+- [ ] **Rebuild and deploy website** — the live site at `errorfamily.lars.software` is stale. API changes from v0.8.0 (ExitCoder, WrapOnce, WithContextAny) have not been deployed. The website docs have been audited and fixed (stale `SuggestedFix` refs corrected, missing v0.8.0 APIs added to api-reference.mdx, error-types.mdx, and changelog.mdx), but the build was never verified (`astro check`/`astro build` not run after the 12-factor guide was added). Source: status report 2026-07-23_15-08 section c.1.
+
+### Medium Priority
+
+- [ ] **Verify full `buildflow` pipeline passes** — individual tools pass (go test, golangci-lint, nix flake check, hierarchical-errors), but the actual `buildflow` command was never run end-to-end. Source: status report 2026-07-23_15-52 section d.3.
+
+- [ ] **Reduce hierarchical-errors nolint noise** — 50 `//nolint:hierarchical-errors` directives across the codebase, and golangci-lint warns "unknown linters: hierarchical-errors" on every run. Investigate config-file support (`.hierarchical-errors.toml`) or type-aware exemptions for `fmt.Formatter` and cleanup patterns. Source: status report 2026-07-23_15-52 section d.2.
+
+- [ ] **Pin `version: latest` in `release.yml`** — 3 occurrences of `version: latest` for golangci-lint-action in the release workflow (CI workflow pins `v2.12.2`). Supply-chain reproducibility concern. Source: status report 2026-07-23_15-52 section c.3.
+
+- [ ] **Investigate `gitignore-upserter:repair` failure** — showing as not-passing in BuildFlow output, never investigated. Source: status report 2026-07-23_15-52 section c.1.
 
 ### Low Priority
 

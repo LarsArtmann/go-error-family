@@ -15,10 +15,12 @@ multiple consumers (DiscordSync, browser-history, SwettySwipperWeb). The CLI
 story was strengthened with per-error exit code overrides (`ExitCoder`),
 idempotent wrapping (`WrapOnce`), typed context values (`WithContextAny`), and
 panic-safe cause rendering (`safeCauseString`). v0.8.0 code is committed at HEAD
-but **not yet tagged** (latest released tag is `v0.7.0`). The focus now is:
-hardening the release pipeline, improving discoverability (godoc), deploying the
-v0.8.0 API changes to the website, and resolving the few open design tensions
-from consumer feedback.
+but **not yet tagged** (latest released tag is `v0.7.0`, 36 commits ahead). The
+focus now is: cutting the v0.8.0 release, deploying the v0.8.0 API changes to
+the website, verifying the full BuildFlow toolchain, and resolving the few open
+design tensions from consumer feedback. The CI module-graph gate and
+consumer-simulation job shipped; lint is at zero golangci-lint issues (though
+the hierarchical-errors tool adds 50 nolint directives that warrant cleanup).
 
 ## Themes
 
@@ -52,12 +54,12 @@ custom layers.
 
 The v0.6.0 phantom-`replace` incident exposed that `go.work` masks
 consumer-facing bugs. CI needs to verify the module graph from the consumer's
-perspective.
+perspective. The `GOWORK=off go list -m all` gate and consumer-simulation job
+shipped in the `[Unreleased]` work (commit `e9c7219`); the remaining gaps are
+tooling-level.
 
 **Raw ideas:**
 
-- CI gate: `GOWORK=off go list -m all` per module
-- CI consumer-simulation job (`go get @tag` in throwaway module)
 - Release automation script for coordinated multi-module tag cutting
 - Deprecation notes for broken tags (v0.6.0 family)
 - Pin-bump hygiene: submodules should bump root pins in lockstep on releases
