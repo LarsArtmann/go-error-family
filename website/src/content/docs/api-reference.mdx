@@ -143,6 +143,20 @@ type ExitCoder interface {
 
 The reference implementation. Not required — implement the interfaces instead if you prefer.
 
+#### Mutator Methods (Copy-on-Write)
+
+All `With*` methods return a **new** `*Error` — safe to chain from shared/sentinel errors.
+
+| Method           | Signature                                     | Description                              |
+| ---------------- | --------------------------------------------- | ---------------------------------------- |
+| `WithContext`    | `(key, value string) *Error`                  | Set a single string context value         |
+| `WithContextMap` | `(ctx map[string]string) *Error`              | Bulk-set from a map                       |
+| `WithContextf`   | `(key, format string, args ...any) *Error`   | Printf-style context value                |
+| `WithContextAny` | `(key string, value any) *Error`              | Type-safe context from any (int, bool, time, etc.) |
+| `WithCause`      | `(cause error) *Error`                        | Attach an underlying error                |
+| `WithTimestamp`  | `(ts time.Time) *Error`                       | Override timestamp (deterministic tests)  |
+| `WithExitCode`   | `(code int) *Error`                           | Override family exit code (0 = default)   |
+
 ### HandleConfig
 
 ```go
@@ -174,6 +188,20 @@ Injectable registry for test isolation and scoped error handling:
 reg := errorfamily.NewRegistry()
 reg.RegisterClassification(sql.ErrNoRows, errorfamily.Rejection)
 child := reg.Clone() // deep-copy, inherit-and-extend
+```
+
+## Test Helpers
+
+The `errorfamilytest` subpackage mirrors `net/http/httptest` — it keeps `testing` out of the production package:
+
+```go
+import "github.com/larsartmann/go-error-family/errorfamilytest"
+
+errorfamilytest.AssertFamily(t, err, errorfamily.Rejection)
+errorfamilytest.AssertCode(t, err, "user.not_found")
+errorfamilytest.AssertRetryable(t, err, false)
+errorfamilytest.AssertContext(t, err, "user_id", "42")
+errorfamilytest.AssertExitCode(t, err, 1)
 ```
 
 ## Full API on pkg.go.dev

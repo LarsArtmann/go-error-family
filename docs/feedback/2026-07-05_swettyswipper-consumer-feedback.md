@@ -195,12 +195,12 @@ _This feedback is given with gratitude for a clean, zero-dep error library that 
 
 ### What's Confusing or Hard to Discover
 
-| #   | Item                                                                 | Status             | Resolution                                                                                                                    |
-| --- | -------------------------------------------------------------------- | ------------------ | ----------------------------------------------------------------------------------------------------------------------------- |
-| S1  | `Classify(nil)` → Rejection should be in **godoc**                   | ✅ **DONE (v0.8.0)** | `classify.go:56` now reads "Returns Rejection for nil errors."                                                                      |
+| #   | Item                                                                 | Status               | Resolution                                                                                                                                    |
+| --- | -------------------------------------------------------------------- | -------------------- | --------------------------------------------------------------------------------------------------------------------------------------------- |
+| S1  | `Classify(nil)` → Rejection should be in **godoc**                   | ✅ **DONE (v0.8.0)** | `classify.go:56` now reads "Returns Rejection for nil errors."                                                                                |
 | S2  | `errors.Is` matches on code+family — needs **godoc example**         | ✅ **DONE (v0.8.0)** | `error.go:50-51` now reads "Is supports errors.Is by matching error code and family. Two errors match if they have the same code AND family." |
-| S3  | `Wrap(nil, ...)` → nil should be in **constructor godoc**            | ✅ **DONE (v0.8.0)** | `constructors.go:27-28` now reads "Returns nil if err is nil."                                                                      |
-| S4  | Template `{key}` substitution should be in **MessageTemplate godoc** | ✅ **DONE (v0.8.0)** | `handle.go:84-90` documents `{key}` placeholder support on What/Why/Fix/WayOut fields.                                             |
+| S3  | `Wrap(nil, ...)` → nil should be in **constructor godoc**            | ✅ **DONE (v0.8.0)** | `constructors.go:27-28` now reads "Returns nil if err is nil."                                                                                |
+| S4  | Template `{key}` substitution should be in **MessageTemplate godoc** | ✅ **DONE (v0.8.0)** | `handle.go:84-90` documents `{key}` placeholder support on What/Why/Fix/WayOut fields.                                                        |
 
 ### What's Missing
 

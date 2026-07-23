@@ -210,6 +210,11 @@ func (e *Error) WithTimestamp(ts time.Time) *Error {
 // WithExitCode sets a custom process exit code that overrides the family-based
 // default from [Family.ExitCode]. A value of 0 means "not set" — callers should
 // fall back to the family's canonical exit code.
+//
+// Note: os.Exit wraps the code to the range 0-255 on POSIX (e.g., -1 becomes 255).
+// Use values in the 1-125 range for maximum portability (126+ have special meaning
+// in some shells).
+//
 // Returns a new Error, leaving the original unchanged — safe for shared/sentinel errors.
 func (e *Error) WithExitCode(code int) *Error {
 	clone := e.clone()
@@ -271,13 +276,30 @@ func safeCauseString(cause error) (result string) {
 }
 
 // contextValueToString converts any context value to its string representation.
-// Uses a type switch for common scalar types and falls back to fmt.Sprint.
-//
-//nolint:cyclop // type switch with trivial one-liner cases; not cognitively complex
+// Handles complex types directly and delegates numeric/boolean scalars to scalarToString.
 func contextValueToString(v any) string {
 	switch val := v.(type) {
 	case string:
 		return val
+	case nil:
+		return ""
+	case []byte:
+		return string(val)
+	case time.Time:
+		return val.Format(time.RFC3339)
+	case time.Duration:
+		return val.String()
+	case error:
+		return safeCauseString(val)
+	default:
+		return scalarToString(v)
+	}
+}
+
+// scalarToString converts numeric and boolean primitives to strings.
+// Falls back to fmt.Sprint for any type not explicitly handled.
+func scalarToString(v any) string {
+	switch val := v.(type) {
 	case int:
 		return strconv.Itoa(val)
 	case int64:
@@ -290,14 +312,6 @@ func contextValueToString(v any) string {
 		return strconv.FormatFloat(val, 'f', -1, 64)
 	case bool:
 		return strconv.FormatBool(val)
-	case []byte:
-		return string(val)
-	case time.Time:
-		return val.Format(time.RFC3339)
-	case error:
-		return safeCauseString(val)
-	case nil:
-		return ""
 	default:
 		return fmt.Sprint(v)
 	}

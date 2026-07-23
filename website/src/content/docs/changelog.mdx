@@ -3,6 +3,24 @@ title: Changelog
 description: All notable changes to go-error-family.
 ---
 
+## [Unreleased]
+
+### Added
+
+- **`ExitCoder` interface** — fifth consumer interface. Errors implementing `ExitCode() int` override the family-based exit code per-error.
+- **`Error.WithExitCode(code int) *Error`** — copy-on-write mutator (0 = use family default).
+- **`Error.WithContextAny(key string, value any) *Error`** — type-safe context attachment for non-string values (int, bool, float64, time.Time, []byte, error, etc.).
+- **`WrapOnce(err, family, code, msg) *Error`** / **`WrapOncef`** — idempotent wrap. Returns the existing `*Error` unchanged if the chain already contains one.
+- **`errorfamilytest.AssertExitCode`** — test assertion for exit codes.
+- **`safeCauseString`** — panic-recovery guard around `cause.Error()` for third-party error types that panic on nil internals.
+- **`Compose(errs...)`** — re-added as backward-compatibility wrapper around `errors.Join` (was removed in v0.5.0, restored per consumer feedback).
+- **Fuzz tests**: `FuzzWrapOnce`, `FuzzContextValueToString`, `FuzzWithExitCode`.
+
+### Changed
+
+- **`ExitCode(err)` checks `ExitCoder` first** — a non-zero custom exit code wins over family default.
+- **`Error.Error()` / `Summary()` / `formatVerbose()`** use `safeCauseString` for cause rendering.
+
 ## [0.7.0] — 2026-07-11
 
 ### Changed

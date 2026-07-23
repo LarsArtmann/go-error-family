@@ -49,6 +49,12 @@ jobs:
       - name: Verify root builds without workspace
         run: GOWORK=off go build ./...
 
+      - name: Verify root module graph resolves (GOWORK=off)
+        run: GOWORK=off go list -m all
+
+      - name: Run go vet
+        run: go vet ./...
+
       - name: Verify examples compile
         working-directory: ./examples
         run: go build ./...
@@ -104,3 +110,27 @@ jobs:
           version: v2.12.2
           args: --timeout=5m
           working-directory: ./diagnose/postgres
+
+  consumer-simulation:
+    runs-on: ubuntu-latest
+    env:
+      GOEXPERIMENT: jsonv2
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Go
+        uses: actions/setup-go@v5
+        with:
+          go-version-file: "go.mod"
+          cache: true
+
+      - name: Simulate consumer importing root module
+        run: |
+          tmpdir=$(mktemp -d)
+          cd "$tmpdir"
+          go mod init consumer-test
+          printf 'package main\n\nimport _ "github.com/larsartmann/go-error-family"\n\nfunc main() {}\n' > main.go
+          GOWORK=off go mod edit -replace github.com/larsartmann/go-error-family=$GITHUB_WORKSPACE
+          GOWORK=off go mod tidy
+          GOWORK=off go build ./...
+          GOWORK=off go list -m all

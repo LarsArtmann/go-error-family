@@ -108,3 +108,27 @@ func TestHTTPHandlerPlainErrorNoLeak(t *testing.T) {
 		t.Errorf("plain error leaked internal message: %s", rec.Body.String())
 	}
 }
+
+type failingResponseWriter struct {
+	header http.Header
+}
+
+func (f *failingResponseWriter) Header() http.Header {
+	if f.header == nil {
+		f.header = make(http.Header)
+	}
+
+	return f.header
+}
+
+func (f *failingResponseWriter) Write(
+	[]byte,
+) (int, error) {
+	return 0, errors.New("connection broken")
+}
+func (f *failingResponseWriter) WriteHeader(statusCode int) {}
+
+func TestWriteHTTPErrorMarshalFailure(t *testing.T) {
+	w := &failingResponseWriter{}
+	writeHTTPError(w, NewTransient("test.fail", "connection will break"))
+}

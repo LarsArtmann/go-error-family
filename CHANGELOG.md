@@ -22,12 +22,18 @@ non-breaking and use only the Go standard library.
 - **Benchmarks**: `BenchmarkWrapOnceWrap`, `BenchmarkWrapOnceIdempotent`, `BenchmarkWithExitCode`, `BenchmarkExitCodeOverride`.
 - **Examples**: `ExampleWrapOnce`, `ExampleError_WithExitCode`, `ExampleError_WithContextAny`, `ExampleExitCode`.
 - **Fuzz tests**: `FuzzWrapOnce`, `FuzzContextValueToString`, `FuzzWithExitCode`.
+- **`Compose(errs...)`** — re-added as backward-compatibility wrapper around `errors.Join` (was removed in v0.5.0, restored per consumer feedback; commit `8cb240a`).
+- **`time.Duration` case in `contextValueToString`** — common context value type (timeouts, retry intervals) now renders via `Duration.String()` instead of `fmt.Sprint`.
+- **Tests**: `TestSafeCauseStringNonStringPanics` (int, nil, struct panic recovery), `TestWriteHTTPErrorMarshalFailure` (failing writer error path).
+- **CI**: `GOWORK=off go list -m all` module-graph gate, consumer-simulation job (throwaway module import), `go vet ./...` step.
 
 ### Changed
 
 - **`ExitCode(err)` checks `ExitCoder` interface first** — a non-zero custom exit code wins over the family default. Zero falls back to `Family.ExitCode()`.
 - **`HandleErrorWithContext` and `HandleErrorDetailedWithConfig`** now resolve exit codes via a shared `resolveExitCode` helper that respects the `ExitCoder` interface.
 - **`Error.Error()`, `Error.Summary()`, `Error.formatVerbose()`** use `safeCauseString` instead of `%v` format for cause rendering.
+- **`contextValueToString` refactored** into `contextValueToString` + `scalarToString` dispatch, eliminating `//nolint:cyclop` suppression.
+- **`WithExitCode` godoc** documents POSIX exit code wrapping behavior (0-255 range, negative values wrap via `os.Exit`).
 
 ## [0.7.0] - 2026-07-09
 

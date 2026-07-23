@@ -14,7 +14,7 @@ Thank you for contributing! This guide covers everything you need to know.
 
 ## Code of Conduct
 
-Be respectful, inclusive, constructive, and collaborative. See [CODE_OF_CONDUCT.md](CODE_OF_CONDUCT.md) for details.
+Be respectful, inclusive, constructive, and collaborative.
 
 ## Development Setup
 
@@ -127,7 +127,7 @@ go tool cover -func=coverage.out
 errorfamily/          — root package: types, constructors, classification, CLI boundary
   error.go              Error struct (reference implementation)
   family.go             Family enum + Audience/Tone metadata
-  interfaces.go         Coded, Classified, Contextual, Retryable
+│   interfaces.go       Coded, Classified, Contextual, Retryable, ExitCoder
   constructors.go       New/Wrap + family-specific shortcuts
   classify.go           Classify(), RegisterClassification()
   handle.go             HandleError(), HandleErrorWithContext(), template system

@@ -156,7 +156,7 @@ err.Timestamp() time.Time               // when the error was created
 err.WithContext(key, value string) *Error
 err.WithContextMap(ctx map[string]string) *Error    // bulk set from a map
 err.WithContextf(key, format string, args ...any) *Error  // printf-style context value
-err.WithContextAny(key string, value any) *Error   // type-safe: int, bool, float64, etc.
+err.WithContextAny(key string, value any) *Error   // type-safe: string, int, int64, uint, uint64, float64, bool, []byte, time.Time, error, nil
 err.WithCause(cause error) *Error
 err.WithTimestamp(ts time.Time) *Error   // deterministic timestamp for tests
 err.WithExitCode(code int) *Error        // override family exit code (0 = use default)
@@ -205,6 +205,34 @@ WrapRejectionf / WrapConflictf / WrapTransientf / WrapCorruptionf / WrapInfrastr
 
 - `New*` — the error originates here (no underlying cause). Use for validation failures, domain rule violations, sentinel errors.
 - `Wrap*` — the error has a cause you're classifying for the caller. `Wrap(nil, ...)` returns `nil` (nil-safe). Use when translating a third-party error into a behavioral family.
+
+### Domain Error Helpers (the "errkit" pattern)
+
+Every non-trivial consumer builds a thin domain layer over the constructors. This gives reusable, typed error factories with consistent codes:
+
+```go
+// internal/errors/users.go
+package errors
+
+import "github.com/larsartmann/go-error-family"
+
+func UserNotFound(userID string) error {
+    return errorfamily.NewRejection("user.not_found", "user not found").
+        WithContext("user_id", userID)
+}
+
+func DBTimeout(cause error) error {
+    if cause == nil { return nil }  // nil-safe (Wrap* already is, but explicit for domain helpers)
+    return errorfamily.WrapTransient(cause, "db.timeout", "database query timed out")
+}
+
+func OrderConflict(orderID string, cause error) error {
+    return errorfamily.WrapConflict(cause, "order.duplicate", "order already exists").
+        WithContext("order_id", orderID)
+}
+```
+
+Callers import your domain errors, not raw constructors. Codes and families live in one place.
 
 ### Classification
 

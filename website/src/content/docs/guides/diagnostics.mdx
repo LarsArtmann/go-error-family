@@ -14,7 +14,10 @@ results := runner.Run(ctx, err)
 for _, r := range results {
     if r.Status == diagnose.StatusFailed {
         fmt.Println(r.Summary)
-        fmt.Println("  Fix:", r.SuggestedFix)
+        fmt.Println("  Fix:", r.Fix.Summary)
+        if r.Fix.Command != "" {
+            fmt.Println("  Run:", r.Fix.Command)
+        }
     }
 }
 ```
@@ -83,8 +86,10 @@ func (r *RateLimitRule) Run(ctx context.Context, err error) (*diagnose.Diagnosti
     return &diagnose.DiagnosticResult{
         Status:       diagnose.StatusDegraded,
         Confidence:   diagnose.ConfidenceHigh,
-        Summary:      "Rate limited by API",
-        SuggestedFix: "Wait for the Retry-After duration before retrying",
+        Summary:    "Rate limited by API",
+        Fix: diagnose.Fix{
+            Summary: "Wait for the Retry-After duration before retrying",
+        },
     }, nil
 }
 ```

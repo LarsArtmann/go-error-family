@@ -548,3 +548,40 @@ func TestErrorJSON(t *testing.T) {
 		t.Errorf("timestamp = %v, want RFC3339", got["timestamp"])
 	}
 }
+
+type panicIntError struct{}
+
+func (panicIntError) Error() string { panic(42) }
+
+type panicNilError struct{}
+
+func (panicNilError) Error() string { panic(nil) }
+
+type panicStructError struct{}
+
+func (panicStructError) Error() string { panic(struct{ x int }{x: 99}) }
+
+func TestSafeCauseStringNonStringPanics(t *testing.T) {
+	tests := []struct {
+		name  string
+		cause error
+	}{
+		{"int panic", panicIntError{}},
+		{"nil panic", panicNilError{}},
+		{"struct panic", panicStructError{}},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			got := safeCauseString(tt.cause)
+			if got != "" {
+				t.Errorf("safeCauseString = %q, want empty string", got)
+			}
+
+			err := WrapTransient(tt.cause, "test.panic", "cause panics")
+			if msg := err.Error(); msg == "" {
+				t.Error("Error() returned empty for entire error")
+			}
+		})
+	}
+}

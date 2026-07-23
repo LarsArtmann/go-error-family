@@ -13,7 +13,7 @@
 > v0.8.0 hardening session report (`2026-07-16_06-30_v080-hardening-session.md`)
 > is the authoritative follow-up — it resolved the `[]byte`/`time.Time`/`error`
 > cases in `contextValueToString`, added fuzz tests, and verified `nix flake
-> check`. v0.8.0 code is at HEAD but has **not been tagged** (latest tag is
+check`. v0.8.0 code is at HEAD but has **not been tagged** (latest tag is
 > `v0.7.0`).
 
 The prior session implemented 4 BuildFlow-inspired APIs (`ExitCoder`, `WrapOnce`, `WithContextAny`, `safeCauseString`) and committed them as `fa60334`. This session was the polish pass: filling API gaps, splitting the monolithic test file, adding examples/benchmarks/assertions, and updating all 6 documentation surfaces. All tests pass (97.6% root coverage), 0 lint issues, 0 race conditions.
