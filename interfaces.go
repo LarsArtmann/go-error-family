@@ -50,3 +50,16 @@ type ExitCoder interface {
 	error
 	ExitCode() int
 }
+
+// HTTPStatuser errors carry a custom HTTP response status code that overrides
+// the family-based default from [Family.HTTPStatus]. When [HTTPStatus]
+// encounters an error implementing this interface with a non-zero status,
+// that status wins.
+//
+// This allows individual errors to deviate from their family's canonical
+// HTTP status (e.g. a Rejection error that should be 404 Not Found instead
+// of the family default 400 Bad Request) without changing the classification.
+type HTTPStatuser interface {
+	error
+	HTTPStatus() int
+}

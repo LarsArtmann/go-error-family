@@ -172,6 +172,18 @@ func (r *Registry) RegisterClassifiers(classifiers ...Classifier) {
 	})
 }
 
+// RegisterClassificationType registers a type-based classifier that maps any
+// error matching type T to the given Family. It is syntactic sugar over
+// [Registry.RegisterClassifier] for the common case of "type T → Family F".
+func (r *Registry) RegisterClassificationType[T error](family Family) { //nolint:hierarchical-errors // generic constraint, must embed error
+	r.RegisterClassifier(func(err error) (Family, bool) {
+		if _, ok := errors.AsType[T](err); ok {
+			return family, true
+		}
+		return Rejection, false
+	})
+}
+
 // swapClassifiers performs copy-on-write on the immutable classifier slice:
 // clones the current snapshot, applies fn, and atomically publishes the result.
 // Callers must hold r.mu (write lock) so concurrent writers never lose updates;

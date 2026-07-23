@@ -1,19 +1,30 @@
 package errorfamily
 
 import (
-	"encoding/json/v2"
+	"encoding/json"
+	"errors"
 	"net/http"
 )
 
-// HTTPStatus returns the recommended HTTP response status code for an error by
-// classifying it. It is a thin convenience wrapper around
-// [Classify](err).[Family.HTTPStatus], for use at HTTP/REST boundaries:
+// HTTPStatus returns the recommended HTTP response status code for an error.
+// If the error (or any error in its chain) implements [HTTPStatuser] with a
+// non-zero status, that status overrides the family-based default.
 //
 //	w.WriteHeader(errorfamily.HTTPStatus(err))
 //
 // Nil errors classify as Rejection → 400; prefer checking for nil before
 // reaching the HTTP layer.
 func HTTPStatus(err error) int {
+	if err == nil {
+		return Rejection.HTTPStatus()
+	}
+
+	if hs, ok := errors.AsType[HTTPStatuser](err); ok {
+		if status := hs.HTTPStatus(); status != 0 {
+			return status
+		}
+	}
+
 	return Classify(err).HTTPStatus()
 }
 
@@ -68,10 +79,11 @@ func writeHTTPError(w http.ResponseWriter, err error) {
 	}
 
 	w.Header().Set("Content-Type", "application/json; charset=utf-8")
-	w.WriteHeader(family.HTTPStatus())
+	w.WriteHeader(HTTPStatus(err))
 
-	if err := json.MarshalWrite(w, body); err != nil {
-		// Client disconnected or connection broke — nothing actionable.
+	data, marshalErr := json.Marshal(body)
+	if marshalErr != nil {
 		return
 	}
+	_, _ = w.Write(data)
 }

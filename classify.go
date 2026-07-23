@@ -147,3 +147,18 @@ func RegisterClassifier(c Classifier) {
 func RegisterClassifiers(cs ...Classifier) {
 	DefaultRegistry.RegisterClassifiers(cs...)
 }
+
+// RegisterClassificationType registers a type-based classifier that maps any
+// error matching type T to the given Family. It is syntactic sugar over
+// [RegisterClassifier] for the common case where the classification rule is
+// simply "type T → Family F", without field-level inspection.
+//
+//,errorfamily.RegisterClassificationType[*sqlite.Error](errorfamily.Transient)
+//
+// For errors that need field-level logic (e.g. different sqlite error codes
+// mapping to different families), use [RegisterClassifier] with a closure.
+//
+// Delegates to [DefaultRegistry].
+func RegisterClassificationType[T error](family Family) { //nolint:hierarchical-errors // generic constraint, must embed error
+	DefaultRegistry.RegisterClassificationType[T](family)
+}

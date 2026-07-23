@@ -1,7 +1,7 @@
 package errorfamily
 
 import (
-	"encoding/json/v2"
+	"encoding/json"
 	"fmt"
 	"maps"
 	"strconv"
@@ -27,6 +27,7 @@ type Error struct {
 	cause     error             // underlying error in the chain
 	timestamp time.Time         // when the error occurred
 	exitCode  int               // optional override; 0 = use family default
+	httpStatus int              // optional override; 0 = use family default
 }
 
 // Error implements the error interface.
@@ -253,16 +254,34 @@ func (e *Error) WithExitCode(code int) *Error {
 	return clone
 }
 
+// WithHTTPStatus sets a custom HTTP response status code that overrides the
+// family-based default from [Family.HTTPStatus]. A value of 0 means "not set" —
+// callers should fall back to the family's canonical HTTP status.
+//
+// Use this for errors whose family default is misleading at the HTTP layer:
+//
+//	notFound := NewRejection("battle.not_found", "battle not found").
+//	    WithHTTPStatus(http.StatusNotFound) // 404 instead of family default 400
+//
+// Returns a new Error, leaving the original unchanged — safe for shared/sentinel errors.
+func (e *Error) WithHTTPStatus(status int) *Error {
+	clone := e.clone()
+	clone.httpStatus = status
+
+	return clone
+}
+
 // clone returns a shallow copy of the error with a deep-copied context map.
 func (e *Error) clone() *Error {
 	cloned := &Error{
-		code:      e.code,
-		message:   e.message,
-		family:    e.family,
-		cause:     e.cause,
-		timestamp: e.timestamp,
-		exitCode:  e.exitCode,
-		context:   make(map[string]string, len(e.context)),
+		code:       e.code,
+		message:    e.message,
+		family:     e.family,
+		cause:      e.cause,
+		timestamp:  e.timestamp,
+		exitCode:   e.exitCode,
+		httpStatus: e.httpStatus,
+		context:    make(map[string]string, len(e.context)),
 	}
 	maps.Copy(cloned.context, e.context)
 
@@ -290,6 +309,14 @@ func (e *Error) Summary() string {
 // This satisfies the [ExitCoder] interface so that [ExitCode] (the package-level
 // function) can discover per-error overrides.
 func (e *Error) ExitCode() int { return e.exitCode }
+
+// HTTPStatus returns the custom HTTP response status code if one was set via
+// [WithHTTPStatus]. Returns 0 when no custom status is set, signaling callers
+// to fall back to the family-based default from [Family.HTTPStatus].
+//
+// This satisfies the [HTTPStatuser] interface so that [HTTPStatus] (the
+// package-level function) can discover per-error overrides.
+func (e *Error) HTTPStatus() int { return e.httpStatus }
 
 // safeCauseString calls cause.Error() with panic recovery.
 // Certain third-party error types panic when their Error() method encounters
