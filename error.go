@@ -225,7 +225,7 @@ func (e *Error) WithExitCode(code int) *Error {
 
 // clone returns a shallow copy of the error with a deep-copied context map.
 func (e *Error) clone() *Error {
-	c := &Error{
+	cloned := &Error{
 		code:      e.code,
 		message:   e.message,
 		family:    e.family,
@@ -234,9 +234,9 @@ func (e *Error) clone() *Error {
 		exitCode:  e.exitCode,
 		context:   make(map[string]string, len(e.context)),
 	}
-	maps.Copy(c.context, e.context)
+	maps.Copy(cloned.context, e.context)
 
-	return c
+	return cloned
 }
 
 // Summary returns a one-line human-readable summary suitable for logs and CLI output.
@@ -265,11 +265,9 @@ func (e *Error) ExitCode() int { return e.exitCode }
 // Certain third-party error types panic when their Error() method encounters
 // nil internal values. This guard prevents the panic from propagating through
 // fmt.Sprintf callers, returning an empty string instead.
-func safeCauseString(cause error) (result string) {
+func safeCauseString(cause error) string {
 	defer func() {
-		if r := recover(); r != nil {
-			result = ""
-		}
+		_ = recover()
 	}()
 
 	return cause.Error()

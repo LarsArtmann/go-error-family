@@ -176,6 +176,10 @@ Connects go-error-family with `samber/oops`. Separate module with its own `go.mo
 - `ParseAudience` and `ParseStatus` mirror `ParseFamily` — case-insensitive string parsing for all enums.
 - `Family` and `Audience` implement `encoding.TextMarshaler`/`TextUnmarshaler` for YAML/JSON config.
 - `agent.Config.Enabled` now returns `(nil, error)` instead of synthetic result — calling `Analyze` on a disabled agent is a programming error.
+- **depguard** allows `$gostd`, `$module`, `github.com/larsartmann/go-error-family` (all workspace modules), and `github.com/samber/oops` (bridge dependency). The root module's zero-dep guarantee is enforced by `go.mod` + CI's `GOWORK=off go build`, not depguard alone — depguard's `files` patterns are working-directory-relative and can't distinguish modules in a workspace.
+- **Test files** (`_test.go`) exclude: `err113`, `testpackage`, `fatcontext`, `funlen`, `containedctx` — internal tests access unexported identifiers and legitimately create dynamic errors, capture contexts, and exceed function-length thresholds.
+- **mnd** ignores `family.go` — the `familyData` table contains intentional HTTP status codes, exit codes, and severity values with inline comments. Extracting 15+ named constants would reduce readability.
+- **varnamelen** ignore-names includes Go-idiomatic short names: `tc` (test case), `f` (fmt.State — Go stdlib convention), `w` (http.ResponseWriter), `ag` (agent).
 
 ## Known Limitations
 

@@ -16,21 +16,21 @@ import (
 )
 
 func getUser(w http.ResponseWriter, r *http.Request) error {
-	id := r.URL.Query().Get("id")
-	if id == "" {
+	userID := r.URL.Query().Get("id")
+	if userID == "" {
 		return errorfamily.NewRejection("user.missing_id", "id query parameter is required")
 	}
 
-	if id == "notfound" {
+	if userID == "notfound" {
 		return errorfamily.NewRejection("user.not_found", "user not found").
-			WithContext("id", id)
+			WithContext("id", userID)
 	}
 
-	if id == "dbfail" {
+	if userID == "dbfail" {
 		return errorfamily.NewTransient("db.timeout", "database connection timed out")
 	}
 
-	_, _ = fmt.Fprintf(w, `{"user": {"id": %q}}`+"\n", id)
+	_, _ = fmt.Fprintf(w, `{"user": {"id": %q}}`+"\n", userID)
 
 	return nil
 }

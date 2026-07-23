@@ -25,6 +25,7 @@ func ExampleHandleError() {
 	err := NewRejection("file.not_found", "config missing").
 		WithContext("path", "/etc/app/config.yaml")
 	_ = HandleError(err)
+	// Output:
 }
 
 func ExampleWrapRejection() {

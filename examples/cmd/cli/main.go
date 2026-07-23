@@ -11,6 +11,8 @@ import (
 	errorfamily "github.com/larsartmann/go-error-family"
 )
 
+var errConnectionRefused = errors.New("connection refused")
+
 func fetchConfig(path string) error {
 	if path == "/etc/config.yaml" {
 		return errorfamily.NewRejection("file.not_found", "configuration file missing").
@@ -23,7 +25,7 @@ func fetchConfig(path string) error {
 
 func connectDB(host string) error {
 	if host == "badhost" {
-		return errors.New("connection refused")
+		return errConnectionRefused
 	}
 
 	return nil

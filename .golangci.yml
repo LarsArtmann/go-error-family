@@ -133,6 +133,8 @@ linters:
           allow:
             - $gostd
             - $module
+            - github.com/larsartmann/go-error-family
+            - github.com/samber/oops
     dupl:
       threshold: 100
     exhaustruct:
@@ -175,6 +177,9 @@ linters:
         - generic
     makezero:
       always: true
+    mnd:
+      ignored-files:
+        - family\.go
     revive:
       rules:
         - disabled: true
@@ -199,6 +204,10 @@ linters:
         - a
         - b
         - v
+        - tc
+        - f
+        - w
+        - ag
       ignore-type-assert-ok: true
   exclusions:
     generated: lax
@@ -211,6 +220,11 @@ linters:
           - paralleltest
           - revive
           - exhaustruct
+          - err113
+          - testpackage
+          - fatcontext
+          - funlen
+          - containedctx
       - path: diagnose/
         linters:
           - wrapcheck
@@ -228,6 +242,7 @@ linters:
       - path: examples/
         linters:
           - gosec
+          - forbidigo
       - path: _test\.go
         text: unused
         linters:

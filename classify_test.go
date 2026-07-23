@@ -168,24 +168,24 @@ func TestExitCode(t *testing.T) {
 }
 
 func TestRegisterClassifications(t *testing.T) {
-	s1 := errors.New("sentinel.batch.1")
-	s2 := errors.New("sentinel.batch.2")
+	sentinel1 := errors.New("sentinel.batch.1")
+	sentinel2 := errors.New("sentinel.batch.2")
 
 	RegisterClassifications(map[error]Family{
-		s1: Conflict,
-		s2: Infrastructure,
+		sentinel1: Conflict,
+		sentinel2: Infrastructure,
 	})
 	t.Cleanup(func() {
-		UnregisterClassification(s1)
-		UnregisterClassification(s2)
+		UnregisterClassification(sentinel1)
+		UnregisterClassification(sentinel2)
 	})
 
-	if Classify(s1) != Conflict {
-		t.Error("batch-registered s1 should classify as Conflict")
+	if Classify(sentinel1) != Conflict {
+		t.Error("batch-registered sentinel1 should classify as Conflict")
 	}
 
-	if Classify(s2) != Infrastructure {
-		t.Error("batch-registered s2 should classify as Infrastructure")
+	if Classify(sentinel2) != Infrastructure {
+		t.Error("batch-registered sentinel2 should classify as Infrastructure")
 	}
 }
 

@@ -69,16 +69,16 @@ func TestLogErrorNilLoggerUsesDefault(t *testing.T) {
 func TestLogErrorContextPropagation(t *testing.T) {
 	ctx := context.WithValue(context.Background(), ctxKey{}, "trace-123")
 
-	h := &ctxRecordingHandler{}
-	logger := slog.New(h)
+	handler := &ctxRecordingHandler{}
+	logger := slog.New(handler)
 
 	LogErrorContext(ctx, NewRejection("c", "m"), logger)
 
-	if h.lastCtx == nil {
+	if handler.lastCtx == nil {
 		t.Fatal("handler did not receive a context")
 	}
 
-	if got := h.lastCtx.Value(ctxKey{}); got != "trace-123" {
+	if got := handler.lastCtx.Value(ctxKey{}); got != "trace-123" {
 		t.Errorf("context not propagated: got %v, want trace-123", got)
 	}
 }

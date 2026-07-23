@@ -469,15 +469,15 @@ func testFamilyProperty[T comparable](t *testing.T, name string, cases []struct 
 }
 
 func TestErrorWithContextMap(t *testing.T) {
-	e := NewTransient("db.timeout", "msg").
+	err := NewTransient("db.timeout", "msg").
 		WithContextMap(map[string]string{"host": "db1", "port": "5432"})
 
-	if e.ContextValue("host") != "db1" {
-		t.Errorf("host = %q, want db1", e.ContextValue("host"))
+	if err.ContextValue("host") != "db1" {
+		t.Errorf("host = %q, want db1", err.ContextValue("host"))
 	}
 
-	if e.ContextValue("port") != "5432" {
-		t.Errorf("port = %q, want 5432", e.ContextValue("port"))
+	if err.ContextValue("port") != "5432" {
+		t.Errorf("port = %q, want 5432", err.ContextValue("port"))
 	}
 }
 

@@ -37,16 +37,16 @@ type Registry struct {
 
 // NewRegistry creates an empty Registry ready for use.
 func NewRegistry() *Registry {
-	r := &Registry{
+	reg := &Registry{
 		templates: make(map[string]MessageTemplate),
 	}
 	empty := make(sentinelMap)
-	r.sentinels.Store(&empty)
+	reg.sentinels.Store(&empty)
 
 	emptyC := make([]Classifier, 0)
-	r.classifiers.Store(&emptyC)
+	reg.classifiers.Store(&emptyC)
 
-	return r
+	return reg
 }
 
 // DefaultRegistry is the package-level Registry used by the convenience
@@ -269,8 +269,8 @@ func (r *Registry) Clone() *Registry {
 
 	// Copy classifiers from the current immutable snapshot (lock-free read).
 	if cur := r.classifiers.Load(); cur != nil {
-		copied := make([]Classifier, len(*cur))
-		copy(copied, *cur)
+		copied := make([]Classifier, 0, len(*cur))
+		copied = append(copied, *cur...)
 		clone.classifiers.Store(&copied)
 	}
 

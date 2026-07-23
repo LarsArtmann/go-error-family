@@ -63,7 +63,7 @@ func TestHandleErrorWithContextPropagatesContext(t *testing.T) {
 	var receivedCtx context.Context
 
 	diagFunc := func(ctx context.Context, _ error) []DiagnosticFinding {
-		receivedCtx := ctx
+		receivedCtx = ctx
 
 		return nil
 	}

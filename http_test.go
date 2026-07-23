@@ -29,7 +29,7 @@ func TestHTTPStatus(t *testing.T) {
 }
 
 func TestHTTPHandlerSuccess(t *testing.T) {
-	h := HTTPHandler(func(w http.ResponseWriter, _ *http.Request) error {
+	handler := HTTPHandler(func(w http.ResponseWriter, _ *http.Request) error {
 		w.WriteHeader(http.StatusOK)
 		_, _ = w.Write([]byte("ok"))
 
@@ -37,7 +37,7 @@ func TestHTTPHandlerSuccess(t *testing.T) {
 	})
 
 	rec := httptest.NewRecorder()
-	h.ServeHTTP(rec, httptest.NewRequestWithContext(context.Background(), http.MethodGet, "/", nil))
+	handler.ServeHTTP(rec, httptest.NewRequestWithContext(context.Background(), http.MethodGet, "/", nil))
 
 	if rec.Code != http.StatusOK {
 		t.Errorf("status = %d, want 200", rec.Code)
@@ -52,12 +52,12 @@ func TestHTTPHandlerClassifiedError(t *testing.T) {
 	RegisterTemplate("http.test", MessageTemplate{What: "A test error occurred."})
 	t.Cleanup(func() { UnregisterTemplate("http.test") })
 
-	h := HTTPHandler(func(_ http.ResponseWriter, _ *http.Request) error {
+	handler := HTTPHandler(func(_ http.ResponseWriter, _ *http.Request) error {
 		return NewConflict("http.test", "internal details that should not leak")
 	})
 
 	rec := httptest.NewRecorder()
-	h.ServeHTTP(
+	handler.ServeHTTP(
 		rec,
 		httptest.NewRequestWithContext(context.Background(), http.MethodPost, "/", nil),
 	)
@@ -93,12 +93,12 @@ func TestHTTPHandlerClassifiedError(t *testing.T) {
 }
 
 func TestHTTPHandlerPlainErrorNoLeak(t *testing.T) {
-	h := HTTPHandler(func(_ http.ResponseWriter, _ *http.Request) error {
+	handler := HTTPHandler(func(_ http.ResponseWriter, _ *http.Request) error {
 		return errors.New("secret internal failure")
 	})
 
 	rec := httptest.NewRecorder()
-	h.ServeHTTP(rec, httptest.NewRequestWithContext(context.Background(), http.MethodGet, "/", nil))
+	handler.ServeHTTP(rec, httptest.NewRequestWithContext(context.Background(), http.MethodGet, "/", nil))
 
 	if rec.Code != http.StatusServiceUnavailable {
 		t.Errorf("status = %d, want 503 (Transient)", rec.Code)

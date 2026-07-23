@@ -114,26 +114,26 @@ func TestRegistryTwoRegistriesIndependent(t *testing.T) {
 
 func TestRegistryBatchRegistration(t *testing.T) {
 	reg := NewRegistry()
-	s1 := errors.New("batch.1")
-	s2 := errors.New("batch.2")
+	sentinel1 := errors.New("batch.1")
+	sentinel2 := errors.New("batch.2")
 
 	reg.RegisterClassifications(map[error]Family{
-		s1: Transient,
-		s2: Rejection,
+		sentinel1: Transient,
+		sentinel2: Rejection,
 	})
 
-	if reg.Classify(s1) != Transient {
-		t.Error("batch-registered s1 should be Transient")
+	if reg.Classify(sentinel1) != Transient {
+		t.Error("batch-registered sentinel1 should be Transient")
 	}
 
-	if reg.Classify(s2) != Rejection {
-		t.Error("batch-registered s2 should be Rejection")
+	if reg.Classify(sentinel2) != Rejection {
+		t.Error("batch-registered sentinel2 should be Rejection")
 	}
 
-	reg.UnregisterClassification(s1)
+	reg.UnregisterClassification(sentinel1)
 
-	if reg.Classify(s1) != Transient {
-		t.Error("after unregister, s1 should fall back to Transient default")
+	if reg.Classify(sentinel1) != Transient {
+		t.Error("after unregister, sentinel1 should fall back to Transient default")
 	}
 }
 

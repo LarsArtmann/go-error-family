@@ -26,6 +26,13 @@ import (
 	"github.com/larsartmann/go-error-family/diagnose"
 )
 
+const (
+	defaultAgentTimeout = 60 * time.Second
+	defaultConfidence   = 0.5
+)
+
+var errAgentDisabled = errors.New("agent is disabled: set agent.Config{Enabled: true}")
+
 // Config controls the behavior of the debug agent.
 type Config struct {
 	// Enabled controls whether the agent is active at all.
@@ -78,7 +85,7 @@ type DebugAgent interface {
 // The agent is disabled by default — set cfg.Enabled = true to activate.
 func New(cfg Config) DebugAgent {
 	if cfg.Timeout == 0 {
-		cfg.Timeout = 60 * time.Second
+		cfg.Timeout = defaultAgentTimeout
 	}
 
 	return &agent{cfg: cfg}
@@ -94,7 +101,7 @@ func (a *agent) Analyze(
 	diagnosis []*diagnose.DiagnosticResult,
 ) (*AgentResult, error) {
 	if !a.cfg.Enabled {
-		return nil, errors.New("agent is disabled: set agent.Config{Enabled: true}")
+		return nil, errAgentDisabled
 	}
 
 	ctx, cancel := context.WithTimeout(ctx, a.cfg.Timeout)
@@ -113,24 +120,24 @@ func (a *agent) deterministicAnalyze(
 	}
 
 	result := &AgentResult{
-		Confidence: 0.5,
+		Confidence: defaultConfidence,
 	}
 
 	var parts []string
 
-	for _, d := range diagnosis {
-		if d.Status == diagnose.StatusFailed {
-			result.Confidence = max(result.Confidence, d.Confidence)
-			parts = append(parts, d.Summary)
+	for _, diag := range diagnosis {
+		if diag.Status == diagnose.StatusFailed {
+			result.Confidence = max(result.Confidence, diag.Confidence)
+			parts = append(parts, diag.Summary)
 			// Structured Fix comes directly from the diagnostic rule — no prose
 			// parsing needed. Emit a FixStep whenever the rule has any guidance.
-			if d.Fix.Command != "" || d.Fix.Summary != "" {
+			if diag.Fix.Command != "" || diag.Fix.Summary != "" {
 				result.FixSteps = append(result.FixSteps, FixStep{
-					Description: d.Summary,
-					Command:     d.Fix.Command,
+					Description: diag.Summary,
+					Command:     diag.Fix.Command,
 					Rationale: fmt.Sprintf(
 						"Diagnostic rule '%s' identified this issue",
-						d.RuleName,
+						diag.RuleName,
 					),
 				})
 			}

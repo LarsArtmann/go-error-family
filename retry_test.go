@@ -6,17 +6,17 @@ import (
 )
 
 func TestFamilyRetryPolicy(t *testing.T) {
-	tp := Transient.RetryPolicy()
-	if tp.MaxAttempts != defaultRetryMaxAttempts {
-		t.Errorf("Transient MaxAttempts = %d, want %d", tp.MaxAttempts, defaultRetryMaxAttempts)
+	policy := Transient.RetryPolicy()
+	if policy.MaxAttempts != defaultRetryMaxAttempts {
+		t.Errorf("Transient MaxAttempts = %d, want %d", policy.MaxAttempts, defaultRetryMaxAttempts)
 	}
 
-	if tp.MinDelay != 100*time.Millisecond {
-		t.Errorf("Transient MinDelay = %v, want 100ms", tp.MinDelay)
+	if policy.MinDelay != 100*time.Millisecond {
+		t.Errorf("Transient MinDelay = %v, want 100ms", policy.MinDelay)
 	}
 
-	if tp.MaxDelay != 5*time.Second {
-		t.Errorf("Transient MaxDelay = %v, want 5s", tp.MaxDelay)
+	if policy.MaxDelay != 5*time.Second {
+		t.Errorf("Transient MaxDelay = %v, want 5s", policy.MaxDelay)
 	}
 
 	for _, f := range []Family{Rejection, Conflict, Corruption, Infrastructure} {
