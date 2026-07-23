@@ -14,9 +14,8 @@ of opt-in modules (`diagnose`, `agent`, `bridge`). The taxonomy is proven across
 multiple consumers (DiscordSync, browser-history, SwettySwipperWeb). The CLI
 story was strengthened with per-error exit code overrides (`ExitCoder`),
 idempotent wrapping (`WrapOnce`), typed context values (`WithContextAny`), and
-panic-safe cause rendering (`safeCauseString`). v0.8.0 code is committed at HEAD
-but **not yet tagged** (latest released tag is `v0.7.0`, 36 commits ahead). The
-focus now is: cutting the v0.8.0 release, deploying the v0.8.0 API changes to
+panic-safe cause rendering (`safeCauseString`). v0.8.0 is released. The
+focus now is: deploying the v0.8.0 API changes to
 the website, verifying the full BuildFlow toolchain, and resolving the few open
 design tensions from consumer feedback. The CI module-graph gate and
 consumer-simulation job shipped; lint is at zero golangci-lint issues (though

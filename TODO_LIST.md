@@ -50,8 +50,6 @@ All six design decisions from the "Design Decisions Needed" section have been re
 
 6. **json/v2 migration strategy** → **REVERTED to `encoding/json`.** The root module no longer imports `encoding/json/v2`. Only 2 call sites marshaled tiny structs — v1 produces identical output. The `GOEXPERIMENT=jsonv2` requirement was the #1 adoption barrier for a zero-dependency library. Removed from flake.nix, CI workflows, and AGENTS.md.
 
-- [ ] **v0.8.0 release** — v0.8.0 code is committed at HEAD but has **not been tagged** (latest tag is `v0.7.0`). The CHANGELOG `[Unreleased]` entry is prepared. A deliberate tag-and-release decision is needed.
-
 ---
 
 ## Completed
