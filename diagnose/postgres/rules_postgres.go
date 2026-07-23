@@ -55,7 +55,7 @@ var postgresSpec = diagnose.RuleSpec{ //nolint:gochecknoglobals // Immutable rul
 	},
 }
 
-func (r *PostgresRule) Run(ctx context.Context, err error) (*diagnose.DiagnosticResult, error) {
+func (r *PostgresRule) Run(ctx context.Context, err error) (*diagnose.DiagnosticResult, error) { //nolint:hierarchical-errors // DiagnosticRule interface
 	host := r.resolveHost(err)
 	port := r.resolvePort(err)
 
@@ -69,7 +69,7 @@ func (r *PostgresRule) Run(ctx context.Context, err error) (*diagnose.Diagnostic
 
 	// Check 1: pg_isready
 	if r.cmdRunner().Exists("pg_isready") {
-		stdout, exitCode, _ := r.cmdRunner().Run(
+		stdout, exitCode, _ := r.cmdRunner().Run( //nolint:hierarchical-errors // diagnostic rules use exit codes
 			ctx,
 			5*time.Second,
 			"pg_isready",
@@ -102,7 +102,7 @@ func (r *PostgresRule) Run(ctx context.Context, err error) (*diagnose.Diagnostic
 	addr := net.JoinHostPort(host, port)
 	conn, dialErr := net.DialTimeout("tcp", addr, 3*time.Second)
 	if dialErr == nil {
-		_ = conn.Close()
+		_ = conn.Close() //nolint:hierarchical-errors // cleanup: close error irrelevant
 		result.Status = diagnose.StatusHealthy
 		result.Summary = fmt.Sprintf(
 			"TCP connection to %s succeeded — PostgreSQL may be running",
@@ -182,7 +182,7 @@ func IsPostgresRunning(ctx context.Context, host, port string) bool {
 
 	runner := diagnose.DefaultCommandRunner{}
 	if runner.Exists("pg_isready") {
-		_, exitCode, _ := runner.Run(
+		_, exitCode, _ := runner.Run( //nolint:hierarchical-errors // diagnostic rules use exit codes
 			ctx,
 			5*time.Second,
 			"pg_isready",
@@ -199,6 +199,6 @@ func IsPostgresRunning(ctx context.Context, host, port string) bool {
 	if err != nil {
 		return false
 	}
-	_ = conn.Close()
+	_ = conn.Close() //nolint:hierarchical-errors // cleanup: close error irrelevant
 	return true
 }

@@ -95,11 +95,11 @@ type agent struct {
 	cfg Config
 }
 
-func (a *agent) Analyze(
+func (a *agent) Analyze( //nolint:hierarchical-errors // DebugAgent interface
 	ctx context.Context,
 	err error,
 	diagnosis []*diagnose.DiagnosticResult,
-) (*AgentResult, error) { //nolint:hierarchical-errors // DebugAgent interface
+) (*AgentResult, error) {
 	if !a.cfg.Enabled {
 		return nil, errAgentDisabled
 	}
@@ -110,11 +110,11 @@ func (a *agent) Analyze(
 	return a.deterministicAnalyze(ctx, err, diagnosis)
 }
 
-func (a *agent) deterministicAnalyze(
+func (a *agent) deterministicAnalyze( //nolint:hierarchical-errors // matches Analyze signature
 	ctx context.Context,
 	err error,
 	diagnosis []*diagnose.DiagnosticResult,
-) (*AgentResult, error) { //nolint:hierarchical-errors // matches Analyze signature
+) (*AgentResult, error) {
 	if ctx.Err() != nil {
 		return nil, ctx.Err()
 	}

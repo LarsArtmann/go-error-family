@@ -47,7 +47,7 @@ var gitSpec = diagnose.RuleSpec{ //nolint:gochecknoglobals // Immutable rule mat
 }
 
 //nolint:nilerr // Diagnostic rules return results, not errors; local stat errors are expected.
-func (r *GitRule) Run(ctx context.Context, err error) (*diagnose.DiagnosticResult, error) {
+func (r *GitRule) Run(ctx context.Context, err error) (*diagnose.DiagnosticResult, error) { //nolint:hierarchical-errors // DiagnosticRule interface
 	repoPath := r.resolveRepoPath(err)
 
 	result := &diagnose.DiagnosticResult{
@@ -94,7 +94,7 @@ func (r *GitRule) checkWorkingTree(
 	result *diagnose.DiagnosticResult,
 	repoPath string,
 ) bool {
-	stdout, exitCode, _ := r.cmdRunner().Run(
+	stdout, exitCode, _ := r.cmdRunner().Run( //nolint:hierarchical-errors // diagnostic rules use exit codes, not Go errors
 		ctx,
 		5*time.Second,
 		"git",
@@ -148,7 +148,7 @@ func (r *GitRule) checkRemote(
 	result *diagnose.DiagnosticResult,
 	repoPath string,
 ) {
-	remotesStdout, _, _ := r.cmdRunner().Run(ctx, 3*time.Second, "git", "-C", repoPath, "remote")
+	remotesStdout, _, _ := r.cmdRunner().Run(ctx, 3*time.Second, "git", "-C", repoPath, "remote") //nolint:hierarchical-errors // diagnostic rules use exit codes
 	if strings.TrimSpace(remotesStdout) == "" {
 		result.Status = diagnose.StatusHealthy
 		result.Summary = "Git repo is clean, no remotes configured: " + repoPath
@@ -156,7 +156,7 @@ func (r *GitRule) checkRemote(
 		return
 	}
 
-	_, remoteExitCode, _ := r.cmdRunner().Run(
+	_, remoteExitCode, _ := r.cmdRunner().Run( //nolint:hierarchical-errors // diagnostic rules use exit codes
 		ctx,
 		10*time.Second,
 		"git",
