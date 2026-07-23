@@ -5,27 +5,40 @@ description: All notable changes to go-error-family.
 
 ## [Unreleased]
 
+## [0.8.0] — 2026-07-23
+
+BuildFlow-inspired error handling additions. All new APIs use only the Go
+standard library — the root package remains zero-dependency.
+
 ### Added
 
+- **`HTTPStatuser` interface** — sixth consumer interface. Errors implementing `HTTPStatus() int` override the family-based HTTP status per-error. Mirrors the `ExitCoder` pattern.
+- **`Error.WithHTTPStatus(status int) *Error`** — copy-on-write mutator (0 = use family default). Example: `NewRejection("battle.not_found", "...").WithHTTPStatus(404)` returns 404 instead of family default 400.
+- **`RegisterClassificationType[T error](family Family)`** — generic type-based classifier sugar. One-liner for the common "type T → Family F" case.
+- **`RegisterClassificationTypeFor[T error](r *Registry, family Family)`** — variant targeting a custom `Registry`.
 - **`ExitCoder` interface** — fifth consumer interface. Errors implementing `ExitCode() int` override the family-based exit code per-error.
 - **`Error.WithExitCode(code int) *Error`** — copy-on-write mutator (0 = use family default).
-- **`Error.WithContextAny(key string, value any) *Error`** — type-safe context attachment for non-string values (int, bool, float64, time.Time, []byte, error, etc.).
-- **`WrapOnce(err, family, code, msg) *Error`** / **`WrapOncef`** — idempotent wrap. Returns the existing `*Error` unchanged if the chain already contains one.
-- **`errorfamilytest.AssertExitCode`** — test assertion for exit codes.
-- **`safeCauseString`** — panic-recovery guard around `cause.Error()` for third-party error types that panic on nil internals.
-- **`Compose(errs...)`** — re-added as backward-compatibility wrapper around `errors.Join` (was removed in v0.5.0, restored per consumer feedback).
-- **Fuzz tests**: `FuzzWrapOnce`, `FuzzContextValueToString`, `FuzzWithExitCode`.
+- **`Error.WithContextAny(key string, value any) *Error`** — type-safe context attachment for non-string values.
+- **`WrapOnce` / `WrapOncef`** — idempotent wrap. Returns the existing `*Error` unchanged if the chain already contains one.
+- **`errorfamilytest.AssertExitCode`** and **`errorfamilytest.AssertHTTPStatus`** — test assertions for exit codes and HTTP status codes.
+- **`safeCauseString`** — panic-recovery guard around `cause.Error()`.
+- **Fuzz tests**: `FuzzWrapOnce`, `FuzzContextValueToString`, `FuzzWithExitCode`, `FuzzWithHTTPStatus`, `FuzzRegisterClassificationType`.
+- **Benchmarks**: `BenchmarkWithExitCode`, `BenchmarkExitCodeOverride`, `BenchmarkWithHTTPStatus`, `BenchmarkHTTPStatusOverride`.
+- **Examples**: `ExampleError_WithHTTPStatus`, `ExampleHTTPStatus`, `ExampleRegisterClassificationType`.
 
 ### Changed
 
-- **`ExitCode(err)` checks `ExitCoder` first** — a non-zero custom exit code wins over family default.
+- **Root module reverted from `encoding/json/v2` to `encoding/json`** — the `GOEXPERIMENT=jsonv2` requirement (introduced in v0.7.0) has been removed. JSON output is byte-identical; only 2 call sites were affected.
+- **`HTTPStatus(err)` checks `HTTPStatuser` first** — a per-error override wins over the family default.
+- **`writeHTTPError` no longer double-classifies** — the `Classify` result is reused for both the response body and the status code.
+- **`ExitCode(err)` checks `ExitCoder` first** — a non-zero custom exit code wins over the family default.
 - **`Error.Error()` / `Summary()` / `formatVerbose()`** use `safeCauseString` for cause rendering.
 
-## [0.7.0] — 2026-07-11
+## [0.7.0] — 2026-07-09
 
-### Changed
+### Changed (BREAKING)
 
-- **Migrated root module from `encoding/json` to `encoding/json/v2`** — requires `GOEXPERIMENT=jsonv2` on Go 1.26. The root module remains zero-dependency (json/v2 is stdlib).
+- **Migrated root module to `encoding/json/v2`** — required `GOEXPERIMENT=jsonv2` on Go 1.26. **Reverted in v0.8.0.**
 
 ## [0.6.1] — 2026-07-05
 

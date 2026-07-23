@@ -37,5 +37,5 @@ The `Registry` uses `atomic.Pointer[sentinelMap]` for lock-free reads:
 ## Reproducing
 
 ```bash
-GOEXPERIMENT=jsonv2 go test -bench=. -benchmem -count=1 ./...
+go test -bench=. -benchmem -count=1 ./...
 ```

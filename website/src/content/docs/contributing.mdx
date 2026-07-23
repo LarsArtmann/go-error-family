@@ -5,7 +5,7 @@ description: How to contribute to go-error-family.
 
 ## Development Setup
 
-**Requirements:** Go 1.26+, `GOEXPERIMENT=jsonv2`
+**Requirements:** Go 1.26+
 
 ```bash
 git clone https://github.com/LarsArtmann/go-error-family.git
@@ -16,14 +16,14 @@ go mod download
 ## Building
 
 ```bash
-GOEXPERIMENT=jsonv2 go build ./...
+go build ./...
 ```
 
 ## Testing
 
 ```bash
 # All tests (root + submodules) with race detection
-GOEXPERIMENT=jsonv2 go test ./... -count=1 -timeout 120s -race
+go test ./... -count=1 -timeout 120s -race
 ```
 
 ## Linting
@@ -31,18 +31,8 @@ GOEXPERIMENT=jsonv2 go test ./... -count=1 -timeout 120s -race
 Uses golangci-lint with strict defaults. Configuration lives in `.golangci.yml`.
 
 ```bash
-GOEXPERIMENT=jsonv2 golangci-lint run ./...
+golangci-lint run ./...
 ```
-
-## GOEXPERIMENT=jsonv2
-
-The root module uses `encoding/json/v2` (Go 1.26 experimental). You must set:
-
-```bash
-export GOEXPERIMENT=jsonv2
-```
-
-before any `go build`, `go test`, or `golangci-lint` command. The nix devShell sets this automatically.
 
 ## Code Style
 
@@ -65,8 +55,8 @@ The four interfaces (`Coded`/`Classified`/`Contextual`/`Retryable`) are the sole
 
 ## Pull Requests
 
-- Ensure all tests pass: `GOEXPERIMENT=jsonv2 go test ./... -count=1 -timeout 120s -race`
-- Ensure linting passes: `GOEXPERIMENT=jsonv2 golangci-lint run ./...`
+- Ensure all tests pass: `go test ./... -count=1 -timeout 120s -race`
+- Ensure linting passes: `golangci-lint run ./...`
 - Add tests for new functionality
 - Keep changes focused and atomic
 - Do not add third-party dependencies to the root module (it must stay zero-dependency)
