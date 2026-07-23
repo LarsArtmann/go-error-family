@@ -150,7 +150,7 @@ func HandleErrorWithContext(ctx context.Context, err error, cfg HandleConfig) in
 
 	message := renderCLI(code, errCtx, family, cfg, reg)
 
-	_, _ = fmt.Fprintln(cfg.Output, message)
+	_, _ = fmt.Fprintln(cfg.Output, message) //nolint:hierarchical-errors // CLI output to stderr
 
 	return exitCode
 }

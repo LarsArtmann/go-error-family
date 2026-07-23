@@ -45,7 +45,9 @@ func (e *Error) Error() string {
 }
 
 // Unwrap returns the underlying cause for error chain traversal.
-func (e *Error) Unwrap() error { return e.cause }
+func (e *Error) Unwrap() error { //nolint:hierarchical-errors // wrapper interface — signature must return error
+	return e.cause
+}
 
 // Is supports errors.Is by matching error code and family.
 // Two errors match if they have the same code AND family.
@@ -102,7 +104,9 @@ func (e *Error) Code() string { return e.code }
 func (e *Error) Message() string { return e.message }
 
 // Cause returns the underlying error in the chain.
-func (e *Error) Cause() error { return e.cause }
+func (e *Error) Cause() error { //nolint:hierarchical-errors // returns cause error, type is not narrowed
+	return e.cause
+}
 
 // Format implements fmt.Formatter.
 //
@@ -112,7 +116,7 @@ func (e *Error) Cause() error { return e.cause }
 func (e *Error) Format(f fmt.State, verb rune) {
 	switch verb {
 	case 's':
-		_, _ = fmt.Fprint(f, e.message)
+		_, _ = fmt.Fprint(f, e.message) //nolint:hierarchical-errors // fmt.Formatter: fmt.State handles write errors
 	case 'v':
 		if f.Flag('+') {
 			e.formatVerbose(f)
@@ -120,34 +124,34 @@ func (e *Error) Format(f fmt.State, verb rune) {
 			return
 		}
 
-		_, _ = fmt.Fprint(f, e.Error())
+		_, _ = fmt.Fprint(f, e.Error()) //nolint:hierarchical-errors // fmt.Formatter
 	default:
-		_, _ = fmt.Fprint(f, e.Error())
+		_, _ = fmt.Fprint(f, e.Error()) //nolint:hierarchical-errors // fmt.Formatter
 	}
 }
 
 func (e *Error) formatVerbose(f fmt.State) {
-	_, _ = fmt.Fprintf(f, "[%s] %s: %s", e.family, e.code, e.message)
+	_, _ = fmt.Fprintf(f, "[%s] %s: %s", e.family, e.code, e.message) //nolint:hierarchical-errors // fmt.Formatter
 
 	if len(e.context) > 0 {
-		_, _ = fmt.Fprint(f, "\n  context:")
+		_, _ = fmt.Fprint(f, "\n  context:") //nolint:hierarchical-errors // fmt.Formatter
 		for k, v := range e.context {
-			_, _ = fmt.Fprintf(f, "\n    %s: %s", k, v)
+			_, _ = fmt.Fprintf(f, "\n    %s: %s", k, v) //nolint:hierarchical-errors // fmt.Formatter
 		}
 	}
 
 	if !e.timestamp.IsZero() {
-		_, _ = fmt.Fprintf(f, "\n  at: %s", e.timestamp.Format(time.RFC3339))
+		_, _ = fmt.Fprintf(f, "\n  at: %s", e.timestamp.Format(time.RFC3339)) //nolint:hierarchical-errors // fmt.Formatter
 	}
 
 	if e.exitCode != 0 {
-		_, _ = fmt.Fprintf(f, "\n  exit_code: %d", e.exitCode)
+		_, _ = fmt.Fprintf(f, "\n  exit_code: %d", e.exitCode) //nolint:hierarchical-errors // fmt.Formatter
 	}
 
 	if e.cause != nil {
 		causeMsg := safeCauseString(e.cause)
 		if causeMsg != "" {
-			_, _ = fmt.Fprintf(f, "\n  caused by: %s", causeMsg)
+			_, _ = fmt.Fprintf(f, "\n  caused by: %s", causeMsg) //nolint:hierarchical-errors // fmt.Formatter
 		}
 	}
 }
@@ -267,7 +271,7 @@ func (e *Error) ExitCode() int { return e.exitCode }
 // fmt.Sprintf callers, returning an empty string instead.
 func safeCauseString(cause error) string {
 	defer func() {
-		_ = recover()
+		_ = recover() //nolint:hierarchical-errors // panic recovery: value intentionally discarded
 	}()
 
 	return cause.Error()
@@ -352,7 +356,7 @@ type jsonError struct {
 // The shape is stable: {family, code, message, context, retryable, timestamp}.
 // Use this for HTTP/REST error responses where a structured body is preferable
 // to the [transient:code] message format of Error().
-func (e *Error) JSON() ([]byte, error) {
+func (e *Error) JSON() ([]byte, error) { //nolint:hierarchical-errors // marshaler pattern — must return error
 	view := jsonError{
 		Family:    e.family.String(),
 		Code:      e.code,

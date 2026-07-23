@@ -92,7 +92,9 @@ func ExitCode(err error) int {
 // Compose joins multiple errors into one, preserving all in the Unwrap chain.
 // It is a thin wrapper around [errors.Join] kept for backward compatibility
 // with consumers that imported Compose before v0.5.0 reorganized the package.
-func Compose(errs ...error) error { return errors.Join(errs...) }
+func Compose(errs ...error) error { //nolint:hierarchical-errors // wraps errors.Join, must return error
+	return errors.Join(errs...)
+}
 
 // RegisterClassification maps a third-party sentinel error to a Family.
 // Thread-safe. Call from init() in external packages:

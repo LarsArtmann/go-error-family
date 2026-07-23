@@ -99,7 +99,7 @@ func (a *agent) Analyze(
 	ctx context.Context,
 	err error,
 	diagnosis []*diagnose.DiagnosticResult,
-) (*AgentResult, error) {
+) (*AgentResult, error) { //nolint:hierarchical-errors // DebugAgent interface
 	if !a.cfg.Enabled {
 		return nil, errAgentDisabled
 	}
@@ -114,7 +114,7 @@ func (a *agent) deterministicAnalyze(
 	ctx context.Context,
 	err error,
 	diagnosis []*diagnose.DiagnosticResult,
-) (*AgentResult, error) {
+) (*AgentResult, error) { //nolint:hierarchical-errors // matches Analyze signature
 	if ctx.Err() != nil {
 		return nil, ctx.Err()
 	}
