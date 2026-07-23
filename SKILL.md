@@ -15,9 +15,9 @@ A structured error protocol for Go. Every error gets a behavioral **Family** (re
 errorfamily/          ← root module: types, constructors, classification, CLI boundary
   error.go              Error struct (reference implementation)
   family.go             Family enum + Audience/Tone metadata
-  interfaces.go         Coded, Classified, Contextual, Retryable, ExitCoder
+  interfaces.go         Coded, Classified, Contextual, Retryable, ExitCoder, HTTPStatuser
   constructors.go       New/Wrap + family shortcuts (incl. Wrap{Family}f formatted variants)
-  classify.go           Classify(), Code(), IsRetryable, ExitCode, Classifier, RegisterClassification(s), RegisterClassifier(s)
+  classify.go           Classify(), Code(), IsRetryable, ExitCode, HTTPStatus, Classifier, RegisterClassification(s), RegisterClassifier(s), RegisterClassificationType[T]
   registry.go           Registry type (injectable sentinels + classifiers + templates), DefaultRegistry, NewRegistry(), TemplateForCode()
   handle.go             HandleError(), HandleErrorWithContext(), HandleErrorDetailed(), template system
   http.go               HTTPStatus(), HTTPHandler() — classify→status-code net/http middleware
@@ -128,9 +128,14 @@ type ExitCoder interface {    // per-error exit code override (0 = use family de
     error
     ExitCode() int
 }
+
+type HTTPStatuser interface { // per-error HTTP status override (0 = use family default)
+    error
+    HTTPStatus() int
+}
 ```
 
-`*Error` implements all five. Third-party error types can implement whichever subset makes sense.
+`*Error` implements all six. Third-party error types can implement whichever subset makes sense.
 
 ---
 
@@ -160,6 +165,7 @@ err.WithContextAny(key string, value any) *Error   // type-safe: string, int, in
 err.WithCause(cause error) *Error
 err.WithTimestamp(ts time.Time) *Error   // deterministic timestamp for tests
 err.WithExitCode(code int) *Error        // override family exit code (0 = use default)
+err.WithHTTPStatus(status int) *Error    // override family HTTP status (0 = use default)
 
 // Serialization
 err.JSON() ([]byte, error)              // canonical JSON for API boundaries: {family,code,message,context,retryable,timestamp}
@@ -260,6 +266,11 @@ errorfamily.RegisterClassifier(func(err error) (errorfamily.Family, bool) {
     }
     return errorfamily.Transient, false
 })
+
+// Register a type-based classifier (sugar over RegisterClassifier for "type T → Family F")
+errorfamily.RegisterClassificationType[*sqlite.Error](errorfamily.Transient)
+// Or on a custom registry:
+errorfamily.RegisterClassificationTypeFor[*sqlite.Error](reg, errorfamily.Transient)
 
 // Register stdlib taxonomy (context/sql/os errors with documented rationale)
 errorfamily.RegisterStdlibDefaults(errorfamily.DefaultRegistry)
@@ -620,6 +631,8 @@ errorfamilytest.AssertCode(t, err, "user.not_found")
 errorfamilytest.AssertRetryable(t, err, false)
 errorfamilytest.AssertContext(t, err, "user_id", "42")
 errorfamilytest.AssertContextMissing(t, sentinelErr, "field")
+errorfamilytest.AssertExitCode(t, err, 1)              // checks ExitCoder override first
+errorfamilytest.AssertHTTPStatus(t, err, 404)          // checks HTTPStatuser override first
 ```
 
 Test files by area (run `find . -name '*_test.go'` for the canonical list):

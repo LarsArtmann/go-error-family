@@ -221,12 +221,14 @@ func FuzzRegisterClassificationType(f *testing.F) {
 
 		err := &fuzzDynamicError{msg: msg}
 		got := reg.Classify(err)
+
 		if got != Conflict {
 			t.Errorf("Classify = %v, want Conflict", got)
 		}
 
 		wrapped := fmt.Errorf("wrapped: %w", err)
 		gotWrapped := reg.Classify(wrapped)
+
 		if gotWrapped != Conflict {
 			t.Errorf("Classify(wrapped) = %v, want Conflict", gotWrapped)
 		}
