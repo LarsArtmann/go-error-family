@@ -124,6 +124,25 @@ func TestAssertExitCodeMismatch(t *testing.T) {
 	}
 }
 
+func TestAssertHTTPStatus(t *testing.T) {
+	errorfamilytest.AssertHTTPStatus(t, errorfamily.NewRejection("c", "m"), 400)
+	errorfamilytest.AssertHTTPStatus(t, errorfamily.NewConflict("c", "m"), 409)
+	errorfamilytest.AssertHTTPStatus(t, errorfamily.NewTransient("c", "m"), 503)
+	errorfamilytest.AssertHTTPStatus(t, errorfamily.NewRejection("c", "m").WithHTTPStatus(404), 404)
+	errorfamilytest.AssertHTTPStatus(t, nil, 400)
+}
+
+func TestAssertHTTPStatusMismatch(t *testing.T) {
+	rec := newFailureRecorder(t)
+	rec.run(func() {
+		errorfamilytest.AssertHTTPStatus(rec, errorfamily.NewRejection("c", "m"), 500)
+	})
+
+	if !rec.failed {
+		t.Fatal("expected AssertHTTPStatus to fail on mismatch")
+	}
+}
+
 // --- failureRecorder: intercepts test failures without failing the outer test ---
 
 type fatalSentinel struct{}

@@ -179,3 +179,56 @@ func FuzzWithExitCode(f *testing.F) {
 		}
 	})
 }
+
+// FuzzWithHTTPStatus verifies that WithHTTPStatus never panics and that the
+// package-level HTTPStatus function resolves the override correctly.
+func FuzzWithHTTPStatus(f *testing.F) {
+	f.Add(200)
+	f.Add(404)
+	f.Add(0)
+	f.Add(500)
+	f.Add(422)
+
+	f.Fuzz(func(t *testing.T, status int) {
+		err := NewTransient("test", "msg").WithHTTPStatus(status)
+		if got := err.HTTPStatus(); got != status {
+			t.Errorf("HTTPStatus() = %d, want %d", got, status)
+		}
+
+		if status != 0 {
+			if got := HTTPStatus(err); got != status {
+				t.Errorf("package HTTPStatus = %d, want %d (override)", got, status)
+			}
+		}
+	})
+}
+
+type fuzzDynamicError struct{ msg string }
+
+func (e *fuzzDynamicError) Error() string { return e.msg }
+
+// FuzzRegisterClassificationType verifies that RegisterClassificationTypeFor
+// never panics and correctly classifies arbitrary errors of the registered type.
+func FuzzRegisterClassificationType(f *testing.F) {
+	f.Add("database is locked")
+	f.Add("connection refused")
+	f.Add("")
+	f.Add("constraint failed: NOT NULL")
+
+	f.Fuzz(func(t *testing.T, msg string) {
+		reg := NewRegistry()
+		RegisterClassificationTypeFor[*fuzzDynamicError](reg, Conflict)
+
+		err := &fuzzDynamicError{msg: msg}
+		got := reg.Classify(err)
+		if got != Conflict {
+			t.Errorf("Classify = %v, want Conflict", got)
+		}
+
+		wrapped := fmt.Errorf("wrapped: %w", err)
+		gotWrapped := reg.Classify(wrapped)
+		if gotWrapped != Conflict {
+			t.Errorf("Classify(wrapped) = %v, want Conflict", gotWrapped)
+		}
+	})
+}

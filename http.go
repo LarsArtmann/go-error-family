@@ -78,8 +78,15 @@ func writeHTTPError(w http.ResponseWriter, err error) {
 		body["message"] = tmpl.What
 	}
 
+	status := family.HTTPStatus()
+	if hs, ok := errors.AsType[HTTPStatuser](err); ok {
+		if s := hs.HTTPStatus(); s != 0 {
+			status = s
+		}
+	}
+
 	w.Header().Set("Content-Type", "application/json; charset=utf-8")
-	w.WriteHeader(HTTPStatus(err))
+	w.WriteHeader(status)
 
 	data, marshalErr := json.Marshal(body)
 	if marshalErr != nil {

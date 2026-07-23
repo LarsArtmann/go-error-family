@@ -98,3 +98,15 @@ func AssertExitCode(tb testing.TB, err error, want int) {
 		tb.Errorf("ExitCode(%v) = %d, want %d", err, got, want)
 	}
 }
+
+// AssertHTTPStatus asserts that err resolves to the expected HTTP response
+// status code via [errorfamily.HTTPStatus]. This checks the HTTPStatuser
+// interface first (for per-error overrides set via WithHTTPStatus), then
+// falls back to the family default. A nil err classifies as Rejection → 400.
+func AssertHTTPStatus(tb testing.TB, err error, want int) {
+	tb.Helper()
+
+	if got := errorfamily.HTTPStatus(err); got != want {
+		tb.Errorf("HTTPStatus(%v) = %d, want %d", err, got, want)
+	}
+}
