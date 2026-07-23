@@ -161,7 +161,9 @@ func RegisterClassifiers(cs ...Classifier) {
 // For a custom [Registry], use [RegisterClassificationTypeFor].
 //
 // Delegates to [DefaultRegistry].
-func RegisterClassificationType[T error](family Family) { //nolint:hierarchical-errors // generic constraint, must embed error
+func RegisterClassificationType[T error](
+	family Family,
+) { //nolint:hierarchical-errors // generic constraint, must embed error
 	RegisterClassificationTypeFor[T](DefaultRegistry, family)
 }
 
@@ -172,11 +174,15 @@ func RegisterClassificationType[T error](family Family) { //nolint:hierarchical-
 //
 // Go does not permit type parameters on methods, so this is a top-level
 // function rather than a method on [Registry].
-func RegisterClassificationTypeFor[T error](r *Registry, family Family) { //nolint:hierarchical-errors // generic constraint, must embed error
+func RegisterClassificationTypeFor[T error](
+	r *Registry,
+	family Family,
+) { //nolint:hierarchical-errors // generic constraint, must embed error
 	r.RegisterClassifier(func(err error) (Family, bool) {
 		if _, ok := errors.AsType[T](err); ok {
 			return family, true
 		}
+
 		return Rejection, false
 	})
 }

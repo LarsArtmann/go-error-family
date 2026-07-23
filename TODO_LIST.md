@@ -12,7 +12,7 @@ traceable to its source. When an item ships, remove it here and record it in
 
 ### High Priority
 
-- [ ] **Rebuild and deploy website** — the live site at `errorfamily.lars.software` is stale. API changes from v0.8.0 (ExitCoder, WrapOnce, WithContextAny) have not been deployed. The website docs have been audited and fixed (stale `SuggestedFix` refs corrected, missing v0.8.0 APIs added to api-reference.mdx, error-types.mdx, and changelog.mdx), but the build was never verified (`astro check`/`astro build` not run after the 12-factor guide was added). Source: status report 2026-07-23_15-08 section c.1.
+- [ ] **Rebuild and deploy website** — the live site at `errorfamily.lars.software` is stale. API changes from v0.8.0 (ExitCoder, WrapOnce, WithContextAny, WithHTTPStatus, RegisterClassificationType) have not been deployed. The website docs have been audited and fixed (stale `SuggestedFix` refs corrected, missing v0.8.0 APIs added to api-reference.mdx, error-types.mdx, and changelog.mdx), but the build was never verified (`astro check`/`astro build` not run after the 12-factor guide was added). Source: status report 2026-07-23_15-08 section c.1.
 
 ### Medium Priority
 
@@ -32,21 +32,21 @@ traceable to its source. When an item ships, remove it here and record it in
 
 ---
 
-## Design Decisions Needed
+## Design Decisions Resolved (2026-07-23)
 
-These require a product decision before implementation. They are NOT actionable tasks yet.
+All six design decisions from the "Design Decisions Needed" section have been resolved:
 
-- [ ] **Per-error HTTP status override (`Error.WithHTTPStatus(code int)`)** — SwettySwipper's #1 request. `battle.not_found` should be 404, not the family default 400. Core tension: is HTTP status a classification concern (library) or a presentation concern (HTTP handler)? Source: SwettySwipper S5.
+1. **Per-error HTTP status override** → **SHIPPED.** `Error.WithHTTPStatus(code int)` + `HTTPStatuser` interface. Mirrors the `ExitCoder`/`WithExitCode` pattern exactly: per-error override of family-level default, 0 = use family default. `HTTPStatus(err)` and `HTTPHandler` both check the interface. Rationale: `WithExitCode` already set the precedent — per-error overrides of family defaults are an accepted pattern. `battle.not_found` = 404 is undeniable.
 
-- [ ] **`Classify(nil)` semantics** — DiscordSync argues Rejection is inconsistent with fail-open. Options: keep Rejection (current), change to Infrastructure (programming error), or change to Transient (fail-open). Changing is breaking. Source: DiscordSync D4.
+2. **`Classify(nil)` semantics** → **KEPT Rejection.** Nil = caller bug. Changing to Transient would make `HTTPStatus(nil)` → 503 (success becomes "service unavailable"). The fail-open principle applies to *unknown* errors, not *nil* errors — they are fundamentally different situations. Changing is also breaking.
 
-- [ ] **Constructor context ergonomics** — builder pattern, variadic context, or functional options to avoid 3-line `.WithContext().WithContext()` chains. Source: DiscordSync D1.
+3. **Constructor context ergonomics** → **WON'T FIX.** `WithContextMap(map[string]string{...})` already exists for multi-value context. Functional options would conflict with copy-on-write design. The chain complaint is cosmetic, not structural.
 
-- [ ] **"Frozen" registry flag** — prevent runtime mutation of `DefaultRegistry` after first `Classify` call to detect programming errors. Source: DiscordSync D2.
+4. **"Frozen" registry flag** → **WON'T FIX.** `atomic.Pointer` makes late registrations safe — no correctness issue to catch. Would break config-driven registration. Document the expected lifecycle instead of enforcing it.
 
-- [ ] **`RegisterClassificationType[T error](family Family)`** — generic type-based registration via `errors.As`. More ergonomic than `RegisterClassifier` closure for the common case. Source: DiscordSync D5.
+5. **`RegisterClassificationType[T error]`** → **SHIPPED.** Two top-level functions: `RegisterClassificationType[T](family)` (DefaultRegistry) and `RegisterClassificationTypeFor[T](r, family)` (custom Registry). Go doesn't allow type parameters on methods, so the Registry-specific variant is a top-level function rather than a method. Non-breaking, pure sugar over `RegisterClassifier`.
 
-- [ ] **json/v2 migration strategy** — the root is on `encoding/json/v2` (experimental). Decide: keep until stable, or revert to `encoding/json` until Go makes json/v2 non-experimental. Source: status report 2026-07-09.
+6. **json/v2 migration strategy** → **REVERTED to `encoding/json`.** The root module no longer imports `encoding/json/v2`. Only 2 call sites marshaled tiny structs — v1 produces identical output. The `GOEXPERIMENT=jsonv2` requirement was the #1 adoption barrier for a zero-dependency library. Removed from flake.nix, CI workflows, and AGENTS.md.
 
 - [ ] **v0.8.0 release** — v0.8.0 code is committed at HEAD but has **not been tagged** (latest tag is `v0.7.0`). The CHANGELOG `[Unreleased]` entry is prepared. A deliberate tag-and-release decision is needed.
 

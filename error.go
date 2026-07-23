@@ -20,14 +20,14 @@ import (
 //
 // Implements: error, Coded, Classified, Contextual, Retryable, ExitCoder, fmt.Formatter.
 type Error struct {
-	code      string            // machine-readable identity (e.g. "db.timeout")
-	message   string            // human-readable technical message
-	family    Family            // behavioral classification
-	context   map[string]string // factual details about the error
-	cause     error             // underlying error in the chain
-	timestamp time.Time         // when the error occurred
-	exitCode  int               // optional override; 0 = use family default
-	httpStatus int              // optional override; 0 = use family default
+	code       string            // machine-readable identity (e.g. "db.timeout")
+	message    string            // human-readable technical message
+	family     Family            // behavioral classification
+	context    map[string]string // factual details about the error
+	cause      error             // underlying error in the chain
+	timestamp  time.Time         // when the error occurred
+	exitCode   int               // optional override; 0 = use family default
+	httpStatus int               // optional override; 0 = use family default
 }
 
 // Error implements the error interface.

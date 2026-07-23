@@ -85,5 +85,6 @@ func writeHTTPError(w http.ResponseWriter, err error) {
 	if marshalErr != nil {
 		return
 	}
+
 	_, _ = w.Write(data)
 }

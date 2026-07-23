@@ -9,13 +9,14 @@ import (
 // New creates a new Error with the given family, code, and message.
 func New(family Family, code, message string) *Error {
 	return &Error{
-		code:      code,
-		message:   message,
-		family:    family,
-		cause:     nil,
-		context:   make(map[string]string),
-		timestamp: time.Now().UTC(),
-		exitCode:  0,
+		code:       code,
+		message:    message,
+		family:     family,
+		cause:      nil,
+		context:    make(map[string]string),
+		timestamp:  time.Now().UTC(),
+		exitCode:   0,
+		httpStatus: 0,
 	}
 }
 
@@ -32,13 +33,14 @@ func Wrap(err error, family Family, code, message string) *Error {
 	}
 
 	return &Error{
-		code:      code,
-		message:   message,
-		family:    family,
-		cause:     err,
-		context:   make(map[string]string),
-		timestamp: time.Now().UTC(),
-		exitCode:  0,
+		code:       code,
+		message:    message,
+		family:     family,
+		cause:      err,
+		context:    make(map[string]string),
+		timestamp:  time.Now().UTC(),
+		exitCode:   0,
+		httpStatus: 0,
 	}
 }
 
