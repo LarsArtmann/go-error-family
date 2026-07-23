@@ -208,3 +208,17 @@ func BenchmarkExitCodeOverride(b *testing.B) {
 		_ = ExitCode(e)
 	}
 }
+
+func BenchmarkWithHTTPStatus(b *testing.B) {
+	e := NewTransient("db.timeout", "msg")
+	for b.Loop() {
+		_ = e.WithHTTPStatus(404)
+	}
+}
+
+func BenchmarkHTTPStatusOverride(b *testing.B) {
+	e := NewTransient("db.timeout", "msg").WithHTTPStatus(502)
+	for b.Loop() {
+		_ = HTTPStatus(e)
+	}
+}

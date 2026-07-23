@@ -146,3 +146,38 @@ func ExampleExitCode() {
 	// 1
 	// 5
 }
+
+func ExampleError_WithHTTPStatus() {
+	// Override the family-based HTTP status for a specific error.
+	// The family default for Rejection is 400 (Bad Request), but a
+	// "not found" error is more precisely a 404.
+	err := NewRejection("battle.not_found", "battle not found").WithHTTPStatus(404)
+	fmt.Println(err.HTTPStatus())
+	// Output: 404
+}
+
+func ExampleHTTPStatus() {
+	// HTTPStatus checks the HTTPStatuser interface first (per-error override),
+	// then falls back to the family's canonical HTTP status.
+	fmt.Println(HTTPStatus(NewRejection("bad.input", "msg")))
+	fmt.Println(HTTPStatus(NewConflict("order.duplicate", "msg")))
+	fmt.Println(HTTPStatus(NewRejection("not.found", "msg").WithHTTPStatus(404)))
+	// Output: 400
+	// 409
+	// 404
+}
+
+func ExampleRegisterClassificationType() {
+	// RegisterClassificationType maps any error of type T to a Family.
+	// Useful for dynamic third-party errors where every instance is fresh.
+	reg := NewRegistry()
+	RegisterClassificationTypeFor[*exampleSQLError](reg, Transient)
+
+	err := &exampleSQLError{msg: "database is locked"}
+	fmt.Println(reg.Classify(err))
+	// Output: transient
+}
+
+type exampleSQLError struct{ msg string }
+
+func (e *exampleSQLError) Error() string { return e.msg }
