@@ -285,8 +285,7 @@ func (e *fakeSQLiteError) Error() string { return fmt.Sprintf("sqlite: code %d",
 func TestRegistryRegisterClassifierDynamic(t *testing.T) {
 	reg := NewRegistry()
 	reg.RegisterClassifier(func(err error) (Family, bool) {
-		var sq *fakeSQLiteError
-		if errors.As(err, &sq) {
+		if sq, ok := errors.AsType[*fakeSQLiteError](err); ok {
 			switch sq.code {
 			case 5, 6:
 				return Transient, true // BUSY, LOCKED
@@ -442,8 +441,7 @@ func TestPackageLevelRegisterClassifier(t *testing.T) {
 		// Highly specific — only matches our marker type. Stays registered but
 		// cannot affect other tests because nothing else returns this type.
 		func(err error) (Family, bool) {
-			var m pkgLevelClassifierError
-			if errors.As(err, &m) {
+			if _, ok := errors.AsType[pkgLevelClassifierError](err); ok {
 				return Corruption, true
 			}
 
@@ -469,8 +467,7 @@ func (pkgLevelSingularError) Error() string { return "singular marker" }
 
 func TestPackageLevelRegisterClassifierSingular(t *testing.T) {
 	RegisterClassifier(func(err error) (Family, bool) {
-		var m pkgLevelSingularError
-		if errors.As(err, &m) {
+		if _, ok := errors.AsType[pkgLevelSingularError](err); ok {
 			return Infrastructure, true
 		}
 

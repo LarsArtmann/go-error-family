@@ -60,15 +60,15 @@ func TestErrorIs(t *testing.T) {
 	err3 := NewConflict("test.code", "msg1")
 	err4 := NewRejection("other.code", "msg1")
 
-	if !errors.Is(err1, err2) {
+	if !errors.Is(err1, err2) { //nolint:legacyerrors // tests *Error.Is() value matching (code+family), not type extraction
 		t.Error("errors.Is should match same code+family")
 	}
 
-	if errors.Is(err1, err3) {
+	if errors.Is(err1, err3) { //nolint:legacyerrors // tests *Error.Is() value matching (code+family)
 		t.Error("errors.Is should not match different family")
 	}
 
-	if errors.Is(err1, err4) {
+	if errors.Is(err1, err4) { //nolint:legacyerrors // tests *Error.Is() value matching (code+family)
 		t.Error("errors.Is should not match different code")
 	}
 }
@@ -442,7 +442,7 @@ func TestErrorChain(t *testing.T) {
 		t.Error("Classify should find Family through chain")
 	}
 
-	if !errors.Is(top, mid) {
+	if !errors.Is(top, mid) { //nolint:legacyerrors // tests *Error.Is() value matching through wrap chain
 		t.Error("errors.Is should match through chain")
 	}
 
