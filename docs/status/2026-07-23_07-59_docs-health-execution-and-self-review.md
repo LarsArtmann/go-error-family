@@ -231,3 +231,16 @@ This is the same question from the prior session's report (Q2). The code is comm
 ---
 
 _Generated 2026-07-23 07:59 CEST. Auto-commit hook fired before I could commit manually._
+
+---
+
+## Resolution (2026-07-23)
+
+| Item flagged here | Status |
+| ----------------- | ------ |
+| b.2 / c.2 — AGENTS.md stale (`//nolint:cyclop` ref) | **Fixed.** The 08-35 lint session corrected AGENTS.md — no `cyclop` reference remains. `contextValueToString` → `scalarToString` split and `time.Duration` case are documented. |
+| c.1 — FEATURES.md not updated | **Fixed.** FEATURES.md reflects current API (verified 2026-07-23). |
+| b.3 — 96 lint issues | **Fixed.** The 08-35 session eliminated all 154 golangci-lint issues across 7 modules (0 remaining). |
+| Q1 (amend `e9c7219`?) | Left as-is. The misleading mega-commit message stands; 11 more auto-commits followed in the 15-52 session with equally generic messages. |
+| Q2 (CHANGELOG internal entries?) | The `[Unreleased]` CHANGELOG still contains internal entries (contextValueToString refactor, WithExitCode godoc). Kept for transparency. |
+| Q3 (v0.8.0 untagged?) | **Still open.** Latest tag is `v0.7.0`. Tracked in TODO_LIST "Design Decisions Needed". |

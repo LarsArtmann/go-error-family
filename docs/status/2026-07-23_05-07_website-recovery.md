@@ -217,3 +217,22 @@ The site was recovered in this session by creating the missing Firebase hosting 
 | 04:38       | Staged ACME TXT record in Terraform                   | fmt + validate pass                                   |
 | 04:39       | Attempted commit (pre-commit hook)                    | Failed (corrupted flake.lock)                         |
 | 04:39       | Committed with `--no-verify`                          | Success                                               |
+
+---
+
+## Resolution (2026-07-23)
+
+The site recovery itself held — the website source docs were later audited and fixed (07-59 session: stale `SuggestedFix` refs corrected, v0.8.0 APIs added to `api-reference.mdx`/`error-types.mdx`/`changelog.mdx`). The 12-factor logs guide was added (15-08 session, commit `c9094d5`).
+
+**Still open** (tracked in TODO_LIST unless noted):
+
+| Item (this report) | Status | Where tracked |
+| ------------------ | ------ | ------------- |
+| ACME TXT DNS record (b.1) | Open — Namecheap API key still placeholder | TODO_LIST "Apply ACME TXT DNS record" |
+| CI/CD for website deploys (c.5/e.3) | Open — no GitHub Actions workflow | TODO_LIST "Set up CI/CD for website deploys" |
+| Rebuild & deploy v0.8.0 site | Open — live site is stale | TODO_LIST "Rebuild and deploy website" |
+| `astro check` / `html-validate` (c.1/c.2) | Open — never run | TODO_LIST "Rebuild and deploy website" |
+| Domains repo `flake.lock` corruption (d.1) | Open — pre-existing, affects all sibling sites | Cross-repo; not actionable in this repo |
+| Uptime monitor (e.1) | Open | Not yet in TODO_LIST (low priority) |
+
+**Resolved by later sessions:** Firebase hosting site exists and serves; cert provisioned via HTTP challenge; website docs audited and v0.8.0 APIs documented.
