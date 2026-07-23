@@ -11,35 +11,42 @@ Continuation of the 2026-07-23 17:56 session ("Design Decisions Resolved + json/
 ## A) FULLY DONE
 
 ### 1. Fixed `writeHTTPError` double-classify bug (`http.go:81-86`)
+
 - **Problem:** `writeHTTPError` called `Classify(err)` at line 66 for the response body, then `HTTPStatus(err)` at line 82 which internally called `Classify(err)` again. Every HTTP error response classified the error twice.
 - **Fix:** Reuse the already-computed `family` variable. Check `HTTPStatuser` interface inline (same pattern as `ExitCode` function). `Classify` now runs exactly once per HTTP error.
 - **Verified:** `BenchmarkHTTPStatusOverride` confirms the path works; existing `TestHTTPHandlerWithStatusOverride` confirms behavior.
 
 ### 2. Added `AssertHTTPStatus` to `errorfamilytest`
+
 - Mirrors `AssertExitCode` exactly: checks `HTTPStatuser` interface first, falls back to family default.
 - **Tests added:** `TestAssertHTTPStatus` (5 cases: Rejection 400, Conflict 409, Transient 503, override 404, nil 400) + `TestAssertHTTPStatusMismatch` (failure path).
 
 ### 3. Added 2 fuzz tests
+
 - **`FuzzWithHTTPStatus`** — verifies `WithHTTPStatus` never panics and `HTTPStatus()` round-trips. Seeds: 200, 404, 0, 500, 422. Ran 5s/1.1M execs — PASS.
 - **`FuzzRegisterClassificationType`** — verifies `RegisterClassificationTypeFor` never panics, classifies direct + wrapped (`%w`) errors correctly. Seeds: 4 strings. Ran 5s/1.5M execs — PASS.
 
 ### 4. Added 3 examples
+
 - **`ExampleError_WithHTTPStatus`** — Rejection error with 404 override.
 - **`ExampleHTTPStatus`** — package-level function with default + override (3 cases).
 - **`ExampleRegisterClassificationType`** — generic type registration on a custom registry.
 
 ### 5. Added 3 benchmarks
+
 - **`BenchmarkWithHTTPStatus`** — copy-on-write mutator cost.
 - **`BenchmarkHTTPStatus`** — package function without override (baseline).
 - **`BenchmarkHTTPStatusOverride`** — package function with override set.
 
 ### 6. Fixed website split brain (4 `.mdx` files)
+
 - **`installation.mdx`** — Removed GOEXPERIMENT requirement line + entire "GOEXPERIMENT=jsonv2" section (setup instructions, nix snippet, "will become non-experimental" note).
 - **`contributing.mdx`** — Removed all 9 GOEXPERIMENT references (requirements line, build/test/lint commands, entire section with explanation, PR checklist commands).
 - **`benchmarks.mdx`** — Removed GOEXPERIMENT prefix from benchmark reproduction command.
 - **`changelog.mdx`** — Promoted `[Unreleased]` to `[0.8.0]` with full v0.8.0 changelog (HTTPStatuser, WithHTTPStatus, RegisterClassificationType, AssertHTTPStatus, writeHTTPError fix, json/v2 revert). Annotated v0.7.0 entry with "**Reverted in v0.8.0.**"
 
 ### 7. Updated SKILL.md API reference
+
 - **Architecture at a Glance:** `interfaces.go` line updated to include `HTTPStatuser`; `classify.go` line updated to include `HTTPStatus`, `RegisterClassificationType[T]`.
 - **Consumer Interfaces:** Added `HTTPStatuser` interface block after `ExitCoder`. Updated count from "all five" to "all six."
 - **Error Struct Methods:** Added `WithHTTPStatus(status int) *Error` after `WithExitCode`.
@@ -48,32 +55,36 @@ Continuation of the 2026-07-23 17:56 session ("Design Decisions Resolved + json/
 - **Coverage numbers:** Updated to 97.0% root / 96.3% errorfamilytest.
 
 ### 8. Updated AGENTS.md + CHANGELOG.md
+
 - AGENTS.md coverage table updated (97.0% / 96.3%). Fuzz tests list updated with 2 new entries.
 - CHANGELOG.md v0.8.0 section updated: added `AssertHTTPStatus`, `writeHTTPError` double-classify fix, expanded benchmarks/examples/fuzz lists.
 
 ### Quality Gates (all pass)
 
-| Gate | Result |
-|------|--------|
-| `go test -race` (root + errorfamilytest) | PASS (1.05s) |
-| `go test -race` (agent, bridge, diagnose) | PASS |
-| `golangci-lint run ./...` | 0 issues |
-| `go build ./...` | Clean |
-| `GOWORK=off go build ./...` | Clean (zero-dep verified) |
-| `nix fmt` | Idempotent (0 changed on 2nd run) |
-| `nix flake check` | All 4 checks passed |
+| Gate                                      | Result                            |
+| ----------------------------------------- | --------------------------------- |
+| `go test -race` (root + errorfamilytest)  | PASS (1.05s)                      |
+| `go test -race` (agent, bridge, diagnose) | PASS                              |
+| `golangci-lint run ./...`                 | 0 issues                          |
+| `go build ./...`                          | Clean                             |
+| `GOWORK=off go build ./...`               | Clean (zero-dep verified)         |
+| `nix fmt`                                 | Idempotent (0 changed on 2nd run) |
+| `nix flake check`                         | All 4 checks passed               |
 
 ---
 
 ## B) PARTIALLY DONE
 
 ### 1. Coverage investigation — identified root cause but did NOT fix
+
 Coverage dropped from 97.6% to 97.0%. Root cause identified via `go tool cover -func`:
+
 - **`RegisterClassificationType` (classify.go:164) — 0% coverage.** The top-level convenience function (delegates to `DefaultRegistry`) is never called in tests. Only `RegisterClassificationTypeFor` (custom registry variant) is tested. This is a genuine gap in my test coverage.
 - `Compose` (classify.go:95) — 0% — pre-existing, not from this session.
 - Minor partial coverage on `HTTPStatus` (83.3%), `writeHTTPError` (94.1%), `HasContext` (75%), `ContextValue` (66.7%) — all pre-existing or edge-case paths.
 
 ### 2. Website contributing.mdx — says "four interfaces" but should say "six"
+
 I removed GOEXPERIMENT references but missed updating the interface count. Line 54 still reads: "The four interfaces (`Coded`/`Classified`/`Contextual`/`Retryable`) are the sole public contract." There are now six interfaces (added `ExitCoder` in v0.8.0 BuildFlow batch and `HTTPStatuser` in this session). This is a factual error I introduced by not reading the full file context.
 
 ---
@@ -91,15 +102,19 @@ I removed GOEXPERIMENT references but missed updating the interface count. Line 
 ## D) TOTALLY FUCKED UP
 
 ### 1. Left stale code in SKILL.md after edit
+
 My first edit to the Classification section in SKILL.md accidentally left behind orphaned lines (`return errorfamily.Transient, false` + `})`) from the original `RegisterClassifier` example. The edit tool replaced the opening of the closure but left the closing. I caught this during post-edit verification and fixed it immediately, but it should not have happened — I should have included the full closure in the `old_string` match.
 
 ### 2. Example with local type that couldn't have methods
+
 First attempt at `ExampleRegisterClassificationType` defined a local `type sqliteError struct{}` inside the function body. Go doesn't allow methods on locally-scoped types, so it failed to compile (`*sqliteError does not satisfy error (missing method Error)`). Fixed by moving the type to package level as `exampleSQLError`. Should have known this Go limitation upfront.
 
 ### 3. multiedit partial failure on contributing.mdx
+
 My `multiedit` call tried to replace 6 patterns simultaneously, but 2 failed because the patterns appeared multiple times in the file (duplicate `GOEXPERIMENT=jsonv2` strings in different code blocks). Had to do follow-up edits with more surrounding context. Should have read the full file first and used unique context for each replacement.
 
 ### 4. Did not update contributing.mdx interface count
+
 After fixing all GOEXPERIMENT references, I declared the website split brain "fixed" and moved on. But contributing.mdx line 54 still says "The four interfaces" — it should say "six" (or at minimum "five"). This is a factual documentation error that directly contradicts the codebase. I had the file open and read its full contents but didn't notice this line because I was pattern-matching on GOEXPERIMENT only.
 
 ---
@@ -121,12 +136,14 @@ After fixing all GOEXPERIMENT references, I declared the website split brain "fi
 ## F) NEXT 50 TASKS (prioritized)
 
 ### Critical (before v0.8.0 tag)
+
 1. Fix contributing.mdx "four interfaces" → "six interfaces" (`Coded`/`Classified`/`Contextual`/`Retryable`/`ExitCoder`/`HTTPStatuser`)
 2. Add test for `RegisterClassificationType` (DefaultRegistry delegate) — currently 0% coverage
 3. Create `git tag v0.8.0` (user confirmed version)
 4. Rebuild + deploy website (`npm run build && firebase deploy --only hosting` from `website/`)
 
 ### High Priority
+
 5. Update `TODO_LIST.md` with this session's completed work
 6. Add test for `Compose` (classify.go:95) — 0% coverage, pre-existing gap
 7. Investigate `error_test.go:567` nilness warning (gopls nilpanic)
@@ -138,6 +155,7 @@ After fixing all GOEXPERIMENT references, I declared the website split brain "fi
 13. Run bridge fuzz tests to verify no regressions from json/v2 revert
 
 ### Medium Priority
+
 14. Add integration test: full HTTP handler → WithHTTPStatus override → verify response status code end-to-end
 15. Add test verifying `writeHTTPError` calls `Classify` exactly once (performance regression guard)
 16. Consider adding `HTTPStatus` to the `jsonError` struct JSON output (currently excluded like `exitCode`)
@@ -151,6 +169,7 @@ After fixing all GOEXPERIMENT references, I declared the website split brain "fi
 24. Review if `Family.HTTPStatus()` table needs updating for new HTTP standards (RFC 9110)
 
 ### Lower Priority
+
 25. Pin `version: latest` in `release.yml` (3 occurrences)
 26. Investigate `gitignore-upserter:repair` failure
 27. Apply ACME TXT DNS record (needs Namecheap API key)
@@ -192,15 +211,15 @@ After fixing all GOEXPERIMENT references, I declared the website split brain "fi
 
 ## Session Metrics
 
-| Metric | Value |
-|--------|-------|
-| Files changed | 13 |
-| Lines added | +205 |
-| Lines removed | -55 |
-| Tests added | 7 (2 fuzz, 3 example, 2 assert) |
-| Benchmarks added | 3 |
-| Quality gates | 7/7 PASS |
-| Coverage (root) | 97.0% (was 97.0% at session start) |
+| Metric                     | Value                                        |
+| -------------------------- | -------------------------------------------- |
+| Files changed              | 13                                           |
+| Lines added                | +205                                         |
+| Lines removed              | -55                                          |
+| Tests added                | 7 (2 fuzz, 3 example, 2 assert)              |
+| Benchmarks added           | 3                                            |
+| Quality gates              | 7/7 PASS                                     |
+| Coverage (root)            | 97.0% (was 97.0% at session start)           |
 | Coverage (errorfamilytest) | 96.3% (was 95.8% at session start, improved) |
-| Commits | 5 (auto-commit hook) |
-| Questions asked | 0 (as instructed) |
+| Commits                    | 5 (auto-commit hook)                         |
+| Questions asked            | 0 (as instructed)                            |
