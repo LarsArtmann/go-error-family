@@ -5,6 +5,21 @@ description: All notable changes to go-error-family.
 
 ## [Unreleased]
 
+## [0.9.0] — 2026-07-24
+
+Structured-logging hook for `HandleError*` and an HTTP error-path fix. The
+root package remains zero-dependency.
+
+### Added
+
+- **`HandleConfig.Logger *slog.Logger`** — optional structured-logging hook. When set, `HandleErrorWithContext` emits a single `slog` record (family, code, retryable, exit_code, `context.*` keys) alongside the CLI output, classifying once and logging once. Nil (default) preserves the original behavior.
+- **`errorfamilytest.AssertHTTPStatus(tb, err, want)`** — test assertion for HTTP status codes (checks `HTTPStatuser` override first, then family default).
+
+### Changed
+
+- **`writeHTTPError` respects per-error `HTTPStatuser` overrides** — fixes a bug where `WithHTTPStatus` overrides were silently dropped on the HTTP error path. Status is now computed once from the classified family, then checked for a per-error override.
+- **`LogError` / `LogErrorContext` now emit `exit_code`** — every structured log record includes the resolved BSD exit code.
+
 ## [0.8.0] — 2026-07-23
 
 BuildFlow-inspired error handling additions. All new APIs use only the Go

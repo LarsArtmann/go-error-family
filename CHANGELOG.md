@@ -4,6 +4,38 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
+## [0.9.0] - 2026-07-24
+
+Structured-logging hook for `HandleError*` and an HTTP error-path fix. All
+new APIs use only the Go standard library — the root package remains
+zero-dependency.
+
+### Added
+
+- **`HandleConfig.Logger *slog.Logger`** (`handle.go`) — optional structured-logging hook. When set, `HandleErrorWithContext` emits a single `slog` record (family, code, retryable, exit_code, and every `context.*` key) in the same call as the human-facing CLI output, classifying once and logging once. Nil (default) preserves the original behavior — fully backward compatible. Recommended for systemd/journald observability: every `HandleError` call emits a self-contained structured record without a separate `LogError` call.
+- **`errorfamilytest.AssertHTTPStatus(tb, err, want)`** (`errorfamilytest/errorfamilytest.go`) — test assertion for HTTP status codes. Checks the `HTTPStatuser` interface first (per-error override via `WithHTTPStatus`), then falls back to the family default.
+- **`logErrorInternal`** (`log.go`) — shared emission path for `LogError`/`LogErrorContext` and the new `HandleConfig.Logger` hook. Accepts a pre-computed family and exit code so `HandleError` does not re-classify when logging alongside human output.
+- **Fuzz tests**: `FuzzWithHTTPStatus`, `FuzzRegisterClassificationType` (added to existing `fuzz_test.go`).
+- **Benchmarks**: `BenchmarkWithHTTPStatus`, `BenchmarkHTTPStatusOverride`, plus `WrapOnce` benchmarks.
+- **Examples**: `ExampleError_WithHTTPStatus`, `ExampleHTTPStatus`, `ExampleRegisterClassificationType`, `ExampleWrapOnce`, `ExampleError_WithExitCode`, `ExampleError_WithContextAny`.
+
+### Changed
+
+- **`writeHTTPError` respects per-error `HTTPStatuser` overrides** (`http.go`) — previously called `HTTPStatus(err)` which double-classified and could ignore a per-error status set via `WithHTTPStatus`. Now computes the status once from the already-classified family, then checks the `HTTPStatuser` interface for a non-zero override. Fixes a bug where `WithHTTPStatus` overrides were silently dropped on the HTTP error path.
+- **`LogError` / `LogErrorContext` now emit `exit_code`** (`log.go`) — every structured log record includes the resolved BSD exit code alongside family/code/retryable.
+
+### Modules
+
+Coordinated multi-module release. Submodule `go.mod` files now reference root **v0.9.0** and diagnose **v0.2.1**. Submodule code is unchanged; bumps are pin-only patches so consumers of submodules transitively receive the `writeHTTPError` fix and the `HandleConfig.Logger` hook.
+
+- `github.com/larsartmann/go-error-family` → **v0.9.0** (HandleConfig.Logger + writeHTTPError fix)
+- `github.com/larsartmann/go-error-family/diagnose` → **v0.2.1** (root pin bump)
+- `github.com/larsartmann/go-error-family/agent` → **v0.2.1** (root + diagnose pin bump)
+- `github.com/larsartmann/go-error-family/bridge` → **v0.3.1** (root pin bump + oklog/ulid v2.1.2)
+- `github.com/larsartmann/go-error-family/diagnose/git` → **v0.5.1** (root + diagnose pin bump)
+- `github.com/larsartmann/go-error-family/diagnose/postgres` → **v0.5.1** (root + diagnose pin bump)
+- `github.com/larsartmann/go-error-family/examples` → **v0.2.1** (root + diagnose pin bump)
+
 ## [0.8.0] - 2026-07-23
 
 BuildFlow-inspired error handling additions. All new APIs use only the Go
