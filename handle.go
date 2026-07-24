@@ -5,6 +5,7 @@ import (
 	"errors"
 	"fmt"
 	"io"
+	"log/slog"
 	"os"
 	"strings"
 )
@@ -57,6 +58,16 @@ type HandleConfig struct {
 	// OnDiagnosed is called after diagnostics complete, before exit.
 	// Receives the error and diagnostic findings. Useful for logging/metrics.
 	OnDiagnosed func(err error, findings []DiagnosticFinding)
+
+	// Logger, when set, receives a structured log entry (family, code,
+	// retryable, exit_code, context.*) in the same call as human output —
+	// classifying once, logging once. Nil (default) skips structured logging,
+	// preserving the original behavior.
+	//
+	// This is the recommended hook for systemd/journald observability:
+	// every HandleError call emits a self-contained structured record without
+	// a separate LogError call.
+	Logger *slog.Logger
 }
 
 // DiagnosticFunc runs diagnostics for an error and returns results.
@@ -146,6 +157,10 @@ func HandleErrorWithContext(ctx context.Context, err error, cfg HandleConfig) in
 		if cfg.OnDiagnosed != nil {
 			cfg.OnDiagnosed(err, findings)
 		}
+	}
+
+	if cfg.Logger != nil {
+		logErrorInternal(ctx, err, cfg.Logger, family, exitCode)
 	}
 
 	message := renderCLI(code, errCtx, family, cfg, reg)

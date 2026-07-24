@@ -7,7 +7,7 @@ import (
 )
 
 // LogError logs an error with structured fields derived from its classification:
-// family, code, retryable, and every error-context key (prefixed with "context.").
+// family, code, retryable, exit_code, and every error-context key (prefixed with "context.").
 //
 // Severity mapping follows the behavioral family:
 //   - Transient (retryable) → slog.LevelWarn, since these are expected to self-heal.
@@ -35,10 +35,19 @@ func LogErrorContext(ctx context.Context, err error, logger *slog.Logger) {
 	}
 
 	family := Classify(err)
+	logErrorInternal(ctx, err, logger, family, ExitCode(err))
+}
+
+// logErrorInternal is the shared emission path for [LogError] and the Logger
+// hook in [HandleErrorWithContext]. It accepts a pre-computed family and exit
+// code so that HandleError does not re-classify when logging alongside human
+// output.
+func logErrorInternal(ctx context.Context, err error, logger *slog.Logger, family Family, exitCode int) {
 	attrs := []slog.Attr{
 		slog.String("family", family.String()),
 		slog.String("code", Code(err)),
 		slog.Bool("retryable", family.IsRetryable()),
+		slog.Int("exit_code", exitCode),
 	}
 
 	if contextual, ok := errors.AsType[Contextual](err); ok {
