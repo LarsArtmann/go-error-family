@@ -14,28 +14,28 @@ We cut 7 annotated SSH-signed tags (`v0.9.0` + 6 submodules) for a release conta
 
 ## a) FULLY DONE
 
-| Item | Evidence |
-|---|---|
-| CHANGELOG.md `[0.9.0]` entry written | Added/Changed/Modules sections, all 7 module versions documented |
-| Website changelog.mdx `[0.9.0]` entry written | Mirrors CHANGELOG with condensed format |
-| AGENTS.md updated | API Surface header → v0.9.0, new "Structured Logging Hook" section, `LogError` exit_code attr, `AssertHTTPStatus` added to errorfamilytest list |
-| FEATURES.md version ref updated | "Last verified: 2026-07-24 against v0.9.0" |
-| ROADMAP.md direction updated | References v0.9.0, mentions HandleConfig.Logger and writeHTTPError fix |
-| All 6 submodule go.mod require pins bumped | Root → v0.9.0, diagnose → v0.2.1, verified across all files |
-| Workspace tests pass (7 modules, -race) | Root + errorfamilytest + agent + bridge + diagnose + diagnose/git + diagnose/postgres all `ok` |
-| Lint clean (0 issues) | `golangci-lint run ./...` via both direct binary and `nix run .#lint` |
-| 7 annotated SSH-signed tags created | All point to `6a3a1d3`, ED25519 signature verified, correct messages |
-| go.work.sum updated | v0.8.0→v0.9.0 and v0.2.0→v0.2.1 go.mod hashes (dirhash algorithm reverse-engineered and verified against 2 known values) |
+| Item                                          | Evidence                                                                                                                                        |
+| --------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------- |
+| CHANGELOG.md `[0.9.0]` entry written          | Added/Changed/Modules sections, all 7 module versions documented                                                                                |
+| Website changelog.mdx `[0.9.0]` entry written | Mirrors CHANGELOG with condensed format                                                                                                         |
+| AGENTS.md updated                             | API Surface header → v0.9.0, new "Structured Logging Hook" section, `LogError` exit_code attr, `AssertHTTPStatus` added to errorfamilytest list |
+| FEATURES.md version ref updated               | "Last verified: 2026-07-24 against v0.9.0"                                                                                                      |
+| ROADMAP.md direction updated                  | References v0.9.0, mentions HandleConfig.Logger and writeHTTPError fix                                                                          |
+| All 6 submodule go.mod require pins bumped    | Root → v0.9.0, diagnose → v0.2.1, verified across all files                                                                                     |
+| Workspace tests pass (7 modules, -race)       | Root + errorfamilytest + agent + bridge + diagnose + diagnose/git + diagnose/postgres all `ok`                                                  |
+| Lint clean (0 issues)                         | `golangci-lint run ./...` via both direct binary and `nix run .#lint`                                                                           |
+| 7 annotated SSH-signed tags created           | All point to `6a3a1d3`, ED25519 signature verified, correct messages                                                                            |
+| go.work.sum updated                           | v0.8.0→v0.9.0 and v0.2.0→v0.2.1 go.mod hashes (dirhash algorithm reverse-engineered and verified against 2 known values)                        |
 
 ---
 
 ## b) PARTIALLY DONE
 
-| Item | What's done | What's missing |
-|---|---|---|
-| go.sum checksums | go.work.sum updated with correct go.mod hashes | **All 6 submodule go.sum files still reference v0.8.0/v0.2.0** — `go mod tidy` never ran |
-| Consumer simulation | Workspace build verified (with local proxy hack) | **No throwaway-module `go get` test ever ran** — the real CI gate (`GOWORK=off go build`) was never executed until the self-review |
-| Release commit | Content is correct in the tree | **3 generic auto-generated commits** (`chore(deps)`, `docs(changelog)`) instead of a clean `release: v0.9.0` commit — hooks intercepted my edits |
+| Item                | What's done                                      | What's missing                                                                                                                                   |
+| ------------------- | ------------------------------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------ |
+| go.sum checksums    | go.work.sum updated with correct go.mod hashes   | **All 6 submodule go.sum files still reference v0.8.0/v0.2.0** — `go mod tidy` never ran                                                         |
+| Consumer simulation | Workspace build verified (with local proxy hack) | **No throwaway-module `go get` test ever ran** — the real CI gate (`GOWORK=off go build`) was never executed until the self-review               |
+| Release commit      | Content is correct in the tree                   | **3 generic auto-generated commits** (`chore(deps)`, `docs(changelog)`) instead of a clean `release: v0.9.0` commit — hooks intercepted my edits |
 
 ---
 
@@ -61,6 +61,7 @@ GOWORK=off go build ./...  →  FAILS in ALL 6 submodules
 ```
 
 Concrete evidence:
+
 ```
 diagnose:   missing go.sum entry for github.com/larsartmann/go-error-family@v0.9.0
 bridge:     missing go.sum entry for github.com/larsartmann/go-error-family@v0.9.0
@@ -105,7 +106,7 @@ I manually computed dirhashes and hand-edited an auto-generated file. This is fr
    - Incorrect VCS metadata file exclusion (`.gitignore`, `.golangci.yml` should be excluded)
    - Submodule boundary detection (files under `bridge/`, `agent/`, etc. must be excluded from root)
    - License/README inclusion rules differ from `git ls-tree`
-   
+
    This needs proper investigation or just running `go mod download` after pushing tags.
 
 ---
