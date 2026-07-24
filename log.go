@@ -42,7 +42,13 @@ func LogErrorContext(ctx context.Context, err error, logger *slog.Logger) {
 // hook in [HandleErrorWithContext]. It accepts a pre-computed family and exit
 // code so that HandleError does not re-classify when logging alongside human
 // output.
-func logErrorInternal(ctx context.Context, err error, logger *slog.Logger, family Family, exitCode int) {
+func logErrorInternal(
+	ctx context.Context,
+	err error,
+	logger *slog.Logger,
+	family Family,
+	exitCode int,
+) {
 	attrs := []slog.Attr{
 		slog.String("family", family.String()),
 		slog.String("code", Code(err)),

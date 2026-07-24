@@ -114,8 +114,10 @@ func TestLogErrorExitCodeAttribute(t *testing.T) {
 }
 
 func TestHandleErrorWithLoggerEmitsStructuredLog(t *testing.T) {
-	var logBuf bytes.Buffer
-	var outBuf bytes.Buffer
+	var (
+		logBuf bytes.Buffer
+		outBuf bytes.Buffer
+	)
 
 	logger := slog.New(slog.NewTextHandler(&logBuf, nil))
 
@@ -123,8 +125,8 @@ func TestHandleErrorWithLoggerEmitsStructuredLog(t *testing.T) {
 		WithContext("user_id", "42")
 
 	exitCode := HandleErrorWithConfig(err, HandleConfig{
-		Output:  &outBuf,
-		Logger:  logger,
+		Output: &outBuf,
+		Logger: logger,
 	})
 
 	if exitCode != 1 {
@@ -179,6 +181,7 @@ func TestHandleErrorWithLoggerTransientLogsAtWarn(t *testing.T) {
 	if !strings.Contains(logOut, "level=WARN") {
 		t.Errorf("transient via HandleError should log at WARN:\n%s", logOut)
 	}
+
 	if !strings.Contains(logOut, "exit_code=75") {
 		t.Errorf("transient should have exit_code=75:\n%s", logOut)
 	}
