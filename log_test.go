@@ -24,6 +24,7 @@ func TestLogError(t *testing.T) {
 		"family=rejection",
 		"code=user.not_found",
 		"retryable=false",
+		"exit_code=1",
 		"context.user_id=42",
 	} {
 		if !strings.Contains(out, want) {
@@ -97,3 +98,88 @@ func (h *ctxRecordingHandler) Handle(ctx context.Context, _ slog.Record) error {
 }
 func (h *ctxRecordingHandler) WithAttrs(_ []slog.Attr) slog.Handler { return h }
 func (h *ctxRecordingHandler) WithGroup(_ string) slog.Handler      { return h }
+
+func TestLogErrorExitCodeAttribute(t *testing.T) {
+	var buf bytes.Buffer
+
+	logger := slog.New(slog.NewTextHandler(&buf, nil))
+
+	LogError(NewTransient("db.timeout", "timed out"), logger)
+
+	out := buf.String()
+	// Transient → exit code 75 (EX_TEMPFAIL)
+	if !strings.Contains(out, "exit_code=75") {
+		t.Errorf("transient should have exit_code=75:\n%s", out)
+	}
+}
+
+func TestHandleErrorWithLoggerEmitsStructuredLog(t *testing.T) {
+	var logBuf bytes.Buffer
+	var outBuf bytes.Buffer
+
+	logger := slog.New(slog.NewTextHandler(&logBuf, nil))
+
+	err := NewRejection("user.not_found", "no such user").
+		WithContext("user_id", "42")
+
+	exitCode := HandleErrorWithConfig(err, HandleConfig{
+		Output:  &outBuf,
+		Logger:  logger,
+	})
+
+	if exitCode != 1 {
+		t.Errorf("exit code: got %d, want 1", exitCode)
+	}
+
+	// Human output went to outBuf
+	if !strings.Contains(outBuf.String(), "user.not_found") {
+		t.Errorf("human output missing error code:\n%s", outBuf.String())
+	}
+
+	// Structured log went to logBuf
+	logOut := logBuf.String()
+	for _, want := range []string{
+		"level=ERROR",
+		"family=rejection",
+		"code=user.not_found",
+		"retryable=false",
+		"exit_code=1",
+		"context.user_id=42",
+	} {
+		if !strings.Contains(logOut, want) {
+			t.Errorf("structured log missing %q:\n%s", want, logOut)
+		}
+	}
+}
+
+func TestHandleErrorWithoutLoggerSkipsLogging(t *testing.T) {
+	var outBuf bytes.Buffer
+
+	err := NewRejection("user.not_found", "no such user")
+	HandleErrorWithConfig(err, HandleConfig{
+		Output: &outBuf,
+	})
+
+	// Human output present
+	if !strings.Contains(outBuf.String(), "user.not_found") {
+		t.Errorf("human output missing error code:\n%s", outBuf.String())
+	}
+}
+
+func TestHandleErrorWithLoggerTransientLogsAtWarn(t *testing.T) {
+	var logBuf bytes.Buffer
+
+	logger := slog.New(slog.NewTextHandler(&logBuf, nil))
+
+	HandleErrorWithConfig(NewTransient("db.timeout", "timed out"), HandleConfig{
+		Logger: logger,
+	})
+
+	logOut := logBuf.String()
+	if !strings.Contains(logOut, "level=WARN") {
+		t.Errorf("transient via HandleError should log at WARN:\n%s", logOut)
+	}
+	if !strings.Contains(logOut, "exit_code=75") {
+		t.Errorf("transient should have exit_code=75:\n%s", logOut)
+	}
+}
