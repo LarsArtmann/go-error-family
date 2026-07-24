@@ -3,7 +3,7 @@
 Honest inventory of what exists, what works, and what doesn't. Every claim is
 verifiable against the code — citations point at the source.
 
-**Last verified:** 2026-07-23 against v0.8.0
+**Last verified:** 2026-07-24 against v0.9.0
 
 ---
 

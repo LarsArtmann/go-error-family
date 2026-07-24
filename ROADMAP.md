@@ -3,7 +3,7 @@
 Long-term direction and raw ideas not yet refined into actionable tasks.
 When an idea becomes bounded and actionable, it moves to `TODO_LIST.md`.
 
-**Last updated:** 2026-07-23
+**Last updated:** 2026-07-24
 
 ---
 
@@ -14,12 +14,15 @@ of opt-in modules (`diagnose`, `agent`, `bridge`). The taxonomy is proven across
 multiple consumers (DiscordSync, browser-history, SwettySwipperWeb). The CLI
 story was strengthened with per-error exit code overrides (`ExitCoder`),
 idempotent wrapping (`WrapOnce`), typed context values (`WithContextAny`), and
-panic-safe cause rendering (`safeCauseString`). v0.8.0 is released. The
-focus now is: deploying the v0.8.0 API changes to
-the website, verifying the full BuildFlow toolchain, and resolving the few open
-design tensions from consumer feedback. The CI module-graph gate and
-consumer-simulation job shipped; lint is at zero golangci-lint issues (though
-the hierarchical-errors tool adds 50 nolint directives that warrant cleanup).
+panic-safe cause rendering (`safeCauseString`), structured-logging hook
+(`HandleConfig.Logger`), and HTTP error-path fix (`writeHTTPError` respects
+per-error `WithHTTPStatus`). v0.9.0 is released. The focus now is: improving
+consumer discoverability of the higher-level boundary handlers
+(`HTTPHandler`, `LogError`, `diagnose`), verifying the full BuildFlow
+toolchain, and resolving the few open design tensions from consumer feedback.
+The CI module-graph gate and consumer-simulation job shipped; lint is at zero
+golangci-lint issues (though the hierarchical-errors tool adds 50 nolint
+directives that warrant cleanup).
 
 ## Themes
 

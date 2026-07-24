@@ -38,7 +38,7 @@ The classification protocol is the **four interfaces** (`Coded`/`Classified`/`Co
 - **`ExitCode(err)` checks `ExitCoder` before family** — an error implementing `ExitCoder` with a non-zero code overrides the family-based BSD exit code. `*Error` always implements `ExitCoder`, but returns 0 (meaning "use family default") unless `WithExitCode` was called.
 - **`WrapOnce` is idempotent** — if the error chain already contains a `*Error`, it is returned unchanged. This prevents double-wrapping at API boundaries.
 
-## API Surface (v0.8.0)
+## API Surface (v0.9.0)
 
 **Family adapters** (in `family.go` / `retry.go`, all single-source-of-truth via `familyData`):
 
@@ -64,8 +64,8 @@ Driven by SEC and browser-history integration feedback. All use stdlib only (`ne
 - **`TemplateForCode(code) (MessageTemplate, bool)`** (`registry.go` + package-level in `handle.go`) — registry-then-builtin template lookup, for HTTP/gRPC consumers.
 - **`Wrap{Family}f`** (`constructors.go`) — `WrapRejectionf`, `WrapConflictf`, `WrapTransientf`, `WrapCorruptionf`, `WrapInfrastructuref`. Nil-safe.
 - **`HTTPStatus(err)` / `HTTPHandler(fn)`** (`http.go`) — net/http middleware. Checks `HTTPStatuser` interface first (per-error override via `WithHTTPStatus`), then falls back to `Classify(err).HTTPStatus()`. **`HTTPHandler` NEVER leaks `err.Error()`** — the response message comes only from a registered `MessageTemplate`; otherwise just family+code. This is deliberate (consumers value no internal leakage).
-- **`LogError(err, *slog.Logger)` / `LogErrorContext`** (`log.go`) — Transient→Warn, others→Error; nil error is no-op; nil logger→`slog.Default`. Logs `family`, `code`, `retryable`, and `context.<key>` attrs.
-- **`errorfamilytest`** subpackage — `AssertFamily`/`AssertCode`/`AssertRetryable`/`AssertContext`/`AssertContextMissing`/`AssertExitCode`. Mirrors `httptest`: keeps `testing` out of the production package.
+- **`LogError(err, *slog.Logger)` / `LogErrorContext`** (`log.go`) — Transient→Warn, others→Error; nil error is no-op; nil logger→`slog.Default`. Logs `family`, `code`, `retryable`, `exit_code`, and `context.<key>` attrs. Shared `logErrorInternal` path also backs the `HandleConfig.Logger` hook.
+- **`errorfamilytest`** subpackage — `AssertFamily`/`AssertCode`/`AssertRetryable`/`AssertContext`/`AssertContextMissing`/`AssertExitCode`/`AssertHTTPStatus`. Mirrors `httptest`: keeps `testing` out of the production package.
 
 ## BuildFlow-Inspired APIs (added 2026-07-16)
 
@@ -76,6 +76,11 @@ Learned from BuildFlow's `modules/errors/` package — patterns proven in a prod
 - **`WrapOnce(err, family, code, msg)`** (`constructors.go`) — idempotent wrapping. Uses `errors.AsType[*Error]` to detect existing classified errors in the chain. Prevents the `[transient:db.timeout] outer: [transient:db.timeout] inner: cause` double-wrap anti-pattern at API boundaries. Nil-safe.
 - **`WithContextAny(key, value any)`** (`error.go`) — typed context values. Accepts `any` and converts via a type switch (string, int, int64, uint, uint64, float64, bool, []byte, time.Time, error, nil → empty, fallback `fmt.Sprint`). Ergonomic alternative to `fmt.Sprintf` for scalar values.
 - **`safeCauseString`** (`error.go`) — panic recovery in `Error()`, `Summary()`, and `formatVerbose()`. Uses `defer/recover` around `cause.Error()` to guard against misbehaving third-party error types that panic on nil internal values. The error message renders without the cause instead of crashing.
+
+## Structured Logging Hook (added 2026-07-24)
+
+- **`HandleConfig.Logger *slog.Logger`** (`handle.go`) — optional structured-logging hook for `HandleErrorWithContext`. When non-nil, the handler emits a single `slog` record (`family`, `code`, `retryable`, `exit_code`, every `context.<key>`) in the same call as the human-facing CLI output, classifying once and logging once. Nil (default) skips structured logging, preserving the original behavior. Fully backward compatible. Recommended for systemd/journald observability — every `HandleError` call emits a self-contained structured record without a separate `LogError` call.
+- **`writeHTTPError` per-error status fix** (`http.go`) — `HTTPHandler`'s internal writer now resolves the HTTP status once from the already-classified family, then checks the `HTTPStatuser` interface for a non-zero override. Previously it called `HTTPStatus(err)` (double-classifying) and could drop a per-error `WithHTTPStatus` override.
 
 ## Classification Precedence
 
