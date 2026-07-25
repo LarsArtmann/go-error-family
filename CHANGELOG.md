@@ -4,6 +4,28 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
+## [Unreleased]
+
+Adds the `Orchestration` family for internal coordination failures — the class
+of bug where the program's own logic failed to complete an operation (rendering
+output, building a CLI command, wiring dependencies). Distinct from
+`Infrastructure` (the system cannot serve) and `Corruption` (source of truth is
+damaged): nothing is wrong with I/O or data, the program simply has a bug or
+misconfiguration in its own orchestration layer. Not retryable; no user-facing
+fix (report the bug).
+
+### Added
+
+- **`Orchestration` Family** (`family.go`) — 6th behavioral family. Metadata: severity 5, exit code 70 (`EX_SOFTWARE`), HTTP 500 (Internal Server Error), `ToneApologetic`, `AudienceOps`, not retryable. Sits between `Infrastructure` (severity 4) and `Corruption` (severity 6) in the total-severity order, so it dominates infrastructure outages but is itself dominated by data-integrity breaks in multi-error classification.
+- **`NewOrchestration` / `WrapOrchestration` / `WrapOrchestrationf`** (`constructors.go`) — family-specific constructors matching the existing `New{Family}` / `Wrap{Family}` / `Wrap{Family}f` pattern.
+- **Orchestration integration tests** (`orchestration_test.go`) — end-to-end coverage: constructor -> `Classify` -> exit code (70) -> HTTP status (500) -> retryability (false) -> severity ordering (between Infrastructure and Corruption), plus multi-error worst-severity-wins ordering and `Wrap*`/`Wrapf*` chain preservation.
+
+### Changed
+
+- **`Corruption` severity 5 -> 6** (`family.go`) — bumped to preserve the total order after inserting `Orchestration` at severity 5. The fail-closed retry guarantee is unchanged: any non-`Transient` sub-error (severity > 1) still makes a joined error non-retryable.
+- **`IsValid()` boundary** now spans `Rejection`..`Orchestration` (six constants).
+- **Doc comments** (`family.go`, `README.md`, `FEATURES.md`) updated to reflect six families and the `Orchestration -> 500` HTTP mapping.
+
 ## [0.9.0] - 2026-07-24
 
 Structured-logging hook for `HandleError*` and an HTTP error-path fix. All

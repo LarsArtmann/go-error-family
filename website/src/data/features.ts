@@ -4,7 +4,7 @@ export const features: Feature[] = [
   {
     icon: "shield",
     title: "Behavioral Classification",
-    desc: "Five families (Rejection, Conflict, Transient, Corruption, Infrastructure) map to retry decisions, exit codes, HTTP status, and user-facing tone.",
+    desc: "Six families (Rejection, Conflict, Transient, Corruption, Infrastructure, Orchestration) map to retry decisions, exit codes, HTTP status, and user-facing tone.",
   },
   {
     icon: "lightning",

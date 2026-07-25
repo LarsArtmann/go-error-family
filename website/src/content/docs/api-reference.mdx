@@ -16,6 +16,7 @@ const (
     Transient                    // System error, retryable
     Corruption                   // Data damage
     Infrastructure               // System misconfiguration
+    Orchestration                // Internal coordination failure (bug)
 )
 ```
 
@@ -109,9 +110,10 @@ type ExitCoder interface {
 | `NewTransient(code, msg)`                             | Family shortcut                  |
 | `NewCorruption(code, msg)`                            | Family shortcut                  |
 | `NewInfrastructure(code, msg)`                        | Family shortcut                  |
+| `NewOrchestration(code, msg)`                         | Family shortcut                  |
 | `WrapRejection(cause, code, msg)`                     | Family wrap shortcut             |
 | `WrapConflictf(cause, code, format, args)`            | Formatted family wrap            |
-| (and all 5 families × New/Wrap/Wrapf)                 | 20 total constructors            |
+| (and all 6 families × New/Wrap/Wrapf)                 | 24 total constructors            |
 
 ### CLI Boundary
 

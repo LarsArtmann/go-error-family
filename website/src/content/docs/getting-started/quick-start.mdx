@@ -5,7 +5,7 @@ description: Get started with go-error-family in under a minute.
 
 ## The Core Concept: Family
 
-Every error gets classified into one of five families. Each family maps to retry decisions, exit codes, HTTP status codes, and user-facing tone.
+Every error gets classified into one of six families. Each family maps to retry decisions, exit codes, HTTP status codes, and user-facing tone.
 
 | Family         | Retryable | Exit Code | HTTP Status | Whose Fault    |
 | -------------- | --------- | --------- | ----------- | -------------- |
@@ -14,6 +14,7 @@ Every error gets classified into one of five families. Each family maps to retry
 | Transient      | yes       | 75        | 503         | System         |
 | Corruption     | no        | 65        | 500         | Data damage    |
 | Infrastructure | no        | 69        | 503         | System         |
+| Orchestration  | no        | 70        | 500         | System (bug)   |
 
 ## Classify Any Error
 
@@ -100,6 +101,10 @@ err := errorfamily.NewCorruption("data.crc", "checksum mismatch")
 // Infrastructure — system misconfiguration
 err := errorfamily.NewInfrastructure("config.missing", "no config file")
 // IsRetryable → false, ExitCode → 69, HTTPStatus → 503
+
+// Orchestration — internal coordination failure (bug in the program's own logic)
+err := errorfamily.NewOrchestration("render.failed", "template engine returned no output")
+// IsRetryable → false, ExitCode → 70, HTTPStatus → 500
 ```
 
 ## Next Steps

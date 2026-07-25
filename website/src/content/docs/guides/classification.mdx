@@ -19,7 +19,7 @@ description: The 6-step classification pipeline and how to register third-party 
 For `errors.Join(err1, err2, ...)`, each sub-error is classified recursively and the result is the **highest-severity** sub-error:
 
 ```
-Transient(1) < Rejection(2) < Conflict(3) < Infrastructure(4) < Corruption(5)
+Transient(1) < Rejection(2) < Conflict(3) < Infrastructure(4) < Orchestration(5) < Corruption(6)
 ```
 
 This is deterministic regardless of join argument order and remains fail-closed: if any sub-error is non-Transient, the joined result is non-Transient.

@@ -3,7 +3,7 @@
 Honest inventory of what exists, what works, and what doesn't. Every claim is
 verifiable against the code — citations point at the source.
 
-**Last verified:** 2026-07-24 against v0.9.0
+**Last verified:** 2026-07-25 against [Unreleased] (Orchestration family)
 
 ---
 
@@ -26,7 +26,7 @@ The classification core. Zero third-party dependencies (stdlib only).
 
 | Feature                                                                                              | Status           | Evidence                     |
 | ---------------------------------------------------------------------------------------------------- | ---------------- | ---------------------------- |
-| `Family` enum (5 values: Rejection, Conflict, Transient, Corruption, Infrastructure)                 | FULLY_FUNCTIONAL | `family.go`                  |
+| `Family` enum (6 values: Rejection, Conflict, Transient, Corruption, Infrastructure, Orchestration)                 | FULLY_FUNCTIONAL | `family.go`                  |
 | `Family.Severity()` — total order for multi-error worst-case selection                               | FULLY_FUNCTIONAL | `family.go`                  |
 | `Family.HTTPStatus()` — canonical family→HTTP mapping                                                | FULLY_FUNCTIONAL | `family.go`                  |
 | `Family.RetryPolicy()` — advisory retry defaults                                                     | FULLY_FUNCTIONAL | `retry.go`                   |
@@ -48,10 +48,10 @@ The classification core. Zero third-party dependencies (stdlib only).
 | Feature                                                                                                                  | Status           | Evidence          |
 | ------------------------------------------------------------------------------------------------------------------------ | ---------------- | ----------------- |
 | `New(family, code, msg)` / `Newf(family, code, fmt, args)`                                                               | FULLY_FUNCTIONAL | `constructors.go` |
-| Family-specific `New*`: `NewRejection`, `NewConflict`, `NewTransient`, `NewCorruption`, `NewInfrastructure`              | FULLY_FUNCTIONAL | `constructors.go` |
+| Family-specific `New*`: `NewRejection`, `NewConflict`, `NewTransient`, `NewCorruption`, `NewInfrastructure`, `NewOrchestration`              | FULLY_FUNCTIONAL | `constructors.go` |
 | `Wrap(err, family, code, msg)` / `Wrapf(...)` — nil-safe (returns nil for nil err)                                       | FULLY_FUNCTIONAL | `constructors.go` |
-| Family-specific `Wrap*`: `WrapRejection`, `WrapConflict`, `WrapTransient`, `WrapCorruption`, `WrapInfrastructure`        | FULLY_FUNCTIONAL | `constructors.go` |
-| Formatted `Wrap{Family}f`: `WrapRejectionf`, `WrapConflictf`, `WrapTransientf`, `WrapCorruptionf`, `WrapInfrastructuref` | FULLY_FUNCTIONAL | `constructors.go` |
+| Family-specific `Wrap*`: `WrapRejection`, `WrapConflict`, `WrapTransient`, `WrapCorruption`, `WrapInfrastructure`, `WrapOrchestration`        | FULLY_FUNCTIONAL | `constructors.go` |
+| Formatted `Wrap{Family}f`: `WrapRejectionf`, `WrapConflictf`, `WrapTransientf`, `WrapCorruptionf`, `WrapInfrastructuref`, `WrapOrchestrationf` | FULLY_FUNCTIONAL | `constructors.go` |
 | `WrapOnce(err, family, code, msg)` / `WrapOncef(...)` — idempotent wrap (prevents double-wrapping)                       | FULLY_FUNCTIONAL | `constructors.go` |
 
 ### Error Struct (Reference Implementation)
