@@ -127,8 +127,8 @@ var familyData = [...]familyInfo{ //nolint:gochecknoglobals // Immutable lookup 
 	},
 	Orchestration: {
 		Name:     strOrchestration,
-		Severity: 5, // internal logic bug — worse than Infrastructure, less bad than Corruption
-		Exit:     70, // EX_SOFTWARE — internal software error
+		Severity: 5,   // internal logic bug — worse than Infrastructure, less bad than Corruption
+		Exit:     70,  // EX_SOFTWARE — internal software error
 		HTTP:     500, // Internal Server Error
 		Tone:     ToneApologetic,
 		Audience: AudienceOps,
