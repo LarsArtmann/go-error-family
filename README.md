@@ -87,7 +87,7 @@ See [examples/](examples/) for runnable CLI, HTTP, and custom diagnostic rule de
 
 ## What It Gives You
 
-- **`Family`** — behavioral classification (Rejection, Conflict, Transient, Corruption, Infrastructure) that maps to retry decisions, exit codes, HTTP status codes, and user-facing tone
+- **`Family`** — behavioral classification (Rejection, Conflict, Transient, Corruption, Infrastructure, Orchestration) that maps to retry decisions, exit codes, HTTP status codes, and user-facing tone
 - **Small interfaces** — `Coded`, `Classified`, `Contextual`, `Retryable`, `ExitCoder` — each error type implements what it needs; the `Error` struct is just a reference implementation
 - **`Classify(err)`** — universal classification for any error (multi-error → interface → sentinels → classifiers → default)
 - **Multi-error support** — `errors.Join` + `Classify` picks the **worst** Family by severity, deterministically regardless of argument order
@@ -142,7 +142,7 @@ err := errorfamily.Newf(errorfamily.Rejection, "file.not_found", "missing: %s", 
 err := errors.Join(err1, err2, err3)
 ```
 
-Family-specific constructors: `NewRejection`, `NewConflict`, `NewTransient`, `NewCorruption`, `NewInfrastructure`. Wrap variants: `WrapRejection`, `WrapConflict`, `WrapTransient`, `WrapCorruption`, `WrapInfrastructure`. Formatted wrap variants: `WrapRejectionf`, `WrapConflictf`, `WrapTransientf`, `WrapCorruptionf`, `WrapInfrastructuref`.
+Family-specific constructors: `NewRejection`, `NewConflict`, `NewTransient`, `NewCorruption`, `NewInfrastructure`, `NewOrchestration`. Wrap variants: `WrapRejection`, `WrapConflict`, `WrapTransient`, `WrapCorruption`, `WrapInfrastructure`, `WrapOrchestration`. Formatted wrap variants: `WrapRejectionf`, `WrapConflictf`, `WrapTransientf`, `WrapCorruptionf`, `WrapInfrastructuref`, `WrapOrchestrationf`.
 
 ## Classification
 

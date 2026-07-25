@@ -61,7 +61,7 @@ const (
 // Adding a new family requires exactly one entry here.
 type familyInfo struct {
 	Name     string
-	Severity int // total order for multi-error classification: higher = worse (Transient=1 … Corruption=5)
+	Severity int // total order for multi-error classification: higher = worse (Transient=1 … Corruption=6)
 	Exit     int
 	HTTP     int // HTTP status code mapping
 	Tone     Tone
@@ -180,7 +180,7 @@ func (f Family) IsRetryable() bool {
 	return f == Transient
 }
 
-// IsValid reports whether the Family value is one of the five defined constants.
+// IsValid reports whether the Family value is one of the six defined constants.
 func (f Family) IsValid() bool {
 	return f >= Rejection && f <= Orchestration
 }
@@ -214,7 +214,7 @@ func (f Family) ExitCode() int {
 // Use at HTTP/REST boundaries to translate a classified error into a response code:
 //
 //	Rejection → 400, Conflict → 409, Transient → 503,
-//	Corruption → 500, Infrastructure → 503.
+//	Corruption → 500, Infrastructure → 503, Orchestration → 500.
 //
 // Invalid families return 500 (Internal Server Error).
 //
