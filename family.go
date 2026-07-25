@@ -9,6 +9,7 @@ const (
 	strTransient      = "transient"
 	strCorruption     = "corruption"
 	strInfrastructure = "infrastructure"
+	strOrchestration  = "orchestration"
 	strUnknown        = "unknown"
 	strUser           = "user"
 	strOps            = "ops"
@@ -47,6 +48,13 @@ const (
 	// Infrastructure indicates the system cannot serve (closed, nil deps, startup failure).
 	// Not retryable. System's fault. Tone: apologetic.
 	Infrastructure
+
+	// Orchestration indicates an internal coordination failure — the program's own
+	// logic failed to complete an operation (rendering output, building a CLI command,
+	// wiring dependencies, writing config). Not an I/O failure, not user input, not
+	// a data-integrity break: a bug or misconfiguration in the program itself.
+	// Not retryable. System's fault. No user-facing fix (report the bug).
+	Orchestration
 )
 
 // familyInfo holds all per-family data in one place.
@@ -97,7 +105,7 @@ var familyData = [...]familyInfo{ //nolint:gochecknoglobals // Immutable lookup 
 	},
 	Corruption: {
 		Name:     strCorruption,
-		Severity: 5, // worst — source of truth is damaged, data integrity at risk
+		Severity: 6, // worst — source of truth is damaged, data integrity at risk
 		Exit:     65,
 		HTTP:     500, // Internal Server Error (data integrity break is server-side)
 		Tone:     ToneUrgent,
@@ -116,6 +124,17 @@ var familyData = [...]familyInfo{ //nolint:gochecknoglobals // Immutable lookup 
 		Message:  "The service is currently unavailable. Please try again later.",
 		Why:      "This is a system issue, not something you caused.",
 		Fix:      "The service may be temporarily unavailable. Try again later.",
+	},
+	Orchestration: {
+		Name:     strOrchestration,
+		Severity: 5, // internal logic bug — worse than Infrastructure, less bad than Corruption
+		Exit:     70, // EX_SOFTWARE — internal software error
+		HTTP:     500, // Internal Server Error
+		Tone:     ToneApologetic,
+		Audience: AudienceOps,
+		Message:  "An internal error occurred.",
+		Why:      "An internal operation failed unexpectedly.",
+		Fix:      "This is likely a bug. Please report it if the problem persists.",
 	},
 }
 
@@ -163,14 +182,14 @@ func (f Family) IsRetryable() bool {
 
 // IsValid reports whether the Family value is one of the five defined constants.
 func (f Family) IsValid() bool {
-	return f >= Rejection && f <= Infrastructure
+	return f >= Rejection && f <= Orchestration
 }
 
 // Severity returns a total order across families for multi-error classification.
 // Higher = worse. Used by Classify to pick the worst sub-error of an errors.Join
 // result deterministically, independent of argument order.
 //
-//	Transient(1) < Rejection(2) < Conflict(3) < Infrastructure(4) < Corruption(5)
+//	Transient(1) < Rejection(2) < Conflict(3) < Infrastructure(4) < Orchestration(5) < Corruption(6)
 //
 // This preserves the fail-closed retry guarantee: if ANY sub-error is non-Transient
 // (severity > 1), the joined error is non-Transient.
@@ -217,6 +236,9 @@ func (f Family) ExitCode() int {
 //   - Infrastructure → 503 (Service Unavailable): the system cannot serve the
 //     request right now (closed, misconfigured, starting up). Retryable in
 //     principle, though possibly requiring operator action.
+//   - Orchestration → 500 (Internal Server Error): an internal coordination
+//     failure (bug, misconfiguration). Not retryable. The client did nothing
+//     wrong and cannot fix it by retrying.
 //
 // Corruption and Infrastructure are distinguished by severity and audience
 // (see [Family.Severity] and [Family.DefaultAudience]), not by HTTP status.

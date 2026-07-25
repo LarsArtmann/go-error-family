@@ -21,6 +21,7 @@ func TestFamilyString(t *testing.T) {
 		{Transient, "transient"},
 		{Corruption, "corruption"},
 		{Infrastructure, "infrastructure"},
+		{Orchestration, "orchestration"},
 		{Family(99), "unknown"},
 	}, Family.String)
 }
@@ -36,6 +37,8 @@ func TestParseFamily(t *testing.T) {
 		{"transient", Transient},
 		{"corruption", Corruption},
 		{"infrastructure", Infrastructure},
+		{"orchestration", Orchestration},
+		{"ORCHESTRATION", Orchestration},
 		{"unknown", Transient}, // default
 		{"garbage", Transient}, // default
 	}
@@ -55,7 +58,8 @@ func TestFamilySeverity(t *testing.T) {
 		{Rejection, 2},
 		{Conflict, 3},
 		{Infrastructure, 4},
-		{Corruption, 5},
+		{Orchestration, 5},
+		{Corruption, 6},
 		{Family(99), 0}, // invalid → 0
 	}
 	for _, tt := range tests {
@@ -85,6 +89,10 @@ func TestFamilyIsRetryable(t *testing.T) {
 	if Infrastructure.IsRetryable() {
 		t.Error("Infrastructure should not be retryable")
 	}
+
+	if Orchestration.IsRetryable() {
+		t.Error("Orchestration should not be retryable")
+	}
 }
 
 func TestFamilyExitCode(t *testing.T) {
@@ -94,6 +102,7 @@ func TestFamilyExitCode(t *testing.T) {
 		{Transient, 75},
 		{Corruption, 65},
 		{Infrastructure, 69},
+		{Orchestration, 70},
 		{Family(99), 70},
 	}, Family.ExitCode)
 }
@@ -115,6 +124,7 @@ func TestFamilyDefaultMessageAll(t *testing.T) {
 		{Transient, "A temporary error occurred. Please try again in a few moments."},
 		{Corruption, "Data appears to be corrupted. This requires manual intervention."},
 		{Infrastructure, "The service is currently unavailable. Please try again later."},
+		{Orchestration, "An internal error occurred."},
 		{Family(99), "An unexpected error occurred."},
 	}, Family.DefaultMessage)
 }
@@ -126,6 +136,7 @@ func TestFamilyDefaultWhyAll(t *testing.T) {
 		{Transient, "This is a temporary issue. No data was lost."},
 		{Corruption, "Some data appears to be damaged. This requires attention."},
 		{Infrastructure, "This is a system issue, not something you caused."},
+		{Orchestration, "An internal operation failed unexpectedly."},
 		{Family(99), ""},
 	}, Family.DefaultWhy)
 }
@@ -137,6 +148,7 @@ func TestFamilyDefaultFixAll(t *testing.T) {
 		{Transient, "Wait a moment and try again."},
 		{Corruption, "This may require manual intervention. Check the logs for details."},
 		{Infrastructure, "The service may be temporarily unavailable. Try again later."},
+		{Orchestration, "This is likely a bug. Please report it if the problem persists."},
 		{Family(99), "Try again or contact support."},
 	}, Family.DefaultFix)
 }
@@ -151,6 +163,7 @@ func TestFamilyToneAll(t *testing.T) {
 		{Transient, ToneReassuring},
 		{Corruption, ToneUrgent},
 		{Infrastructure, ToneApologetic},
+		{Orchestration, ToneApologetic},
 		{Family(99), ToneApologetic},
 	}, Family.Tone)
 }
@@ -202,6 +215,7 @@ func TestFamilyAudience(t *testing.T) {
 		{Transient, AudienceAll},
 		{Corruption, AudienceOps},
 		{Infrastructure, AudienceOps},
+		{Orchestration, AudienceOps},
 		{Family(99), AudienceOps},
 	}
 	for _, tt := range tests {
@@ -240,6 +254,7 @@ func TestFamilyMarshalText(t *testing.T) {
 		{Rejection, "rejection"},
 		{Transient, "transient"},
 		{Infrastructure, "infrastructure"},
+		{Orchestration, "orchestration"},
 	}
 	for _, tt := range tests {
 		got, err := tt.family.MarshalText()
@@ -304,6 +319,7 @@ func TestFamilyHTTPStatus(t *testing.T) {
 		{Transient, 503},
 		{Corruption, 500},
 		{Infrastructure, 503},
+		{Orchestration, 500},
 		{Family(99), 500},
 	}, Family.HTTPStatus)
 }

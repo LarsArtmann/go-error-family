@@ -78,6 +78,14 @@ func NewInfrastructure(code, message string) *Error {
 	return New(Infrastructure, code, message)
 }
 
+// NewOrchestration creates an Orchestration error (internal coordination failure).
+// Use this for bugs, misconfigurations, and internal logic failures that are
+// neither I/O failures nor user input errors — e.g. "render status tree",
+// "build CLI command", "wire dependencies". Not retryable. No user-facing fix.
+func NewOrchestration(code, message string) *Error {
+	return New(Orchestration, code, message)
+}
+
 // Wrap variants for each family.
 
 // WrapRejection wraps an error as Rejection.
@@ -103,6 +111,11 @@ func WrapCorruption(err error, code, message string) *Error {
 // WrapInfrastructure wraps an error as Infrastructure.
 func WrapInfrastructure(err error, code, message string) *Error {
 	return Wrap(err, Infrastructure, code, message)
+}
+
+// WrapOrchestration wraps an error as Orchestration (internal coordination failure).
+func WrapOrchestration(err error, code, message string) *Error {
+	return Wrap(err, Orchestration, code, message)
 }
 
 // Formatted Wrap variants for each family.
@@ -131,6 +144,11 @@ func WrapCorruptionf(err error, code, format string, args ...any) *Error {
 // WrapInfrastructuref wraps an error as Infrastructure with a formatted message.
 func WrapInfrastructuref(err error, code, format string, args ...any) *Error {
 	return Wrap(err, Infrastructure, code, fmt.Sprintf(format, args...))
+}
+
+// WrapOrchestrationf wraps an error as Orchestration with a formatted message.
+func WrapOrchestrationf(err error, code, format string, args ...any) *Error {
+	return Wrap(err, Orchestration, code, fmt.Sprintf(format, args...))
 }
 
 // WrapOnce wraps an error only if it is not already a *Error.
