@@ -10,10 +10,6 @@ traceable to its source. When an item ships, remove it here and record it in
 
 ## Active
 
-### High Priority
-
-- [ ] **Deploy website** — the live site at `errorfamily.lars.software` is stale. API changes from v0.8.0 (ExitCoder, WrapOnce, WithContextAny, WithHTTPStatus, RegisterClassificationType) have not been deployed. The website docs have been audited and fixed, and the build is now verified passing (`astro check`: 0 errors/warnings/hints, `astro build`: 14 pages in 8s). A CI/CD workflow (`.github/workflows/website-deploy.yml`) was added for automated deploys. **Blocked on:** `FIREBASE_SERVICE_ACCOUNT_LARS_SOFTWARE` GitHub secret must be set before the workflow can deploy. Source: status report 2026-07-23_15-08 section c.1.
-
 ### Medium Priority
 
 - [ ] **Create reference implementation for oops + bridge stack** — the `bridge/` module has zero external consumers. Root cause: near-zero `samber/oops` adoption and no project demonstrating the classify→enrich→handle flow. Pick one real application, wire it through oops + bridge + error-family end-to-end, and document the pattern. This is the #1 unblocker for bridge adoption. Source: adoption audit 2026-07-23.

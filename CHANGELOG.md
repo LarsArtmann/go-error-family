@@ -26,6 +26,10 @@ fix (report the bug).
 - **`IsValid()` boundary** now spans `Rejection`..`Orchestration` (six constants).
 - **Doc comments** (`family.go`, `README.md`, `FEATURES.md`) updated to reflect six families and the `Orchestration -> 500` HTTP mapping.
 
+### Fixed
+
+- **Website deploy workflow** (`.github/workflows/website-deploy.yml`) — pinned `FirebaseExtended/action-hosting-deploy` to a valid commit SHA (`500ac625 # v0.11.0`); the previously pinned SHA did not exist in the upstream repo, failing every run at action resolution. The `FIREBASE_SERVICE_ACCOUNT_LARS_SOFTWARE` GitHub secret is now set, so production deploys to `errorfamily.lars.software` run automatically on `website/**` changes to `master` (verified green).
+
 ## [0.9.0] - 2026-07-24
 
 Structured-logging hook for `HandleError*` and an HTTP error-path fix. All
