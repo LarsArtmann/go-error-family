@@ -6,7 +6,10 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ## [Unreleased]
 
-Adds the `Orchestration` family for internal coordination failures — the class
+## [0.10.0] - 2026-07-26
+
+Adds the `Orchestration` family — the 6th behavioral family — for internal
+coordination failures: the class
 of bug where the program's own logic failed to complete an operation (rendering
 output, building a CLI command, wiring dependencies). Distinct from
 `Infrastructure` (the system cannot serve) and `Corruption` (source of truth is
@@ -23,20 +26,30 @@ fix (report the bug).
 
 ### Changed
 
-- **`Corruption` severity 5 -> 6** (`family.go`) — bumped to preserve the total order after inserting `Orchestration` at severity 5. The fail-closed retry guarantee is unchanged: any non-`Transient` sub-error (severity > 1) still makes a joined error non-retryable.
+- **`Corruption` severity 5 -> 6** (`family.go`) — bumped to preserve the total order after inserting `Orchestration` at severity 5. The fail-closed retry guarantee is unchanged: any non-`Transient` sub-error (severity > 1) still makes a joined error non-retryable. The relative ordering of the five original families is unchanged.
 - **`IsValid()` boundary** now spans `Rejection`..`Orchestration` (six constants).
 - **Doc comments** (`family.go`, `README.md`, `FEATURES.md`) updated to reflect six families and the `Orchestration -> 500` HTTP mapping.
+- **Removed 52 phantom `//nolint:hierarchical-errors` directives** across 13 Go files — the `hierarchical-errors` linter was never installed (not as a binary, not as a golangci-lint linter, not as a BuildFlow step). The directives only produced "unknown linters: hierarchical-errors" warnings on every lint run.
+- **Test-file lint exclusions** (`.golangci.yml`) — added `cyclop`, `gocyclo`, `gocognit`, `maintidx` to the `_test.go` exclusion list. Test functions with many subtests legitimately exceed complexity thresholds.
+- **BuildFlow pipeline verified** — 38/39 steps pass (1 skipped via config). The previously-failing `gitignore-upsetter:repair` and `nix-hash-fix` now succeed.
 
 ### Fixed
 
+- **`examples/go.mod` phantom replace directive** — the examples module referenced `bridge v0.0.0-00010101000000-000000000000` with a local `replace` directive. Go strips `replace` on fetch, so consumers would hit an unresolvable module-graph edge. Replaced with the real `bridge v0.3.2` version and removed the `replace` directive. Same class of bug as the v0.6.0 hotfix.
 - **Website deploy workflow** (`.github/workflows/website-deploy.yml`) — pinned `FirebaseExtended/action-hosting-deploy` to a valid commit SHA (`500ac625 # v0.11.0`); the previously pinned SHA did not exist in the upstream repo, failing every run at action resolution. The `FIREBASE_SERVICE_ACCOUNT_LARS_SOFTWARE` GitHub secret is now set, so production deploys to `errorfamily.lars.software` run automatically on `website/**` changes to `master` (verified green).
 - **Release workflow supply-chain pin** (`.github/workflows/release.yml`) — pinned 3 occurrences of `version: latest` for `golangci-lint-action` to `version: v2.12.2`, matching the pin already in `ci.yml`. Previously every release picked up whatever version existed at tag-push time.
 
-### Changed
+### Modules
 
-- **Removed 52 phantom `//nolint:hierarchical-errors` directives** across 13 Go files — the `hierarchical-errors` linter was never installed (not as a binary, not as a golangci-lint linter, not as a BuildFlow step). The directives only produced "unknown linters: hierarchical-errors" warnings on every lint run.
-- **Test-file lint exclusions** (`.golangci.yml`) — added `cyclop`, `gocyclo`, `gocognit`, `maintidx` to the `_test.go` exclusion list. Test functions with many subtests legitimately exceed complexity thresholds.
-- **BuildFlow pipeline verified** — 38/39 steps pass (1 skipped via config). The previously-failing `gitignore-upserter:repair` and `nix-hash-fix` now succeed.
+Coordinated multi-module release. Submodule `go.mod` files now reference root **v0.10.0** and diagnose **v0.2.2**.
+
+- `github.com/larsartmann/go-error-family` -> **v0.10.0** (Orchestration family + examples/go.mod fix)
+- `github.com/larsartmann/go-error-family/diagnose` -> **v0.2.2** (nolint cleanup + root pin bump)
+- `github.com/larsartmann/go-error-family/agent` -> **v0.2.2** (nolint cleanup + pin bumps)
+- `github.com/larsartmann/go-error-family/bridge` -> **v0.3.2** (nolint cleanup + root pin bump)
+- `github.com/larsartmann/go-error-family/diagnose/git` -> **v0.5.2** (nolint cleanup + pin bumps)
+- `github.com/larsartmann/go-error-family/diagnose/postgres` -> **v0.5.2** (nolint cleanup + pin bumps)
+- `github.com/larsartmann/go-error-family/examples` -> **v0.3.0** (bridge reference implementation + checkout example + phantom replace fix)
 
 ## [0.9.0] - 2026-07-24
 

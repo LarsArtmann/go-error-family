@@ -38,12 +38,12 @@ The classification protocol is the **six interfaces** (`Coded`/`Classified`/`Con
 - **`ExitCode(err)` checks `ExitCoder` before family** — an error implementing `ExitCoder` with a non-zero code overrides the family-based BSD exit code. `*Error` always implements `ExitCoder`, but returns 0 (meaning "use family default") unless `WithExitCode` was called.
 - **`WrapOnce` is idempotent** — if the error chain already contains a `*Error`, it is returned unchanged. This prevents double-wrapping at API boundaries.
 
-## API Surface (v0.9.0)
+## API Surface (v0.10.0)
 
 **Family adapters** (in `family.go` / `retry.go`, all single-source-of-truth via `familyData`):
 
-- `Family.Severity() int` — total order for multi-error classification (Transient<Rejection<Conflict<Infrastructure<Corruption).
-- `Family.HTTPStatus() int` — canonical family→HTTP status (Rejection→400, Conflict→409, Transient→503, Corruption→500, Infrastructure→503).
+- `Family.Severity() int` — total order for multi-error classification (Transient<Rejection<Conflict<Infrastructure<Orchestration<Corruption).
+- `Family.HTTPStatus() int` — canonical family→HTTP status (Rejection→400, Conflict→409, Transient→503, Corruption→500, Infrastructure→503, Orchestration→500).
 - `Family.RetryPolicy() RetryPolicy` — advisory defaults (Transient: 3 attempts, 100ms-5s; others: single attempt). Library does not run the loop.
 
 **Error methods** (`error.go`): `WithContextMap(map)`, `WithContextf(key, fmt, args)`, `WithContextAny(key, any)` (type-switched to string), `WithExitCode(int)` (overrides family-based exit code), `WithHTTPStatus(int)` (overrides family-based HTTP status), `ExitCode() int` (satisfies `ExitCoder`), `HTTPStatus() int` (satisfies `HTTPStatuser`), `JSON() ([]byte, error)` (canonical `{family,code,message,context,retryable,timestamp}` for API boundaries). All `With*` methods are copy-on-write.
@@ -95,7 +95,7 @@ Learned from BuildFlow's `modules/errors/` package — patterns proven in a prod
 
 This means a type implementing both `Classified` and `Retryable` will use `Classified` and ignore `Retryable`. Registering a sentinel for an error that already implements `Classified` has no effect. Classifiers only run when all earlier steps miss, so the hot path is unaffected.
 
-**Multi-error behavior:** For `errors.Join(err1, err2, ...)`, each sub-error is classified recursively and the result is the **highest-severity** sub-error (`Family.Severity()` total order: Transient(1) < Rejection(2) < Conflict(3) < Infrastructure(4) < Corruption(5)). This is deterministic regardless of join argument order and remains fail-closed: if any sub-error is non-Transient (severity > 1), the joined result is non-Transient.
+**Multi-error behavior:** For `errors.Join(err1, err2, ...)`, each sub-error is classified recursively and the result is the **highest-severity** sub-error (`Family.Severity()` total order: Transient(1) < Rejection(2) < Conflict(3) < Infrastructure(4) < Orchestration(5) < Corruption(6)). This is deterministic regardless of join argument order and remains fail-closed: if any sub-error is non-Transient (severity > 1), the joined result is non-Transient.
 
 ## Registry Pattern
 
