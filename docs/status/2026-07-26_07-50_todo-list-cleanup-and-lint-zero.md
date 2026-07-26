@@ -87,6 +87,7 @@ This is the biggest miss. The TODO_LIST.md explicitly documents the contract: "r
 ### 2. cyclop exclusion is a band-aid, not a fix
 
 The orchestration_test.go `TestOrchestrationIntegration` function has cyclomatic complexity 16 (threshold 12) because it has 7 subtests in one function. Instead of refactoring the test into smaller functions (which would be the real fix), I blanket-excluded `cyclop`, `gocyclo`, `gocognit`, and `maintidx` for **all** test files across the entire project. This suppresses the symptom everywhere rather than fixing the root cause in one file. A top-tier engineer would have either:
+
 - Split `TestOrchestrationIntegration` into 7 separate top-level `TestOrchestration*_` functions (each complexity ~2), or
 - Used a table-driven test with a single loop (complexity ~3), or
 - At minimum, used a targeted `//nolint:cyclop` on just that one function with a reason, not a project-wide exclusion.
