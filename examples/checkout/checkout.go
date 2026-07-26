@@ -20,6 +20,17 @@ import (
 	errorfamily "github.com/larsartmann/go-error-family"
 )
 
+// Demo constants used by the example store's mock data.
+const (
+	defaultUserID      = "user-42"
+	defaultOrderAmount = 9900 // $99.00 in cents
+	// DefaultWidgetSKU is the SKU of the item in the mock order data.
+	// Exported so the application can reference it when simulating failures.
+	DefaultWidgetSKU = "WIDGET-001"
+	defaultWidgetQty   = 2
+	defaultWidgetPrice = 4950 // $49.50 in cents
+)
+
 // Order represents a checkout order in the domain.
 type Order struct {
 	ID          string
@@ -55,28 +66,28 @@ type Store struct {
 //   - empty ID           → Rejection (order.missing_id)
 //   - DB unreachable     → Transient (order.db_timeout)
 //   - corrupt record     → Corruption (order.data_corrupt)
-func (s *Store) GetOrder(id string) (*Order, error) {
-	if id == "" {
+func (s *Store) GetOrder(orderID string) (*Order, error) {
+	if orderID == "" {
 		return nil, errorfamily.NewRejection("order.missing_id", "order ID is required").
 			WithContext("suggestion", "Provide the order ID as a query parameter or path segment.")
 	}
 
 	if s.DBUnreachable {
 		return nil, errorfamily.NewTransient("order.db_timeout", "database query exceeded deadline").
-			WithContext("order_id", id)
+			WithContext("order_id", orderID)
 	}
 
 	if s.DataCorrupted {
 		return nil, errorfamily.NewCorruption("order.data_corrupt", "order record is unparseable").
-			WithContext("order_id", id)
+			WithContext("order_id", orderID)
 	}
 
 	return &Order{
-		ID:          id,
-		UserID:      "user-42",
-		AmountCents: 9900,
+		ID:          orderID,
+		UserID:      defaultUserID,
+		AmountCents: defaultOrderAmount,
 		Items: []LineItem{
-			{SKU: "WIDGET-001", Qty: 2, PriceCents: 4950},
+			{SKU: DefaultWidgetSKU, Qty: defaultWidgetQty, PriceCents: defaultWidgetPrice},
 		},
 	}, nil
 }

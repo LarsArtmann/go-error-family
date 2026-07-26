@@ -37,20 +37,22 @@ func TestGetOrder_DataCorrupted_IsCorruption(t *testing.T) {
 
 func TestGetOrder_Success(t *testing.T) {
 	store := &Store{}
+
 	order, err := store.GetOrder("order-42")
 	if err != nil {
 		t.Fatalf("unexpected error: %v", err)
 	}
+
 	if order.ID != "order-42" {
 		t.Errorf("order ID = %q, want order-42", order.ID)
 	}
 }
 
 func TestReserveInventory_OutOfStock_IsConflict(t *testing.T) {
-	store := &Store{ItemOutOfStock: "WIDGET-001"}
+	store := &Store{ItemOutOfStock: DefaultWidgetSKU}
 	order := &Order{
 		ID:    "order-1",
-		Items: []LineItem{{SKU: "WIDGET-001", Qty: 5}},
+		Items: []LineItem{{SKU: DefaultWidgetSKU, Qty: 5}},
 	}
 
 	err := store.ReserveInventory(order)
@@ -58,7 +60,7 @@ func TestReserveInventory_OutOfStock_IsConflict(t *testing.T) {
 	errorfamilytest.AssertFamily(t, err, errorfamily.Conflict)
 	errorfamilytest.AssertCode(t, err, "inventory.conflict")
 	errorfamilytest.AssertRetryable(t, err, false)
-	errorfamilytest.AssertContext(t, err, "sku", "WIDGET-001")
+	errorfamilytest.AssertContext(t, err, "sku", DefaultWidgetSKU)
 }
 
 func TestReserveInventory_InStock_NoError(t *testing.T) {
@@ -75,7 +77,7 @@ func TestReserveInventory_InStock_NoError(t *testing.T) {
 
 func TestChargeCard_Declined_IsRejection(t *testing.T) {
 	store := &Store{PaymentDeclined: true}
-	order := &Order{ID: "order-1", AmountCents: 9900}
+	order := &Order{ID: "order-1", AmountCents: defaultOrderAmount}
 
 	err := store.ChargeCard(order)
 
@@ -86,7 +88,7 @@ func TestChargeCard_Declined_IsRejection(t *testing.T) {
 
 func TestChargeCard_Approved_NoError(t *testing.T) {
 	store := &Store{}
-	order := &Order{ID: "order-1", AmountCents: 9900}
+	order := &Order{ID: "order-1", AmountCents: defaultOrderAmount}
 
 	if err := store.ChargeCard(order); err != nil {
 		t.Fatalf("unexpected error: %v", err)
