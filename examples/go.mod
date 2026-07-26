@@ -3,9 +3,9 @@ module github.com/larsartmann/go-error-family/examples
 go 1.26.5
 
 require (
-	github.com/larsartmann/go-error-family v0.9.0
-	github.com/larsartmann/go-error-family/bridge v0.0.0-00010101000000-000000000000
-	github.com/larsartmann/go-error-family/diagnose v0.2.1
+	github.com/larsartmann/go-error-family v0.10.0
+	github.com/larsartmann/go-error-family/bridge v0.3.2
+	github.com/larsartmann/go-error-family/diagnose v0.2.2
 	github.com/samber/oops v1.23.0
 )
 
@@ -17,5 +17,3 @@ require (
 	go.opentelemetry.io/otel/trace v1.44.0 // indirect
 	golang.org/x/text v0.40.0 // indirect
 )
-
-replace github.com/larsartmann/go-error-family/bridge => ../bridge
