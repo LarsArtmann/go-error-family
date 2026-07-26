@@ -26,7 +26,7 @@ const (
 	defaultOrderAmount = 9900 // $99.00 in cents
 	// DefaultWidgetSKU is the SKU of the item in the mock order data.
 	// Exported so the application can reference it when simulating failures.
-	DefaultWidgetSKU = "WIDGET-001"
+	DefaultWidgetSKU   = "WIDGET-001"
 	defaultWidgetQty   = 2
 	defaultWidgetPrice = 4950 // $49.50 in cents
 )
