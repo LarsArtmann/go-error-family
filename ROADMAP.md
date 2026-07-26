@@ -76,13 +76,15 @@ external consumers despite being correct, tested (95.6%), and fuzzed.
 The bridge gap is demand and demonstration, not quality. The root cause is
 that `samber/oops` adoption is near-zero across the ecosystem, and consumers
 skip the enrichment layer entirely (classify→handle, not classify→enrich→
-handle). Before building more bridge packages, the existing oops bridge needs
-a **reference implementation** showing the full classify→enrich→handle flow
-in a real application.
+handle). The reference implementation shipped (2026-07-26: `examples/cmd/bridge/`
++ `examples/checkout/`) demonstrates the full classify→enrich→handle flow with
+three patterns (pass-through, AutoWrap, explicit Wrap) and documents when to use
+each. The remaining gap is **demand and discoverability** — getting the pattern
+in front of consumers who already use oops.
 
 **Raw ideas:**
 
-- **Reference implementation for oops + bridge + error-family stack** — the #1 unblocker for bridge adoption. Pick one real application and wire it end-to-end as the living example.
+- ~~**Reference implementation for oops + bridge + error-family stack**~~ — **SHIPPED (2026-07-26):** `examples/cmd/bridge/` + `examples/checkout/`. Three patterns, 19 tests, pattern documentation in `cmd/bridge/README.md`. Next: website guide page and announcement.
 - More diagnostic submodules (`redis`, `docker`, `kubectl`)
 - Bridge packages for other error enrichment libraries beyond oops (only after oops bridge has proven consumers)
 - Integration guides for common frameworks (Echo, Gin, Chi, gRPC interceptors)

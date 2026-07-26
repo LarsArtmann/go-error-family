@@ -12,7 +12,9 @@ traceable to its source. When an item ships, remove it here and record it in
 
 ### Medium Priority
 
-_(All medium-priority items completed — see Completed section below.)_
+- [ ] **Add test and lint CI steps for the examples module** — CI currently only runs `go build ./...` for examples. The bridge reference implementation added 19 tests and lint-sensitive code, but neither runs in CI. Add `go test -race -count=1 ./...` and `golangci-lint run ./...` steps to `ci.yml`. Source: bridge reference session 2026-07-26.
+- [ ] **Add bridge guide to the website** — `website/src/content/docs/guides/` has pages for classification, diagnostics, HTTP/CLI, logs, benchmarks, and error-types, but NOT bridge patterns. The reference implementation (`examples/cmd/bridge/`) is the #1 adoption unblocker and should have a corresponding guide page. Link from `related-tools.mdx`. Source: bridge reference session 2026-07-26.
+- [ ] **Link the reference implementation from `related-tools.mdx`** — the website page mentions bridge APIs but doesn't link to `examples/cmd/bridge/`. Source: bridge reference session 2026-07-26.
 
 ### Low Priority
 
