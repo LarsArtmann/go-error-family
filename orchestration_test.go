@@ -68,21 +68,21 @@ func TestOrchestrationIntegration(t *testing.T) {
 	t.Run("severity sits between Infrastructure and Corruption", func(t *testing.T) {
 		t.Parallel()
 
-		s := Orchestration.Severity()
-		if s != 5 {
-			t.Errorf("Severity() = %d, want 5", s)
+		severity := Orchestration.Severity()
+		if severity != 5 {
+			t.Errorf("Severity() = %d, want 5", severity)
 		}
 
-		if Infrastructure.Severity() >= s {
+		if Infrastructure.Severity() >= severity {
 			t.Errorf(
 				"Infrastructure severity %d not < Orchestration %d",
 				Infrastructure.Severity(),
-				s,
+				severity,
 			)
 		}
 
-		if s >= Corruption.Severity() {
-			t.Errorf("Orchestration severity %d not < Corruption %d", s, Corruption.Severity())
+		if severity >= Corruption.Severity() {
+			t.Errorf("Orchestration severity %d not < Corruption %d", severity, Corruption.Severity())
 		}
 	})
 

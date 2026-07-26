@@ -11,7 +11,7 @@ import (
 )
 
 // RunCommand executes a command with timeout and returns its output.
-func RunCommand( //nolint:hierarchical-errors // executes system commands, must return error
+func RunCommand(
 	ctx context.Context,
 	timeout time.Duration,
 	name string,

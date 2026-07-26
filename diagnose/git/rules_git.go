@@ -47,7 +47,7 @@ var gitSpec = diagnose.RuleSpec{ //nolint:gochecknoglobals // Immutable rule mat
 }
 
 //nolint:nilerr // Diagnostic rules return results, not errors; local stat errors are expected.
-func (r *GitRule) Run( //nolint:hierarchical-errors // DiagnosticRule interface
+func (r *GitRule) Run(
 	ctx context.Context,
 	err error,
 ) (*diagnose.DiagnosticResult, error) {
@@ -97,7 +97,7 @@ func (r *GitRule) checkWorkingTree(
 	result *diagnose.DiagnosticResult,
 	repoPath string,
 ) bool {
-	stdout, exitCode, _ := r.cmdRunner().Run( //nolint:hierarchical-errors
+	stdout, exitCode, _ := r.cmdRunner().Run(
 		ctx,
 		5*time.Second,
 		"git",
@@ -151,7 +151,7 @@ func (r *GitRule) checkRemote(
 	result *diagnose.DiagnosticResult,
 	repoPath string,
 ) {
-	remotesStdout, _, _ := r.cmdRunner().Run( //nolint:hierarchical-errors
+	remotesStdout, _, _ := r.cmdRunner().Run(
 		ctx, 3*time.Second, "git", "-C", repoPath, "remote",
 	)
 	if strings.TrimSpace(remotesStdout) == "" {
@@ -161,7 +161,7 @@ func (r *GitRule) checkRemote(
 		return
 	}
 
-	_, remoteExitCode, _ := r.cmdRunner().Run( //nolint:hierarchical-errors
+	_, remoteExitCode, _ := r.cmdRunner().Run(
 		ctx,
 		10*time.Second,
 		"git",

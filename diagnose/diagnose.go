@@ -294,7 +294,7 @@ type CommandRunner interface {
 
 type DefaultCommandRunner struct{}
 
-func (DefaultCommandRunner) Run( //nolint:hierarchical-errors // CommandRunner interface
+func (DefaultCommandRunner) Run(
 	ctx context.Context,
 	timeout time.Duration,
 	name string,

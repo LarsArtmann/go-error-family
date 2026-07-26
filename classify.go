@@ -92,7 +92,7 @@ func ExitCode(err error) int {
 // Compose joins multiple errors into one, preserving all in the Unwrap chain.
 // It is a thin wrapper around [errors.Join] kept for backward compatibility
 // with consumers that imported Compose before v0.5.0 reorganized the package.
-func Compose( //nolint:hierarchical-errors // wraps errors.Join, must return error
+func Compose(
 	errs ...error,
 ) error {
 	return errors.Join(errs...)
@@ -163,7 +163,7 @@ func RegisterClassifiers(cs ...Classifier) {
 // Delegates to [DefaultRegistry].
 func RegisterClassificationType[T error](
 	family Family,
-) { //nolint:hierarchical-errors // generic constraint, must embed error
+) {
 	RegisterClassificationTypeFor[T](DefaultRegistry, family)
 }
 
@@ -177,7 +177,7 @@ func RegisterClassificationType[T error](
 func RegisterClassificationTypeFor[T error](
 	r *Registry,
 	family Family,
-) { //nolint:hierarchical-errors // generic constraint, must embed error
+) {
 	r.RegisterClassifier(func(err error) (Family, bool) {
 		if _, ok := errors.AsType[T](err); ok {
 			return family, true

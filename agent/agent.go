@@ -95,7 +95,7 @@ type agent struct {
 	cfg Config
 }
 
-func (a *agent) Analyze( //nolint:hierarchical-errors // DebugAgent interface
+func (a *agent) Analyze(
 	ctx context.Context,
 	err error,
 	diagnosis []*diagnose.DiagnosticResult,
@@ -110,7 +110,7 @@ func (a *agent) Analyze( //nolint:hierarchical-errors // DebugAgent interface
 	return a.deterministicAnalyze(ctx, err, diagnosis)
 }
 
-func (a *agent) deterministicAnalyze( //nolint:hierarchical-errors // matches Analyze signature
+func (a *agent) deterministicAnalyze(
 	ctx context.Context,
 	err error,
 	diagnosis []*diagnose.DiagnosticResult,

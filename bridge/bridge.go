@@ -66,7 +66,7 @@ type ClassifiedError struct {
 // The returned value satisfies Classified, Coded, Retryable, and Contextual
 // from error-family, and retains all oops methods when the input is an OopsError.
 func Wrap(err error, f errorfamily.Family) *ClassifiedError {
-	oopsErr, _ := oops.AsOops(err) //nolint:hierarchical-errors // non-OopsError is valid
+	oopsErr, _ := oops.AsOops(err)
 
 	return &ClassifiedError{OopsError: oopsErr, original: err, family: f}
 }
@@ -89,7 +89,7 @@ func (c *ClassifiedError) Error() string {
 // Unwrap returns the underlying error for chain traversal.
 // Returns the OopsError's wrapped error when present, otherwise returns
 // the original error. This ensures errors.Is always reaches the root cause.
-func (c *ClassifiedError) Unwrap() error { //nolint:hierarchical-errors // wrapper interface — signature must return error
+func (c *ClassifiedError) Unwrap() error {
 	if inner := c.OopsError.Unwrap(); inner != nil {
 		return inner
 	}
@@ -190,37 +190,37 @@ func (c *ClassifiedError) Format(f fmt.State, verb rune) {
 	switch verb {
 	case 's':
 		if c.OopsError.Error() != "" {
-			_, _ = fmt.Fprintf( //nolint:hierarchical-errors // fmt.Formatter
+			_, _ = fmt.Fprintf(
 				f,
 				"%s",
 				c.OopsError.Error(),
 			)
 		} else if c.original != nil && c.original.Error() != "" {
-			_, _ = fmt.Fprintf( //nolint:hierarchical-errors // fmt.Formatter
+			_, _ = fmt.Fprintf(
 				f,
 				"%s",
 				c.original.Error(),
 			)
 		} else {
-			_, _ = fmt.Fprintf(f, "[%s]", c.family) //nolint:hierarchical-errors // fmt.Formatter
+			_, _ = fmt.Fprintf(f, "[%s]", c.family)
 		}
 	case 'v':
 		if f.Flag('+') {
 			if c.OopsError.Error() != "" {
-				_, _ = fmt.Fprintf( //nolint:hierarchical-errors // fmt.Formatter
+				_, _ = fmt.Fprintf(
 					f,
 					"%+v",
 					&c.OopsError,
 				)
 			} else if c.original != nil {
-				_, _ = fmt.Fprintf( //nolint:hierarchical-errors // fmt.Formatter
+				_, _ = fmt.Fprintf(
 					f,
 					"[%s] %+v",
 					c.family,
 					c.original,
 				)
 			} else {
-				_, _ = fmt.Fprintf( //nolint:hierarchical-errors // fmt.Formatter
+				_, _ = fmt.Fprintf(
 					f,
 					"[%s]",
 					c.family,
@@ -230,8 +230,8 @@ func (c *ClassifiedError) Format(f fmt.State, verb rune) {
 			return
 		}
 
-		_, _ = fmt.Fprint(f, c.Error()) //nolint:hierarchical-errors // fmt.Formatter
+		_, _ = fmt.Fprint(f, c.Error())
 	default:
-		_, _ = fmt.Fprint(f, c.Error()) //nolint:hierarchical-errors // fmt.Formatter
+		_, _ = fmt.Fprint(f, c.Error())
 	}
 }
