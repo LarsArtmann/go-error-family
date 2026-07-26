@@ -155,17 +155,17 @@ The library is **heavily adopted** — 50+ projects across the ecosystem directl
 
 **But consumer-facing enrichment APIs have minimal adoption:** `LogError` (~3 consumers), `HTTPHandler`/`HTTPStatus` (~5), `errorfamilytest` (~3), `diagnose` (~3). The classification core is the bread and butter; the higher-level boundary handlers haven't spread proportionally.
 
-## Bridge Submodule (`bridge/`) — Zero Consumers
+## Bridge Submodule (`bridge/`) — Reference Implementation Added
 
 Connects go-error-family with `samber/oops`. Separate module with its own `go.mod` (depends on both libraries). The root package remains zero-dependency.
 
-**Adoption status: ZERO external consumers.** Root causes:
+**Adoption status: ZERO external consumers (as of 2026-07-23 audit).** Root causes:
 
 1. **Near-zero oops adoption in the ecosystem** — only ~1 project uses `samber/oops` at all. The bridge connects two libraries, but the second one barely exists.
 2. **The enrichment layer is skipped in practice** — consumers call `HandleError(err)` at the top with whatever error bubbled up, without adding stack traces, trace IDs, or domain context. The typical flow is classify→handle, not classify→enrich→handle.
-3. **No reference implementation** — the "libraries classify, applications enrich" architecture is architecturally sound but no project demonstrates the full classify→enrich→handle flow end-to-end. The one project using both libraries combines them at separate layers that never need the bridge.
+3. **~~No reference implementation~~** — **RESOLVED (2026-07-26):** `examples/cmd/bridge/` now demonstrates the full classify→enrich→handle flow with three patterns (pass-through, AutoWrap, explicit Wrap). See `examples/cmd/bridge/README.md` for the pattern documentation and decision guide.
 
-The bridge is correct, tested (95.6%), and fuzzed. The gap is **demand and demonstration, not quality**. It needs a reference implementation showing the oops + bridge + error-family stack in a real application to prove the pattern.
+The bridge is correct, tested (95.6%), and fuzzed. The reference implementation (`examples/cmd/bridge/` + `examples/checkout/`) proves the pattern works end-to-end and documents when to use each bridge API.
 
 | API                        | Purpose                                                                               |
 | -------------------------- | ------------------------------------------------------------------------------------- |

@@ -44,6 +44,13 @@ agent/                ← OWN MODULE (v0.x experimental): analysis-only debug ag
 bridge/               ← submodule: samber/oops integration (opt-in, depends on both libraries)
   bridge.go             ClassifiedError (satisfies Classified, Coded, Retryable, Contextual), Wrap
   classify.go           InferFamily, AutoWrap (tag/domain → Family mapping)
+
+examples/             ← OWN MODULE: runnable examples (depends on root + diagnose + bridge)
+  checkout/             LIBRARY layer: imports only errorfamily (proves "libraries classify")
+  cmd/bridge/           REFERENCE IMPL: oops + bridge + error-family (3 patterns, HTTP server)
+  cmd/cli/              CLI boundary handler
+  cmd/http/             HTTP middleware
+  cmd/custom_rule/      custom DiagnosticRule
 ```
 
 ---
@@ -608,6 +615,20 @@ family := bridge.InferFamily(err)           // just the Family, no wrapping
 ```go
 import "github.com/larsartmann/go-error-family/bridge"
 ```
+
+### Reference Implementation
+
+`examples/cmd/bridge/` is the canonical reference implementation demonstrating the full
+classify→enrich→handle flow. It shows three patterns:
+
+1. **Pass-through** — library errors (classified with error-family) flow through oops
+   enrichment unchanged. `Classify()` finds the family through the chain. No bridge needed.
+2. **AutoWrap** — application-created errors built with oops, classified by `bridge.AutoWrap`.
+3. **Explicit Wrap** — `bridge.Wrap` when the application knows the exact family.
+
+The library layer (`examples/checkout/`) imports ONLY `go-error-family`, proving the
+"libraries classify, applications enrich" architecture. See `examples/cmd/bridge/README.md`
+for the full pattern documentation and decision guide.
 
 ---
 

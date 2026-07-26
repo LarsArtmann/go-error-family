@@ -12,7 +12,7 @@ traceable to its source. When an item ships, remove it here and record it in
 
 ### Medium Priority
 
-- [ ] **Create reference implementation for oops + bridge stack** — the `bridge/` module has zero external consumers. Root cause: near-zero `samber/oops` adoption and no project demonstrating the classify→enrich→handle flow. Pick one real application, wire it through oops + bridge + error-family end-to-end, and document the pattern. This is the #1 unblocker for bridge adoption. Source: adoption audit 2026-07-23.
+*(All medium-priority items completed — see Completed section below.)*
 
 ### Low Priority
 

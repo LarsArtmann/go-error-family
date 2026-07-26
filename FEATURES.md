@@ -188,11 +188,11 @@ Analysis-only debug agent. Separate Go module (depends on root + diagnose).
 
 ---
 
-## `bridge` Module — FULLY_FUNCTIONAL (Zero Consumers)
+## `bridge` Module — FULLY_FUNCTIONAL (Reference Implementation Added)
 
 Connects go-error-family with `samber/oops`. Separate Go module (depends on both).
 
-The code is correct, tested (95.6%), and fuzzed — but has **zero external consumers**. Root cause: `samber/oops` adoption is near-zero across the ecosystem, and consumers skip the enrichment layer in practice. See ROADMAP.md "Ecosystem Growth" and AGENTS.md "Bridge Submodule" for details.
+The code is correct, tested (95.6%), and fuzzed. Has **zero external consumers** (adoption audit 2026-07-23), but now has a **reference implementation** (`examples/cmd/bridge/` + `examples/checkout/`) demonstrating the full classify→enrich→handle flow with three patterns. See `examples/cmd/bridge/README.md` for the pattern documentation and decision guide.
 
 | Feature                                                                                         | Status           | Evidence             |
 | ----------------------------------------------------------------------------------------------- | ---------------- | -------------------- |
@@ -212,6 +212,8 @@ Separate Go module so root stays zero-dependency.
 | `cmd/cli` — CLI boundary handler example              | FULLY_FUNCTIONAL | `examples/cmd/cli/`         |
 | `cmd/http` — HTTP middleware with status code mapping | FULLY_FUNCTIONAL | `examples/cmd/http/`        |
 | `cmd/custom_rule` — writing your own DiagnosticRule   | FULLY_FUNCTIONAL | `examples/cmd/custom_rule/` |
+| `cmd/bridge` — oops+bridge reference impl (3 patterns) | FULLY_FUNCTIONAL | `examples/cmd/bridge/`     |
+| `checkout` — library layer (imports only errorfamily) | FULLY_FUNCTIONAL | `examples/checkout/`        |
 
 ---
 
