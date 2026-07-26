@@ -135,7 +135,7 @@ func (r *FilesystemRule) checkDirWritable(result *DiagnosticResult, path string)
 		)
 		return
 	}
-	_ = f.Close()          
+	_ = f.Close()
 	_ = os.Remove(testFile)
 	setAccessSuccess(result, "writable", "Path exists and is writable: "+path)
 }

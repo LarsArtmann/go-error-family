@@ -82,7 +82,11 @@ func TestOrchestrationIntegration(t *testing.T) {
 		}
 
 		if severity >= Corruption.Severity() {
-			t.Errorf("Orchestration severity %d not < Corruption %d", severity, Corruption.Severity())
+			t.Errorf(
+				"Orchestration severity %d not < Corruption %d",
+				severity,
+				Corruption.Severity(),
+			)
 		}
 	})
 
