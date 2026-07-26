@@ -92,12 +92,3 @@ func TestChargeCard_Approved_NoError(t *testing.T) {
 		t.Fatalf("unexpected error: %v", err)
 	}
 }
-
-func TestLibrary_ImportsOnlyErrorFamily(t *testing.T) {
-	// This test documents the architectural constraint: the checkout library
-	// must import ONLY go-error-family for error handling. It must NEVER import
-	// samber/oops — that is the application's choice, not the library's.
-	//
-	// If this test fails, someone added an enrichment dependency to library code.
-	// Move the enrichment to the application layer instead.
-}
