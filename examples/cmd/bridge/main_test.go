@@ -5,7 +5,6 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
-	"io"
 	"log/slog"
 	"net/http"
 	"net/http/httptest"
@@ -223,7 +222,11 @@ func TestHTTPBoundary_AutoWrapValidation_Returns400Rejection(t *testing.T) {
 	handler.ServeHTTP(rec, req)
 
 	if rec.Code != http.StatusBadRequest {
-		t.Errorf("status = %d, want %d (AutoWrap Rejection to 400)", rec.Code, http.StatusBadRequest)
+		t.Errorf(
+			"status = %d, want %d (AutoWrap Rejection to 400)",
+			rec.Code,
+			http.StatusBadRequest,
+		)
 	}
 
 	body := parseJSON(t, rec.Body.Bytes())
@@ -325,5 +328,7 @@ func parseJSON(t *testing.T, b []byte) map[string]string {
 }
 
 func testLogger() *slog.Logger {
-	return slog.New(slog.NewTextHandler(io.Discard, nil)) //nolint:sloglint // Go 1.26 has no slog.DiscardHandler yet
+	return slog.New(
+		slog.DiscardHandler,
+	)
 }

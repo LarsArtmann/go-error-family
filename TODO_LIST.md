@@ -12,7 +12,7 @@ traceable to its source. When an item ships, remove it here and record it in
 
 ### Medium Priority
 
-*(All medium-priority items completed — see Completed section below.)*
+_(All medium-priority items completed — see Completed section below.)_
 
 ### Low Priority
 

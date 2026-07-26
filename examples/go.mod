@@ -4,7 +4,7 @@ go 1.26.5
 
 require (
 	github.com/larsartmann/go-error-family v0.9.0
-	github.com/larsartmann/go-error-family/bridge v0.0.0
+	github.com/larsartmann/go-error-family/bridge v0.0.0-00010101000000-000000000000
 	github.com/larsartmann/go-error-family/diagnose v0.2.1
 	github.com/samber/oops v1.23.0
 )

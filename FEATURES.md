@@ -95,30 +95,30 @@ The classification core. Zero third-party dependencies (stdlib only).
 
 ### HTTP Boundary
 
-| Feature                                                                           | Status           | Evidence  |
-| --------------------------------------------------------------------------------- | ---------------- | --------- |
-| `HTTPStatus(err)` — checks `HTTPStatuser` override first, then family default      | FULLY_FUNCTIONAL | `http.go` |
-| `HTTPHandler(fn)` — net/http middleware writing safe JSON (no `err.Error()` leak) | FULLY_FUNCTIONAL | `http.go` |
+| Feature                                                                                         | Status           | Evidence   |
+| ----------------------------------------------------------------------------------------------- | ---------------- | ---------- |
+| `HTTPStatus(err)` — checks `HTTPStatuser` override first, then family default                   | FULLY_FUNCTIONAL | `http.go`  |
+| `HTTPHandler(fn)` — net/http middleware writing safe JSON (no `err.Error()` leak)               | FULLY_FUNCTIONAL | `http.go`  |
 | `Error.WithHTTPStatus(status int) *Error` — per-error HTTP status override (0 = family default) | FULLY_FUNCTIONAL | `error.go` |
 
 ### Structured Logging
 
-| Feature                                                                                                       | Status           | Evidence |
-| ------------------------------------------------------------------------------------------------------------- | ---------------- | -------- |
-| `LogError(err, logger)` / `LogErrorContext(ctx, err, logger)` — slog with family/code/retryable/exit_code/context attrs | FULLY_FUNCTIONAL | `log.go` |
-| `HandleConfig.Logger *slog.Logger` — optional structured-logging hook in `HandleError*` (nil = skip)        | FULLY_FUNCTIONAL | `handle.go` |
+| Feature                                                                                                                 | Status           | Evidence    |
+| ----------------------------------------------------------------------------------------------------------------------- | ---------------- | ----------- |
+| `LogError(err, logger)` / `LogErrorContext(ctx, err, logger)` — slog with family/code/retryable/exit_code/context attrs | FULLY_FUNCTIONAL | `log.go`    |
+| `HandleConfig.Logger *slog.Logger` — optional structured-logging hook in `HandleError*` (nil = skip)                    | FULLY_FUNCTIONAL | `handle.go` |
 
 ### Consumer Interfaces
 
-| Feature                                                       | Status           | Evidence        |
-| ------------------------------------------------------------- | ---------------- | --------------- |
-| `Coded` (`ErrorCode() string`)                                | FULLY_FUNCTIONAL | `interfaces.go` |
-| `Classified` (`ErrorFamily() Family`)                         | FULLY_FUNCTIONAL | `interfaces.go` |
-| `Contextual` (`ErrorContext() map[string]string`)             | FULLY_FUNCTIONAL | `interfaces.go` |
-| `Retryable` (`IsRetryable() bool`)                            | FULLY_FUNCTIONAL | `interfaces.go` |
-| `ExitCoder` (`ExitCode() int`) — per-error exit code override | FULLY_FUNCTIONAL | `interfaces.go` |
+| Feature                                                              | Status           | Evidence        |
+| -------------------------------------------------------------------- | ---------------- | --------------- |
+| `Coded` (`ErrorCode() string`)                                       | FULLY_FUNCTIONAL | `interfaces.go` |
+| `Classified` (`ErrorFamily() Family`)                                | FULLY_FUNCTIONAL | `interfaces.go` |
+| `Contextual` (`ErrorContext() map[string]string`)                    | FULLY_FUNCTIONAL | `interfaces.go` |
+| `Retryable` (`IsRetryable() bool`)                                   | FULLY_FUNCTIONAL | `interfaces.go` |
+| `ExitCoder` (`ExitCode() int`) — per-error exit code override        | FULLY_FUNCTIONAL | `interfaces.go` |
 | `HTTPStatuser` (`HTTPStatus() int`) — per-error HTTP status override | FULLY_FUNCTIONAL | `interfaces.go` |
-| All six embed `error` (required for `errors.AsType[T]()`)     | FULLY_FUNCTIONAL | `interfaces.go` |
+| All six embed `error` (required for `errors.AsType[T]()`)            | FULLY_FUNCTIONAL | `interfaces.go` |
 
 ---
 
@@ -207,13 +207,13 @@ The code is correct, tested (95.6%), and fuzzed. Has **zero external consumers**
 
 Separate Go module so root stays zero-dependency.
 
-| Feature                                               | Status           | Evidence                    |
-| ----------------------------------------------------- | ---------------- | --------------------------- |
-| `cmd/cli` — CLI boundary handler example              | FULLY_FUNCTIONAL | `examples/cmd/cli/`         |
-| `cmd/http` — HTTP middleware with status code mapping | FULLY_FUNCTIONAL | `examples/cmd/http/`        |
-| `cmd/custom_rule` — writing your own DiagnosticRule   | FULLY_FUNCTIONAL | `examples/cmd/custom_rule/` |
-| `cmd/bridge` — oops+bridge reference impl (3 patterns) | FULLY_FUNCTIONAL | `examples/cmd/bridge/`     |
-| `checkout` — library layer (imports only errorfamily) | FULLY_FUNCTIONAL | `examples/checkout/`        |
+| Feature                                                | Status           | Evidence                    |
+| ------------------------------------------------------ | ---------------- | --------------------------- |
+| `cmd/cli` — CLI boundary handler example               | FULLY_FUNCTIONAL | `examples/cmd/cli/`         |
+| `cmd/http` — HTTP middleware with status code mapping  | FULLY_FUNCTIONAL | `examples/cmd/http/`        |
+| `cmd/custom_rule` — writing your own DiagnosticRule    | FULLY_FUNCTIONAL | `examples/cmd/custom_rule/` |
+| `cmd/bridge` — oops+bridge reference impl (3 patterns) | FULLY_FUNCTIONAL | `examples/cmd/bridge/`      |
+| `checkout` — library layer (imports only errorfamily)  | FULLY_FUNCTIONAL | `examples/checkout/`        |
 
 ---
 

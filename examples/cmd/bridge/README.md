@@ -116,10 +116,10 @@ return bridge.Wrap(rich, errorfamily.Conflict)  // explicit family
 The same enriched+classified error object produces **two completely different
 outputs** depending on the audience:
 
-| Audience      | What they see                                    | How                              |
-| ------------- | ------------------------------------------------ | -------------------------------- |
-| **Operator**  | Full stack trace, trace ID, all context fields   | `logger.Error(fmt.Sprintf("%+v", err))` |
-| **HTTP client** | Safe `{family, code, message}` — no internals  | `errorfamily.HTTPHandler`        |
+| Audience        | What they see                                  | How                                     |
+| --------------- | ---------------------------------------------- | --------------------------------------- |
+| **Operator**    | Full stack trace, trace ID, all context fields | `logger.Error(fmt.Sprintf("%+v", err))` |
+| **HTTP client** | Safe `{family, code, message}` — no internals  | `errorfamily.HTTPHandler`               |
 
 ```go
 // Internal log: operator sees everything
@@ -166,13 +166,13 @@ curl 'http://localhost:8090/orders?id=order-42&fail=inv'
 
 ## Decision Guide: When to Use What
 
-| Situation                                       | Use                        |
-| ----------------------------------------------- | -------------------------- |
-| Library already classified the error            | `oops.Wrap(err)` — done    |
-| Application creates errors with oops            | `bridge.AutoWrap(err)`     |
-| Application knows the exact family              | `bridge.Wrap(err, family)` |
-| Need just the family from an oops error         | `bridge.InferFamily(err)`  |
-| Don't use oops at all                           | `errorfamily.New*` / `Wrap*` |
+| Situation                               | Use                          |
+| --------------------------------------- | ---------------------------- |
+| Library already classified the error    | `oops.Wrap(err)` — done      |
+| Application creates errors with oops    | `bridge.AutoWrap(err)`       |
+| Application knows the exact family      | `bridge.Wrap(err, family)`   |
+| Need just the family from an oops error | `bridge.InferFamily(err)`    |
+| Don't use oops at all                   | `errorfamily.New*` / `Wrap*` |
 
 ## File Layout
 

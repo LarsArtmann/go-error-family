@@ -154,13 +154,13 @@ This is the most recent session. Its open items are current:
 > linter was never installed), and v0.9.0 is tagged and live. Remaining open:
 > the domains repo `flake.lock` corruption (cross-repo, not actionable here).
 
-| Open item (this report)                            | Status                                                                                             | Tracked in                   |
-| -------------------------------------------------- | -------------------------------------------------------------------------------------------------- | ---------------------------- |
-| `gitignore-upserter:repair` failure (c.1)          | ~~**Still open** — never investigated~~ **RESOLVED 2026-07-26:** `gitignore-upserter:detect` now succeeds; BuildFlow 38/39 pass | TODO_LIST (removed)          |
-| Actual `buildflow` command never run (d.3)         | ~~**Still open** — individual tools pass, full pipeline unverified~~ **RESOLVED 2026-07-26:** `buildflow --dry-run` verified end-to-end | TODO_LIST (removed)          |
-| `version: latest` in release.yml (c.3)             | ~~**Still open** — 3 occurrences unpinned~~ **RESOLVED 2026-07-26:** pinned to `v2.12.2` matching `ci.yml` | TODO_LIST (removed)          |
-| 50 `//nolint:hierarchical-errors` directives (d.2) | ~~**Still open**~~ **RESOLVED 2026-07-26:** all 52 directives removed; the linter was never installed | TODO_LIST (removed)          |
-| Domains repo `flake.lock` corruption               | **Still open** — pre-existing, cross-repo                                                          | Not actionable here          |
-| v0.8.0 untagged                                    | ~~**Still open**~~ **RESOLVED:** v0.8.0 tagged; project is now at v0.9.0 | TODO_LIST (removed)          |
+| Open item (this report)                            | Status                                                                                                                                  | Tracked in          |
+| -------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------- | ------------------- |
+| `gitignore-upserter:repair` failure (c.1)          | ~~**Still open** — never investigated~~ **RESOLVED 2026-07-26:** `gitignore-upserter:detect` now succeeds; BuildFlow 38/39 pass         | TODO_LIST (removed) |
+| Actual `buildflow` command never run (d.3)         | ~~**Still open** — individual tools pass, full pipeline unverified~~ **RESOLVED 2026-07-26:** `buildflow --dry-run` verified end-to-end | TODO_LIST (removed) |
+| `version: latest` in release.yml (c.3)             | ~~**Still open** — 3 occurrences unpinned~~ **RESOLVED 2026-07-26:** pinned to `v2.12.2` matching `ci.yml`                              | TODO_LIST (removed) |
+| 50 `//nolint:hierarchical-errors` directives (d.2) | ~~**Still open**~~ **RESOLVED 2026-07-26:** all 52 directives removed; the linter was never installed                                   | TODO_LIST (removed) |
+| Domains repo `flake.lock` corruption               | **Still open** — pre-existing, cross-repo                                                                                               | Not actionable here |
+| v0.8.0 untagged                                    | ~~**Still open**~~ **RESOLVED:** v0.8.0 tagged; project is now at v0.9.0                                                                | TODO_LIST (removed) |
 
 The auto-commit hook (Q1) and squash question (Q2) remain unresolved design choices — the 11 generic auto-commits stand in git history.

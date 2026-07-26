@@ -141,7 +141,8 @@ func enrichLibraryError(
 		With("path", r.URL.Path).
 		Wrap(err)
 
-	logger.Error(fmt.Sprintf("%+v", enriched),
+	logger.Error(
+		fmt.Sprintf("%+v", enriched),
 		"trace_id", traceID,
 		"user_id", userID,
 	)
