@@ -77,10 +77,11 @@ The bridge gap is demand and demonstration, not quality. The root cause is
 that `samber/oops` adoption is near-zero across the ecosystem, and consumers
 skip the enrichment layer entirely (classify→handle, not classify→enrich→
 handle). The reference implementation shipped (2026-07-26: `examples/cmd/bridge/`
-+ `examples/checkout/`) demonstrates the full classify→enrich→handle flow with
-three patterns (pass-through, AutoWrap, explicit Wrap) and documents when to use
-each. The remaining gap is **demand and discoverability** — getting the pattern
-in front of consumers who already use oops.
+
+- `examples/checkout/`) demonstrates the full classify→enrich→handle flow with
+  three patterns (pass-through, AutoWrap, explicit Wrap) and documents when to use
+  each. The remaining gap is **demand and discoverability** — getting the pattern
+  in front of consumers who already use oops.
 
 **Raw ideas:**
 
