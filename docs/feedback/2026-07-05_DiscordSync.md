@@ -195,6 +195,13 @@ The skill file (`/home/lars/projects/go-error-family/SKILL.md`) is **excellent o
 ## Appendix: Resolution Status (2026-07-05)
 
 > **Note:** This feedback document was missed during the initial feedback-implementation session. It was discovered during a self-review. Items below are marked with their current status as of 2026-07-23.
+>
+> **Update 2026-07-26:** All design-decision items (D1, D2, D4) have been
+> resolved — see TODO_LIST.md "Design Decisions Resolved" for rationale. D1
+> (constructor context) and D2 (frozen registry flag) are WON'T FIX. D4
+> (`Classify(nil)`) is KEPT as Rejection. D5 (`RegisterClassificationType[T]`)
+> shipped in v0.8.0. The skill-doc items (New\* vs Wrap\*, errkit pattern) were
+> added to SKILL.md in the 2026-07-23 session.
 
 ### What's Painful
 

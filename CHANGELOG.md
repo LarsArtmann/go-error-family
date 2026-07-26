@@ -29,6 +29,13 @@ fix (report the bug).
 ### Fixed
 
 - **Website deploy workflow** (`.github/workflows/website-deploy.yml`) — pinned `FirebaseExtended/action-hosting-deploy` to a valid commit SHA (`500ac625 # v0.11.0`); the previously pinned SHA did not exist in the upstream repo, failing every run at action resolution. The `FIREBASE_SERVICE_ACCOUNT_LARS_SOFTWARE` GitHub secret is now set, so production deploys to `errorfamily.lars.software` run automatically on `website/**` changes to `master` (verified green).
+- **Release workflow supply-chain pin** (`.github/workflows/release.yml`) — pinned 3 occurrences of `version: latest` for `golangci-lint-action` to `version: v2.12.2`, matching the pin already in `ci.yml`. Previously every release picked up whatever version existed at tag-push time.
+
+### Changed
+
+- **Removed 52 phantom `//nolint:hierarchical-errors` directives** across 13 Go files — the `hierarchical-errors` linter was never installed (not as a binary, not as a golangci-lint linter, not as a BuildFlow step). The directives only produced "unknown linters: hierarchical-errors" warnings on every lint run.
+- **Test-file lint exclusions** (`.golangci.yml`) — added `cyclop`, `gocyclo`, `gocognit`, `maintidx` to the `_test.go` exclusion list. Test functions with many subtests legitimately exceed complexity thresholds.
+- **BuildFlow pipeline verified** — 38/39 steps pass (1 skipped via config). The previously-failing `gitignore-upserter:repair` and `nix-hash-fix` now succeed.
 
 ## [0.9.0] - 2026-07-24
 

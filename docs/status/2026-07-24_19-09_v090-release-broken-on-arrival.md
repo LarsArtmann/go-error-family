@@ -4,6 +4,13 @@
 > **Trigger:** User asked "Time for a new release?" → "Do it" → brutal self-review
 > **Verdict:** Tags cut, but **release is broken for all submodule consumers**. Do NOT push tags until go.sum is fixed.
 
+> **Update 2026-07-26:** The go.sum staleness described here was **resolved**.
+> Commits `922f0ce` and `e7200b4` ("update Go module dependencies across
+> project" / "update module dependencies across all submodules") regenerated
+> all 6 submodule `go.sum` files with correct `v0.9.0`/`v0.2.1` checksums.
+> `GOWORK=off go build ./...` now passes in every submodule. The v0.9.0 tags
+> were pushed and the release is live.
+
 ---
 
 ## Executive Summary

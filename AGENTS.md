@@ -126,7 +126,7 @@ Not a library type — partial success is a consumption pattern, not a classific
 
 | Package              | Coverage |
 | -------------------- | -------- |
-| root (`errorfamily`) | 97.0%    |
+| root (`errorfamily`) | 97.1%    |
 | `errorfamilytest`    | 96.3%    |
 | `agent`              | 100.0%   |
 | `bridge`             | 95.6%    |
