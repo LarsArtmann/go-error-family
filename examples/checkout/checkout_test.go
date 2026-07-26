@@ -49,7 +49,7 @@ func TestGetOrder_Success(t *testing.T) {
 func TestReserveInventory_OutOfStock_IsConflict(t *testing.T) {
 	store := &Store{ItemOutOfStock: "WIDGET-001"}
 	order := &Order{
-		ID: "order-1",
+		ID:    "order-1",
 		Items: []LineItem{{SKU: "WIDGET-001", Qty: 5}},
 	}
 
@@ -64,7 +64,7 @@ func TestReserveInventory_OutOfStock_IsConflict(t *testing.T) {
 func TestReserveInventory_InStock_NoError(t *testing.T) {
 	store := &Store{}
 	order := &Order{
-		ID: "order-1",
+		ID:    "order-1",
 		Items: []LineItem{{SKU: "GADGET-002", Qty: 1}},
 	}
 

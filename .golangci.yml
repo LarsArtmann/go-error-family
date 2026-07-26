@@ -160,6 +160,7 @@ linters:
         - github.com/larsartmann/go-error-family/diagnose.staticRule
         - github.com/larsartmann/go-error-family/agent.AgentResult
         - github.com/larsartmann/go-error-family/agent.Config
+        - github.com/larsartmann/go-error-family/examples/checkout.Store
     ginkgolinter:
       forbid-focus-container: true
       forbid-spec-pollution: true
@@ -208,6 +209,7 @@ linters:
         - f
         - w
         - ag
+        - r
       ignore-type-assert-ok: true
   exclusions:
     generated: lax

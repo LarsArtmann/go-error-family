@@ -39,7 +39,10 @@ func TestPattern1_LibraryRejection_SurvivesOopsEnrichment(t *testing.T) {
 	// and finds the library's *Error implementing Classified.
 	family := errorfamily.Classify(enriched)
 	if family != errorfamily.Rejection {
-		t.Errorf("Classify(enriched) = %v, want Rejection (library classification should survive oops wrapping)", family)
+		t.Errorf(
+			"Classify(enriched) = %v, want Rejection (library classification should survive oops wrapping)",
+			family,
+		)
 	}
 
 	// The code also survives.
@@ -133,7 +136,7 @@ func TestPattern2_AutoWrap_TagOverridesDomain(t *testing.T) {
 func TestPattern3_ExplicitWrap_AssignsConflict(t *testing.T) {
 	store := &checkout.Store{ItemOutOfStock: "WIDGET-001"}
 	order := &checkout.Order{
-		ID: "order-1",
+		ID:    "order-1",
 		Items: []checkout.LineItem{{SKU: "WIDGET-001", Qty: 5}},
 	}
 

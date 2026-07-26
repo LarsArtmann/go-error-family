@@ -22,16 +22,16 @@ import (
 
 // Order represents a checkout order in the domain.
 type Order struct {
-	ID       string
-	UserID   string
+	ID          string
+	UserID      string
 	AmountCents int
-	Items    []LineItem
+	Items       []LineItem
 }
 
 // LineItem is a single item in an order.
 type LineItem struct {
-	SKU   string
-	Qty   int
+	SKU        string
+	Qty        int
 	PriceCents int
 }
 
@@ -107,9 +107,8 @@ func (s *Store) ChargeCard(order *Order) error {
 	if s.PaymentDeclined {
 		return errorfamily.NewRejection("payment.declined", "card issuer declined the charge").
 			WithContext("order_id", order.ID).
-				WithContextAny("amount_cents", order.AmountCents)
+			WithContextAny("amount_cents", order.AmountCents)
 	}
 
 	return nil
 }
-
