@@ -3,7 +3,7 @@
 Honest inventory of what exists, what works, and what doesn't. Every claim is
 verifiable against the code — citations point at the source.
 
-**Last verified:** 2026-07-25 against [Unreleased] (Orchestration family)
+**Last verified:** 2026-07-26 against [Unreleased] (Orchestration family)
 
 ---
 
@@ -97,14 +97,16 @@ The classification core. Zero third-party dependencies (stdlib only).
 
 | Feature                                                                           | Status           | Evidence  |
 | --------------------------------------------------------------------------------- | ---------------- | --------- |
-| `HTTPStatus(err)` — classify→status-code                                          | FULLY_FUNCTIONAL | `http.go` |
+| `HTTPStatus(err)` — checks `HTTPStatuser` override first, then family default      | FULLY_FUNCTIONAL | `http.go` |
 | `HTTPHandler(fn)` — net/http middleware writing safe JSON (no `err.Error()` leak) | FULLY_FUNCTIONAL | `http.go` |
+| `Error.WithHTTPStatus(status int) *Error` — per-error HTTP status override (0 = family default) | FULLY_FUNCTIONAL | `error.go` |
 
 ### Structured Logging
 
 | Feature                                                                                                       | Status           | Evidence |
 | ------------------------------------------------------------------------------------------------------------- | ---------------- | -------- |
-| `LogError(err, logger)` / `LogErrorContext(ctx, err, logger)` — slog with family/code/retryable/context attrs | FULLY_FUNCTIONAL | `log.go` |
+| `LogError(err, logger)` / `LogErrorContext(ctx, err, logger)` — slog with family/code/retryable/exit_code/context attrs | FULLY_FUNCTIONAL | `log.go` |
+| `HandleConfig.Logger *slog.Logger` — optional structured-logging hook in `HandleError*` (nil = skip)        | FULLY_FUNCTIONAL | `handle.go` |
 
 ### Consumer Interfaces
 
@@ -115,7 +117,8 @@ The classification core. Zero third-party dependencies (stdlib only).
 | `Contextual` (`ErrorContext() map[string]string`)             | FULLY_FUNCTIONAL | `interfaces.go` |
 | `Retryable` (`IsRetryable() bool`)                            | FULLY_FUNCTIONAL | `interfaces.go` |
 | `ExitCoder` (`ExitCode() int`) — per-error exit code override | FULLY_FUNCTIONAL | `interfaces.go` |
-| All five embed `error` (required for `errors.AsType[T]()`)    | FULLY_FUNCTIONAL | `interfaces.go` |
+| `HTTPStatuser` (`HTTPStatus() int`) — per-error HTTP status override | FULLY_FUNCTIONAL | `interfaces.go` |
+| All six embed `error` (required for `errors.AsType[T]()`)     | FULLY_FUNCTIONAL | `interfaces.go` |
 
 ---
 
@@ -131,6 +134,7 @@ Test assertion helpers mirroring `net/http/httptest`. Keeps `testing` out of pro
 | `AssertContext(tb, err, key, want)`  | FULLY_FUNCTIONAL | `errorfamilytest/errorfamilytest.go` |
 | `AssertContextMissing(tb, err, key)` | FULLY_FUNCTIONAL | `errorfamilytest/errorfamilytest.go` |
 | `AssertExitCode(tb, err, want)`      | FULLY_FUNCTIONAL | `errorfamilytest/errorfamilytest.go` |
+| `AssertHTTPStatus(tb, err, want)`    | FULLY_FUNCTIONAL | `errorfamilytest/errorfamilytest.go` |
 
 ---
 
@@ -215,17 +219,17 @@ Separate Go module so root stays zero-dependency.
 
 | Package              | Coverage |
 | -------------------- | -------- |
-| root (`errorfamily`) | 97.6%    |
-| `errorfamilytest`    | 95.8%    |
+| root (`errorfamily`) | 97.1%    |
+| `errorfamilytest`    | 96.3%    |
 | `agent`              | 100.0%   |
 | `bridge`             | 95.6%    |
 | `diagnose` (core)    | 83.9%    |
 | `diagnose/git`       | 98.5%    |
 | `diagnose/postgres`  | 80.3%    |
 
-All packages at 80%+. Fuzz tests (14 total):
+All packages at 80%+. Fuzz tests (16 total):
 
-**Root** (9): `FuzzParseFamily`, `FuzzParseFamilyRoundTrip`, `FuzzClassify`, `FuzzClassifyPlainError`, `FuzzErrorFormatting`, `FuzzApplyContext`, `FuzzWrapOnce`, `FuzzContextValueToString`, `FuzzWithExitCode`.
+**Root** (11): `FuzzParseFamily`, `FuzzParseFamilyRoundTrip`, `FuzzClassify`, `FuzzClassifyPlainError`, `FuzzErrorFormatting`, `FuzzApplyContext`, `FuzzWrapOnce`, `FuzzContextValueToString`, `FuzzWithExitCode`, `FuzzWithHTTPStatus`, `FuzzRegisterClassificationType`.
 
 **Bridge** (5): `FuzzInferFamily`, `FuzzAutoWrap`, `FuzzWrapRoundTrip`, `FuzzWrapOopsRoundTrip`, `FuzzFormat`.
 
@@ -234,6 +238,6 @@ All packages at 80%+. Fuzz tests (14 total):
 ## Known Gaps
 
 - ~~**No per-error HTTP status override**~~ — **SHIPPED (v0.8.0).** `WithHTTPStatus(int)` + `HTTPStatuser` interface provide per-error overrides of family-level defaults. Mirrors `ExitCoder`/`WithExitCode` pattern exactly.
-- **`Classify(nil)` returns Rejection** — intentional but debated. Some consumers argue it should be Transient (fail-open) or Infrastructure (programming error). This is a design decision, not a bug.
-- **Constructor context ergonomics** — `.WithContext().WithContext()` chains are verbose. No builder pattern or variadic context yet. Consumers build `errkit`-style helpers.
+- **`Classify(nil)` returns Rejection** — resolved design decision (2026-07-23). Kept as Rejection: nil = caller bug, and changing to Transient would make `HTTPStatus(nil)` return 503. See TODO_LIST "Design Decisions Resolved" #2.
+- **Constructor context ergonomics** — resolved design decision (2026-07-23). WON'T FIX: `WithContextMap(map[string]string{...})` already exists for multi-value context. Functional options would conflict with copy-on-write design. See TODO_LIST "Design Decisions Resolved" #3.
 - **`encoding/json` (stdlib)** — the root module uses standard `encoding/json`. The v0.7.0 json/v2 experiment was reverted in v0.8.0; no `GOEXPERIMENT` required.

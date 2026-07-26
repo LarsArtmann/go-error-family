@@ -3,7 +3,7 @@
 Long-term direction and raw ideas not yet refined into actionable tasks.
 When an idea becomes bounded and actionable, it moves to `TODO_LIST.md`.
 
-**Last updated:** 2026-07-24
+**Last updated:** 2026-07-26
 
 ---
 
@@ -16,13 +16,14 @@ story was strengthened with per-error exit code overrides (`ExitCoder`),
 idempotent wrapping (`WrapOnce`), typed context values (`WithContextAny`), and
 panic-safe cause rendering (`safeCauseString`), structured-logging hook
 (`HandleConfig.Logger`), and HTTP error-path fix (`writeHTTPError` respects
-per-error `WithHTTPStatus`). v0.9.0 is released. The focus now is: improving
-consumer discoverability of the higher-level boundary handlers
-(`HTTPHandler`, `LogError`, `diagnose`), verifying the full BuildFlow
-toolchain, and resolving the few open design tensions from consumer feedback.
-The CI module-graph gate and consumer-simulation job shipped; lint is at zero
-golangci-lint issues (though the hierarchical-errors tool adds 50 nolint
-directives that warrant cleanup).
+per-error `WithHTTPStatus`). v0.9.0 is released; `[Unreleased]` adds the
+`Orchestration` family (6th family for internal coordination failures). The
+focus now is: improving consumer discoverability of the higher-level boundary
+handlers (`HTTPHandler`, `LogError`, `diagnose`), and resolving the few open
+design tensions from consumer feedback. The CI module-graph gate and
+consumer-simulation job shipped; lint is at zero golangci-lint issues across
+all modules. The 52 phantom `//nolint:hierarchical-errors` directives (for a
+linter that was never installed) have been removed.
 
 ## Themes
 
@@ -56,9 +57,8 @@ custom layers.
 
 The v0.6.0 phantom-`replace` incident exposed that `go.work` masks
 consumer-facing bugs. CI needs to verify the module graph from the consumer's
-perspective. The `GOWORK=off go list -m all` gate and consumer-simulation job
-shipped in the `[Unreleased]` work (commit `e9c7219`); the remaining gaps are
-tooling-level.
+perspective. The `GOWORK=off go list -m all` gate, consumer-simulation job,
+and `go vet` all shipped in v0.8.0; the remaining gaps are tooling-level.
 
 **Raw ideas:**
 
