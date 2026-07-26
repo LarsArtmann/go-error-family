@@ -20,7 +20,7 @@ go build ./...                                 # build check
 - **LIBRARY code** (clients, SDKs, domain packages) imports `go-error-family` only and returns classified errors. A library knows its own domain contract (404 = Rejection, timeout = Transient) but must NOT presume the application's observability stack — so it never imports oops.
 - **APPLICATION code** imports oops for enrichment (stack traces, trace IDs, request context) and, if it also needs behavioral decisions, wraps library errors via the bridge.
 
-The classification protocol is the **four interfaces** (`Coded`/`Classified`/`Contextual`/`Retryable`) — the sole public contract. `Error` is a reference implementation, not the contract; domain types implement only the interfaces they need.
+The classification protocol is the **six interfaces** (`Coded`/`Classified`/`Contextual`/`Retryable`/`ExitCoder`/`HTTPStatuser`) — the sole public contract. `Error` is a reference implementation, not the contract; domain types implement only the interfaces they need.
 
 ## Surprising Behaviors
 
@@ -30,7 +30,7 @@ The classification protocol is the **four interfaces** (`Coded`/`Classified`/`Co
 - **`Wrap(nil, ...)` returns `nil`** — nil-safe, but means you can't construct an error wrapping nil.
 - **`WithContext`/`WithCause`/`WithTimestamp`/`WithExitCode` are copy-on-write** — they return a NEW `*Error`, not the same pointer. Safe to chain from shared/sentinel errors. Do NOT assume identity preservation.
 - **Template placeholders use `{key}`, not `{{.key}}`** — the old syntax collided with Go's `text/template`. Migration: replace all `{{.key}}` with `{key}` in registered templates.
-- **Consumer interfaces (`Coded`, `Classified`, `Contextual`, `Retryable`, `ExitCoder`) embed `error`** — required for Go 1.26's `errors.AsType[T]()`. Don't remove the embedding.
+- **Consumer interfaces (`Coded`, `Classified`, `Contextual`, `Retryable`, `ExitCoder`, `HTTPStatuser`) embed `error`** — required for Go 1.26's `errors.AsType[T]()`. Don't remove the embedding.
 - **`HandleErrorWithContext` is the canonical entry point** — `HandleError` and `HandleErrorWithConfig` delegate to it. Always prefer the context-accepting variant when you have a `context.Context`.
 - **Package-level `Classify`/`RegisterClassification`/`RegisterTemplate` delegate to `DefaultRegistry`** — backward compatible. For test isolation or scoped handling, construct a `NewRegistry()` and pass it via `HandleConfig.Registry`.
 - **`CommandRunner` defaults to `DefaultCommandRunner{}`** — rules with a nil `Runner` field use the real system commands. Tests inject mocks.
