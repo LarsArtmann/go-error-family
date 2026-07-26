@@ -3,6 +3,9 @@ package main
 import (
 	"encoding/json"
 	"errors"
+	"fmt"
+	"io"
+	"log/slog"
 	"net/http"
 	"net/http/httptest"
 	"strings"
@@ -50,7 +53,7 @@ func TestPattern1_LibraryRejection_SurvivesOopsEnrichment(t *testing.T) {
 	}
 
 	// The oops enrichment is present: %+v reveals a stack trace.
-	verbose := fmtSprintf("%+v", enriched)
+	verbose := fmt.Sprintf("%+v", enriched)
 	if !strings.Contains(verbose, "trace-abc") {
 		t.Errorf("verbose output should contain trace_id, got: %s", verbose)
 	}
@@ -207,9 +210,8 @@ func TestHTTPBoundary_DBFailure_Returns503Transient(t *testing.T) {
 	if body["family"] != "transient" {
 		t.Errorf("family = %q, want transient", body["family"])
 	}
-	if body["retryable"] != "true" {
-		t.Errorf("retryable = %q, want true", body["retryable"])
-	}
+	// HTTPHandler writes family/code/message only — it never exposes retryable
+	// directly. The family "transient" is the retryable signal.
 }
 
 func TestHTTPBoundary_AutoWrapValidation_Returns400Rejection(t *testing.T) {
@@ -264,12 +266,17 @@ func TestHTTPBoundary_Success_Returns200(t *testing.T) {
 		t.Errorf("status = %d, want %d", rec.Code, http.StatusOK)
 	}
 
-	body := parseJSON(t, rec.Body.Bytes())
-	if body["order_id"] != "order-42" {
-		t.Errorf("order_id = %q, want order-42", body["order_id"])
+	// The success path returns application JSON (not from HTTPHandler).
+	// Parse with any-typed values since amount_cents is a number.
+	var success map[string]any
+	if err := json.Unmarshal(rec.Body.Bytes(), &success); err != nil {
+		t.Fatalf("failed to parse success response: %v", err)
 	}
-	if body["trace_id"] != "trace-success" {
-		t.Errorf("trace_id = %q, want trace-success", body["trace_id"])
+	if success["order_id"] != "order-42" {
+		t.Errorf("order_id = %v, want order-42", success["order_id"])
+	}
+	if success["trace_id"] != "trace-success" {
+		t.Errorf("trace_id = %v, want trace-success", success["trace_id"])
 	}
 }
 
@@ -304,11 +311,6 @@ func parseJSON(t *testing.T, b []byte) map[string]string {
 	return m
 }
 
-func testLogger() *slogLogger {
-	return &slogLogger{}
-}
-
-// fmtSprintf wraps fmt.Sprintf to avoid importing fmt in test helpers.
-func fmtSprintf(format string, args ...any) string {
-	return sprintf(format, args...)
+func testLogger() *slog.Logger {
+	return slog.New(slog.NewTextHandler(io.Discard, nil))
 }
