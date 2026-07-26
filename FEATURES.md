@@ -3,7 +3,7 @@
 Honest inventory of what exists, what works, and what doesn't. Every claim is
 verifiable against the code — citations point at the source.
 
-**Last verified:** 2026-07-26 against [Unreleased] (Orchestration family)
+**Last verified:** 2026-07-26 against v0.10.0 (Orchestration family)
 
 ---
 

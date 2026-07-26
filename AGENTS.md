@@ -37,6 +37,7 @@ The classification protocol is the **six interfaces** (`Coded`/`Classified`/`Con
 - **`Error()`/`Summary()` use `safeCauseString` for panic recovery** — if a wrapped cause's `Error()` method panics (e.g. nil internal values in third-party error types), the panic is caught and the cause message is omitted rather than crashing the process.
 - **`ExitCode(err)` checks `ExitCoder` before family** — an error implementing `ExitCoder` with a non-zero code overrides the family-based BSD exit code. `*Error` always implements `ExitCoder`, but returns 0 (meaning "use family default") unless `WithExitCode` was called.
 - **`WrapOnce` is idempotent** — if the error chain already contains a `*Error`, it is returned unchanged. This prevents double-wrapping at API boundaries.
+- **`Orchestration` is the 6th family** (v0.10.0) — internal coordination failures (program's own logic bug), severity 5, exit 70, HTTP 500. `Corruption` severity bumped 5 to 6 to preserve total order. Relative ordering of the original 5 families is unchanged.
 
 ## API Surface (v0.10.0)
 

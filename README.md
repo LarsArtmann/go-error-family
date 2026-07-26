@@ -118,6 +118,7 @@ See [examples/](examples/) for runnable CLI, HTTP, and custom diagnostic rule de
 | **Transient**      | **yes**   | 75        | System                  | Reassuring    |
 | **Corruption**     | no        | 65        | Data damage             | Urgent        |
 | **Infrastructure** | no        | 69        | System                  | Apologetic    |
+| **Orchestration**  | no        | 70        | Program (internal bug)  | Apologetic    |
 
 Each family exposes `Audience()` (User / Ops / All) and `Tone()` for presentation-layer decisions.
 

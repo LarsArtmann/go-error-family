@@ -5,6 +5,32 @@ description: All notable changes to go-error-family.
 
 ## [Unreleased]
 
+## [0.10.0] — 2026-07-26
+
+Adds the `Orchestration` family — the 6th behavioral family — for internal
+coordination failures: the program's own logic failed to complete an operation.
+Not retryable; no user-facing fix (report the bug).
+
+### Added
+
+- **`Orchestration` Family** — 6th behavioral family. Severity 5, exit code 70 (`EX_SOFTWARE`), HTTP 500. Sits between Infrastructure (4) and Corruption (6) in the severity order.
+- **`NewOrchestration` / `WrapOrchestration` / `WrapOrchestrationf`** — family-specific constructors.
+- **Bridge reference implementation** (`examples/cmd/bridge/` + `examples/checkout/`) — canonical classify->enrich->handle flow with 19 tests.
+
+### Changed
+
+- **`Corruption` severity 5 -> 6** — bumped to preserve total order after inserting Orchestration at 5. Relative ordering of original families unchanged.
+- **`IsValid()` boundary** now spans six constants (Rejection..Orchestration).
+- **Removed 52 phantom `//nolint:hierarchical-errors` directives** across 13 files — linter was never installed.
+
+### Fixed
+
+- **`examples/go.mod` phantom replace directive** — replaced `bridge v0.0.0-...` + local `replace` with real `bridge v0.3.2`. Same class of bug as the v0.6.0 hotfix.
+
+### Modules
+
+- `go-error-family` -> **v0.10.0**, `diagnose` -> **v0.2.2**, `agent` -> **v0.2.2**, `bridge` -> **v0.3.2**, `diagnose/git` -> **v0.5.2**, `diagnose/postgres` -> **v0.5.2**, `examples` -> **v0.3.0**
+
 ## [0.9.0] — 2026-07-24
 
 Structured-logging hook for `HandleError*` and an HTTP error-path fix. The
