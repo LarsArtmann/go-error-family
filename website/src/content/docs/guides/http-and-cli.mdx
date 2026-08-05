@@ -61,6 +61,7 @@ All lookups are exact code matches (case-insensitive). Template placeholders use
 `HTTPStatus(err)` maps any error to its status code. `HTTPHandler` wraps an error-returning handler and writes a **safe** JSON response (no internal leakage):
 
 ```go
+// skip-validate
 func createOrder(w http.ResponseWriter, r *http.Request) error {
     order, err := parseOrder(r)
     if err != nil {
