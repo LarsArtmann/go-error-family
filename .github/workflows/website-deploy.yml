@@ -29,17 +29,17 @@ jobs:
         uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4
         with:
           node-version-file: "website/.node-version"
-          cache: npm
+          cache: pnpm
           cache-dependency-path: website/package-lock.json
 
       - name: Install dependencies
-        run: npm ci
+        run: pnpm install --frozen-lockfile
 
       - name: Type check
-        run: npx astro check
+        run: pnpm dlx astro check
 
       - name: Build
-        run: npm run build
+        run: pnpm run build
 
       - name: Deploy to Firebase Hosting
         uses: FirebaseExtended/action-hosting-deploy@500ac625ca2dd40cbd15f7659af953801858032a # v0.11.0

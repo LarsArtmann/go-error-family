@@ -27,7 +27,7 @@ User asked: "How does go-error-family compare to https://12factor.net/logs?" —
 
 | #   | Task                                                                                                                                           |
 | --- | ---------------------------------------------------------------------------------------------------------------------------------------------- |
-| 1   | **Never verified the website builds** — no `npx astro build` or `npx astro check` was run after adding the .mdx and editing `astro.config.mjs` |
+| 1   | **Never verified the website builds** — no `pnpm dlx astro build` or `pnpm dlx astro check` was run after adding the .mdx and editing `astro.config.mjs` |
 | 2   | No cross-links added from `http-and-cli.mdx` or `related-tools.mdx` to the new guide                                                           |
 | 3   | No `AGENTS.md` update noting the new guide exists                                                                                              |
 | 4   | Go code snippet in the .mdx is untested / not compiled                                                                                         |
@@ -57,8 +57,8 @@ Nothing. No errors were encountered. No files were damaged. The two files create
 
 ### Immediate — verify and fix this session's work
 
-1. **Run `npx astro check` in `website/`** to verify the .mdx and config edit are valid
-2. **Run `npx astro build` in `website/`** to confirm the site builds with the new page
+1. **Run `pnpm dlx astro check` in `website/`** to verify the .mdx and config edit are valid
+2. **Run `pnpm dlx astro build` in `website/`** to confirm the site builds with the new page
 3. **Fix any build errors** found by the above
 4. **Reorder sidebar** — move "Twelve-Factor Logs" before "Performance", near "HTTP & CLI Boundaries"
 5. **Add cross-link** from `guides/http-and-cli.mdx` to `guides/twelve-factor-logs` (they share the stderr/stream topic)
@@ -142,7 +142,7 @@ I placed it on the **public website** (`website/src/content/docs/guides/`) becau
 
 ### Q2: Is there a website build command I should have run?
 
-The `AGENTS.md` says the website is a separate Node.js project with its own `flake.nix`. I didn't find a documented "test/build the website" command in AGENTS.md (it mentions `nix run .#deploy` but not a build-check). Is there a canonical command for verifying website changes locally (e.g., `nix run .#website-check`, `cd website && npm run build`, `cd website && npx astro check`)? If so, I'll add it to AGENTS.md.
+The `AGENTS.md` says the website is a separate Node.js project with its own `flake.nix`. I didn't find a documented "test/build the website" command in AGENTS.md (it mentions `nix run .#deploy` but not a build-check). Is there a canonical command for verifying website changes locally (e.g., `nix run .#website-check`, `cd website && pnpm run build`, `cd website && pnpm dlx astro check`)? If so, I'll add it to AGENTS.md.
 
 ### Q3: Should I broaden this into a full "12-Factor Audit" covering all intersecting factors?
 

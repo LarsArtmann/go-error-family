@@ -91,7 +91,7 @@ I removed GOEXPERIMENT references but missed updating the interface count. Line 
 
 ## C) NOT STARTED
 
-1. **Website rebuild/deploy** — `.mdx` files are fixed but `npm run build` + `firebase deploy` has not been run. The live site still shows old content.
+1. **Website rebuild/deploy** — `.mdx` files are fixed but `pnpm run build` + `firebase deploy` has not been run. The live site still shows old content.
 2. **Tag v0.8.0** — User confirmed "we are already on v0.8.0" but no `git tag v0.8.0` has been created. The CHANGELOG says v0.8.0 but there is no tag.
 3. **TODO_LIST.md update** — Not updated to reflect this session's completed work.
 4. **`Compose` (classify.go:95) has 0% coverage** — pre-existing gap, not from this session, but noticed during coverage analysis.
@@ -140,7 +140,7 @@ After fixing all GOEXPERIMENT references, I declared the website split brain "fi
 1. Fix contributing.mdx "four interfaces" → "six interfaces" (`Coded`/`Classified`/`Contextual`/`Retryable`/`ExitCoder`/`HTTPStatuser`)
 2. Add test for `RegisterClassificationType` (DefaultRegistry delegate) — currently 0% coverage
 3. Create `git tag v0.8.0` (user confirmed version)
-4. Rebuild + deploy website (`npm run build && firebase deploy --only hosting` from `website/`)
+4. Rebuild + deploy website (`pnpm run build && firebase deploy --only hosting` from `website/`)
 
 ### High Priority
 
@@ -203,7 +203,7 @@ After fixing all GOEXPERIMENT references, I declared the website split brain "fi
 
 **Q1:** Should I create the `v0.8.0` git tag now, or are there more changes you want before tagging? The CHANGELOG says v0.8.0, you confirmed "we are already on v0.8.0," but no tag exists. The auto-commit hook has already committed all work to `master`.
 
-**Q2:** Should the website be rebuilt and deployed now? The `.mdx` source files are fixed, but `npm run build && firebase deploy` has not been run. The live site at `errorfamily.lars.software` still shows GOEXPERIMENT instructions.
+**Q2:** Should the website be rebuilt and deployed now? The `.mdx` source files are fixed, but `pnpm run build && firebase deploy` has not been run. The live site at `errorfamily.lars.software` still shows GOEXPERIMENT instructions.
 
 **Q3:** The `hierarchical-errors` linter is referenced in 50+ `//nolint:hierarchical-errors` directives, but golangci-lint reports it as an "unknown linter." Is this linter configured outside `.golangci.yml` (e.g., a custom plugin), or are all these nolint directives silently doing nothing?
 

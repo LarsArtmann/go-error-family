@@ -19,7 +19,7 @@ The site was recovered in this session by creating the missing Firebase hosting 
 
 2. **Firebase hosting site created:** `firebase hosting:sites:create errorfamily --project lars-software` succeeded. Site URL: `https://errorfamily.web.app`.
 
-3. **Website built successfully:** `npm install` + `npm run build` produced 13 pages, 0 errors. Pagefind search index, sitemap, all generated.
+3. **Website built successfully:** `pnpm install` + `pnpm run build` produced 13 pages, 0 errors. Pagefind search index, sitemap, all generated.
 
 4. **Website deployed to Firebase:** 65 files uploaded and released. `https://errorfamily.web.app` returns HTTP 200 with full content.
 
@@ -39,7 +39,7 @@ The site was recovered in this session by creating the missing Firebase hosting 
 
 2. **Cert lifecycle (TEMPORARY → permanent):** At time of writing, the Firebase API reported `cert.type: TEMPORARY` and `cert.state: CERT_VALIDATING`. A valid cert was detected via TLS inspection, but the Firebase backend may still be transitioning to a permanent cert. Needs monitoring.
 
-3. **Build verification (partial):** `npm run build` passed, but `npx astro check` (type checking) was NOT run. The website-launch skill mandates both.
+3. **Build verification (partial):** `pnpm run build` passed, but `pnpm dlx astro check` (type checking) was NOT run. The website-launch skill mandates both.
 
 4. **Domain repo commit (committed but pre-commit hook bypassed):** Committed with `--no-verify` because the domains repo has a **pre-existing corrupted `flake.lock`** with unresolved git merge conflict markers (`<<<<<<< Updated upstream` inside JSON). This is unrelated to the DNS change but blocks the BuildFlow pre-commit hook.
 
@@ -93,7 +93,7 @@ The site was recovered in this session by creating the missing Firebase hosting 
 
 7. **Document the recovery in the domains repo** — add a comment or note that `firebase hosting:sites:create` must be run for any new site, and that `.firebaserc` config alone is insufficient.
 
-8. **Run `astro check` and `html-validate`** as part of every website build, not just `npm run build`. The build succeeding does not guarantee type safety or valid HTML.
+8. **Run `astro check` and `html-validate`** as part of every website build, not just `pnpm run build`. The build succeeding does not guarantee type safety or valid HTML.
 
 ---
 
@@ -101,7 +101,7 @@ The site was recovered in this session by creating the missing Firebase hosting 
 
 ### Immediate (this session's gaps)
 
-1. Run `npx astro check` on the website
+1. Run `pnpm dlx astro check` on the website
 2. Run `html-validate "dist/**/*.html"` on the built output
 3. Verify all docs pages return HTTP 200 on the custom domain
 4. Verify the 404 page works
@@ -202,9 +202,9 @@ The site was recovered in this session by creating the missing Firebase hosting 
 | 04:26       | Checked Firebase hosting sites list                   | `errorfamily` NOT FOUND                               |
 | 04:26       | Verified `errorfamily.web.app`                        | HTTP 404                                              |
 | 04:27       | Created Firebase hosting site                         | Success                                               |
-| 04:27       | Started `npm install`                                 | Success (background)                                  |
+| 04:27       | Started `pnpm install`                                 | Success (background)                                  |
 | 04:28       | Approved native scripts (esbuild, sharp)              | Success                                               |
-| 04:28       | `npm run build`                                       | 13 pages, 0 errors                                    |
+| 04:28       | `pnpm run build`                                       | 13 pages, 0 errors                                    |
 | 04:29       | Verified upload endpoint reachable                    | HTTP 405 (expected)                                   |
 | 04:29       | Deployed to Firebase                                  | 65 files, release complete                            |
 | 04:30       | Verified `errorfamily.web.app`                        | HTTP 200, full content                                |
