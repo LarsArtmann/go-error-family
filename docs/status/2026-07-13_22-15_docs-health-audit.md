@@ -17,28 +17,28 @@
 
 ## a) FULLY DONE
 
-| #   | Item                                                                                                                                                                         | Evidence                                     |
-| --- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------- |
-| 1   | **Read all 7 `2026-07-0*` files** (3 feedback, 4 status reports)                                                                                                             | All read in full, appendices included        |
-| 2   | **Fixed README.md:5 ghost `context.go`** → corrected to `command.go` (actual file: `diagnose/command.go`)                                                                    | README.md line ~525                          |
-| 3   | **Fixed README.md `Diagnose: true` in HandleConfig** — field removed in v0.4.0; code wouldn't compile if copied                                                              | README.md HandleErrorWithContext example     |
-| 4   | **Fixed README.md `r.SuggestedFix`** on DiagnosticResult → `r.Fix.Summary` + `r.Fix.Command` (field renamed in v0.5.0)                                                       | README.md diagnostic rules example           |
-| 5   | **Fixed README.md `SuggestedFix:`** in DiagnosticResult construction → `Fix: diagnose.Fix{Summary: ...}`                                                                     | README.md custom rule example                |
-| 6   | **Fixed CONTRIBUTING.md ghost `context.go`** → `command.go`                                                                                                                  | CONTRIBUTING.md architecture tree            |
-| 7   | **Added `GOEXPERIMENT=jsonv2`** to README.md install requirement                                                                                                             | README.md line ~34                           |
-| 8   | **Added `GOEXPERIMENT=jsonv2`** to CONTRIBUTING.md prerequisites table + setup commands + test commands                                                                      | CONTRIBUTING.md 3 locations                  |
-| 9   | **Clarified "zero deps"** in CONTRIBUTING.md and SKILL.md — json/v2 is stdlib experimental, requiring GOEXPERIMENT                                                           | CONTRIBUTING.md:57, SKILL.md:4               |
-| 10  | **Fixed SKILL.md `DiagnosticResult.SuggestedFix`** → `Fix (struct with Summary and Command)`                                                                                 | SKILL.md:367                                 |
-| 11  | **Added `GOEXPERIMENT=jsonv2`** to SKILL.md testing commands                                                                                                                 | SKILL.md:568                                 |
-| 12  | **Added `[0.7.0]` entry to CHANGELOG.md** — json/v2 migration (breaking), bridge dep bumps (oops v1.23.0, x/text v0.40.0)                                                    | CHANGELOG.md lines 7-14                      |
-| 13  | **Updated DOMAIN_LANGUAGE.md classification precedence** — 4 steps → 6 steps (multi-error → Classified → Retryable → sentinels → classifiers → Transient default)            | DOMAIN_LANGUAGE.md 3 rows                    |
-| 14  | **Added `Classifier` term** to DOMAIN_LANGUAGE.md glossary (missing since v0.6.0)                                                                                            | DOMAIN_LANGUAGE.md sentinel/classifier rows  |
-| 15  | **Built FEATURES.md** — full feature inventory with FULLY_FUNCTIONAL status, file:line evidence, coverage table (verified against live `go test -cover`), known gaps section | New file, ~180 lines                         |
-| 16  | **Built TODO_LIST.md** — 16 actionable tasks sourced from 3 feedback docs + 4 status reports, separated into Active / Design Decisions Needed                                | New file, ~80 lines                          |
-| 17  | **Built ROADMAP.md** — 5 long-term themes from consumer feedback patterns                                                                                                    | New file, ~60 lines                          |
-| 18  | **Build green, all tests pass with -race, 0 lint issues**                                                                                                                    | `go build`, `go test -race`, `golangci-lint` |
-| 19  | **Cross-file consistency verified** — version numbers aligned, no split brains (shipped features in TODO), no ghost refs remaining, all markdown links resolve               | Verified via grep                            |
-| 20  | **Produced inline Documentation Health Report** — 14 findings found and fixed, 3 missing docs built                                                                          | Reported in conversation                     |
+| #  | Item                                                                                                                                                                         | Evidence                                     |
+| -- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------- |
+| 1  | **Read all 7 `2026-07-0*` files** (3 feedback, 4 status reports)                                                                                                             | All read in full, appendices included        |
+| 2  | **Fixed README.md:5 ghost `context.go`** → corrected to `command.go` (actual file: `diagnose/command.go`)                                                                    | README.md line ~525                          |
+| 3  | **Fixed README.md `Diagnose: true` in HandleConfig** — field removed in v0.4.0; code wouldn't compile if copied                                                              | README.md HandleErrorWithContext example     |
+| 4  | **Fixed README.md `r.SuggestedFix`** on DiagnosticResult → `r.Fix.Summary` + `r.Fix.Command` (field renamed in v0.5.0)                                                       | README.md diagnostic rules example           |
+| 5  | **Fixed README.md `SuggestedFix:`** in DiagnosticResult construction → `Fix: diagnose.Fix{Summary: ...}`                                                                     | README.md custom rule example                |
+| 6  | **Fixed CONTRIBUTING.md ghost `context.go`** → `command.go`                                                                                                                  | CONTRIBUTING.md architecture tree            |
+| 7  | **Added `GOEXPERIMENT=jsonv2`** to README.md install requirement                                                                                                             | README.md line ~34                           |
+| 8  | **Added `GOEXPERIMENT=jsonv2`** to CONTRIBUTING.md prerequisites table + setup commands + test commands                                                                      | CONTRIBUTING.md 3 locations                  |
+| 9  | **Clarified "zero deps"** in CONTRIBUTING.md and SKILL.md — json/v2 is stdlib experimental, requiring GOEXPERIMENT                                                           | CONTRIBUTING.md:57, SKILL.md:4               |
+| 10 | **Fixed SKILL.md `DiagnosticResult.SuggestedFix`** → `Fix (struct with Summary and Command)`                                                                                 | SKILL.md:367                                 |
+| 11 | **Added `GOEXPERIMENT=jsonv2`** to SKILL.md testing commands                                                                                                                 | SKILL.md:568                                 |
+| 12 | **Added `[0.7.0]` entry to CHANGELOG.md** — json/v2 migration (breaking), bridge dep bumps (oops v1.23.0, x/text v0.40.0)                                                    | CHANGELOG.md lines 7-14                      |
+| 13 | **Updated DOMAIN_LANGUAGE.md classification precedence** — 4 steps → 6 steps (multi-error → Classified → Retryable → sentinels → classifiers → Transient default)            | DOMAIN_LANGUAGE.md 3 rows                    |
+| 14 | **Added `Classifier` term** to DOMAIN_LANGUAGE.md glossary (missing since v0.6.0)                                                                                            | DOMAIN_LANGUAGE.md sentinel/classifier rows  |
+| 15 | **Built FEATURES.md** — full feature inventory with FULLY_FUNCTIONAL status, file:line evidence, coverage table (verified against live `go test -cover`), known gaps section | New file, ~180 lines                         |
+| 16 | **Built TODO_LIST.md** — 16 actionable tasks sourced from 3 feedback docs + 4 status reports, separated into Active / Design Decisions Needed                                | New file, ~80 lines                          |
+| 17 | **Built ROADMAP.md** — 5 long-term themes from consumer feedback patterns                                                                                                    | New file, ~60 lines                          |
+| 18 | **Build green, all tests pass with -race, 0 lint issues**                                                                                                                    | `go build`, `go test -race`, `golangci-lint` |
+| 19 | **Cross-file consistency verified** — version numbers aligned, no split brains (shipped features in TODO), no ghost refs remaining, all markdown links resolve               | Verified via grep                            |
+| 20 | **Produced inline Documentation Health Report** — 14 findings found and fixed, 3 missing docs built                                                                          | Reported in conversation                     |
 
 **Stats:** 8 files touched (5 modified + 3 created), +33/-17 lines on modified files, ~320 lines new docs.
 
@@ -46,24 +46,24 @@
 
 ## b) PARTIALLY DONE
 
-| #   | Item                                | What's done                                                                               | What remains                                                                                                                                                                                                                                                       |
-| --- | ----------------------------------- | ----------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| 1   | **AGENTS.md freshness**             | Verified accuracy: version, coverage, surprising behaviors, GOEXPERIMENT docs all correct | "Last Updated: 2026-07-11" is 2 days stale. Could bump to 2026-07-13. The content is accurate; only the date string lags. Also, AGENTS.md doesn't reference the new FEATURES.md / TODO_LIST.md / ROADMAP.md anywhere.                                              |
-| 2   | **SKILL.md consumer-feedback gaps** | Fixed stale `SuggestedFix` reference and GOEXPERIMENT                                     | 5 skill improvement items from DiscordSync feedback remain NOT STARTED (New vs Wrap guidance, RegisterClassifications map example, errkit pattern, skip-diagnose note, ParseFamily gotcha). These are tracked in TODO_LIST.md but not yet implemented in SKILL.md. |
-| 3   | **Benchmark numbers in README.md**  | Numbers are present and formatted correctly                                               | Not re-verified this session — they cite "AMD Ryzen 9 7950X" hardware. The values are plausible given the lock-free design but would need `go test -bench` to confirm they haven't drifted.                                                                        |
+| # | Item                                | What's done                                                                               | What remains                                                                                                                                                                                                                                                       |
+| - | ----------------------------------- | ----------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| 1 | **AGENTS.md freshness**             | Verified accuracy: version, coverage, surprising behaviors, GOEXPERIMENT docs all correct | "Last Updated: 2026-07-11" is 2 days stale. Could bump to 2026-07-13. The content is accurate; only the date string lags. Also, AGENTS.md doesn't reference the new FEATURES.md / TODO_LIST.md / ROADMAP.md anywhere.                                              |
+| 2 | **SKILL.md consumer-feedback gaps** | Fixed stale `SuggestedFix` reference and GOEXPERIMENT                                     | 5 skill improvement items from DiscordSync feedback remain NOT STARTED (New vs Wrap guidance, RegisterClassifications map example, errkit pattern, skip-diagnose note, ParseFamily gotcha). These are tracked in TODO_LIST.md but not yet implemented in SKILL.md. |
+| 3 | **Benchmark numbers in README.md**  | Numbers are present and formatted correctly                                               | Not re-verified this session — they cite "AMD Ryzen 9 7950X" hardware. The values are plausible given the lock-free design but would need `go test -bench` to confirm they haven't drifted.                                                                        |
 
 ---
 
 ## c) NOT STARTED
 
-| #   | Item                                                                                                                                                                                                  | Why                                                                                                                                                                                                                        |
-| --- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| 1   | **Godoc improvements (S1-S4)** — `Classify(nil)`→Rejection, `Wrap(nil)`→nil, `errors.Is` matching, `{key}` substitution need to be in godoc on the types/functions themselves, not just SKILL.md      | These are TODO_LIST.md items now, but they were NOT implemented this session. Every consumer (DiscordSync, SwettySwipper, browser-history) independently asked for these. Highest cross-cutting demand.                    |
-| 2   | **CI hardening** — `GOWORK=off go list -m all` gate, consumer-simulation job, zero-dep invariant check                                                                                                | Tracked in TODO_LIST.md. Not implemented. Would prevent recurrence of the v0.6.0 phantom-replace incident.                                                                                                                 |
-| 3   | **SKILL.md skill-feedback items (D6, D8, D9, D10, D11)** — New vs Wrap guidance, RegisterClassifications map variant, errkit pattern, partial-success example, skip-diagnose note, ParseFamily gotcha | Tracked in TODO_LIST.md. Not implemented.                                                                                                                                                                                  |
-| 4   | **Committing the changes**                                                                                                                                                                            | User hasn't said "commit". 8 files uncommitted.                                                                                                                                                                            |
-| 5   | **Website docs sync** — the new `website/` directory has docs content (`src/content/docs/`) that may reference stale APIs                                                                             | Not audited. The website was added in commit `2d5b208` (same session context). Its `changelog.mdx`, `api-reference.mdx`, etc. may contain the same `SuggestedFix`/`context.go`/`Diagnose:` drift I fixed in the root docs. |
-| 6   | **README.md benchmark table** — not re-verified against actual `go test -bench`                                                                                                                       | Numbers may have drifted after json/v2 migration.                                                                                                                                                                          |
+| # | Item                                                                                                                                                                                                  | Why                                                                                                                                                                                                                        |
+| - | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| 1 | **Godoc improvements (S1-S4)** — `Classify(nil)`→Rejection, `Wrap(nil)`→nil, `errors.Is` matching, `{key}` substitution need to be in godoc on the types/functions themselves, not just SKILL.md      | These are TODO_LIST.md items now, but they were NOT implemented this session. Every consumer (DiscordSync, SwettySwipper, browser-history) independently asked for these. Highest cross-cutting demand.                    |
+| 2 | **CI hardening** — `GOWORK=off go list -m all` gate, consumer-simulation job, zero-dep invariant check                                                                                                | Tracked in TODO_LIST.md. Not implemented. Would prevent recurrence of the v0.6.0 phantom-replace incident.                                                                                                                 |
+| 3 | **SKILL.md skill-feedback items (D6, D8, D9, D10, D11)** — New vs Wrap guidance, RegisterClassifications map variant, errkit pattern, partial-success example, skip-diagnose note, ParseFamily gotcha | Tracked in TODO_LIST.md. Not implemented.                                                                                                                                                                                  |
+| 4 | **Committing the changes**                                                                                                                                                                            | User hasn't said "commit". 8 files uncommitted.                                                                                                                                                                            |
+| 5 | **Website docs sync** — the new `website/` directory has docs content (`src/content/docs/`) that may reference stale APIs                                                                             | Not audited. The website was added in commit `2d5b208` (same session context). Its `changelog.mdx`, `api-reference.mdx`, etc. may contain the same `SuggestedFix`/`context.go`/`Diagnose:` drift I fixed in the root docs. |
+| 6 | **README.md benchmark table** — not re-verified against actual `go test -bench`                                                                                                                       | Numbers may have drifted after json/v2 migration.                                                                                                                                                                          |
 
 ---
 
@@ -118,93 +118,93 @@ I wrote "Health Score: 6.5/10 (started at 3.5 before fixes; now 9.5 after fixes)
 
 ### Immediate (fix the gaps I left)
 
-| #   | Task                                                                                                                              | Impact      |
-| --- | --------------------------------------------------------------------------------------------------------------------------------- | ----------- |
-| 1   | **Audit `website/src/content/docs/` for the same stale refs I fixed in root** (context.go, SuggestedFix, Diagnose:, GOEXPERIMENT) | 🔴 Critical |
-| 2   | **Fix any stale refs found in website docs**                                                                                      | 🔴 Critical |
-| 3   | **Update AGENTS.md "Last Updated" date** to 2026-07-13                                                                            | 🟠          |
-| 4   | **Add references to FEATURES.md, TODO_LIST.md, ROADMAP.md in AGENTS.md**                                                          | 🟠          |
-| 5   | **Run `go test -bench=.` and verify/update README benchmark numbers**                                                             | 🟠          |
-| 6   | **Commit the 8 file changes** from this session                                                                                   | 🔴          |
-| 7   | **Update feedback-doc appendices** to point at TODO_LIST.md instead of duplicating status                                         | 🟡          |
+| # | Task                                                                                                                              | Impact      |
+| - | --------------------------------------------------------------------------------------------------------------------------------- | ----------- |
+| 1 | **Audit `website/src/content/docs/` for the same stale refs I fixed in root** (context.go, SuggestedFix, Diagnose:, GOEXPERIMENT) | 🔴 Critical |
+| 2 | **Fix any stale refs found in website docs**                                                                                      | 🔴 Critical |
+| 3 | **Update AGENTS.md "Last Updated" date** to 2026-07-13                                                                            | 🟠          |
+| 4 | **Add references to FEATURES.md, TODO_LIST.md, ROADMAP.md in AGENTS.md**                                                          | 🟠          |
+| 5 | **Run `go test -bench=.` and verify/update README benchmark numbers**                                                             | 🟠          |
+| 6 | **Commit the 8 file changes** from this session                                                                                   | 🔴          |
+| 7 | **Update feedback-doc appendices** to point at TODO_LIST.md instead of duplicating status                                         | 🟡          |
 
 ### Consumer feedback items (now tracked in TODO_LIST.md)
 
-| #   | Task                                                                                    | Source |
-| --- | --------------------------------------------------------------------------------------- | ------ |
-| 8   | Add `Classify(nil)`→Rejection to `Classify` godoc                                       | S1, D4 |
-| 9   | Add `errors.Is` code+family matching example to `Error.Is` godoc                        | S2     |
-| 10  | Add "Returns nil if err is nil" to `Wrap` godoc                                         | S3     |
-| 11  | Add `{key}` substitution note to `MessageTemplate` godoc                                | S4     |
-| 12  | Add `New*` vs `Wrap*` guidance to SKILL.md                                              | D9     |
-| 13  | Add `RegisterClassifications` map variant to SKILL.md                                   | D11    |
-| 14  | Clarify `RegisterTemplate` on DefaultRegistry in SKILL.md                               | D7     |
-| 15  | Add partial-success canonical example to SKILL.md (verify existing section is complete) | D8     |
-| 16  | Add `errkit` consumer pattern example to SKILL.md                                       | D10    |
-| 17  | Add "skip diagnose/ unless infrastructure debugging" note to SKILL.md                   | D6     |
-| 18  | Add `ParseFamily` default-to-Transient to SKILL.md gotchas                              | D12    |
+| #  | Task                                                                                    | Source |
+| -- | --------------------------------------------------------------------------------------- | ------ |
+| 8  | Add `Classify(nil)`→Rejection to `Classify` godoc                                       | S1, D4 |
+| 9  | Add `errors.Is` code+family matching example to `Error.Is` godoc                        | S2     |
+| 10 | Add "Returns nil if err is nil" to `Wrap` godoc                                         | S3     |
+| 11 | Add `{key}` substitution note to `MessageTemplate` godoc                                | S4     |
+| 12 | Add `New*` vs `Wrap*` guidance to SKILL.md                                              | D9     |
+| 13 | Add `RegisterClassifications` map variant to SKILL.md                                   | D11    |
+| 14 | Clarify `RegisterTemplate` on DefaultRegistry in SKILL.md                               | D7     |
+| 15 | Add partial-success canonical example to SKILL.md (verify existing section is complete) | D8     |
+| 16 | Add `errkit` consumer pattern example to SKILL.md                                       | D10    |
+| 17 | Add "skip diagnose/ unless infrastructure debugging" note to SKILL.md                   | D6     |
+| 18 | Add `ParseFamily` default-to-Transient to SKILL.md gotchas                              | D12    |
 
 ### CI / Release pipeline
 
-| #   | Task                                                                      | Impact |
-| --- | ------------------------------------------------------------------------- | ------ |
-| 19  | Add CI gate: `GOWORK=off go list -m all` per module                       | 🔴     |
-| 20  | Add CI consumer-simulation job (`go get @tag` in throwaway module)        | 🔴     |
-| 21  | Add CI invariant: root `go list -m all` returns exactly 1 line            | 🟠     |
-| 22  | Add `go vet ./...` to CI                                                  | 🟢     |
-| 23  | Add pre-commit check for `replace` directives in tagged go.mod files      | 🟡     |
-| 24  | Add benchmark regression check to CI                                      | 🟡     |
-| 25  | Create release automation script for coordinated multi-module tag cutting | 🟢     |
+| #  | Task                                                                      | Impact |
+| -- | ------------------------------------------------------------------------- | ------ |
+| 19 | Add CI gate: `GOWORK=off go list -m all` per module                       | 🔴     |
+| 20 | Add CI consumer-simulation job (`go get @tag` in throwaway module)        | 🔴     |
+| 21 | Add CI invariant: root `go list -m all` returns exactly 1 line            | 🟠     |
+| 22 | Add `go vet ./...` to CI                                                  | 🟢     |
+| 23 | Add pre-commit check for `replace` directives in tagged go.mod files      | 🟡     |
+| 24 | Add benchmark regression check to CI                                      | 🟡     |
+| 25 | Create release automation script for coordinated multi-module tag cutting | 🟢     |
 
 ### Design decisions (need user input)
 
-| #   | Task                                                                           | Source |
-| --- | ------------------------------------------------------------------------------ | ------ |
-| 26  | **Per-error HTTP status override** (`Error.WithHTTPStatus(code int)`)          | S5     |
-| 27  | **`Classify(nil)` semantics** — keep Rejection vs Infrastructure vs Transient  | D4     |
-| 28  | **Constructor context ergonomics** — builder/variadic/options                  | D1     |
-| 29  | **"Frozen" registry flag** — detect runtime mutation after first Classify      | D2     |
-| 30  | **`RegisterClassificationType[T error]`** — generic type-based registration    | D5     |
-| 31  | **json/v2 strategy** — keep until stable, revert, or centralize behind wrapper | Status |
+| #  | Task                                                                           | Source |
+| -- | ------------------------------------------------------------------------------ | ------ |
+| 26 | **Per-error HTTP status override** (`Error.WithHTTPStatus(code int)`)          | S5     |
+| 27 | **`Classify(nil)` semantics** — keep Rejection vs Infrastructure vs Transient  | D4     |
+| 28 | **Constructor context ergonomics** — builder/variadic/options                  | D1     |
+| 29 | **"Frozen" registry flag** — detect runtime mutation after first Classify      | D2     |
+| 30 | **`RegisterClassificationType[T error]`** — generic type-based registration    | D5     |
+| 31 | **json/v2 strategy** — keep until stable, revert, or centralize behind wrapper | Status |
 
 ### Coverage / test gaps
 
-| #   | Task                                                                                                                     | Impact |
-| --- | ------------------------------------------------------------------------------------------------------------------------ | ------ |
-| 32  | Add test for `RegisterClassifier` (singular) — currently 0% covered                                                      | 🟡     |
-| 33  | Add test for `writeHTTPError` json-encode error branch                                                                   | 🟡     |
-| 34  | Add Example tests for all v0.6.0 APIs (HTTPHandler, LogError, RegisterClassifier, Code, TemplateForCode, WrapRejectionf) | 🟡     |
-| 35  | Add benchmark for classifier pipeline (`BenchmarkClassifyWithClassifiers`)                                               | 🟡     |
-| 36  | Update `examples/cmd/http` to use `HTTPHandler`                                                                          | 🟢     |
+| #  | Task                                                                                                                     | Impact |
+| -- | ------------------------------------------------------------------------------------------------------------------------ | ------ |
+| 32 | Add test for `RegisterClassifier` (singular) — currently 0% covered                                                      | 🟡     |
+| 33 | Add test for `writeHTTPError` json-encode error branch                                                                   | 🟡     |
+| 34 | Add Example tests for all v0.6.0 APIs (HTTPHandler, LogError, RegisterClassifier, Code, TemplateForCode, WrapRejectionf) | 🟡     |
+| 35 | Add benchmark for classifier pipeline (`BenchmarkClassifyWithClassifiers`)                                               | 🟡     |
+| 36 | Update `examples/cmd/http` to use `HTTPHandler`                                                                          | 🟢     |
 
 ### Website / public presence
 
-| #   | Task                                                                                     | Impact |
-| --- | ---------------------------------------------------------------------------------------- | ------ |
-| 37  | Sync `website/src/content/docs/changelog.mdx` with latest CHANGELOG.md                   | 🟠     |
-| 38  | Verify `website/src/content/docs/api-reference.mdx` against actual API                   | 🟠     |
-| 39  | Verify `website/src/content/docs/getting-started/installation.mdx` includes GOEXPERIMENT | 🟠     |
-| 40  | Verify `website/src/content/docs/guides/*.mdx` for stale SuggestedFix/Diagnose refs      | 🟠     |
-| 41  | Consider generating website docs FROM root docs instead of maintaining copies            | 🟡     |
-| 42  | Add `website/src/content/docs/` to the docs-health inventory checklist                   | 🟡     |
+| #  | Task                                                                                     | Impact |
+| -- | ---------------------------------------------------------------------------------------- | ------ |
+| 37 | Sync `website/src/content/docs/changelog.mdx` with latest CHANGELOG.md                   | 🟠     |
+| 38 | Verify `website/src/content/docs/api-reference.mdx` against actual API                   | 🟠     |
+| 39 | Verify `website/src/content/docs/getting-started/installation.mdx` includes GOEXPERIMENT | 🟠     |
+| 40 | Verify `website/src/content/docs/guides/*.mdx` for stale SuggestedFix/Diagnose refs      | 🟠     |
+| 41 | Consider generating website docs FROM root docs instead of maintaining copies            | 🟡     |
+| 42 | Add `website/src/content/docs/` to the docs-health inventory checklist                   | 🟡     |
 
 ### Documentation polish
 
-| #   | Task                                                                                   | Impact |
-| --- | -------------------------------------------------------------------------------------- | ------ |
-| 43  | Add "last verified" date stamp to README benchmark table                               | 🟢     |
-| 44  | Update feedback-doc appendices to reference TODO_LIST.md as single source of truth     | 🟡     |
-| 45  | Consider adding `CODE_OF_CONDUCT.md` (referenced in CONTRIBUTING.md but may not exist) | 🟢     |
-| 46  | Add `docs/adr/` for json/v2 migration decision (attempted, reverted, re-attempted)     | 🟢     |
-| 47  | Normalize `go.mod` `require` style (inline vs block) across submodules                 | 🟢     |
+| #  | Task                                                                                   | Impact |
+| -- | -------------------------------------------------------------------------------------- | ------ |
+| 43 | Add "last verified" date stamp to README benchmark table                               | 🟢     |
+| 44 | Update feedback-doc appendices to reference TODO_LIST.md as single source of truth     | 🟡     |
+| 45 | Consider adding `CODE_OF_CONDUCT.md` (referenced in CONTRIBUTING.md but may not exist) | 🟢     |
+| 46 | Add `docs/adr/` for json/v2 migration decision (attempted, reverted, re-attempted)     | 🟢     |
+| 47 | Normalize `go.mod` `require` style (inline vs block) across submodules                 | 🟢     |
 
 ### Process / tooling
 
-| #   | Task                                                                     | Impact |
-| --- | ------------------------------------------------------------------------ | ------ |
-| 48  | Update docs-health skill to account for website/derived doc surfaces     | 🟡     |
-| 49  | Consider a pre-commit hook that lints doc examples for compile-ability   | 🟢     |
-| 50  | Run the `code-quality-scan` skill for a full build/lint/duplication pass | 🟢     |
+| #  | Task                                                                     | Impact |
+| -- | ------------------------------------------------------------------------ | ------ |
+| 48 | Update docs-health skill to account for website/derived doc surfaces     | 🟡     |
+| 49 | Consider a pre-commit hook that lints doc examples for compile-ability   | 🟢     |
+| 50 | Run the `code-quality-scan` skill for a full build/lint/duplication pass | 🟢     |
 
 ---
 

@@ -38,25 +38,25 @@ Today the root module mixes the stable classification library with two experimen
 
 ## Medium-Granularity Plan (30-100 min each)
 
-| #   | Task                                                                     | Tier | Impact   | Effort | Depends on |
-| --- | ------------------------------------------------------------------------ | ---- | -------- | ------ | ---------- |
-| 1   | Create `diagnose/go.mod` — extract diagnose package into own module      | 1    | Critical | 30min  | —          |
-| 2   | Create `agent/go.mod` — extract agent package into own module            | 1    | Critical | 30min  | 1          |
-| 3   | Update `go.work` to add `./diagnose` and `./agent`                       | 1    | Critical | 10min  | 1,2        |
-| 4   | Bump bridge root pin from v0.3.0 → v0.5.0                                | 2    | High     | 15min  | —          |
-| 5   | Bump git submodule: root → v0.5.0, add diagnose dep                      | 2    | High     | 20min  | 1          |
-| 6   | Bump postgres submodule: root → v0.5.0, add diagnose dep                 | 2    | High     | 20min  | 1          |
-| 7   | Full workspace verification (build + test + race + lint all modules)     | 2    | High     | 30min  | 1-6        |
-| 8   | Update CI: add test/lint steps for diagnose/ and agent/ modules          | 3    | Medium   | 30min  | 7          |
-| 9   | Add `Registry.Clone()` method                                            | 3    | Medium   | 20min  | —          |
-| 10  | Add `Registry.RegisterTemplates()` batch method                          | 3    | Low      | 15min  | —          |
-| 11  | DRY `resolveSuggestedFix` / `renderCLI` — extract shared template lookup | 3    | Medium   | 30min  | —          |
-| 12  | Update README for new module structure                                   | 4    | Medium   | 30min  | 7          |
-| 13  | Update AGENTS.md (build commands, module structure, coverage)            | 4    | Medium   | 20min  | 7          |
-| 14  | Update SKILL.md (architecture overview, module map)                      | 4    | Low      | 20min  | 7          |
-| 15  | Update CHANGELOG with v0.6.0 entry                                       | 4    | Medium   | 15min  | 7-11       |
-| 16  | Update DOMAIN_LANGUAGE.md if needed                                      | 4    | Low      | 10min  | —          |
-| 17  | Bump root go.mod version comment / prepare release notes                 | 4    | Low      | 10min  | 15         |
+| #  | Task                                                                     | Tier | Impact   | Effort | Depends on |
+| -- | ------------------------------------------------------------------------ | ---- | -------- | ------ | ---------- |
+| 1  | Create `diagnose/go.mod` — extract diagnose package into own module      | 1    | Critical | 30min  | —          |
+| 2  | Create `agent/go.mod` — extract agent package into own module            | 1    | Critical | 30min  | 1          |
+| 3  | Update `go.work` to add `./diagnose` and `./agent`                       | 1    | Critical | 10min  | 1,2        |
+| 4  | Bump bridge root pin from v0.3.0 → v0.5.0                                | 2    | High     | 15min  | —          |
+| 5  | Bump git submodule: root → v0.5.0, add diagnose dep                      | 2    | High     | 20min  | 1          |
+| 6  | Bump postgres submodule: root → v0.5.0, add diagnose dep                 | 2    | High     | 20min  | 1          |
+| 7  | Full workspace verification (build + test + race + lint all modules)     | 2    | High     | 30min  | 1-6        |
+| 8  | Update CI: add test/lint steps for diagnose/ and agent/ modules          | 3    | Medium   | 30min  | 7          |
+| 9  | Add `Registry.Clone()` method                                            | 3    | Medium   | 20min  | —          |
+| 10 | Add `Registry.RegisterTemplates()` batch method                          | 3    | Low      | 15min  | —          |
+| 11 | DRY `resolveSuggestedFix` / `renderCLI` — extract shared template lookup | 3    | Medium   | 30min  | —          |
+| 12 | Update README for new module structure                                   | 4    | Medium   | 30min  | 7          |
+| 13 | Update AGENTS.md (build commands, module structure, coverage)            | 4    | Medium   | 20min  | 7          |
+| 14 | Update SKILL.md (architecture overview, module map)                      | 4    | Low      | 20min  | 7          |
+| 15 | Update CHANGELOG with v0.6.0 entry                                       | 4    | Medium   | 15min  | 7-11       |
+| 16 | Update DOMAIN_LANGUAGE.md if needed                                      | 4    | Low      | 10min  | —          |
+| 17 | Bump root go.mod version comment / prepare release notes                 | 4    | Low      | 10min  | 15         |
 
 **17 tasks. Total estimated effort: ~6 hours.**
 

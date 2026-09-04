@@ -323,9 +323,11 @@
           <em>Scalability &amp; Modularity</em>
         </h1>
         <p class="hero-subtitle">
-          Evaluates the module boundaries, dependency directions, coupling, and composability of
-          <code>github.com/larsartmann/go-error-family</code> at v0.5.0 — after the pro/contra
-          review execution. Includes D2 diagrams of the current and ideal architecture.
+          Evaluates the module boundaries, dependency directions, coupling, and
+          composability of
+          <code>github.com/larsartmann/go-error-family</code> at v0.5.0 — after
+          the pro/contra review execution. Includes D2 diagrams of the current
+          and ideal architecture.
         </p>
       </div>
     </header>
@@ -334,10 +336,12 @@
     <section>
       <div class="container">
         <div class="section-label">The bottom line</div>
-        <h2 class="section-title">One god-module, four submodules, one clear path to v1.0</h2>
+        <h2 class="section-title">
+          One god-module, four submodules, one clear path to v1.0
+        </h2>
         <p class="section-intro">
-          The classification library is excellent — zero-dep, well-tested, copy-on-write immutable.
-          But it shares a
+          The classification library is excellent — zero-dep, well-tested,
+          copy-on-write immutable. But it shares a
           <code
             class="inline"
             style="
@@ -377,9 +381,9 @@
               border-radius: 3px;
             "
             >examples/</code
-          >). This prevents the root from reaching v1.0 stability independently. Extracting the two
-          experimental packages into their own modules is the single highest-leverage architectural
-          change.
+          >). This prevents the root from reaching v1.0 stability independently.
+          Extracting the two experimental packages into their own modules is the
+          single highest-leverage architectural change.
         </p>
         <div class="score-row">
           <div class="score-cell">
@@ -418,8 +422,8 @@
               border-radius: 3px;
             "
             >go.work</code
-          >. The root module is the heaviest — it contains the stable classification library AND
-          three experimental packages.
+          >. The root module is the heaviest — it contains the stable
+          classification library AND three experimental packages.
         </p>
         <table>
           <thead>
@@ -439,7 +443,9 @@
               <td>zero</td>
               <td>— (it IS the root)</td>
               <td>v0.5.0</td>
-              <td style="color: #1a5c3a">Mixed (errorfamily stable, rest experimental)</td>
+              <td style="color: #1a5c3a">
+                Mixed (errorfamily stable, rest experimental)
+              </td>
             </tr>
             <tr>
               <td><strong>bridge</strong></td>
@@ -468,9 +474,10 @@
           </tbody>
         </table>
         <p style="margin-top: 1rem; font-size: 0.84rem; color: var(--muted)">
-          The submodule version pins are <strong>stale</strong> — all three submodules pin root at
-          v0.3.0, but v0.5.0 introduced breaking changes (copy-on-write, Registry, template syntax).
-          The submodules haven't been bumped yet.
+          The submodule version pins are <strong>stale</strong> — all three
+          submodules pin root at v0.3.0, but v0.5.0 introduced breaking changes
+          (copy-on-write, Registry, template syntax). The submodules haven't
+          been bumped yet.
         </p>
       </div>
     </section>
@@ -501,12 +508,13 @@
               "
               >go.mod</code
             >
-            has zero external dependencies. No samber/oops, no OpenTelemetry, no testify. This means
-            any Go project can adopt the classification library without pulling transitive
-            dependency trees. The bridge module (which pulls in oops) is opt-in. This is textbook
-            "mechanism, not policy" — it defines
-            <em>what</em> classification means; consumers bring <em>how</em> they want their errors
-            enriched.
+            has zero external dependencies. No samber/oops, no OpenTelemetry, no
+            testify. This means any Go project can adopt the classification
+            library without pulling transitive dependency trees. The bridge
+            module (which pulls in oops) is opt-in. This is textbook "mechanism,
+            not policy" — it defines
+            <em>what</em> classification means; consumers bring
+            <em>how</em> they want their errors enriched.
           </p>
           <div class="ref">go.mod (root) — zero require directives</div>
         </div>
@@ -520,10 +528,11 @@
             <span class="severity low">high impact</span>
           </div>
           <p>
-            Every internal dependency points toward the classification library. No cycles exist. The
-            agent depends on diagnose (which depends on root). The bridge depends on root. The
-            git/postgres submodules depend on root + diagnose. This is the correct direction —
-            domain types define the interface, infrastructure implements it.
+            Every internal dependency points toward the classification library.
+            No cycles exist. The agent depends on diagnose (which depends on
+            root). The bridge depends on root. The git/postgres submodules
+            depend on root + diagnose. This is the correct direction — domain
+            types define the interface, infrastructure implements it.
           </p>
           <pre>
 agent/    → diagnose/ → root (errorfamily)
@@ -543,7 +552,8 @@ examples/ → root (leaf nodes)</pre>
             <span class="severity low">high impact</span>
           </div>
           <p>
-            Four small interfaces (Coded, Classified, Contextual, Retryable), each embedding
+            Four small interfaces (Coded, Classified, Contextual, Retryable),
+            each embedding
             <code
               class="inline"
               style="
@@ -583,8 +593,9 @@ examples/ → root (leaf nodes)</pre>
                 border-radius: 3px;
               "
               >ExitCode</code
-            >. The bridge module proves this — it makes samber/oops errors satisfy the interfaces
-            without either library knowing about the other. This is Unix-pipe composability.
+            >. The bridge module proves this — it makes samber/oops errors
+            satisfy the interfaces without either library knowing about the
+            other. This is Unix-pipe composability.
           </p>
           <div class="ref">interfaces.go · bridge/bridge.go</div>
         </div>
@@ -592,7 +603,9 @@ examples/ → root (leaf nodes)</pre>
         <div class="finding pro">
           <div class="finding-head">
             <span class="finding-num">STR 04</span>
-            <span class="finding-title">Copy-on-write errors — safe for concurrent use</span>
+            <span class="finding-title"
+              >Copy-on-write errors — safe for concurrent use</span
+            >
             <span class="severity low">med impact</span>
           </div>
           <p>
@@ -638,10 +651,13 @@ examples/ → root (leaf nodes)</pre>
               "
               >*Error</code
             >
-            pointers. This eliminates the data race where shared/sentinel errors were mutated by
-            chaining. Errors are now safe to share across goroutines.
+            pointers. This eliminates the data race where shared/sentinel errors
+            were mutated by chaining. Errors are now safe to share across
+            goroutines.
           </p>
-          <div class="ref">error.go:120-152 (clone helper + copy-on-write methods)</div>
+          <div class="ref">
+            error.go:120-152 (clone helper + copy-on-write methods)
+          </div>
         </div>
 
         <div class="finding pro">
@@ -664,8 +680,8 @@ examples/ → root (leaf nodes)</pre>
               "
               >Registry</code
             >
-            type (new in v0.5.0) replaces global mutable maps with a construct-and-pass pattern.
-            Tests get isolation (no
+            type (new in v0.5.0) replaces global mutable maps with a
+            construct-and-pass pattern. Tests get isolation (no
             <code
               class="inline"
               style="
@@ -704,13 +720,15 @@ examples/ → root (leaf nodes)</pre>
           <div class="finding-head">
             <span class="finding-num">CON 01</span>
             <span class="finding-title"
-              >God-module: stable root shares go.mod with experimental packages</span
+              >God-module: stable root shares go.mod with experimental
+              packages</span
             >
             <span class="severity high">high impact</span>
           </div>
           <p>
-            The root module contains four distinct concerns: (1) the stable classification library,
-            (2) the experimental diagnostic engine (<code
+            The root module contains four distinct concerns: (1) the stable
+            classification library, (2) the experimental diagnostic engine
+            (<code
               class="inline"
               style="
                 font-family: var(--mono);
@@ -737,9 +755,11 @@ examples/ → root (leaf nodes)</pre>
                 border-radius: 3px;
               "
               >examples/cmd/</code
-            >). This means the root <strong>cannot reach v1.0 independently</strong> — a breaking
-            change to the agent forces a version bump for the entire module, including the stable
-            root. The v1.0 dream requires extracting agent/ and diagnose/ into their own modules.
+            >). This means the root
+            <strong>cannot reach v1.0 independently</strong> — a breaking change
+            to the agent forces a version bump for the entire module, including
+            the stable root. The v1.0 dream requires extracting agent/ and
+            diagnose/ into their own modules.
           </p>
           <pre>
 root go.mod
@@ -754,7 +774,8 @@ root go.mod
           <div class="finding-head">
             <span class="finding-num">CON 02</span>
             <span class="finding-title"
-              >Stale submodule version pins — submodules reference v0.3.0, not v0.5.0</span
+              >Stale submodule version pins — submodules reference v0.3.0, not
+              v0.5.0</span
             >
             <span class="severity high">high impact</span>
           </div>
@@ -798,8 +819,9 @@ root go.mod
                 border-radius: 3px;
               "
               >v0.3.0</code
-            >. But v0.5.0 introduced breaking changes: copy-on-write methods, Registry type,
-            template syntax change, and Compose removal. The submodules work locally via
+            >. But v0.5.0 introduced breaking changes: copy-on-write methods,
+            Registry type, template syntax change, and Compose removal. The
+            submodules work locally via
             <code
               class="inline"
               style="
@@ -810,18 +832,22 @@ root go.mod
               "
               >go.work</code
             >
-            (which overrides version pins), but external consumers pulling these submodules from the
-            Go proxy would get v0.3.0 root — missing the breaking changes.
+            (which overrides version pins), but external consumers pulling these
+            submodules from the Go proxy would get v0.3.0 root — missing the
+            breaking changes.
           </p>
           <div class="ref">
-            bridge/go.mod · diagnose/git/go.mod · diagnose/postgres/go.mod — all pin v0.3.0
+            bridge/go.mod · diagnose/git/go.mod · diagnose/postgres/go.mod — all
+            pin v0.3.0
           </div>
         </div>
 
         <div class="finding con">
           <div class="finding-head">
             <span class="finding-num">CON 03</span>
-            <span class="finding-title">agent → diagnose coupling within the same module</span>
+            <span class="finding-title"
+              >agent → diagnose coupling within the same module</span
+            >
             <span class="severity med">med impact</span>
           </div>
           <p>
@@ -858,10 +884,12 @@ root go.mod
               "
               >diagnose.StatusFailed</code
             >
-            directly. Today this is invisible — both are in the same module. But if either is
-            extracted to its own module, the agent must explicitly depend on diagnose. This is a
-            <em>correct</em> dependency direction (agent consumes diagnostic results), but the
-            coupling should be through a thin interface, not concrete types.
+            directly. Today this is invisible — both are in the same module. But
+            if either is extracted to its own module, the agent must explicitly
+            depend on diagnose. This is a
+            <em>correct</em> dependency direction (agent consumes diagnostic
+            results), but the coupling should be through a thin interface, not
+            concrete types.
           </p>
           <pre>
 agent/agent.go:26  import ".../diagnose"
@@ -873,11 +901,14 @@ agent/agent.go:120 if d.Status == diagnose.StatusFailed</pre>
         <div class="finding con">
           <div class="finding-head">
             <span class="finding-num">CON 04</span>
-            <span class="finding-title">No internal/ usage — all packages are public export</span>
+            <span class="finding-title"
+              >No internal/ usage — all packages are public export</span
+            >
             <span class="severity med">low impact</span>
           </div>
           <p>
-            Every package in the root module is importable by any external consumer. There is no
+            Every package in the root module is importable by any external
+            consumer. There is no
             <code
               class="inline"
               style="
@@ -921,8 +952,8 @@ agent/agent.go:120 if d.Status == diagnose.StatusFailed</pre>
               "
               >handle.go</code
             >
-            is unexported (good), but package-level visibility means the <em>package itself</em> is
-            public API. After module extraction,
+            is unexported (good), but package-level visibility means the
+            <em>package itself</em> is public API. After module extraction,
             <code
               class="inline"
               style="
@@ -946,8 +977,8 @@ agent/agent.go:120 if d.Status == diagnose.StatusFailed</pre>
         <div class="section-label">Path forward</div>
         <h2 class="section-title">Recommendations</h2>
         <p class="section-intro">
-          Ordered by impact on the path to v1.0. The first two are the single highest-leverage
-          architectural change.
+          Ordered by impact on the path to v1.0. The first two are the single
+          highest-leverage architectural change.
         </p>
         <ol class="rec-list">
           <li>
@@ -976,10 +1007,10 @@ agent/agent.go:120 if d.Status == diagnose.StatusFailed</pre>
               >
               into separate modules.</strong
             >
-            The root module shrinks to the classification library only (~1000 LOC). Agent depends on
-            diagnose (explicit go.mod require). Diagnose depends on root. Each versions
-            independently. This unblocks the v1.0 stable root without freezing the experimental
-            packages.
+            The root module shrinks to the classification library only (~1000
+            LOC). Agent depends on diagnose (explicit go.mod require). Diagnose
+            depends on root. Each versions independently. This unblocks the v1.0
+            stable root without freezing the experimental packages.
           </li>
           <li>
             <strong>Bump submodule version pins to v0.5.0.</strong>
@@ -1008,7 +1039,10 @@ agent/agent.go:120 if d.Status == diagnose.StatusFailed</pre>
             in each.
           </li>
           <li>
-            <strong>Define the agent's dependency on diagnose through a thin interface.</strong>
+            <strong
+              >Define the agent's dependency on diagnose through a thin
+              interface.</strong
+            >
             Instead of importing
             <code
               class="inline"
@@ -1031,8 +1065,8 @@ agent/agent.go:120 if d.Status == diagnose.StatusFailed</pre>
               "
               >DiagnosticResult</code
             >
-            interface or move the type to root. This allows the agent to consume results from any
-            diagnostic engine, not just this library's.
+            interface or move the type to root. This allows the agent to consume
+            results from any diagnostic engine, not just this library's.
           </li>
           <li>
             <strong
@@ -1081,8 +1115,8 @@ agent/agent.go:120 if d.Status == diagnose.StatusFailed</pre>
               "
               >diagnose/testutil</code
             >
-            module. Implementation details that are currently package-level public should move
-            behind
+            module. Implementation details that are currently package-level
+            public should move behind
             <code
               class="inline"
               style="
@@ -1096,8 +1130,9 @@ agent/agent.go:120 if d.Status == diagnose.StatusFailed</pre>
           </li>
           <li>
             <strong>Update CI for per-module parallelism.</strong>
-            After module extraction, CI should test each module in parallel. The current CI already
-            does this for the submodules — add steps for the new
+            After module extraction, CI should test each module in parallel. The
+            current CI already does this for the submodules — add steps for the
+            new
             <code
               class="inline"
               style="
@@ -1123,8 +1158,9 @@ agent/agent.go:120 if d.Status == diagnose.StatusFailed</pre>
           </li>
           <li>
             <strong>Ship v1.0 of the classification library.</strong>
-            Once the root module contains only Family, Error, interfaces, Classify, Registry,
-            HandleError, and constructors — freeze it. Tag it
+            Once the root module contains only Family, Error, interfaces,
+            Classify, Registry, HandleError, and constructors — freeze it. Tag
+            it
             <code
               class="inline"
               style="
@@ -1134,7 +1170,8 @@ agent/agent.go:120 if d.Status == diagnose.StatusFailed</pre>
                 border-radius: 3px;
               "
               >v1.0.0</code
-            >. The experimental modules (agent, diagnose, bridge, git, postgres) stay at v0.x.
+            >. The experimental modules (agent, diagnose, bridge, git, postgres)
+            stay at v0.x.
           </li>
         </ol>
       </div>
@@ -1146,9 +1183,9 @@ agent/agent.go:120 if d.Status == diagnose.StatusFailed</pre>
         <div class="section-label">Architecture Diagrams</div>
         <h2 class="section-title">Current vs Ideal</h2>
         <p class="section-intro">
-          D2 diagrams showing the current module structure (god-module with experimental packages)
-          and the ideal target (root as v1.0 stable, all experimental packages as separate modules).
-          SVG files:
+          D2 diagrams showing the current module structure (god-module with
+          experimental packages) and the ideal target (root as v1.0 stable, all
+          experimental packages as separate modules). SVG files:
           <code
             class="inline"
             style="
@@ -1187,7 +1224,11 @@ agent/agent.go:120 if d.Status == diagnose.StatusFailed</pre>
             <object
               data="2026-06-17_11_09-current.svg"
               type="image/svg+xml"
-              style="width: 100%; border: 1px solid var(--border); border-radius: 4px"
+              style="
+                width: 100%;
+                border: 1px solid var(--border);
+                border-radius: 4px;
+              "
             ></object>
           </div>
           <div>
@@ -1205,7 +1246,11 @@ agent/agent.go:120 if d.Status == diagnose.StatusFailed</pre>
             <object
               data="2026-06-17_11_09-improved.svg"
               type="image/svg+xml"
-              style="width: 100%; border: 1px solid var(--border); border-radius: 4px"
+              style="
+                width: 100%;
+                border: 1px solid var(--border);
+                border-radius: 4px;
+              "
             ></object>
           </div>
         </div>
@@ -1216,9 +1261,12 @@ agent/agent.go:120 if d.Status == diagnose.StatusFailed</pre>
       <div class="container">
         <p>
           Architecture review of
-          <a href="https://github.com/larsartmann/go-error-family">go-error-family</a> at v0.5.0.<br />
-          Generated 2026-06-17. All claims verified against source: 4 modules, go.work, all go.mod
-          files, import graph, CI config.
+          <a href="https://github.com/larsartmann/go-error-family"
+            >go-error-family</a
+          >
+          at v0.5.0.<br />
+          Generated 2026-06-17. All claims verified against source: 4 modules,
+          go.work, all go.mod files, import graph, CI config.
         </p>
       </div>
     </footer>

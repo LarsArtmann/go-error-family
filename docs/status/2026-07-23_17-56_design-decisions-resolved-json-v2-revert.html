@@ -30,14 +30,14 @@
         --warning: var(--color-yellow);
         --radius: 0px;
         --font-heading:
-          ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
-          Helvetica, Arial, sans-serif;
+          ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont,
+          "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
         --font-body:
-          ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
-          Helvetica, Arial, sans-serif;
+          ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont,
+          "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
         --font-mono:
-          ui-monospace, "Cascadia Code", "Source Code Pro", "JetBrains Mono", Menlo, Consolas,
-          monospace;
+          ui-monospace, "Cascadia Code", "Source Code Pro", "JetBrains Mono",
+          Menlo, Consolas, monospace;
       }
       * {
         box-sizing: border-box;
@@ -233,15 +233,27 @@
       }
       .card-problem {
         border-left-color: var(--problem);
-        background: color-mix(in srgb, var(--problem) 8%, var(--surface-raised));
+        background: color-mix(
+          in srgb,
+          var(--problem) 8%,
+          var(--surface-raised)
+        );
       }
       .card-solution {
         border-left-color: var(--solution);
-        background: color-mix(in srgb, var(--solution) 8%, var(--surface-raised));
+        background: color-mix(
+          in srgb,
+          var(--solution) 8%,
+          var(--surface-raised)
+        );
       }
       .card-warning {
         border-left-color: var(--warning);
-        background: color-mix(in srgb, var(--warning) 8%, var(--surface-raised));
+        background: color-mix(
+          in srgb,
+          var(--warning) 8%,
+          var(--surface-raised)
+        );
       }
       .issue {
         background: var(--surface-raised);
@@ -252,15 +264,27 @@
       }
       .issue-critical {
         border-left-color: var(--problem);
-        background: color-mix(in srgb, var(--problem) 8%, var(--surface-raised));
+        background: color-mix(
+          in srgb,
+          var(--problem) 8%,
+          var(--surface-raised)
+        );
       }
       .issue-important {
         border-left-color: var(--warning);
-        background: color-mix(in srgb, var(--warning) 8%, var(--surface-raised));
+        background: color-mix(
+          in srgb,
+          var(--warning) 8%,
+          var(--surface-raised)
+        );
       }
       .issue-nice {
         border-left-color: var(--solution);
-        background: color-mix(in srgb, var(--solution) 8%, var(--surface-raised));
+        background: color-mix(
+          in srgb,
+          var(--solution) 8%,
+          var(--surface-raised)
+        );
       }
       .issue h3 {
         margin-bottom: 0.3rem;
@@ -599,10 +623,11 @@
           <div class="hero-badge">Brutal Self-Review</div>
           <h1>6 Design Decisions Resolved, 3 Shipped, json/v2 Killed</h1>
           <p class="hero-subtitle">
-            Resolved all 6 open design decisions from TODO_LIST. Shipped WithHTTPStatus,
-            RegisterClassificationType, and the json/v2 revert. But the website is now a split
-            brain, no fuzz tests or benchmarks were added for the new APIs, and writeHTTPError
-            double-classifies. Honest assessment below.
+            Resolved all 6 open design decisions from TODO_LIST. Shipped
+            WithHTTPStatus, RegisterClassificationType, and the json/v2 revert.
+            But the website is now a split brain, no fuzz tests or benchmarks
+            were added for the new APIs, and writeHTTPError double-classifies.
+            Honest assessment below.
           </p>
         </div>
 
@@ -610,28 +635,28 @@
           <h3>TL;DR</h3>
           <ul>
             <li>
-              <strong>3 features shipped:</strong> WithHTTPStatus + HTTPStatuser interface,
-              RegisterClassificationType[T], json/v2 revert
+              <strong>3 features shipped:</strong> WithHTTPStatus + HTTPStatuser
+              interface, RegisterClassificationType[T], json/v2 revert
             </li>
             <li>
-              <strong>3 decisions rejected:</strong> Classify(nil) kept as Rejection, context
-              ergonomics won't fix, frozen registry won't fix
+              <strong>3 decisions rejected:</strong> Classify(nil) kept as
+              Rejection, context ergonomics won't fix, frozen registry won't fix
             </li>
             <li>
-              <strong>ALL tests pass</strong> (root + agent + bridge + diagnose), 0 lint issues, nix
-              flake check clean
+              <strong>ALL tests pass</strong> (root + agent + bridge +
+              diagnose), 0 lint issues, nix flake check clean
             </li>
             <li>
-              <strong>BIGGEST MISS:</strong> Website docs still say GOEXPERIMENT required — split
-              brain with root docs
+              <strong>BIGGEST MISS:</strong> Website docs still say GOEXPERIMENT
+              required — split brain with root docs
             </li>
             <li>
-              <strong>2nd MISS:</strong> No fuzz tests, examples, or benchmarks for new APIs —
-              breaks project conventions
+              <strong>2nd MISS:</strong> No fuzz tests, examples, or benchmarks
+              for new APIs — breaks project conventions
             </li>
             <li>
-              <strong>3rd MISS:</strong> writeHTTPError double-classifies (calls Classify +
-              HTTPStatus which calls Classify again)
+              <strong>3rd MISS:</strong> writeHTTPError double-classifies (calls
+              Classify + HTTPStatus which calls Classify again)
             </li>
           </ul>
         </nav>
@@ -667,10 +692,11 @@
 
         <p>
           The user pasted 6 open design decisions and said
-          <strong>"Questions?!?!?! Solutions??!?!"</strong> — demanding decisions, not more
-          questions. I read the code, made all 6 decisions, shipped 3, rejected 3, and reverted
-          json/v2. All quality gates pass. But I missed several things that a senior engineer would
-          have caught on review.
+          <strong>"Questions?!?!?! Solutions??!?!"</strong> — demanding
+          decisions, not more questions. I read the code, made all 6 decisions,
+          shipped 3, rejected 3, and reverted json/v2. All quality gates pass.
+          But I missed several things that a senior engineer would have caught
+          on review.
         </p>
 
         <!-- ================================================================ -->
@@ -679,72 +705,86 @@
         <div class="card card-solution">
           <h4>1. WithHTTPStatus + HTTPStatuser interface</h4>
           <p>
-            New <code>HTTPStatuser</code> interface in <code>interfaces.go</code> mirrors
-            <code>ExitCoder</code> exactly. <code>Error.WithHTTPStatus(int)</code> is copy-on-write
-            (like all <code>With*</code> methods). Package-level <code>HTTPStatus(err)</code> checks
-            the interface first, then falls back to <code>Classify(err).HTTPStatus()</code>.
-            <code>HTTPHandler</code> uses the updated <code>HTTPStatus(err)</code>, so per-error
-            overrides take effect in HTTP responses. Tests cover: override values,
-            zero-means-default, copy-on-write isolation, handler integration, interface compliance.
+            New <code>HTTPStatuser</code> interface in
+            <code>interfaces.go</code> mirrors <code>ExitCoder</code> exactly.
+            <code>Error.WithHTTPStatus(int)</code> is copy-on-write (like all
+            <code>With*</code> methods). Package-level
+            <code>HTTPStatus(err)</code> checks the interface first, then falls
+            back to <code>Classify(err).HTTPStatus()</code>.
+            <code>HTTPHandler</code> uses the updated
+            <code>HTTPStatus(err)</code>, so per-error overrides take effect in
+            HTTP responses. Tests cover: override values, zero-means-default,
+            copy-on-write isolation, handler integration, interface compliance.
           </p>
         </div>
 
         <div class="card card-solution">
           <h4>2. RegisterClassificationType[T error](family Family)</h4>
           <p>
-            Two top-level generic functions (Go doesn't allow type params on methods):
-            <code>RegisterClassificationType[T](family)</code> delegates to DefaultRegistry,
-            <code>RegisterClassificationTypeFor[T](r, family)</code> targets a custom Registry. Both
-            are sugar over <code>RegisterClassifier</code> with an
-            <code>errors.AsType[T]</code> check. Tests cover: type matching, wrapped errors,
-            non-matching types, custom registry isolation.
+            Two top-level generic functions (Go doesn't allow type params on
+            methods):
+            <code>RegisterClassificationType[T](family)</code> delegates to
+            DefaultRegistry,
+            <code>RegisterClassificationTypeFor[T](r, family)</code> targets a
+            custom Registry. Both are sugar over
+            <code>RegisterClassifier</code> with an
+            <code>errors.AsType[T]</code> check. Tests cover: type matching,
+            wrapped errors, non-matching types, custom registry isolation.
           </p>
         </div>
 
         <div class="card card-solution">
           <h4>3. json/v2 reverted to encoding/json</h4>
           <p>
-            <code>encoding/json/v2</code> replaced with <code>encoding/json</code> in
-            <code>error.go</code> and <code>http.go</code>. <code>json.Marshal</code> replaces
-            <code>json.Marshal</code> (v2 API), <code>json.Marshal + w.Write</code> replaces
-            <code>json.MarshalWrite</code>. GOEXPERIMENT=jsonv2 removed from: flake.nix (6
-            locations), ci.yml (2 jobs), .golangci.yml (build-tags), AGENTS.md (4 locations),
-            README.md, ROADMAP.md, FEATURES.md, SKILL.md (3 locations), CONTRIBUTING.md (4
-            locations). Build/test/lint/flake-check all pass WITHOUT GOEXPERIMENT.
+            <code>encoding/json/v2</code> replaced with
+            <code>encoding/json</code> in <code>error.go</code> and
+            <code>http.go</code>. <code>json.Marshal</code> replaces
+            <code>json.Marshal</code> (v2 API),
+            <code>json.Marshal + w.Write</code> replaces
+            <code>json.MarshalWrite</code>. GOEXPERIMENT=jsonv2 removed from:
+            flake.nix (6 locations), ci.yml (2 jobs), .golangci.yml
+            (build-tags), AGENTS.md (4 locations), README.md, ROADMAP.md,
+            FEATURES.md, SKILL.md (3 locations), CONTRIBUTING.md (4 locations).
+            Build/test/lint/flake-check all pass WITHOUT GOEXPERIMENT.
           </p>
         </div>
 
         <div class="card card-solution">
           <h4>4. 3 design decisions rejected with documented rationale</h4>
           <p>
-            <strong>Classify(nil) = Rejection:</strong> KEPT. Transient would make
-            <code>HTTPStatus(nil)</code> return 503 (success = "service unavailable"). Nil is a
-            caller bug, not an unknown error.<br />
+            <strong>Classify(nil) = Rejection:</strong> KEPT. Transient would
+            make <code>HTTPStatus(nil)</code> return 503 (success = "service
+            unavailable"). Nil is a caller bug, not an unknown error.<br />
             <strong>Constructor context ergonomics:</strong> WON'T FIX.
-            <code>WithContextMap(map{...})</code> already exists. Functional options conflict with
-            copy-on-write.<br />
-            <strong>Frozen registry flag:</strong> WON'T FIX. <code>atomic.Pointer</code>
-            makes late registrations safe. Would break config-driven registration.
+            <code>WithContextMap(map{...})</code> already exists. Functional
+            options conflict with copy-on-write.<br />
+            <strong>Frozen registry flag:</strong> WON'T FIX.
+            <code>atomic.Pointer</code>
+            makes late registrations safe. Would break config-driven
+            registration.
           </p>
         </div>
 
         <div class="card card-solution">
           <h4>5. Living docs updated</h4>
           <p>
-            TODO_LIST.md: all 6 design decisions resolved with rationale. CHANGELOG.md: new APIs +
-            json/v2 revert documented in [Unreleased]. AGENTS.md: new APIs documented, GOEXPERIMENT
-            references removed/replaced. ROADMAP.md: json/v2 strategy section removed (decision
-            made). FEATURES.md: json/v2 limitation updated to reflect revert.
+            TODO_LIST.md: all 6 design decisions resolved with rationale.
+            CHANGELOG.md: new APIs + json/v2 revert documented in [Unreleased].
+            AGENTS.md: new APIs documented, GOEXPERIMENT references
+            removed/replaced. ROADMAP.md: json/v2 strategy section removed
+            (decision made). FEATURES.md: json/v2 limitation updated to reflect
+            revert.
           </p>
         </div>
 
         <div class="card card-solution">
           <h4>6. Quality gate passed</h4>
           <p>
-            <code>go test ./... -race</code> passes on root + agent + bridge + diagnose.
-            <code>golangci-lint run ./...</code> = 0 issues. <code>nix flake check</code> = all
-            checks passed. <code>nix fmt</code> = clean. <code>GOWORK=off go build ./...</code> =
-            clean (zero-dep verified).
+            <code>go test ./... -race</code> passes on root + agent + bridge +
+            diagnose. <code>golangci-lint run ./...</code> = 0 issues.
+            <code>nix flake check</code> = all checks passed.
+            <code>nix fmt</code> = clean.
+            <code>GOWORK=off go build ./...</code> = clean (zero-dep verified).
           </p>
         </div>
 
@@ -755,15 +795,18 @@
           <span class="severity severity-important">Partial</span>
           <h3>SKILL.md API reference not fully updated</h3>
           <div class="where">
-            SKILL.md — header + conventions updated, API reference body NOT updated
+            SKILL.md — header + conventions updated, API reference body NOT
+            updated
           </div>
           <p>
-            I updated the SKILL.md header line (removed GOEXPERIMENT) and the Code Conventions
-            section (removed json/v2 mention). But I did NOT add
+            I updated the SKILL.md header line (removed GOEXPERIMENT) and the
+            Code Conventions section (removed json/v2 mention). But I did NOT
+            add
             <code>WithHTTPStatus</code>, <code>HTTPStatuser</code>,
             <code>RegisterClassificationType</code>, or
-            <code>RegisterClassificationTypeFor</code> to the API reference section of SKILL.md. A
-            consumer reading SKILL.md will not discover these new APIs.
+            <code>RegisterClassificationTypeFor</code> to the API reference
+            section of SKILL.md. A consumer reading SKILL.md will not discover
+            these new APIs.
           </p>
         </div>
 
@@ -771,38 +814,46 @@
           <span class="severity severity-important">Partial</span>
           <h3>GOEXPERIMENT removal — root docs done, website NOT done</h3>
           <div class="where">
-            website/src/content/docs/*.mdx — 4 files still reference GOEXPERIMENT
+            website/src/content/docs/*.mdx — 4 files still reference
+            GOEXPERIMENT
           </div>
           <p>
-            Root repo docs are clean. But the website is a <strong>SPLIT BRAIN</strong>:
-            <code>installation.mdx</code> has a dedicated "GOEXPERIMENT=jsonv2" section with setup
-            instructions, <code>contributing.mdx</code> has GOEXPERIMENT in every command,
+            Root repo docs are clean. But the website is a
+            <strong>SPLIT BRAIN</strong>: <code>installation.mdx</code> has a
+            dedicated "GOEXPERIMENT=jsonv2" section with setup instructions,
+            <code>contributing.mdx</code> has GOEXPERIMENT in every command,
             <code>benchmarks.mdx</code> prefixes every command with it, and
-            <code>changelog.mdx</code> still lists json/v2 migration as a v0.7.0 feature with no
-            revert note. A consumer reading the website will think GOEXPERIMENT is required when it
-            isn't.
+            <code>changelog.mdx</code> still lists json/v2 migration as a v0.7.0
+            feature with no revert note. A consumer reading the website will
+            think GOEXPERIMENT is required when it isn't.
           </p>
           <div class="callout callout-problem">
-            <strong>Critical:</strong> This is the #1 issue from this session. The website is the
-            public-facing documentation. It now contradicts the root docs. This must be fixed before
-            the website is rebuilt.
+            <strong>Critical:</strong> This is the #1 issue from this session.
+            The website is the public-facing documentation. It now contradicts
+            the root docs. This must be fixed before the website is rebuilt.
           </div>
         </div>
 
         <div class="issue issue-important">
           <span class="severity severity-important">Partial</span>
-          <h3>Test coverage for new APIs — tests exist but no fuzz/examples/benchmarks</h3>
+          <h3>
+            Test coverage for new APIs — tests exist but no
+            fuzz/examples/benchmarks
+          </h3>
           <div class="where">
-            http_test.go, classify_test.go — unit tests added; fuzz_test.go, example_test.go,
-            benchmark_test.go — NOTHING added
+            http_test.go, classify_test.go — unit tests added; fuzz_test.go,
+            example_test.go, benchmark_test.go — NOTHING added
           </div>
           <p>
-            The project has 9 fuzz tests, 16 examples, and 23 benchmarks. I added ZERO for the new
-            APIs. Missing: <code>FuzzWithHTTPStatus</code>,
-            <code>FuzzRegisterClassificationType</code>, <code>ExampleError_WithHTTPStatus</code>,
+            The project has 9 fuzz tests, 16 examples, and 23 benchmarks. I
+            added ZERO for the new APIs. Missing:
+            <code>FuzzWithHTTPStatus</code>,
+            <code>FuzzRegisterClassificationType</code>,
+            <code>ExampleError_WithHTTPStatus</code>,
             <code>ExampleRegisterClassificationType</code>,
-            <code>BenchmarkHTTPStatusOverride</code>, <code>BenchmarkWithHTTPStatus</code>. The
-            project's own AGENTS.md documents these as conventions — I broke them.
+            <code>BenchmarkHTTPStatusOverride</code>,
+            <code>BenchmarkWithHTTPStatus</code>. The project's own AGENTS.md
+            documents these as conventions — I broke them.
           </p>
         </div>
 
@@ -810,13 +861,16 @@
           <span class="severity severity-important">Partial</span>
           <h3>errorfamilytest.AssertHTTPStatus not added</h3>
           <div class="where">
-            errorfamilytest/errorfamilytest.go — AssertExitCode exists, AssertHTTPStatus does not
+            errorfamilytest/errorfamilytest.go — AssertExitCode exists,
+            AssertHTTPStatus does not
           </div>
           <p>
-            The test subpackage has <code>AssertFamily</code>, <code>AssertCode</code>,
-            <code>AssertRetryable</code>, <code>AssertContext</code>, <code>AssertExitCode</code> —
-            but no <code>AssertHTTPStatus</code>. I added the <code>HTTPStatuser</code> interface
-            that parallels <code>ExitCoder</code>, but forgot the test helper that parallels
+            The test subpackage has <code>AssertFamily</code>,
+            <code>AssertCode</code>, <code>AssertRetryable</code>,
+            <code>AssertContext</code>, <code>AssertExitCode</code> — but no
+            <code>AssertHTTPStatus</code>. I added the
+            <code>HTTPStatuser</code> interface that parallels
+            <code>ExitCoder</code>, but forgot the test helper that parallels
             <code>AssertExitCode</code>. Asymmetric API surface.
           </p>
         </div>
@@ -824,14 +878,16 @@
         <div class="issue issue-important">
           <span class="severity severity-important">Partial</span>
           <h3>Coverage dropped 97.6% to 97.0%</h3>
-          <div class="where">Root package — new code paths not fully exercised</div>
+          <div class="where">
+            Root package — new code paths not fully exercised
+          </div>
           <p>
-            The new <code>HTTPStatus(err)</code> function has a nil-guard path (<code
-              >err == nil</code
-            >) and an <code>HTTPStatuser</code> interface check path that may not be fully covered.
-            The <code>RegisterClassificationType</code>
-            closure's false-return path may also be uncovered. 0.6% drop = ~3-4 uncovered lines,
-            likely in the new code.
+            The new <code>HTTPStatus(err)</code> function has a nil-guard path
+            (<code>err == nil</code>) and an <code>HTTPStatuser</code> interface
+            check path that may not be fully covered. The
+            <code>RegisterClassificationType</code>
+            closure's false-return path may also be uncovered. 0.6% drop = ~3-4
+            uncovered lines, likely in the new code.
           </p>
         </div>
 
@@ -852,27 +908,33 @@
                 <td>1</td>
                 <td>v0.8.0 tag</td>
                 <td>
-                  36+ commits ahead of v0.7.0. Code is committed but untagged. Still a TODO_LIST
-                  design decision.
+                  36+ commits ahead of v0.7.0. Code is committed but untagged.
+                  Still a TODO_LIST design decision.
                 </td>
               </tr>
               <tr>
                 <td>2</td>
                 <td>Website rebuild + deploy</td>
                 <td>
-                  Never verified after 12-factor guide addition. Now also needs GOEXPERIMENT
-                  removal.
+                  Never verified after 12-factor guide addition. Now also needs
+                  GOEXPERIMENT removal.
                 </td>
               </tr>
               <tr>
                 <td>3</td>
                 <td>buildflow end-to-end verification</td>
-                <td>Individual tools pass but the pipeline was never run as a whole.</td>
+                <td>
+                  Individual tools pass but the pipeline was never run as a
+                  whole.
+                </td>
               </tr>
               <tr>
                 <td>4</td>
                 <td>50 hierarchical-errors nolint directives cleanup</td>
-                <td>Ongoing friction. golangci-lint warns "unknown linters" on every run.</td>
+                <td>
+                  Ongoing friction. golangci-lint warns "unknown linters" on
+                  every run.
+                </td>
               </tr>
               <tr>
                 <td>5</td>
@@ -903,24 +965,29 @@
 
         <div class="issue issue-critical">
           <span class="severity severity-critical">Critical</span>
-          <h3>Website split brain — GOEXPERIMENT references contradict root docs</h3>
+          <h3>
+            Website split brain — GOEXPERIMENT references contradict root docs
+          </h3>
           <div class="where">
-            website/src/content/docs/installation.mdx, contributing.mdx, benchmarks.mdx,
-            changelog.mdx
+            website/src/content/docs/installation.mdx, contributing.mdx,
+            benchmarks.mdx, changelog.mdx
           </div>
           <p>
-            I systematically removed GOEXPERIMENT from every root repo file (flake.nix, ci.yml,
-            .golangci.yml, AGENTS.md, README.md, ROADMAP.md, FEATURES.md, SKILL.md,
-            CONTRIBUTING.md). But I <strong>completely forgot the website</strong>. The website docs
+            I systematically removed GOEXPERIMENT from every root repo file
+            (flake.nix, ci.yml, .golangci.yml, AGENTS.md, README.md, ROADMAP.md,
+            FEATURES.md, SKILL.md, CONTRIBUTING.md). But I
+            <strong>completely forgot the website</strong>. The website docs
             still tell consumers to <code>export GOEXPERIMENT=jsonv2</code>
-            and have a dedicated section explaining why it's required. The root docs now say "no
-            GOEXPERIMENT needed." This is a textbook split brain — the public documentation
-            contradicts the developer documentation.
+            and have a dedicated section explaining why it's required. The root
+            docs now say "no GOEXPERIMENT needed." This is a textbook split
+            brain — the public documentation contradicts the developer
+            documentation.
           </p>
           <div class="callout callout-solution">
-            <strong>Fix:</strong> Update all 4 .mdx files to remove GOEXPERIMENT references. Remove
-            the "GOEXPERIMENT=jsonv2" section from installation.mdx. Update all command examples in
-            contributing.mdx and benchmarks.mdx. Add a note to changelog.mdx about the revert.
+            <strong>Fix:</strong> Update all 4 .mdx files to remove GOEXPERIMENT
+            references. Remove the "GOEXPERIMENT=jsonv2" section from
+            installation.mdx. Update all command examples in contributing.mdx
+            and benchmarks.mdx. Add a note to changelog.mdx about the revert.
           </div>
         </div>
 
@@ -928,14 +995,16 @@
           <span class="severity severity-critical">Performance</span>
           <h3>writeHTTPError double-classifies every HTTP error</h3>
           <div class="where">
-            http.go:66,82 — Classify(err) called at line 66, HTTPStatus(err) calls Classify(err)
-            again internally
+            http.go:66,82 — Classify(err) called at line 66, HTTPStatus(err)
+            calls Classify(err) again internally
           </div>
           <p>
-            <code>writeHTTPError</code> calls <code>family := Classify(err)</code> for the response
-            body, then calls <code>w.WriteHeader(HTTPStatus(err))</code> which internally calls
-            <code>Classify(err)</code> again. Every HTTP error response now runs the classification
-            pipeline twice. The fix is to compute the status code once and reuse the family:
+            <code>writeHTTPError</code> calls
+            <code>family := Classify(err)</code> for the response body, then
+            calls <code>w.WriteHeader(HTTPStatus(err))</code> which internally
+            calls <code>Classify(err)</code> again. Every HTTP error response
+            now runs the classification pipeline twice. The fix is to compute
+            the status code once and reuse the family:
           </p>
           <pre><code>// Current (double classify):
 family := Classify(err)
@@ -950,9 +1019,10 @@ if hs, ok := errors.AsType[HTTPStatuser](err); ok && hs.HTTPStatus() != 0 {
 }
 w.WriteHeader(status)</code></pre>
           <div class="callout callout-warning">
-            <strong>Impact:</strong> Minor (Classify is ~285ns/0-allocs with 50 sentinels), but it's
-            a code smell. The whole point of the atomic.Pointer optimization was to make Classify
-            cheap — and now we call it twice on the hot path.
+            <strong>Impact:</strong> Minor (Classify is ~285ns/0-allocs with 50
+            sentinels), but it's a code smell. The whole point of the
+            atomic.Pointer optimization was to make Classify cheap — and now we
+            call it twice on the hot path.
           </div>
         </div>
 
@@ -960,16 +1030,17 @@ w.WriteHeader(status)</code></pre>
           <span class="severity severity-critical">Convention Violation</span>
           <h3>Zero fuzz tests, examples, or benchmarks for new APIs</h3>
           <div class="where">
-            fuzz_test.go (9 existing), example_test.go (16 existing), benchmark_test.go (23
-            existing) — 0 added
+            fuzz_test.go (9 existing), example_test.go (16 existing),
+            benchmark_test.go (23 existing) — 0 added
           </div>
           <p>
-            The project has a strong testing culture: 9 fuzz functions, 16 examples, 23 benchmarks.
-            Every prior API addition (ExitCode, WrapOnce, WithContextAny) shipped with fuzz tests,
-            examples, AND benchmarks in the same session. I added none for WithHTTPStatus or
-            RegisterClassificationType. This breaks the project's own convention documented in
-            AGENTS.md and CHANGELOG.md. A future contributor will see the pattern and wonder why
-            these APIs are the exception.
+            The project has a strong testing culture: 9 fuzz functions, 16
+            examples, 23 benchmarks. Every prior API addition (ExitCode,
+            WrapOnce, WithContextAny) shipped with fuzz tests, examples, AND
+            benchmarks in the same session. I added none for WithHTTPStatus or
+            RegisterClassificationType. This breaks the project's own convention
+            documented in AGENTS.md and CHANGELOG.md. A future contributor will
+            see the pattern and wonder why these APIs are the exception.
           </p>
         </div>
 
@@ -977,62 +1048,76 @@ w.WriteHeader(status)</code></pre>
         <h2 id="improve"><span class="num">05</span>What We Should Improve</h2>
 
         <div class="card card-warning">
-          <h4>1. Always check the website when changing cross-cutting concerns</h4>
+          <h4>
+            1. Always check the website when changing cross-cutting concerns
+          </h4>
           <p>
-            GOEXPERIMENT was referenced in 4 .mdx files that I never opened. When removing a
-            cross-cutting concern (env var, build tag, dependency), the
-            <code>grep</code> must include <code>website/</code> — not just root repo files. The
-            website is a first-class consumer of the documentation.
+            GOEXPERIMENT was referenced in 4 .mdx files that I never opened.
+            When removing a cross-cutting concern (env var, build tag,
+            dependency), the
+            <code>grep</code> must include <code>website/</code> — not just root
+            repo files. The website is a first-class consumer of the
+            documentation.
           </p>
         </div>
 
         <div class="card card-warning">
           <h4>2. New API = fuzz + example + benchmark in the same session</h4>
           <p>
-            The project convention is clear: every API ships with all three. I should have a mental
-            checklist: (a) implementation, (b) unit tests, (c) fuzz test, (d) example, (e)
-            benchmark, (f) docs. I did (a), (b), and (f) but skipped (c), (d), and (e).
+            The project convention is clear: every API ships with all three. I
+            should have a mental checklist: (a) implementation, (b) unit tests,
+            (c) fuzz test, (d) example, (e) benchmark, (f) docs. I did (a), (b),
+            and (f) but skipped (c), (d), and (e).
           </p>
         </div>
 
         <div class="card card-warning">
           <h4>3. writeHTTPError needs refactor to avoid double Classify</h4>
           <p>
-            The fix is straightforward (inline the HTTPStatuser check, reuse the family from the
-            first Classify call). Should be done before the next release — it's a performance
-            regression on the HTTP error hot path.
+            The fix is straightforward (inline the HTTPStatuser check, reuse the
+            family from the first Classify call). Should be done before the next
+            release — it's a performance regression on the HTTP error hot path.
           </p>
         </div>
 
         <div class="card card-warning">
-          <h4>4. AssertHTTPStatus should have been added alongside HTTPStatuser</h4>
+          <h4>
+            4. AssertHTTPStatus should have been added alongside HTTPStatuser
+          </h4>
           <p>
-            When you add an interface that parallels an existing one (HTTPStatuser parallels
-            ExitCoder), the test helper should parallel too (AssertHTTPStatus parallels
-            AssertExitCode). The asymmetry is a smell.
+            When you add an interface that parallels an existing one
+            (HTTPStatuser parallels ExitCoder), the test helper should parallel
+            too (AssertHTTPStatus parallels AssertExitCode). The asymmetry is a
+            smell.
           </p>
         </div>
 
         <div class="card card-warning">
-          <h4>5. Coverage drop should trigger investigation, not just a note</h4>
+          <h4>
+            5. Coverage drop should trigger investigation, not just a note
+          </h4>
           <p>
-            97.6% to 97.0% is small but it's the wrong direction. I should have run
-            <code>go test -coverprofile</code> and identified the exact uncovered lines instead of
-            just noting the number.
+            97.6% to 97.0% is small but it's the wrong direction. I should have
+            run
+            <code>go test -coverprofile</code> and identified the exact
+            uncovered lines instead of just noting the number.
           </p>
         </div>
 
         <div class="card card-warning">
           <h4>6. ROADMAP.md section renumbering was not verified</h4>
           <p>
-            I removed section "4. json/v2 Strategy" and renamed "5. Ecosystem Growth" to "4.
-            Ecosystem Growth". But I didn't check if there were section 6+ that need renumbering, or
-            if the TOC (if any) references section numbers.
+            I removed section "4. json/v2 Strategy" and renamed "5. Ecosystem
+            Growth" to "4. Ecosystem Growth". But I didn't check if there were
+            section 6+ that need renumbering, or if the TOC (if any) references
+            section numbers.
           </p>
         </div>
 
         <!-- ================================================================ -->
-        <h2 id="next"><span class="num">06</span>Next 50 Tasks (Sorted by Impact)</h2>
+        <h2 id="next">
+          <span class="num">06</span>Next 50 Tasks (Sorted by Impact)
+        </h2>
 
         <div class="table-wrap">
           <table>
@@ -1048,14 +1133,18 @@ w.WriteHeader(status)</code></pre>
               <tr>
                 <td>1</td>
                 <td><span class="badge badge-critical">Critical</span></td>
-                <td>Fix website split brain — remove GOEXPERIMENT from all 4 .mdx files</td>
+                <td>
+                  Fix website split brain — remove GOEXPERIMENT from all 4 .mdx
+                  files
+                </td>
                 <td>30 min</td>
               </tr>
               <tr>
                 <td>2</td>
                 <td><span class="badge badge-critical">Critical</span></td>
                 <td>
-                  Fix writeHTTPError double-classify — inline HTTPStatuser check, reuse family
+                  Fix writeHTTPError double-classify — inline HTTPStatuser
+                  check, reuse family
                 </td>
                 <td>15 min</td>
               </tr>
@@ -1080,14 +1169,17 @@ w.WriteHeader(status)</code></pre>
               <tr>
                 <td>6</td>
                 <td><span class="badge badge-high">High</span></td>
-                <td>Add ExampleRegisterClassificationType to example_test.go</td>
+                <td>
+                  Add ExampleRegisterClassificationType to example_test.go
+                </td>
                 <td>10 min</td>
               </tr>
               <tr>
                 <td>7</td>
                 <td><span class="badge badge-high">High</span></td>
                 <td>
-                  Add BenchmarkWithHTTPStatus + BenchmarkHTTPStatusOverride to benchmark_test.go
+                  Add BenchmarkWithHTTPStatus + BenchmarkHTTPStatusOverride to
+                  benchmark_test.go
                 </td>
                 <td>15 min</td>
               </tr>
@@ -1106,13 +1198,17 @@ w.WriteHeader(status)</code></pre>
               <tr>
                 <td>10</td>
                 <td><span class="badge badge-high">High</span></td>
-                <td>Investigate coverage drop — identify exact uncovered lines</td>
+                <td>
+                  Investigate coverage drop — identify exact uncovered lines
+                </td>
                 <td>15 min</td>
               </tr>
               <tr>
                 <td>11</td>
                 <td><span class="badge badge-high">High</span></td>
-                <td>Verify ROADMAP.md section numbering after section 4 removal</td>
+                <td>
+                  Verify ROADMAP.md section numbering after section 4 removal
+                </td>
                 <td>5 min</td>
               </tr>
               <tr>
@@ -1161,21 +1257,25 @@ w.WriteHeader(status)</code></pre>
                 <td>19</td>
                 <td><span class="badge badge-medium">Medium</span></td>
                 <td>
-                  Update website api-reference.mdx with WithHTTPStatus, RegisterClassificationType
+                  Update website api-reference.mdx with WithHTTPStatus,
+                  RegisterClassificationType
                 </td>
                 <td>30 min</td>
               </tr>
               <tr>
                 <td>20</td>
                 <td><span class="badge badge-medium">Medium</span></td>
-                <td>Update website error-types.mdx with HTTPStatuser interface</td>
+                <td>
+                  Update website error-types.mdx with HTTPStatuser interface
+                </td>
                 <td>15 min</td>
               </tr>
               <tr>
                 <td>21</td>
                 <td><span class="badge badge-medium">Medium</span></td>
                 <td>
-                  Add json/v2 revert note to CHANGELOG.md [0.7.0] section (historical context)
+                  Add json/v2 revert note to CHANGELOG.md [0.7.0] section
+                  (historical context)
                 </td>
                 <td>5 min</td>
               </tr>
@@ -1183,28 +1283,35 @@ w.WriteHeader(status)</code></pre>
                 <td>22</td>
                 <td><span class="badge badge-medium">Medium</span></td>
                 <td>
-                  Document jsonError struct exclusion of httpStatus (parallel to exitCode exclusion)
+                  Document jsonError struct exclusion of httpStatus (parallel to
+                  exitCode exclusion)
                 </td>
                 <td>5 min</td>
               </tr>
               <tr>
                 <td>23</td>
                 <td><span class="badge badge-medium">Medium</span></td>
-                <td>Run go test -bench=. to verify benchmarks still pass after json/v2 revert</td>
+                <td>
+                  Run go test -bench=. to verify benchmarks still pass after
+                  json/v2 revert
+                </td>
                 <td>5 min</td>
               </tr>
               <tr>
                 <td>24</td>
                 <td><span class="badge badge-medium">Medium</span></td>
                 <td>
-                  Verify README.md benchmark table numbers are still accurate after json/v2 revert
+                  Verify README.md benchmark table numbers are still accurate
+                  after json/v2 revert
                 </td>
                 <td>10 min</td>
               </tr>
               <tr>
                 <td>25</td>
                 <td><span class="badge badge-low">Low</span></td>
-                <td>Set up CI/CD for website deploys (GitHub Actions workflow)</td>
+                <td>
+                  Set up CI/CD for website deploys (GitHub Actions workflow)
+                </td>
                 <td>1 hr</td>
               </tr>
               <tr>
@@ -1216,31 +1323,42 @@ w.WriteHeader(status)</code></pre>
               <tr>
                 <td>27</td>
                 <td><span class="badge badge-low">Low</span></td>
-                <td>Add hierarchical-errors config file support investigation</td>
+                <td>
+                  Add hierarchical-errors config file support investigation
+                </td>
                 <td>2 hr</td>
               </tr>
               <tr>
                 <td>28</td>
                 <td><span class="badge badge-low">Low</span></td>
-                <td>Consider adding WithHTTPStatus to bridge/ ClassifiedError type</td>
+                <td>
+                  Consider adding WithHTTPStatus to bridge/ ClassifiedError type
+                </td>
                 <td>30 min</td>
               </tr>
               <tr>
                 <td>29</td>
                 <td><span class="badge badge-low">Low</span></td>
-                <td>Add json/v2 revert ADR to docs/adr/ (attempted, reverted, re-reverted)</td>
+                <td>
+                  Add json/v2 revert ADR to docs/adr/ (attempted, reverted,
+                  re-reverted)
+                </td>
                 <td>30 min</td>
               </tr>
               <tr>
                 <td>30</td>
                 <td><span class="badge badge-low">Low</span></td>
-                <td>Consider RegisterClassificationTypes (plural/batch) API parity</td>
+                <td>
+                  Consider RegisterClassificationTypes (plural/batch) API parity
+                </td>
                 <td>20 min</td>
               </tr>
               <tr>
                 <td>31</td>
                 <td><span class="badge badge-low">Low</span></td>
-                <td>Review whether WithHTTPStatus should validate range (100-599)</td>
+                <td>
+                  Review whether WithHTTPStatus should validate range (100-599)
+                </td>
                 <td>15 min</td>
               </tr>
               <tr>
@@ -1253,8 +1371,8 @@ w.WriteHeader(status)</code></pre>
                 <td>33</td>
                 <td><span class="badge badge-low">Low</span></td>
                 <td>
-                  Consider HTTPStatus() method on Family that accepts an error (family-aware
-                  override)
+                  Consider HTTPStatus() method on Family that accepts an error
+                  (family-aware override)
                 </td>
                 <td>30 min</td>
               </tr>
@@ -1262,69 +1380,86 @@ w.WriteHeader(status)</code></pre>
                 <td>34</td>
                 <td><span class="badge badge-low">Low</span></td>
                 <td>
-                  Document the Classify(nil) = Rejection decision in SKILL.md (rationale for future
-                  readers)
+                  Document the Classify(nil) = Rejection decision in SKILL.md
+                  (rationale for future readers)
                 </td>
                 <td>10 min</td>
               </tr>
               <tr>
                 <td>35</td>
                 <td><span class="badge badge-low">Low</span></td>
-                <td>Add CI guard: fail if encoding/json/v2 appears in any .go file</td>
+                <td>
+                  Add CI guard: fail if encoding/json/v2 appears in any .go file
+                </td>
                 <td>15 min</td>
               </tr>
               <tr>
                 <td>36</td>
                 <td><span class="badge badge-low">Low</span></td>
                 <td>
-                  Verify examples/ module builds with new APIs (no separate go.mod update needed?)
+                  Verify examples/ module builds with new APIs (no separate
+                  go.mod update needed?)
                 </td>
                 <td>10 min</td>
               </tr>
               <tr>
                 <td>37</td>
                 <td><span class="badge badge-low">Low</span></td>
-                <td>Consider deprecation notice for GOEXPERIMENT in any consumer docs</td>
+                <td>
+                  Consider deprecation notice for GOEXPERIMENT in any consumer
+                  docs
+                </td>
                 <td>5 min</td>
               </tr>
               <tr>
                 <td>38</td>
                 <td><span class="badge badge-low">Low</span></td>
-                <td>Update go.sum if any transitive deps changed (unlikely with json revert)</td>
+                <td>
+                  Update go.sum if any transitive deps changed (unlikely with
+                  json revert)
+                </td>
                 <td>5 min</td>
               </tr>
               <tr>
                 <td>39</td>
                 <td><span class="badge badge-low">Low</span></td>
                 <td>
-                  Review whether RegisterClassificationType should use errors.As instead of
-                  errors.AsType
+                  Review whether RegisterClassificationType should use errors.As
+                  instead of errors.AsType
                 </td>
                 <td>15 min</td>
               </tr>
               <tr>
                 <td>40</td>
                 <td><span class="badge badge-low">Low</span></td>
-                <td>Consider adding HTTPStatusString() string method for debugging</td>
+                <td>
+                  Consider adding HTTPStatusString() string method for debugging
+                </td>
                 <td>10 min</td>
               </tr>
               <tr>
                 <td>41</td>
                 <td><span class="badge badge-low">Low</span></td>
-                <td>Verify nix run .#test-race works without GOEXPERIMENT (flake app)</td>
+                <td>
+                  Verify nix run .#test-race works without GOEXPERIMENT (flake
+                  app)
+                </td>
                 <td>5 min</td>
               </tr>
               <tr>
                 <td>42</td>
                 <td><span class="badge badge-low">Low</span></td>
-                <td>Add migration guide for v0.7.0 consumers removing GOEXPERIMENT</td>
+                <td>
+                  Add migration guide for v0.7.0 consumers removing GOEXPERIMENT
+                </td>
                 <td>20 min</td>
               </tr>
               <tr>
                 <td>43</td>
                 <td><span class="badge badge-low">Low</span></td>
                 <td>
-                  Consider WithHTTPStatus validation: warn or error on invalid HTTP status codes
+                  Consider WithHTTPStatus validation: warn or error on invalid
+                  HTTP status codes
                 </td>
                 <td>20 min</td>
               </tr>
@@ -1332,29 +1467,34 @@ w.WriteHeader(status)</code></pre>
                 <td>44</td>
                 <td><span class="badge badge-low">Low</span></td>
                 <td>
-                  Review whether the mkApp wrapper in flake.nix still works with empty text
-                  (GOEXPERIMENT removed)
+                  Review whether the mkApp wrapper in flake.nix still works with
+                  empty text (GOEXPERIMENT removed)
                 </td>
                 <td>10 min</td>
               </tr>
               <tr>
                 <td>45</td>
                 <td><span class="badge badge-low">Low</span></td>
-                <td>Add WithHTTPStatus godoc example showing the battle.not_found 404 use case</td>
+                <td>
+                  Add WithHTTPStatus godoc example showing the battle.not_found
+                  404 use case
+                </td>
                 <td>10 min</td>
               </tr>
               <tr>
                 <td>46</td>
                 <td><span class="badge badge-low">Low</span></td>
-                <td>Review diagnose package — does it need HTTPStatus awareness?</td>
+                <td>
+                  Review diagnose package — does it need HTTPStatus awareness?
+                </td>
                 <td>30 min</td>
               </tr>
               <tr>
                 <td>47</td>
                 <td><span class="badge badge-low">Low</span></td>
                 <td>
-                  Consider adding HTTP family method: Family.HTTPStatusFor(err) that checks
-                  overrides
+                  Consider adding HTTP family method: Family.HTTPStatusFor(err)
+                  that checks overrides
                 </td>
                 <td>30 min</td>
               </tr>
@@ -1362,7 +1502,8 @@ w.WriteHeader(status)</code></pre>
                 <td>48</td>
                 <td><span class="badge badge-low">Low</span></td>
                 <td>
-                  Verify golangci-lint CI step still works after .golangci.yml build-tags change
+                  Verify golangci-lint CI step still works after .golangci.yml
+                  build-tags change
                 </td>
                 <td>10 min</td>
               </tr>
@@ -1370,15 +1511,18 @@ w.WriteHeader(status)</code></pre>
                 <td>49</td>
                 <td><span class="badge badge-low">Low</span></td>
                 <td>
-                  Consider whether json/v2 should be re-adopted when Go makes it stable (track
-                  upstream)
+                  Consider whether json/v2 should be re-adopted when Go makes it
+                  stable (track upstream)
                 </td>
                 <td>Ongoing</td>
               </tr>
               <tr>
                 <td>50</td>
                 <td><span class="badge badge-low">Low</span></td>
-                <td>Review all status reports from today for cross-references to this session</td>
+                <td>
+                  Review all status reports from today for cross-references to
+                  this session
+                </td>
                 <td>20 min</td>
               </tr>
             </tbody>
@@ -1386,59 +1530,74 @@ w.WriteHeader(status)</code></pre>
         </div>
 
         <!-- ================================================================ -->
-        <h2 id="questions"><span class="num">07</span>Questions (That I Cannot Answer Myself)</h2>
+        <h2 id="questions">
+          <span class="num">07</span>Questions (That I Cannot Answer Myself)
+        </h2>
 
         <div class="issue issue-important">
           <span class="severity severity-important">Q1</span>
           <h3>
-            Should v0.8.0 be tagged now, or should the website split brain + missing fuzz/benchmarks
-            be fixed first?
+            Should v0.8.0 be tagged now, or should the website split brain +
+            missing fuzz/benchmarks be fixed first?
           </h3>
           <div class="where">TODO_LIST Design Decision #7 — v0.8.0 release</div>
           <p>
-            The code is committed and all quality gates pass. But the website contradicts the root
-            docs, and the new APIs lack fuzz tests/examples/benchmarks. Options: (a) tag now — the
-            Go code is correct, website is a separate deploy cycle; (b) tag after website fix —
-            consumers hitting the website first shouldn't see contradictions; (c) tag after
-            everything is fixed — maximum quality before release. I cannot decide this because it
-            depends on your release philosophy: "ship the code, fix docs later" vs "everything must
-            be consistent before tag."
+            The code is committed and all quality gates pass. But the website
+            contradicts the root docs, and the new APIs lack fuzz
+            tests/examples/benchmarks. Options: (a) tag now — the Go code is
+            correct, website is a separate deploy cycle; (b) tag after website
+            fix — consumers hitting the website first shouldn't see
+            contradictions; (c) tag after everything is fixed — maximum quality
+            before release. I cannot decide this because it depends on your
+            release philosophy: "ship the code, fix docs later" vs "everything
+            must be consistent before tag."
           </p>
         </div>
 
         <div class="issue issue-important">
           <span class="severity severity-important">Q2</span>
-          <h3>Should the json/v2 revert be its own minor version (v0.7.1) or part of v0.8.0?</h3>
+          <h3>
+            Should the json/v2 revert be its own minor version (v0.7.1) or part
+            of v0.8.0?
+          </h3>
           <div class="where">
             CHANGELOG.md — currently in [Unreleased] alongside v0.8.0 features
           </div>
           <p>
-            The json/v2 revert is technically a <strong>breaking change in reverse</strong>
-            — it removes the GOEXPERIMENT requirement that v0.7.0 introduced. Consumers who pinned
-            v0.7.0 and set GOEXPERIMENT won't break (the env var is just ignored), but semantically
-            this is a rollback of a v0.7.0 feature. Should this be a patch release (v0.7.1: "reverts
-            the json/v2 experiment from v0.7.0") or should it ride with v0.8.0? I cannot decide this
-            because it depends on whether you want the revert to be independently consumable or
-            bundled with the new features.
+            The json/v2 revert is technically a
+            <strong>breaking change in reverse</strong>
+            — it removes the GOEXPERIMENT requirement that v0.7.0 introduced.
+            Consumers who pinned v0.7.0 and set GOEXPERIMENT won't break (the
+            env var is just ignored), but semantically this is a rollback of a
+            v0.7.0 feature. Should this be a patch release (v0.7.1: "reverts the
+            json/v2 experiment from v0.7.0") or should it ride with v0.8.0? I
+            cannot decide this because it depends on whether you want the revert
+            to be independently consumable or bundled with the new features.
           </p>
         </div>
 
         <div class="issue issue-important">
           <span class="severity severity-important">Q3</span>
-          <h3>Is the auto-commit hook behavior acceptable, or should I be fighting it?</h3>
+          <h3>
+            Is the auto-commit hook behavior acceptable, or should I be fighting
+            it?
+          </h3>
           <div class="where">
-            Git history — commits 877631a through 369af5e appear to be hook-generated
+            Git history — commits 877631a through 369af5e appear to be
+            hook-generated
           </div>
           <p>
-            The git log shows 5 commits from this session that appear to be auto-generated by a
-            pre-existing hook (documented in status reports 07-59 and 15-52). The hook appears to
-            squash/re-commit changes with generic messages like "feat(errors): implement
-            comprehensive error family system." This means the individual changes (WithHTTPStatus,
-            RegisterClassificationType, json/v2 revert, doc updates) are NOT individually visible in
-            git history — they're lumped together. I followed the safety rule of not
-            resetting/amending auto-commits, but I cannot determine whether this hook behavior is
-            intentional and desired, or a misconfiguration that destroys useful commit granularity.
-            Only you can answer this.
+            The git log shows 5 commits from this session that appear to be
+            auto-generated by a pre-existing hook (documented in status reports
+            07-59 and 15-52). The hook appears to squash/re-commit changes with
+            generic messages like "feat(errors): implement comprehensive error
+            family system." This means the individual changes (WithHTTPStatus,
+            RegisterClassificationType, json/v2 revert, doc updates) are NOT
+            individually visible in git history — they're lumped together. I
+            followed the safety rule of not resetting/amending auto-commits, but
+            I cannot determine whether this hook behavior is intentional and
+            desired, or a misconfiguration that destroys useful commit
+            granularity. Only you can answer this.
           </p>
         </div>
 
@@ -1450,8 +1609,8 @@ w.WriteHeader(status)</code></pre>
             <div class="text">
               <strong>Decisive decision-making</strong>
               <span
-                >All 6 design decisions resolved in one pass with documented rationale. No analysis
-                paralysis.</span
+                >All 6 design decisions resolved in one pass with documented
+                rationale. No analysis paralysis.</span
               >
             </div>
           </div>
@@ -1460,8 +1619,9 @@ w.WriteHeader(status)</code></pre>
             <div class="text">
               <strong>WithHTTPStatus mirrors ExitCoder pattern exactly</strong>
               <span
-                >Same interface shape, same copy-on-write semantics, same 0=unset convention, same
-                package-function-checks-interface-first pattern. Consistent API design.</span
+                >Same interface shape, same copy-on-write semantics, same
+                0=unset convention, same package-function-checks-interface-first
+                pattern. Consistent API design.</span
               >
             </div>
           </div>
@@ -1470,8 +1630,9 @@ w.WriteHeader(status)</code></pre>
             <div class="text">
               <strong>json/v2 removal was thorough in the root repo</strong>
               <span
-                >Every .go, .nix, .yml, .md file in the root repo was swept. Zero json/v2 references
-                remain in Go source. Build verified without GOEXPERIMENT.</span
+                >Every .go, .nix, .yml, .md file in the root repo was swept.
+                Zero json/v2 references remain in Go source. Build verified
+                without GOEXPERIMENT.</span
               >
             </div>
           </div>
@@ -1480,16 +1641,16 @@ w.WriteHeader(status)</code></pre>
             <div class="text">
               <strong>All quality gates pass</strong>
               <span
-                >Tests (race), lint (0 issues), nix flake check, nix fmt, GOWORK=off build — all
-                green.</span
+                >Tests (race), lint (0 issues), nix flake check, nix fmt,
+                GOWORK=off build — all green.</span
               >
             </div>
           </div>
         </div>
 
         <footer class="footer">
-          Generated 2026-07-23 17:56 &middot; Based solely on this session's work &middot; All
-          claims verified against source code where noted
+          Generated 2026-07-23 17:56 &middot; Based solely on this session's
+          work &middot; All claims verified against source code where noted
         </footer>
       </main>
     </div>

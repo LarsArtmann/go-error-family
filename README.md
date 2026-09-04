@@ -357,7 +357,11 @@ The response body contains only `family`, `code`, and a user-facing `message`
 (from a registered template) — never the raw `err.Error()`:
 
 ```json
-{ "family": "conflict", "code": "order.duplicate", "message": "A conflict was detected." }
+{
+  "family": "conflict",
+  "code": "order.duplicate",
+  "message": "A conflict was detected."
+}
 ```
 
 For a custom response shape, write your own response and use `HTTPStatus(err)`

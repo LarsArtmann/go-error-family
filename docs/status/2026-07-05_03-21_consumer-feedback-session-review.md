@@ -7,19 +7,19 @@
 
 ## a) FULLY DONE (verified green: 0 lint, all tests -race pass, build OK)
 
-| #   | Item                                                                                        | Source    | Evidence                                                 |
-| --- | ------------------------------------------------------------------------------------------- | --------- | -------------------------------------------------------- |
-| 1   | `RegisterClassifier` / `RegisterClassifiers` (predicate-based dynamic error classification) | BH-PP1    | `classify.go`, `registry.go`, 8 tests passing with -race |
-| 2   | `Code(err) string` public helper                                                            | SEC-PP1   | `classify.go`, `extractCode` refactored to delegate      |
-| 3   | `Wrap{Family}f` formatted variants (5 families)                                             | BH-PP3    | `constructors.go`, 6 tests                               |
-| 4   | `TemplateForCode(code)` helper                                                              | SEC-PP3   | `registry.go` + `handle.go`, Registry + package-level    |
-| 5   | `HTTPStatus(err)` + `HTTPHandler(fn)` net/http middleware                                   | SEC-IDEA2 | `http.go`, 4 tests, safe JSON (no internal leak)         |
-| 6   | `LogError` / `LogErrorContext` structured slog logging                                      | SEC-IDEA3 | `log.go`, 5 tests                                        |
-| 7   | `errorfamilytest` subpackage (Assert helpers)                                               | SEC-IDEA4 | `errorfamilytest/`, 5 tests                              |
-| 8   | `Code()` vs `ErrorCode()` doc clarification                                                 | BH-PP2    | `error.go` godoc                                         |
-| 9   | HTTP mapping rationale (per-family "why")                                                   | SEC-PP4   | `family.go` HTTPStatus doc                               |
-| 10  | Decision-tree doc (own→Classified, sentinel→Register, dynamic→Classifier)                   | SEC-PP2   | `README.md`                                              |
-| 11  | CHANGELOG `[Unreleased]`, AGENTS.md, SKILL.md, README sync                                  | —         | all updated                                              |
+| #  | Item                                                                                        | Source    | Evidence                                                 |
+| -- | ------------------------------------------------------------------------------------------- | --------- | -------------------------------------------------------- |
+| 1  | `RegisterClassifier` / `RegisterClassifiers` (predicate-based dynamic error classification) | BH-PP1    | `classify.go`, `registry.go`, 8 tests passing with -race |
+| 2  | `Code(err) string` public helper                                                            | SEC-PP1   | `classify.go`, `extractCode` refactored to delegate      |
+| 3  | `Wrap{Family}f` formatted variants (5 families)                                             | BH-PP3    | `constructors.go`, 6 tests                               |
+| 4  | `TemplateForCode(code)` helper                                                              | SEC-PP3   | `registry.go` + `handle.go`, Registry + package-level    |
+| 5  | `HTTPStatus(err)` + `HTTPHandler(fn)` net/http middleware                                   | SEC-IDEA2 | `http.go`, 4 tests, safe JSON (no internal leak)         |
+| 6  | `LogError` / `LogErrorContext` structured slog logging                                      | SEC-IDEA3 | `log.go`, 5 tests                                        |
+| 7  | `errorfamilytest` subpackage (Assert helpers)                                               | SEC-IDEA4 | `errorfamilytest/`, 5 tests                              |
+| 8  | `Code()` vs `ErrorCode()` doc clarification                                                 | BH-PP2    | `error.go` godoc                                         |
+| 9  | HTTP mapping rationale (per-family "why")                                                   | SEC-PP4   | `family.go` HTTPStatus doc                               |
+| 10 | Decision-tree doc (own→Classified, sentinel→Register, dynamic→Classifier)                   | SEC-PP2   | `README.md`                                              |
+| 11 | CHANGELOG `[Unreleased]`, AGENTS.md, SKILL.md, README sync                                  | —         | all updated                                              |
 
 **Stats:** 14 files changed, +740/-34 lines, 8 new files, 134 root tests pass, root coverage 97.1%.
 
@@ -40,15 +40,15 @@
 
 ### From SwettySwipper feedback:
 
-| #   | Item                                                                 | Ask                                                                              |
-| --- | -------------------------------------------------------------------- | -------------------------------------------------------------------------------- |
-| S1  | `Classify(nil)` → Rejection in **godoc**                             | Document prominently on `Classify` itself, not just SKILL.md                     |
-| S2  | `errors.Is` code+family matching in **godoc**                        | Add example to `Error.Is` godoc                                                  |
-| S3  | `Wrap(nil,...)` → nil in **constructor godoc**                       | "Returns nil if err is nil — use `New*` for errors without a cause"              |
-| S4  | Template `{key}` substitution mechanism in **MessageTemplate godoc** | Document it's `strings.ReplaceAll`, no escaping                                  |
-| S5  | **Per-error HTTP status override**                                   | `err.WithHTTPStatus(404)` — new feature, Family default + per-error override     |
-| S6  | Registry isolation testing pattern                                   | Document "use NewRegistry for test isolation" pattern                            |
-| S7  | Error code in HTTP responses                                         | Partially solved by my `HTTPHandler`, but consumer's cqrs-htmx layer is separate |
+| #  | Item                                                                 | Ask                                                                              |
+| -- | -------------------------------------------------------------------- | -------------------------------------------------------------------------------- |
+| S1 | `Classify(nil)` → Rejection in **godoc**                             | Document prominently on `Classify` itself, not just SKILL.md                     |
+| S2 | `errors.Is` code+family matching in **godoc**                        | Add example to `Error.Is` godoc                                                  |
+| S3 | `Wrap(nil,...)` → nil in **constructor godoc**                       | "Returns nil if err is nil — use `New*` for errors without a cause"              |
+| S4 | Template `{key}` substitution mechanism in **MessageTemplate godoc** | Document it's `strings.ReplaceAll`, no escaping                                  |
+| S5 | **Per-error HTTP status override**                                   | `err.WithHTTPStatus(404)` — new feature, Family default + per-error override     |
+| S6 | Registry isolation testing pattern                                   | Document "use NewRegistry for test isolation" pattern                            |
+| S7 | Error code in HTTP responses                                         | Partially solved by my `HTTPHandler`, but consumer's cqrs-htmx layer is separate |
 
 ### From DiscordSync feedback:
 

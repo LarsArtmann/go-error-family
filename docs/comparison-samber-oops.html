@@ -620,9 +620,11 @@
             June 2026 · Comparative Analysis
           </div>
           <p class="hero-subtitle">
-            Two Go libraries that ask the same question — <em>"what do you do with an error?"</em> —
-            and arrive at radically different answers. One classifies behavior. The other enriches
-            context. Here is how they differ, where each excels, and when to choose which.
+            Two Go libraries that ask the same question —
+            <em>"what do you do with an error?"</em> — and arrive at radically
+            different answers. One classifies behavior. The other enriches
+            context. Here is how they differ, where each excels, and when to
+            choose which.
           </p>
         </div>
       </header>
@@ -634,15 +636,22 @@
         <div class="philosophy-grid">
           <div class="phil-card a">
             <h3>go-error-family</h3>
-            <div class="name">Share the protocol,<br />not the implementation.</div>
-            <div class="tagline">"What should the system <em>do</em> with this error?"</div>
+            <div class="name">
+              Share the protocol,<br />not the implementation.
+            </div>
+            <div class="tagline">
+              "What should the system <em>do</em> with this error?"
+            </div>
             <p>
-              Behavioral classification first. Every error gets a <strong>Family</strong> —
-              Rejection, Conflict, Transient, Corruption, or Infrastructure — which directly
-              answers: should we retry? what exit code? whose fault? what tone for the user? The
-              library provides small interfaces (<code>Coded</code>, <code>Classified</code>,
-              <code>Contextual</code>, <code>Retryable</code>) that any error type can implement. It
-              is a <strong>classification protocol</strong>, not a structured error wrapper.
+              Behavioral classification first. Every error gets a
+              <strong>Family</strong> — Rejection, Conflict, Transient,
+              Corruption, or Infrastructure — which directly answers: should we
+              retry? what exit code? whose fault? what tone for the user? The
+              library provides small interfaces (<code>Coded</code>,
+              <code>Classified</code>, <code>Contextual</code>,
+              <code>Retryable</code>) that any error type can implement. It is a
+              <strong>classification protocol</strong>, not a structured error
+              wrapper.
             </p>
             <div class="stat-row">
               <div class="stat-item">
@@ -666,14 +675,18 @@
           <div class="phil-card b">
             <h3>samber/oops</h3>
             <div class="name">Rich context for<br />every error.</div>
-            <div class="tagline">"What do I <em>know</em> about this error?"</div>
+            <div class="tagline">
+              "What do I <em>know</em> about this error?"
+            </div>
             <p>
-              Observability and debugging first. Every error carries a rich payload — stack traces,
-              source code fragments, structured attributes, trace/span IDs, user/tenant context,
-              HTTP request/response bodies, timing data, ownership tags, and domain labels. It is a
-              <strong>context enrichment layer</strong> that wraps any error into an
-              <code>OopsError</code> with a fluent builder API. Designed to make production
-              debugging dramatically easier.
+              Observability and debugging first. Every error carries a rich
+              payload — stack traces, source code fragments, structured
+              attributes, trace/span IDs, user/tenant context, HTTP
+              request/response bodies, timing data, ownership tags, and domain
+              labels. It is a
+              <strong>context enrichment layer</strong> that wraps any error
+              into an <code>OopsError</code> with a fluent builder API. Designed
+              to make production debugging dramatically easier.
             </p>
             <div class="stat-row">
               <div class="stat-item">
@@ -740,9 +753,11 @@
           </div>
         </div>
         <p class="pull-quote">
-          go-error-family asks <strong>"what kind of error is this?"</strong> and gives you a
+          go-error-family asks
+          <strong>"what kind of error is this?"</strong> and gives you a
           behavioral answer. samber/oops asks
-          <strong>"what do I know about this error?"</strong> and gives you a forensic answer.
+          <strong>"what do I know about this error?"</strong> and gives you a
+          forensic answer.
         </p>
       </section>
 
@@ -826,28 +841,42 @@ err = oops.<span class="fn">Recover</span>(<span class="kw">func</span>() {
           <tbody>
             <tr>
               <td>Error classification / taxonomy</td>
-              <td><span class="check">✓</span> 5 families with behavioral semantics</td>
+              <td>
+                <span class="check">✓</span> 5 families with behavioral
+                semantics
+              </td>
               <td><span class="cross">✗</span> No classification model</td>
             </tr>
             <tr>
               <td>Retry decision</td>
-              <td><span class="check">✓</span> <code>IsRetryable()</code> — first-class concept</td>
+              <td>
+                <span class="check">✓</span> <code>IsRetryable()</code> —
+                first-class concept
+              </td>
               <td><span class="cross">✗</span> No built-in retry semantics</td>
             </tr>
             <tr>
               <td>Exit code mapping</td>
-              <td><span class="check">✓</span> BSD sysexits.h — <code>ExitCode(err)</code></td>
+              <td>
+                <span class="check">✓</span> BSD sysexits.h —
+                <code>ExitCode(err)</code>
+              </td>
               <td><span class="cross">✗</span> No exit code support</td>
             </tr>
             <tr>
               <td>CLI boundary handler</td>
-              <td><span class="check">✓</span> <code>HandleError()</code> — stderr + exit code</td>
+              <td>
+                <span class="check">✓</span> <code>HandleError()</code> — stderr
+                + exit code
+              </td>
               <td><span class="cross">✗</span> No CLI boundary concept</td>
             </tr>
             <tr>
               <td>Stack traces</td>
               <td><span class="cross">✗</span> Not included</td>
-              <td><span class="check">✓</span> Automatic capture with filtering</td>
+              <td>
+                <span class="check">✓</span> Automatic capture with filtering
+              </td>
             </tr>
             <tr>
               <td>Source code fragments</td>
@@ -856,18 +885,27 @@ err = oops.<span class="fn">Recover</span>(<span class="kw">func</span>() {
             </tr>
             <tr>
               <td>Structured attributes / context</td>
-              <td><span class="check">✓</span> <code>map[string]string</code></td>
-              <td><span class="check">✓</span> <code>map[string]any</code> — richer types</td>
+              <td>
+                <span class="check">✓</span> <code>map[string]string</code>
+              </td>
+              <td>
+                <span class="check">✓</span> <code>map[string]any</code> —
+                richer types
+              </td>
             </tr>
             <tr>
               <td>Trace / Span IDs</td>
               <td><span class="cross">✗</span> No built-in tracing</td>
-              <td><span class="check">✓</span> Auto-generated ULID, OpenTelemetry</td>
+              <td>
+                <span class="check">✓</span> Auto-generated ULID, OpenTelemetry
+              </td>
             </tr>
             <tr>
               <td>User / Tenant context</td>
               <td><span class="cross">✗</span> Generic context only</td>
-              <td><span class="check">✓</span> First-class user/tenant with data</td>
+              <td>
+                <span class="check">✓</span> First-class user/tenant with data
+              </td>
             </tr>
             <tr>
               <td>HTTP request/response capture</td>
@@ -876,45 +914,73 @@ err = oops.<span class="fn">Recover</span>(<span class="kw">func</span>() {
             </tr>
             <tr>
               <td>Error code</td>
-              <td><span class="check">✓</span> <code>string</code> — typed, consistent</td>
-              <td><span class="check">✓</span> <code>any</code> — flexible, untyped</td>
+              <td>
+                <span class="check">✓</span> <code>string</code> — typed,
+                consistent
+              </td>
+              <td>
+                <span class="check">✓</span> <code>any</code> — flexible,
+                untyped
+              </td>
             </tr>
             <tr>
               <td>Builder / fluent API</td>
-              <td><span class="partial-mark">◐</span> Chainable <code>WithContext()</code></td>
-              <td><span class="check">✓</span> Full builder with 20+ methods</td>
+              <td>
+                <span class="partial-mark">◐</span> Chainable
+                <code>WithContext()</code>
+              </td>
+              <td>
+                <span class="check">✓</span> Full builder with 20+ methods
+              </td>
             </tr>
             <tr>
               <td>Third-party error registration</td>
               <td>
-                <span class="check">✓</span> <code>RegisterClassification(sentinel, family)</code>
+                <span class="check">✓</span>
+                <code>RegisterClassification(sentinel, family)</code>
               </td>
               <td><span class="cross">✗</span> Wrap only — no registry</td>
             </tr>
             <tr>
               <td>Multi-error / partial success</td>
-              <td><span class="check">✓</span> <code>Compose()</code> with classification</td>
-              <td><span class="check">✓</span> <code>Join()</code> — standard errors.Join</td>
+              <td>
+                <span class="check">✓</span> <code>Compose()</code> with
+                classification
+              </td>
+              <td>
+                <span class="check">✓</span> <code>Join()</code> — standard
+                errors.Join
+              </td>
             </tr>
             <tr>
               <td>Diagnostic rules</td>
-              <td><span class="check">✓</span> Concurrent, extensible (FS, net, git, pg)</td>
+              <td>
+                <span class="check">✓</span> Concurrent, extensible (FS, net,
+                git, pg)
+              </td>
               <td><span class="cross">✗</span> No diagnostic system</td>
             </tr>
             <tr>
               <td>AI debug agent</td>
-              <td><span class="check">✓</span> Root cause analysis + FixSteps</td>
+              <td>
+                <span class="check">✓</span> Root cause analysis + FixSteps
+              </td>
               <td><span class="cross">✗</span> No agent concept</td>
             </tr>
             <tr>
               <td>Panic recovery</td>
               <td><span class="cross">✗</span> Not included</td>
-              <td><span class="check">✓</span> <code>Recover()</code> with context</td>
+              <td>
+                <span class="check">✓</span> <code>Recover()</code> with context
+              </td>
             </tr>
             <tr>
               <td>Assertion helpers</td>
               <td><span class="cross">✗</span> Not included</td>
-              <td><span class="check">✓</span> <code>Assert()</code>, <code>Assertf()</code></td>
+              <td>
+                <span class="check">✓</span> <code>Assert()</code>,
+                <code>Assertf()</code>
+              </td>
             </tr>
             <tr>
               <td>Logger integration</td>
@@ -924,29 +990,42 @@ err = oops.<span class="fn">Recover</span>(<span class="kw">func</span>() {
             <tr>
               <td>JSON serialization</td>
               <td><span class="cross">✗</span> Not built-in</td>
-              <td><span class="check">✓</span> <code>MarshalJSON()</code>, <code>ToMap()</code></td>
+              <td>
+                <span class="check">✓</span> <code>MarshalJSON()</code>,
+                <code>ToMap()</code>
+              </td>
             </tr>
             <tr>
               <td>User-facing messaging</td>
-              <td><span class="check">✓</span> What/Why/Fix/WayOut templates</td>
+              <td>
+                <span class="check">✓</span> What/Why/Fix/WayOut templates
+              </td>
               <td><span class="check">✓</span> <code>Public()</code> field</td>
             </tr>
             <tr>
               <td>Audience targeting</td>
-              <td><span class="check">✓</span> User / Ops / All — per family</td>
+              <td>
+                <span class="check">✓</span> User / Ops / All — per family
+              </td>
               <td><span class="cross">✗</span> No audience concept</td>
             </tr>
             <tr>
               <td>Interface-based extensibility</td>
-              <td><span class="check">✓</span> 4 small interfaces, any type can implement</td>
               <td>
-                <span class="partial-mark">◐</span> OopsError is the type; layers via wrapping
+                <span class="check">✓</span> 4 small interfaces, any type can
+                implement
+              </td>
+              <td>
+                <span class="partial-mark">◐</span> OopsError is the type;
+                layers via wrapping
               </td>
             </tr>
             <tr>
               <td>Zero dependencies</td>
               <td><span class="check">✓</span> True zero</td>
-              <td><span class="cross">✗</span> 3 deps (ulid, lo, otel/trace)</td>
+              <td>
+                <span class="cross">✗</span> 3 deps (ulid, lo, otel/trace)
+              </td>
             </tr>
           </tbody>
         </table>
@@ -962,41 +1041,46 @@ err = oops.<span class="fn">Recover</span>(<span class="kw">func</span>() {
             <div class="deep-item">
               <strong>Interface-driven</strong>
               <p>
-                Four tiny interfaces (<code>Coded</code>, <code>Classified</code>,
-                <code>Contextual</code>, <code>Retryable</code>) that any struct can implement. You
-                never need to import the library's Error type — just satisfy the interface.
+                Four tiny interfaces (<code>Coded</code>,
+                <code>Classified</code>, <code>Contextual</code>,
+                <code>Retryable</code>) that any struct can implement. You never
+                need to import the library's Error type — just satisfy the
+                interface.
               </p>
             </div>
             <div class="deep-item">
               <strong>Classification cascade</strong>
               <p>
-                <code>Classify(err)</code> walks: multi-error → Classified interface → Retryable
-                interface → registered sentinels → default Transient. First match wins. Thread-safe
-                sentinel registry with lock-free snapshots.
+                <code>Classify(err)</code> walks: multi-error → Classified
+                interface → Retryable interface → registered sentinels → default
+                Transient. First match wins. Thread-safe sentinel registry with
+                lock-free snapshots.
               </p>
             </div>
             <div class="deep-item">
               <strong>Boundary-oriented</strong>
               <p>
-                Designed for the moment errors leave the program. <code>HandleError()</code> is the
-                canonical entry point — classifies, formats with templates, writes to stderr,
-                returns exit code. One line in <code>main()</code>.
+                Designed for the moment errors leave the program.
+                <code>HandleError()</code> is the canonical entry point —
+                classifies, formats with templates, writes to stderr, returns
+                exit code. One line in <code>main()</code>.
               </p>
             </div>
             <div class="deep-item">
               <strong>Diagnostic engine</strong>
               <p>
-                Concurrent rule-based diagnostics (filesystem, network, git, postgres). Rules match
-                on error codes/context, run targeted system checks, produce confidence-scored
-                findings. Agent layer produces FixSteps without executing them.
+                Concurrent rule-based diagnostics (filesystem, network, git,
+                postgres). Rules match on error codes/context, run targeted
+                system checks, produce confidence-scored findings. Agent layer
+                produces FixSteps without executing them.
               </p>
             </div>
             <div class="deep-item">
               <strong>Fail-open design</strong>
               <p>
                 Unknown errors default to <code>Transient</code> (retryable).
-                <code>Classify(nil)</code> returns <code>Rejection</code>. Every decision is
-                deliberate about what happens at the boundary.
+                <code>Classify(nil)</code> returns <code>Rejection</code>. Every
+                decision is deliberate about what happens at the boundary.
               </p>
             </div>
           </div>
@@ -1005,41 +1089,47 @@ err = oops.<span class="fn">Recover</span>(<span class="kw">func</span>() {
             <div class="deep-item">
               <strong>Builder-driven</strong>
               <p>
-                Fluent API with 20+ methods. Each returns a new <code>OopsErrorBuilder</code>.
-                Terminal methods (<code>New()</code>, <code>Wrap()</code>, <code>Errorf()</code>)
-                materialize the error. Immutable builder — each call copies the context map.
+                Fluent API with 20+ methods. Each returns a new
+                <code>OopsErrorBuilder</code>. Terminal methods
+                (<code>New()</code>, <code>Wrap()</code>, <code>Errorf()</code>)
+                materialize the error. Immutable builder — each call copies the
+                context map.
               </p>
             </div>
             <div class="deep-item">
               <strong>Observability-native</strong>
               <p>
-                Stack traces, source code fragments, trace/span IDs, OpenTelemetry integration,
-                structured logging via <code>slog.LogValuer</code>. Every error is a rich telemetry
+                Stack traces, source code fragments, trace/span IDs,
+                OpenTelemetry integration, structured logging via
+                <code>slog.LogValuer</code>. Every error is a rich telemetry
                 event waiting to be emitted.
               </p>
             </div>
             <div class="deep-item">
               <strong>Layer chain</strong>
               <p>
-                Wrapping creates layers accessible via <code>Layers()</code>. Context flattens
-                across layers (later wins). Tags merge and deduplicate. Trace prefers explicit over
-                auto-generated. "Deepest wins" for most scalar fields.
+                Wrapping creates layers accessible via <code>Layers()</code>.
+                Context flattens across layers (later wins). Tags merge and
+                deduplicate. Trace prefers explicit over auto-generated.
+                "Deepest wins" for most scalar fields.
               </p>
             </div>
             <div class="deep-item">
               <strong>Multi-domain context</strong>
               <p>
-                First-class support for HTTP req/res (with body capture), user/tenant identity (with
-                attributes), ownership tagging, domain categorization, and timing data. Built for
-                microservice and multi-tenant environments.
+                First-class support for HTTP req/res (with body capture),
+                user/tenant identity (with attributes), ownership tagging,
+                domain categorization, and timing data. Built for microservice
+                and multi-tenant environments.
               </p>
             </div>
             <div class="deep-item">
               <strong>Copy cost tradeoff</strong>
               <p>
-                The immutable builder copies the context map at each step — O(n) per builder call.
-                Optimized for the common case: create error, rarely introspect. Benchmarks confirm
-                allocation patterns scale with builder chain depth.
+                The immutable builder copies the context map at each step — O(n)
+                per builder call. Optimized for the common case: create error,
+                rarely introspect. Benchmarks confirm allocation patterns scale
+                with builder chain depth.
               </p>
             </div>
           </div>
@@ -1086,7 +1176,9 @@ err = oops.<span class="fn">Recover</span>(<span class="kw">func</span>() {
             </tr>
             <tr>
               <td>Multi-error</td>
-              <td><code>Compose()</code> → classify each, first non-Transient wins</td>
+              <td>
+                <code>Compose()</code> → classify each, first non-Transient wins
+              </td>
               <td><code>Join()</code> → standard <code>errors.Join</code></td>
             </tr>
             <tr>
@@ -1096,13 +1188,20 @@ err = oops.<span class="fn">Recover</span>(<span class="kw">func</span>() {
             </tr>
             <tr>
               <td>Formatting</td>
-              <td><code>%v</code> = <code>[family:code] msg</code>, <code>%+v</code> = verbose</td>
-              <td><code>%v</code> = message, <code>%+v</code> = full stacktrace</td>
+              <td>
+                <code>%v</code> = <code>[family:code] msg</code>,
+                <code>%+v</code> = verbose
+              </td>
+              <td>
+                <code>%v</code> = message, <code>%+v</code> = full stacktrace
+              </td>
             </tr>
             <tr>
               <td>Performance focus</td>
               <td>Zero allocations in hot path, lock-free reads</td>
-              <td>Builder copy cost, optimized for "create rarely, inspect rarely"</td>
+              <td>
+                Builder copy cost, optimized for "create rarely, inspect rarely"
+              </td>
             </tr>
             <tr>
               <td>Module structure</td>
@@ -1121,7 +1220,10 @@ err = oops.<span class="fn">Recover</span>(<span class="kw">func</span>() {
             </tr>
             <tr>
               <td>Testing story</td>
-              <td><code>WithTimestamp()</code>, <code>CommandRunner</code> mocks, fuzz tests</td>
+              <td>
+                <code>WithTimestamp()</code>, <code>CommandRunner</code> mocks,
+                fuzz tests
+              </td>
               <td>Standard Go testing</td>
             </tr>
             <tr>
@@ -1139,55 +1241,97 @@ err = oops.<span class="fn">Recover</span>(<span class="kw">func</span>() {
         <h2 class="section-title">When to choose which</h2>
 
         <p class="pull-quote">
-          These libraries are not competitors. They solve different problems and can even be
-          <strong>used together</strong> — wrap errors with oops for observability, then classify
-          them with error-family for behavioral decisions.
+          These libraries are not competitors. They solve different problems and
+          can even be
+          <strong>used together</strong> — wrap errors with oops for
+          observability, then classify them with error-family for behavioral
+          decisions.
         </p>
 
         <div class="verdict-grid">
           <div class="verdict-card a">
             <h3>Choose go-error-family when</h3>
-            <div class="use-for">Best for: CLI tools, services, API boundaries</div>
+            <div class="use-for">
+              Best for: CLI tools, services, API boundaries
+            </div>
             <ul>
               <li>
-                Your program needs to <strong>decide what to do</strong> with errors (retry, exit,
-                alert)
+                Your program needs to <strong>decide what to do</strong> with
+                errors (retry, exit, alert)
               </li>
-              <li>You need consistent <strong>exit codes</strong> across CLI tools</li>
-              <li>You want <strong>automatic classification</strong> of third-party errors</li>
               <li>
-                Your error model is about <strong>behavior</strong> (retryable? user's fault?)
+                You need consistent <strong>exit codes</strong> across CLI tools
               </li>
-              <li>You need <strong>diagnostic rules</strong> that investigate system state</li>
+              <li>
+                You want <strong>automatic classification</strong> of
+                third-party errors
+              </li>
+              <li>
+                Your error model is about <strong>behavior</strong> (retryable?
+                user's fault?)
+              </li>
+              <li>
+                You need <strong>diagnostic rules</strong> that investigate
+                system state
+              </li>
               <li>You want zero-dependency, protocol-first design</li>
-              <li>You need <strong>user-facing messaging</strong> with tone/audience targeting</li>
               <li>
-                You want to <strong>share a protocol</strong> across services without sharing
-                implementations
+                You need <strong>user-facing messaging</strong> with
+                tone/audience targeting
+              </li>
+              <li>
+                You want to <strong>share a protocol</strong> across services
+                without sharing implementations
               </li>
             </ul>
           </div>
           <div class="verdict-card b">
             <h3>Choose samber/oops when</h3>
-            <div class="use-for">Best for: HTTP services, microservices, observability</div>
+            <div class="use-for">
+              Best for: HTTP services, microservices, observability
+            </div>
             <ul>
               <li>
-                You need <strong>rich debugging context</strong> in production (stack traces, source
-                code)
+                You need <strong>rich debugging context</strong> in production
+                (stack traces, source code)
               </li>
-              <li>Your errors flow through <strong>structured logging</strong> pipelines</li>
-              <li>You need <strong>distributed tracing</strong> with trace/span IDs</li>
-              <li>You want <strong>user/tenant context</strong> attached to errors</li>
-              <li>You need <strong>HTTP request/response</strong> capture for debugging</li>
-              <li>You want <strong>JSON serialization</strong> of error context</li>
-              <li>You value a <strong>fluent builder API</strong> for error construction</li>
-              <li>You need <strong>OpenTelemetry integration</strong> out of the box</li>
+              <li>
+                Your errors flow through
+                <strong>structured logging</strong> pipelines
+              </li>
+              <li>
+                You need <strong>distributed tracing</strong> with trace/span
+                IDs
+              </li>
+              <li>
+                You want <strong>user/tenant context</strong> attached to errors
+              </li>
+              <li>
+                You need <strong>HTTP request/response</strong> capture for
+                debugging
+              </li>
+              <li>
+                You want <strong>JSON serialization</strong> of error context
+              </li>
+              <li>
+                You value a <strong>fluent builder API</strong> for error
+                construction
+              </li>
+              <li>
+                You need <strong>OpenTelemetry integration</strong> out of the
+                box
+              </li>
             </ul>
           </div>
         </div>
 
         <div
-          style="margin-top: 3rem; padding: 2rem; border: 2px solid var(--fg); border-radius: 4px"
+          style="
+            margin-top: 3rem;
+            padding: 2rem;
+            border: 2px solid var(--fg);
+            border-radius: 4px;
+          "
         >
           <div
             style="
@@ -1204,7 +1348,8 @@ err = oops.<span class="fn">Recover</span>(<span class="kw">func</span>() {
           <div class="code-comparison" style="margin-top: 0">
             <div class="code-block a" style="grid-column: 1 / -1">
               <div class="code-block-header">
-                <span class="dot" style="background: var(--fg)"></span> Using both together
+                <span class="dot" style="background: var(--fg)"></span> Using
+                both together
               </div>
               <pre><span class="cm">// Enrich with oops for observability</span>
 richErr := oops.<span class="fn">In</span>(<span class="str">"database"</span>).
@@ -1237,27 +1382,39 @@ family := errorfamily.<span class="fn">Classify</span>(richErr)
           <tbody>
             <tr>
               <td>Conceptual model</td>
-              <td>Simple: 5 families, clear semantics. Easy to explain to a team.</td>
+              <td>
+                Simple: 5 families, clear semantics. Easy to explain to a team.
+              </td>
               <td>Rich: many dimensions. More to learn, more to configure.</td>
             </tr>
             <tr>
               <td>Custom error types</td>
-              <td>Implement 1–4 interfaces on your own struct. Full control.</td>
-              <td>Wrap into OopsError. Your struct is hidden behind the wrapper.</td>
+              <td>
+                Implement 1–4 interfaces on your own struct. Full control.
+              </td>
+              <td>
+                Wrap into OopsError. Your struct is hidden behind the wrapper.
+              </td>
             </tr>
             <tr>
               <td>Context value types</td>
               <td>Strings only — simple, serializable, no reflection.</td>
-              <td><code>any</code> — flexible but requires serialization thought.</td>
+              <td>
+                <code>any</code> — flexible but requires serialization thought.
+              </td>
             </tr>
             <tr>
               <td>Production debugging</td>
-              <td>Diagnostic rules check live system state. No stack traces.</td>
+              <td>
+                Diagnostic rules check live system state. No stack traces.
+              </td>
               <td>Stack traces + source fragments. Rich forensic data.</td>
             </tr>
             <tr>
               <td>Operational decisions</td>
-              <td>First-class: retry, exit codes, audience, tone. The whole point.</td>
+              <td>
+                First-class: retry, exit codes, audience, tone. The whole point.
+              </td>
               <td>Not provided. You build retry/exit logic yourself.</td>
             </tr>
             <tr>
@@ -1268,7 +1425,9 @@ family := errorfamily.<span class="fn">Classify</span>(richErr)
             <tr>
               <td>Maturity / adoption</td>
               <td>Young (v0.3.0, 80 commits). Niche but focused.</td>
-              <td>Mature (v1.22.0, 956 stars, 41 releases). Proven in production.</td>
+              <td>
+                Mature (v1.22.0, 956 stars, 41 releases). Proven in production.
+              </td>
             </tr>
             <tr>
               <td>Go version gate</td>
@@ -1282,7 +1441,10 @@ family := errorfamily.<span class="fn">Classify</span>(richErr)
       <footer>
         <p>
           Generated June 2026 ·
-          <a href="https://github.com/larsartmann/go-error-family">go-error-family</a> ·
+          <a href="https://github.com/larsartmann/go-error-family"
+            >go-error-family</a
+          >
+          ·
           <a href="https://github.com/samber/oops">samber/oops</a>
         </p>
       </footer>

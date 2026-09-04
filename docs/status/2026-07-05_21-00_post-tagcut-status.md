@@ -14,40 +14,40 @@
 
 ## a) FULLY DONE ✅
 
-| #   | Item                                                                                                                                                                       | Evidence                   |
-| --- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | -------------------------- |
-| 1   | **Hotfix committed** (`48d7e70`) — removed phantom `replace`+`require`, extracted `examples/` module, bumped bridge/git/postgres root pins                                 | `git log -1`               |
-| 2   | **7 patch tags cut** on the fix commit: `v0.6.1`, `diagnose/v0.1.1`, `agent/v0.1.1`, `bridge/v0.2.1`, `diagnose/git/v0.4.1`, `diagnose/postgres/v0.4.1`, `examples/v0.1.0` | `git tag --points-at HEAD` |
-| 3   | **CHANGELOG.md updated** with `[0.6.1]` entry documenting the fix + examples extraction                                                                                    | lines 7-23                 |
-| 4   | **AGENTS.md version bumped** v0.6.0 → v0.6.1                                                                                                                               | line 6                     |
-| 5   | **BuildFlow passed** pre-commit: 26/26 checks, 0 failed, 0 skipped (16.8s)                                                                                                 | commit output              |
-| 6   | **All 7 modules pass tests** with `-race` (verified pre-commit)                                                                                                            | prior run                  |
-| 7   | **0 lint issues**                                                                                                                                                          | `golangci-lint run ./...`  |
-| 8   | **Root module is truly zero-dependency** — `go.mod` is 3 lines, no requires                                                                                                | committed state            |
-| 9   | **Consumer simulation passes** — `GOWORK=off go list -m all` resolves real versions only                                                                                   | verified pre-commit        |
+| # | Item                                                                                                                                                                       | Evidence                   |
+| - | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | -------------------------- |
+| 1 | **Hotfix committed** (`48d7e70`) — removed phantom `replace`+`require`, extracted `examples/` module, bumped bridge/git/postgres root pins                                 | `git log -1`               |
+| 2 | **7 patch tags cut** on the fix commit: `v0.6.1`, `diagnose/v0.1.1`, `agent/v0.1.1`, `bridge/v0.2.1`, `diagnose/git/v0.4.1`, `diagnose/postgres/v0.4.1`, `examples/v0.1.0` | `git tag --points-at HEAD` |
+| 3 | **CHANGELOG.md updated** with `[0.6.1]` entry documenting the fix + examples extraction                                                                                    | lines 7-23                 |
+| 4 | **AGENTS.md version bumped** v0.6.0 → v0.6.1                                                                                                                               | line 6                     |
+| 5 | **BuildFlow passed** pre-commit: 26/26 checks, 0 failed, 0 skipped (16.8s)                                                                                                 | commit output              |
+| 6 | **All 7 modules pass tests** with `-race` (verified pre-commit)                                                                                                            | prior run                  |
+| 7 | **0 lint issues**                                                                                                                                                          | `golangci-lint run ./...`  |
+| 8 | **Root module is truly zero-dependency** — `go.mod` is 3 lines, no requires                                                                                                | committed state            |
+| 9 | **Consumer simulation passes** — `GOWORK=off go list -m all` resolves real versions only                                                                                   | verified pre-commit        |
 
 ---
 
 ## b) PARTIALLY DONE ⚠️
 
-| #   | Item                             | What's done                                                                                           | What remains                                                                                                                                                                               |
-| --- | -------------------------------- | ----------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| 1   | **Cross-module pin consistency** | Tags cut; committed go.mod files reference valid older versions (v0.6.0, diagnose v0.1.0) — MVS-valid | BuildFlow auto-generated pin bumps to the fresh tags (v0.6.1, diagnose v0.1.1) sitting **uncommitted** in the working tree. Committing them would require yet another tag round (chasing). |
-| 2   | **Release publication**          | Tags exist locally                                                                                    | **Not pushed to remote** (no explicit push run). `origin/master` tracking ref shows `48d7e70` but this is suspicious — see (d). Tags definitely not pushed.                                |
-| 3   | **CI hardening**                 | Source go.mod files are correct                                                                       | No CI gate added yet to prevent recurrence (`GOWORK=off go list -m all` check)                                                                                                             |
+| # | Item                             | What's done                                                                                           | What remains                                                                                                                                                                               |
+| - | -------------------------------- | ----------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| 1 | **Cross-module pin consistency** | Tags cut; committed go.mod files reference valid older versions (v0.6.0, diagnose v0.1.0) — MVS-valid | BuildFlow auto-generated pin bumps to the fresh tags (v0.6.1, diagnose v0.1.1) sitting **uncommitted** in the working tree. Committing them would require yet another tag round (chasing). |
+| 2 | **Release publication**          | Tags exist locally                                                                                    | **Not pushed to remote** (no explicit push run). `origin/master` tracking ref shows `48d7e70` but this is suspicious — see (d). Tags definitely not pushed.                                |
+| 3 | **CI hardening**                 | Source go.mod files are correct                                                                       | No CI gate added yet to prevent recurrence (`GOWORK=off go list -m all` check)                                                                                                             |
 
 ---
 
 ## c) NOT STARTED ⏭️
 
-| #   | Item                                                                     |
-| --- | ------------------------------------------------------------------------ |
-| 1   | Pushing commit + tags to remote (`git push origin master --tags`)        |
-| 2   | CI gate: `GOWORK=off go list -m all` per module                          |
-| 3   | CI consumer-simulation job (`go get ...@tag` in throwaway module)        |
-| 4   | CI invariant: root `go list -m all` returns exactly 1 line               |
-| 5   | SKILL.md audit for stale "replace" / "not yet published" language        |
-| 6   | Release-notes / README note deprecating the broken v0.6.0 family of tags |
+| # | Item                                                                     |
+| - | ------------------------------------------------------------------------ |
+| 1 | Pushing commit + tags to remote (`git push origin master --tags`)        |
+| 2 | CI gate: `GOWORK=off go list -m all` per module                          |
+| 3 | CI consumer-simulation job (`go get ...@tag` in throwaway module)        |
+| 4 | CI invariant: root `go list -m all` returns exactly 1 line               |
+| 5 | SKILL.md audit for stale "replace" / "not yet published" language        |
+| 6 | Release-notes / README note deprecating the broken v0.6.0 family of tags |
 
 ---
 
@@ -98,33 +98,33 @@ I did **not** run `git push`. Before my commit, `origin/master` was at `7605190`
 
 ## f) Up to 25 things we should get done next 🎯
 
-| #   | Task                                                                                                                  | Impact                                     |
-| --- | --------------------------------------------------------------------------------------------------------------------- | ------------------------------------------ |
-| 1   | **Confirm whether `48d7e70` is actually on the remote** (`git ls-remote origin master`)                               | 🔴 Critical — determines release state     |
-| 2   | **Push tags to remote** (`git push origin --tags`) if commit is there, else push both                                 | 🔴 Makes the release real                  |
-| 3   | **Decide on the dirty pin bumps** — commit them + cut v0.6.2/diagnose-v0.1.2/etc., OR discard and accept lagging pins | 🔴 Unblocks clean tree                     |
-| 4   | **Resolve flake.lock churn** — commit the nixpkgs bump or configure BuildFlow to skip it                              | 🟠 Stops recurring dirt                    |
-| 5   | **Add CI gate: `GOWORK=off go list -m all`** per module                                                               | 🔴 Prevents recurrence of the original bug |
-| 6   | **Add CI consumer-simulation job** (`go get @tag` in throwaway module)                                                | 🔴 Honest release proof                    |
-| 7   | **Add CI invariant: root `go list -m all` = 1 line**                                                                  | 🟠 Enforces zero-dep                       |
-| 8   | **Audit BuildFlow config** for auto-push hooks; make explicit/opt-in                                                  | 🟠 Safety                                  |
-| 9   | **Update SKILL.md** for stale replace/publish language                                                                | 🟡 Doc honesty                             |
-| 10  | **Write release deprecation note** for broken v0.6.0 family                                                           | 🟡 Consumer trust                          |
-| 11  | **Document the multi-module release sequence** in AGENTS.md                                                           | 🟡 Process                                 |
-| 12  | **Add `go mod tidy` check to CI** (detect missing go.sum entries)                                                     | 🟡                                         |
-| 13  | **Consider a release automation script** (nix/just target for coordinated tags)                                       | 🟢 Tooling                                 |
-| 14  | **Bump examples go.mod pins** to v0.6.1/diagnose v0.1.1 (currently v0.6.0/v0.1.0)                                     | 🟢 Freshness                               |
-| 15  | **Verify `project-meta` resolves against the new tags**                                                               | 🟡 Validates the fix downstream            |
-| 16  | **Run `nix build` / `nix flake check`** after module changes                                                          | 🟡                                         |
-| 17  | **Normalize go.mod require style** (inline vs block) across submodules                                                | 🟢                                         |
-| 18  | **Add `go vet ./...` to CI** if not present                                                                           | 🟢                                         |
-| 19  | **Review whether `errorfamilytest` should be its own module**                                                         | 🟢 Future                                  |
-| 20  | **Consider Dependabot/Renovate** for multi-module pin management                                                      | 🟢                                         |
-| 21  | **Post the v0.6.1 release on GitHub Releases** with the CHANGELOG excerpt                                             | 🟢                                         |
-| 22  | **Add a pre-release checklist** (run consumer sim, verify no replace directives)                                      | 🟡 Process                                 |
-| 23  | **Tag the broken v0.6.0 release as a GitHub "broken" release** with a pointer to v0.6.1                               | 🟢                                         |
-| 24  | **Investigate go.work.sum consistency** after examples addition                                                       | 🟢                                         |
-| 25  | **Consider `gofmt -s` / `gofumpt` on all go.mod files** in CI                                                         | 🟢                                         |
+| #  | Task                                                                                                                  | Impact                                     |
+| -- | --------------------------------------------------------------------------------------------------------------------- | ------------------------------------------ |
+| 1  | **Confirm whether `48d7e70` is actually on the remote** (`git ls-remote origin master`)                               | 🔴 Critical — determines release state     |
+| 2  | **Push tags to remote** (`git push origin --tags`) if commit is there, else push both                                 | 🔴 Makes the release real                  |
+| 3  | **Decide on the dirty pin bumps** — commit them + cut v0.6.2/diagnose-v0.1.2/etc., OR discard and accept lagging pins | 🔴 Unblocks clean tree                     |
+| 4  | **Resolve flake.lock churn** — commit the nixpkgs bump or configure BuildFlow to skip it                              | 🟠 Stops recurring dirt                    |
+| 5  | **Add CI gate: `GOWORK=off go list -m all`** per module                                                               | 🔴 Prevents recurrence of the original bug |
+| 6  | **Add CI consumer-simulation job** (`go get @tag` in throwaway module)                                                | 🔴 Honest release proof                    |
+| 7  | **Add CI invariant: root `go list -m all` = 1 line**                                                                  | 🟠 Enforces zero-dep                       |
+| 8  | **Audit BuildFlow config** for auto-push hooks; make explicit/opt-in                                                  | 🟠 Safety                                  |
+| 9  | **Update SKILL.md** for stale replace/publish language                                                                | 🟡 Doc honesty                             |
+| 10 | **Write release deprecation note** for broken v0.6.0 family                                                           | 🟡 Consumer trust                          |
+| 11 | **Document the multi-module release sequence** in AGENTS.md                                                           | 🟡 Process                                 |
+| 12 | **Add `go mod tidy` check to CI** (detect missing go.sum entries)                                                     | 🟡                                         |
+| 13 | **Consider a release automation script** (nix/just target for coordinated tags)                                       | 🟢 Tooling                                 |
+| 14 | **Bump examples go.mod pins** to v0.6.1/diagnose v0.1.1 (currently v0.6.0/v0.1.0)                                     | 🟢 Freshness                               |
+| 15 | **Verify `project-meta` resolves against the new tags**                                                               | 🟡 Validates the fix downstream            |
+| 16 | **Run `nix build` / `nix flake check`** after module changes                                                          | 🟡                                         |
+| 17 | **Normalize go.mod require style** (inline vs block) across submodules                                                | 🟢                                         |
+| 18 | **Add `go vet ./...` to CI** if not present                                                                           | 🟢                                         |
+| 19 | **Review whether `errorfamilytest` should be its own module**                                                         | 🟢 Future                                  |
+| 20 | **Consider Dependabot/Renovate** for multi-module pin management                                                      | 🟢                                         |
+| 21 | **Post the v0.6.1 release on GitHub Releases** with the CHANGELOG excerpt                                             | 🟢                                         |
+| 22 | **Add a pre-release checklist** (run consumer sim, verify no replace directives)                                      | 🟡 Process                                 |
+| 23 | **Tag the broken v0.6.0 release as a GitHub "broken" release** with a pointer to v0.6.1                               | 🟢                                         |
+| 24 | **Investigate go.work.sum consistency** after examples addition                                                       | 🟢                                         |
+| 25 | **Consider `gofmt -s` / `gofumpt` on all go.mod files** in CI                                                         | 🟢                                         |
 
 ---
 

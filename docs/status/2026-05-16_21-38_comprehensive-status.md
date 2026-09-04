@@ -192,53 +192,53 @@ Build is clean. All 130 tests pass. No compile errors. No panics. `go vet` clean
 
 ### Critical — Quality Gates
 
-| #   | Task                                                            | Effort | Impact                 |
-| --- | --------------------------------------------------------------- | ------ | ---------------------- |
-| 1   | Update CHANGELOG.md with all changes since initial commit       | 30min  | Historical accuracy    |
-| 2   | Fix remaining gopls warnings (unused params) or document intent | 15min  | Zero-warning hygiene   |
-| 3   | Tag `v0.1.0-alpha`                                              | 5min   | API stability signal   |
-| 4   | Add GitHub Actions CI (build + test + vet)                      | 1h     | Automated quality gate |
-| 5   | Add `.golangci.yml`                                             | 30min  | Consistent linting     |
+| # | Task                                                            | Effort | Impact                 |
+| - | --------------------------------------------------------------- | ------ | ---------------------- |
+| 1 | Update CHANGELOG.md with all changes since initial commit       | 30min  | Historical accuracy    |
+| 2 | Fix remaining gopls warnings (unused params) or document intent | 15min  | Zero-warning hygiene   |
+| 3 | Tag `v0.1.0-alpha`                                              | 5min   | API stability signal   |
+| 4 | Add GitHub Actions CI (build + test + vet)                      | 1h     | Automated quality gate |
+| 5 | Add `.golangci.yml`                                             | 30min  | Consistent linting     |
 
 ### High — Test Coverage
 
-| #   | Task                                                                            | Effort | Impact                                   |
-| --- | ------------------------------------------------------------------------------- | ------ | ---------------------------------------- |
-| 6   | Integration tests for GitRule (dirty repo, merge conflicts, unreachable remote) | 1h     | GitRule only tested for clean repo       |
-| 7   | Integration tests for PostgresRule (mock pg_isready, TCP server)                | 1h     | PostgresRule TCP path untested           |
-| 8   | Integration tests for NetworkRule (DNS resolution, TCP connect, timeout)        | 1h     | NetworkRule only tested for host parsing |
-| 9   | Extract CommandRunner/ConnectionTester interfaces for mockability               | 1h     | Enables unit tests without system tools  |
-| 10  | Test FilesystemRule auto-fix callback (mkdir in temp dir)                       | 30min  | AutoFix path never executed in tests     |
+| #  | Task                                                                            | Effort | Impact                                   |
+| -- | ------------------------------------------------------------------------------- | ------ | ---------------------------------------- |
+| 6  | Integration tests for GitRule (dirty repo, merge conflicts, unreachable remote) | 1h     | GitRule only tested for clean repo       |
+| 7  | Integration tests for PostgresRule (mock pg_isready, TCP server)                | 1h     | PostgresRule TCP path untested           |
+| 8  | Integration tests for NetworkRule (DNS resolution, TCP connect, timeout)        | 1h     | NetworkRule only tested for host parsing |
+| 9  | Extract CommandRunner/ConnectionTester interfaces for mockability               | 1h     | Enables unit tests without system tools  |
+| 10 | Test FilesystemRule auto-fix callback (mkdir in temp dir)                       | 30min  | AutoFix path never executed in tests     |
 
 ### High — Ecosystem Integration
 
-| #   | Task                                                          | Effort | Impact                |
-| --- | ------------------------------------------------------------- | ------ | --------------------- |
-| 11  | Migrate go-cqrs-lite to import go-error-family                | 2h     | First real consumer   |
-| 12  | Add go-error-family to projects-management-automation go.work | 15min  | Workspace integration |
-| 13  | Add ErrorCode()/ErrorContext() to go-finding FindingError     | 30min  | Second consumer       |
-| 14  | Add ErrorCode()/ErrorContext() to docs-organizer DocsError    | 30min  | Third consumer        |
+| #  | Task                                                          | Effort | Impact                |
+| -- | ------------------------------------------------------------- | ------ | --------------------- |
+| 11 | Migrate go-cqrs-lite to import go-error-family                | 2h     | First real consumer   |
+| 12 | Add go-error-family to projects-management-automation go.work | 15min  | Workspace integration |
+| 13 | Add ErrorCode()/ErrorContext() to go-finding FindingError     | 30min  | Second consumer       |
+| 14 | Add ErrorCode()/ErrorContext() to docs-organizer DocsError    | 30min  | Third consumer        |
 
 ### Medium — Feature Completeness
 
-| #   | Task                                                         | Effort | Impact                                |
-| --- | ------------------------------------------------------------ | ------ | ------------------------------------- |
-| 15  | Wire AI agent to real provider (OpenAI/Anthropic SDK)        | 3h     | Agent actually works                  |
-| 16  | Implement actual command execution in ApplyFixes (sandboxed) | 2h     | Autonomous mode is not a lie          |
-| 17  | Add `Mark(err, sentinel)` identity stamping                  | 30min  | Alternative to RegisterClassification |
-| 18  | Add default MessageTemplate overrides for common error codes | 1h     | Better out-of-box UX                  |
-| 19  | Add golangci.yml configuration                               | 30min  | Consistent linting                    |
-| 20  | Add flake.nix for build/test automation                      | 1h     | Ecosystem standard                    |
+| #  | Task                                                         | Effort | Impact                                |
+| -- | ------------------------------------------------------------ | ------ | ------------------------------------- |
+| 15 | Wire AI agent to real provider (OpenAI/Anthropic SDK)        | 3h     | Agent actually works                  |
+| 16 | Implement actual command execution in ApplyFixes (sandboxed) | 2h     | Autonomous mode is not a lie          |
+| 17 | Add `Mark(err, sentinel)` identity stamping                  | 30min  | Alternative to RegisterClassification |
+| 18 | Add default MessageTemplate overrides for common error codes | 1h     | Better out-of-box UX                  |
+| 19 | Add golangci.yml configuration                               | 30min  | Consistent linting                    |
+| 20 | Add flake.nix for build/test automation                      | 1h     | Ecosystem standard                    |
 
 ### Lower — Polish
 
-| #   | Task                                                   | Effort | Impact                     |
-| --- | ------------------------------------------------------ | ------ | -------------------------- |
-| 21  | Write ADR-001: Why Family int over string              | 30min  | Architecture documentation |
-| 22  | Write examples/ directory with runnable Go examples    | 1h     | GoDoc integration          |
-| 23  | Add IsPostgresRunning helper to consumer repos         | 15min  | Useful utility             |
-| 24  | Update README with v0.1. status and installation badge | 15min  | Professional appearance    |
-| 25  | Benchmark Classify() performance for hot-path usage    | 30min  | Performance baseline       |
+| #  | Task                                                   | Effort | Impact                     |
+| -- | ------------------------------------------------------ | ------ | -------------------------- |
+| 21 | Write ADR-001: Why Family int over string              | 30min  | Architecture documentation |
+| 22 | Write examples/ directory with runnable Go examples    | 1h     | GoDoc integration          |
+| 23 | Add IsPostgresRunning helper to consumer repos         | 15min  | Useful utility             |
+| 24 | Update README with v0.1. status and installation badge | 15min  | Professional appearance    |
+| 25 | Benchmark Classify() performance for hot-path usage    | 30min  | Performance baseline       |
 
 ---
 

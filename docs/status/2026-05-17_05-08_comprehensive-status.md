@@ -216,48 +216,48 @@ Ranked by impact × effort (Pareto ordering):
 
 ### Tier 1: HIGH IMPACT, LOW EFFORT (do these first)
 
-| #   | Task                                                                                                            | Effort | Impact                                      |
-| --- | --------------------------------------------------------------------------------------------------------------- | ------ | ------------------------------------------- |
-| 1   | **Push 2 unpushed commits to origin**                                                                           | 1 min  | Prevents data loss                          |
-| 2   | **Add GitHub Actions CI** (`go test`, `go vet`, `go build` on push/PR)                                          | 15 min | Safety net for all future work              |
-| 3   | **Update CHANGELOG `[Unreleased]`** with refactoring changes                                                    | 5 min  | Honest docs                                 |
-| 4   | **Add `diagnose/context_test.go`** — direct tests for `runCommand()` (mockable scenarios) and `commandExists()` | 20 min | Closes 2 coverage gaps                      |
-| 5   | **Add `ruleSpec.matches()` direct unit test**                                                                   | 10 min | Closes coverage gap for core matching logic |
-| 6   | **Add `*Rule.Name()` tests** (all 4 rules)                                                                      | 5 min  | Trivial 0% → 100% on 4 functions            |
-| 7   | **Add `PostgresRule.suggestStartFix()` table-driven test**                                                      | 10 min | 0% → ~100% on 4 branches                    |
-| 8   | **Add README license badge + changelog link**                                                                   | 5 min  | Professional polish                         |
+| # | Task                                                                                                            | Effort | Impact                                      |
+| - | --------------------------------------------------------------------------------------------------------------- | ------ | ------------------------------------------- |
+| 1 | **Push 2 unpushed commits to origin**                                                                           | 1 min  | Prevents data loss                          |
+| 2 | **Add GitHub Actions CI** (`go test`, `go vet`, `go build` on push/PR)                                          | 15 min | Safety net for all future work              |
+| 3 | **Update CHANGELOG `[Unreleased]`** with refactoring changes                                                    | 5 min  | Honest docs                                 |
+| 4 | **Add `diagnose/context_test.go`** — direct tests for `runCommand()` (mockable scenarios) and `commandExists()` | 20 min | Closes 2 coverage gaps                      |
+| 5 | **Add `ruleSpec.matches()` direct unit test**                                                                   | 10 min | Closes coverage gap for core matching logic |
+| 6 | **Add `*Rule.Name()` tests** (all 4 rules)                                                                      | 5 min  | Trivial 0% → 100% on 4 functions            |
+| 7 | **Add `PostgresRule.suggestStartFix()` table-driven test**                                                      | 10 min | 0% → ~100% on 4 branches                    |
+| 8 | **Add README license badge + changelog link**                                                                   | 5 min  | Professional polish                         |
 
 ### Tier 2: HIGH IMPACT, MEDIUM EFFORT
 
-| #   | Task                                                                        | Effort | Impact                                 |
-| --- | --------------------------------------------------------------------------- | ------ | -------------------------------------- |
-| 9   | **Extract `CommandRunner` interface in diagnose**                           | 1 hr   | Unlocks full unit testing of all rules |
-| 10  | **Add GoReleaser config** for automated releases                            | 30 min | Professional release pipeline          |
-| 11  | **Add `flake.nix`** for reproducible builds                                 | 30 min | Per AGENTS.md policy                   |
-| 12  | **Add concurrent `Runner.Run()` test** with `-race`                         | 20 min | Verifies thread safety                 |
-| 13  | **Add `Runner.Run()` nil-result filtering test**                            | 10 min | Closes untested path                   |
-| 14  | **Test `GitRule.Run()` branches** — merge conflicts, dirty tree, no remotes | 30 min | 17.3% → ~70% coverage                  |
-| 15  | **Test `PostgresRule.Run()` branches** — TCP fallback, pg_isready success   | 20 min | 35.5% → ~70%                           |
+| #  | Task                                                                        | Effort | Impact                                 |
+| -- | --------------------------------------------------------------------------- | ------ | -------------------------------------- |
+| 9  | **Extract `CommandRunner` interface in diagnose**                           | 1 hr   | Unlocks full unit testing of all rules |
+| 10 | **Add GoReleaser config** for automated releases                            | 30 min | Professional release pipeline          |
+| 11 | **Add `flake.nix`** for reproducible builds                                 | 30 min | Per AGENTS.md policy                   |
+| 12 | **Add concurrent `Runner.Run()` test** with `-race`                         | 20 min | Verifies thread safety                 |
+| 13 | **Add `Runner.Run()` nil-result filtering test**                            | 10 min | Closes untested path                   |
+| 14 | **Test `GitRule.Run()` branches** — merge conflicts, dirty tree, no remotes | 30 min | 17.3% → ~70% coverage                  |
+| 15 | **Test `PostgresRule.Run()` branches** — TCP fallback, pg_isready success   | 20 min | 35.5% → ~70%                           |
 
 ### Tier 3: MEDIUM IMPACT, LOW EFFORT
 
-| #   | Task                                                                                              | Effort | Impact                             |
-| --- | ------------------------------------------------------------------------------------------------- | ------ | ---------------------------------- |
-| 16  | **Add `FilesystemRule.Run()` error branch tests** — permission denied, not writable, not readable | 20 min | 47.5% → ~80%                       |
-| 17  | **Test `NetworkRule.Run()` uncovered branches**                                                   | 15 min | 59.3% → ~80%                       |
-| 18  | **Extract pure helper functions** (`stripAfter`, `resolvePort`, `resolvePath`, `resolveRepoPath`) | 20 min | Testability                        |
-| 19  | **Add `CONTRIBUTING.md`** for open-source contributors                                            | 15 min | Community readiness                |
-| 20  | **Add Go Report Card badge** to README                                                            | 2 min  | Already has it — verify link works |
+| #  | Task                                                                                              | Effort | Impact                             |
+| -- | ------------------------------------------------------------------------------------------------- | ------ | ---------------------------------- |
+| 16 | **Add `FilesystemRule.Run()` error branch tests** — permission denied, not writable, not readable | 20 min | 47.5% → ~80%                       |
+| 17 | **Test `NetworkRule.Run()` uncovered branches**                                                   | 15 min | 59.3% → ~80%                       |
+| 18 | **Extract pure helper functions** (`stripAfter`, `resolvePort`, `resolvePath`, `resolveRepoPath`) | 20 min | Testability                        |
+| 19 | **Add `CONTRIBUTING.md`** for open-source contributors                                            | 15 min | Community readiness                |
+| 20 | **Add Go Report Card badge** to README                                                            | 2 min  | Already has it — verify link works |
 
 ### Tier 4: NICE TO HAVE
 
-| #   | Task                                                                  | Effort | Impact                 |
-| --- | --------------------------------------------------------------------- | ------ | ---------------------- |
-| 21  | **Add `example/` directory** with a working CLI app                   | 30 min | Discoverability        |
-| 22  | **Add `NetworkRule.resolvePort()` direct test**                       | 10 min | Closes untested helper |
-| 23  | **Add versioning policy** to README (semver compatibility guarantees) | 15 min | Consumer confidence    |
-| 24  | **Plan v0.2.0 release** — milestone document with breaking changes    | 20 min | Release management     |
-| 25  | **Add `IsPostgresRunning()` assertions** in existing smoke test       | 5 min  | 53.8% → higher         |
+| #  | Task                                                                  | Effort | Impact                 |
+| -- | --------------------------------------------------------------------- | ------ | ---------------------- |
+| 21 | **Add `example/` directory** with a working CLI app                   | 30 min | Discoverability        |
+| 22 | **Add `NetworkRule.resolvePort()` direct test**                       | 10 min | Closes untested helper |
+| 23 | **Add versioning policy** to README (semver compatibility guarantees) | 15 min | Consumer confidence    |
+| 24 | **Plan v0.2.0 release** — milestone document with breaking changes    | 20 min | Release management     |
+| 25 | **Add `IsPostgresRunning()` assertions** in existing smoke test       | 5 min  | 53.8% → higher         |
 
 ---
 

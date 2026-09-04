@@ -114,23 +114,23 @@ Nothing was left half-finished in terms of the BuildFlow failures.
 
 ## f) Up to 50 Things to Get Done Next
 
-| #   | Priority | Task                                                                                  |
-| --- | -------- | ------------------------------------------------------------------------------------- |
-| 1   | CRITICAL | Investigate and fix the auto-commit hook that generates misleading commit messages    |
-| 2   | CRITICAL | Run actual `buildflow` command to verify full pipeline passes                         |
-| 3   | CRITICAL | Fix `gitignore-upserter:repair` (was `○` in BuildFlow output)                         |
-| 4   | HIGH     | Pin `version: latest` → specific version in release.yml (3 occurrences)               |
-| 5   | HIGH     | Update AGENTS.md with flake.nix `...` fix, nolint patterns, SHA pinning policy        |
-| 6   | HIGH     | Investigate hierarchical-errors config file support to reduce nolint noise            |
-| 7   | HIGH     | Silence golangci-lint "unknown linters" warning for hierarchical-errors/legacyerrors  |
-| 8   | MEDIUM   | Consider squashing the 11 misleading auto-commits into meaningful commits             |
-| 9   | MEDIUM   | File issue/contribute to hierarchical-errors: fmt.Formatter false positives           |
-| 10  | MEDIUM   | File issue/contribute to hierarchical-errors: cleanup `_ = f.Close()` false positives |
-| 11  | MEDIUM   | Add `//nolint:hierarchical-errors` documentation to AGENTS.md lint section            |
-| 12  | MEDIUM   | Consider a `.hierarchical-errors.toml` or similar config if supported                 |
-| 13  | LOW      | Review whether `hierarchical-errors` `generic_return` finding type has value at all   |
-| 14  | LOW      | Consider excluding `ignored` finding type globally for diagnose package               |
-| 15  | LOW      | Review the 11 auto-commits for any unintended changes                                 |
+| #  | Priority | Task                                                                                  |
+| -- | -------- | ------------------------------------------------------------------------------------- |
+| 1  | CRITICAL | Investigate and fix the auto-commit hook that generates misleading commit messages    |
+| 2  | CRITICAL | Run actual `buildflow` command to verify full pipeline passes                         |
+| 3  | CRITICAL | Fix `gitignore-upserter:repair` (was `○` in BuildFlow output)                         |
+| 4  | HIGH     | Pin `version: latest` → specific version in release.yml (3 occurrences)               |
+| 5  | HIGH     | Update AGENTS.md with flake.nix `...` fix, nolint patterns, SHA pinning policy        |
+| 6  | HIGH     | Investigate hierarchical-errors config file support to reduce nolint noise            |
+| 7  | HIGH     | Silence golangci-lint "unknown linters" warning for hierarchical-errors/legacyerrors  |
+| 8  | MEDIUM   | Consider squashing the 11 misleading auto-commits into meaningful commits             |
+| 9  | MEDIUM   | File issue/contribute to hierarchical-errors: fmt.Formatter false positives           |
+| 10 | MEDIUM   | File issue/contribute to hierarchical-errors: cleanup `_ = f.Close()` false positives |
+| 11 | MEDIUM   | Add `//nolint:hierarchical-errors` documentation to AGENTS.md lint section            |
+| 12 | MEDIUM   | Consider a `.hierarchical-errors.toml` or similar config if supported                 |
+| 13 | LOW      | Review whether `hierarchical-errors` `generic_return` finding type has value at all   |
+| 14 | LOW      | Consider excluding `ignored` finding type globally for diagnose package               |
+| 15 | LOW      | Review the 11 auto-commits for any unintended changes                                 |
 
 ---
 

@@ -1,7 +1,7 @@
 # Status Report — 2026-06-01 09:17
 
-**Project:** go-error-family — Structured Error Protocol Library  
-**Branch:** master  
+**Project:** go-error-family — Structured Error Protocol Library\
+**Branch:** master\
 **Go:** 1.26.3 | **Tests:** 184 passing | **Lint:** 0 issues | **Races:** 0
 
 ---
@@ -28,16 +28,16 @@ This session continued v0.3.0 cleanup work from a previous interrupted session. 
 
 ### a) FULLY DONE
 
-| #   | Task                                                                    | Commit    |
-| --- | ----------------------------------------------------------------------- | --------- |
-| 1   | Commit uncommitted `UnregisterTemplate` in handle.go                    | `2ab6fea` |
-| 2   | Add `UnregisterClassification` in classify.go                           | `13729ad` |
-| 3   | Add `t.Cleanup()` to all 5 registry-mutating tests                      | `13729ad` |
-| 4   | Runner.Run context cancellation enforcement (channel-based)             | `ea85f2c` |
-| 5   | Refactor Runner.Run into 3 methods (reduce cyclomatic complexity 15→~6) | `ea85f2c` |
-| 6   | Add `TestRunnerContextCancelledMidRun` (early return verification)      | `ea85f2c` |
-| 7   | Run benchmarks — all nominal                                            | —         |
-| 8   | Lint all 3 modules — 0 issues                                           | —         |
+| # | Task                                                                    | Commit    |
+| - | ----------------------------------------------------------------------- | --------- |
+| 1 | Commit uncommitted `UnregisterTemplate` in handle.go                    | `2ab6fea` |
+| 2 | Add `UnregisterClassification` in classify.go                           | `13729ad` |
+| 3 | Add `t.Cleanup()` to all 5 registry-mutating tests                      | `13729ad` |
+| 4 | Runner.Run context cancellation enforcement (channel-based)             | `ea85f2c` |
+| 5 | Refactor Runner.Run into 3 methods (reduce cyclomatic complexity 15→~6) | `ea85f2c` |
+| 6 | Add `TestRunnerContextCancelledMidRun` (early return verification)      | `ea85f2c` |
+| 7 | Run benchmarks — all nominal                                            | —         |
+| 8 | Lint all 3 modules — 0 issues                                           | —         |
 
 ### b) PARTIALLY DONE
 
@@ -76,33 +76,33 @@ Nothing. All 184 tests pass, 0 lint issues, 0 race conditions across all 5 modul
 
 Sorted by impact × effort (Pareto):
 
-| #   | Task                                                                                         | Impact | Effort | Category     |
-| --- | -------------------------------------------------------------------------------------------- | ------ | ------ | ------------ |
-| 1   | Add concurrent safety tests for registries (`RegisterClassification`, `RegisterTemplate`)    | High   | Low    | Test         |
-| 2   | Make `FilesystemRule.Run` respect context cancellation                                       | High   | Low    | Correctness  |
-| 3   | Consolidate `DiagnosticFinding` vs `DiagnosticResult` (split brain)                          | High   | Medium | Architecture |
-| 4   | Rename `DebugAgent` → `Agent` interface                                                      | Medium | Low    | API          |
-| 5   | Add `UnregisterClassification`/`UnregisterTemplate` to AGENTS.md                             | Medium | Low    | Docs         |
-| 6   | Add Example functions for `HandleErrorWithContext`, `UnregisterClassification`, `ContextKey` | Medium | Low    | Docs         |
-| 7   | Increase `diagnose` coverage from 66.9% to 80%+                                              | Medium | Medium | Test         |
-| 8   | Increase `diagnose/postgres` coverage from 80.3% to 90%+                                     | Medium | Medium | Test         |
-| 9   | Add integration test: full pipeline (create error → classify → diagnose → handle)            | Medium | Medium | Test         |
-| 10  | Add `Family-specific format constructors` (NewRejectionf, NewTransientf)                     | Medium | Medium | Feature      |
-| 11  | Add `errors.Join`-aware `Compose` that returns worst family                                  | Medium | Medium | Feature      |
-| 12  | Add `Mark(err, sentinel)` for identity stamping                                              | Medium | Medium | Feature      |
-| 13  | Add structured logging adapter (slog integration)                                            | Medium | Medium | Feature      |
-| 14  | Benchmark `Runner.Run` with context cancellation path                                        | Low    | Low    | Perf         |
-| 15  | Add `Runner.Register` concurrent safety test                                                 | Low    | Low    | Test         |
-| 16  | Add fuzz tests for `ParseFamily`, `Classify`                                                 | Low    | Medium | Test         |
-| 17  | Add `Error.Format(state, verb)` for `%+v` verbose output                                     | Low    | Low    | Feature      |
-| 18  | Add `Errors(err) []error` unwrapping helper                                                  | Low    | Low    | Feature      |
-| 19  | Add `IsFamily(err, Family) bool` convenience function                                        | Low    | Low    | Feature      |
-| 20  | Add `Corruption` family diagnostic rules                                                     | Medium | High   | Feature      |
-| 21  | Add `Conflict` family diagnostic rules                                                       | Medium | High   | Feature      |
-| 22  | Add observability hooks (metrics, tracing)                                                   | Medium | High   | Feature      |
-| 23  | Extract `diagnose/internal/testutil` for shared mock runners                                 | Low    | Medium | Cleanup      |
-| 24  | Add `go vet` line-length check or custom linter                                              | Low    | Low    | Tooling      |
-| 25  | Add `CODEOWNERS` file                                                                        | Low    | Low    | Process      |
+| #  | Task                                                                                         | Impact | Effort | Category     |
+| -- | -------------------------------------------------------------------------------------------- | ------ | ------ | ------------ |
+| 1  | Add concurrent safety tests for registries (`RegisterClassification`, `RegisterTemplate`)    | High   | Low    | Test         |
+| 2  | Make `FilesystemRule.Run` respect context cancellation                                       | High   | Low    | Correctness  |
+| 3  | Consolidate `DiagnosticFinding` vs `DiagnosticResult` (split brain)                          | High   | Medium | Architecture |
+| 4  | Rename `DebugAgent` → `Agent` interface                                                      | Medium | Low    | API          |
+| 5  | Add `UnregisterClassification`/`UnregisterTemplate` to AGENTS.md                             | Medium | Low    | Docs         |
+| 6  | Add Example functions for `HandleErrorWithContext`, `UnregisterClassification`, `ContextKey` | Medium | Low    | Docs         |
+| 7  | Increase `diagnose` coverage from 66.9% to 80%+                                              | Medium | Medium | Test         |
+| 8  | Increase `diagnose/postgres` coverage from 80.3% to 90%+                                     | Medium | Medium | Test         |
+| 9  | Add integration test: full pipeline (create error → classify → diagnose → handle)            | Medium | Medium | Test         |
+| 10 | Add `Family-specific format constructors` (NewRejectionf, NewTransientf)                     | Medium | Medium | Feature      |
+| 11 | Add `errors.Join`-aware `Compose` that returns worst family                                  | Medium | Medium | Feature      |
+| 12 | Add `Mark(err, sentinel)` for identity stamping                                              | Medium | Medium | Feature      |
+| 13 | Add structured logging adapter (slog integration)                                            | Medium | Medium | Feature      |
+| 14 | Benchmark `Runner.Run` with context cancellation path                                        | Low    | Low    | Perf         |
+| 15 | Add `Runner.Register` concurrent safety test                                                 | Low    | Low    | Test         |
+| 16 | Add fuzz tests for `ParseFamily`, `Classify`                                                 | Low    | Medium | Test         |
+| 17 | Add `Error.Format(state, verb)` for `%+v` verbose output                                     | Low    | Low    | Feature      |
+| 18 | Add `Errors(err) []error` unwrapping helper                                                  | Low    | Low    | Feature      |
+| 19 | Add `IsFamily(err, Family) bool` convenience function                                        | Low    | Low    | Feature      |
+| 20 | Add `Corruption` family diagnostic rules                                                     | Medium | High   | Feature      |
+| 21 | Add `Conflict` family diagnostic rules                                                       | Medium | High   | Feature      |
+| 22 | Add observability hooks (metrics, tracing)                                                   | Medium | High   | Feature      |
+| 23 | Extract `diagnose/internal/testutil` for shared mock runners                                 | Low    | Medium | Cleanup      |
+| 24 | Add `go vet` line-length check or custom linter                                              | Low    | Low    | Tooling      |
+| 25 | Add `CODEOWNERS` file                                                                        | Low    | Low    | Process      |
 
 ---
 

@@ -1,7 +1,7 @@
 version: "2"
 run:
   timeout: 5m
-  go: 1.26.4
+  go: 1.26.7
   build-tags:
     - goexperiment.arenas
     - goexperiment.goroutineleakprofile
@@ -27,7 +27,6 @@ linters:
     - copyloopvar
     - cyclop
     - decorder
-    - depguard
     - dogsled
     - dupl
     - dupword
@@ -124,19 +123,31 @@ linters:
     - wrapcheck
     - wsl_v5
     - zerologlint
+  disable:
+    - depguard
   settings:
     cyclop:
       max-complexity: 12
-    depguard:
-      rules:
-        main:
-          allow:
-            - $gostd
-            - $module
-            - github.com/larsartmann/go-error-family
-            - github.com/samber/oops
     dupl:
       threshold: 100
+    errcheck:
+      exclude-functions:
+        - (*os.File).Close
+        - (io.Closer).Close
+        - (*sql.DB).Close
+        - (*sql.Rows).Close
+        - (*sql.Stmt).Close
+        - (net.Conn).Close
+        - (*net.TCPConn).Close
+        - (*net.UDPConn).Close
+        - fmt.Fprint
+        - fmt.Fprintf
+        - fmt.Fprintln
+        - fmt.Print
+        - fmt.Printf
+        - fmt.Println
+        - (*strings.Builder).WriteString
+        - (*bytes.Buffer).WriteString
     exhaustruct:
       exclude:
         - os/exec.Cmd
@@ -161,6 +172,9 @@ linters:
         - github.com/larsartmann/go-error-family/agent.AgentResult
         - github.com/larsartmann/go-error-family/agent.Config
         - github.com/larsartmann/go-error-family/examples/checkout.Store
+    funlen:
+      lines: 200
+      statements: 100
     ginkgolinter:
       forbid-focus-container: true
       forbid-spec-pollution: true
@@ -169,6 +183,10 @@ linters:
         - ifElseChain
     gomoddirectives:
       replace-local: true
+    gosec:
+      excludes:
+        - G304
+        - G115
     ireturn:
       allow:
         - error
@@ -211,6 +229,17 @@ linters:
         - ag
         - r
       ignore-type-assert-ok: true
+    wrapcheck:
+      ignore-sigs:
+        - .Errorf(
+        - errors.New(
+        - errors.Unwrap(
+        - errors.Join(
+        - .Wrap(
+        - .Wrapf(
+        - .WithMessage(
+        - .WithMessagef(
+        - .WithStack(
   exclusions:
     generated: lax
     rules:

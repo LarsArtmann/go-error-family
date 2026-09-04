@@ -202,9 +202,9 @@ The site was recovered in this session by creating the missing Firebase hosting 
 | 04:26       | Checked Firebase hosting sites list                   | `errorfamily` NOT FOUND                               |
 | 04:26       | Verified `errorfamily.web.app`                        | HTTP 404                                              |
 | 04:27       | Created Firebase hosting site                         | Success                                               |
-| 04:27       | Started `pnpm install`                                 | Success (background)                                  |
+| 04:27       | Started `pnpm install`                                | Success (background)                                  |
 | 04:28       | Approved native scripts (esbuild, sharp)              | Success                                               |
-| 04:28       | `pnpm run build`                                       | 13 pages, 0 errors                                    |
+| 04:28       | `pnpm run build`                                      | 13 pages, 0 errors                                    |
 | 04:29       | Verified upload endpoint reachable                    | HTTP 405 (expected)                                   |
 | 04:29       | Deployed to Firebase                                  | 65 files, release complete                            |
 | 04:30       | Verified `errorfamily.web.app`                        | HTTP 200, full content                                |

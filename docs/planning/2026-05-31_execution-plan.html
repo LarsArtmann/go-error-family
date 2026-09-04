@@ -24,7 +24,9 @@
         box-sizing: border-box;
       }
       body {
-        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
+        font-family:
+          -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial,
+          sans-serif;
         background: var(--bg);
         color: var(--text);
         line-height: 1.6;
@@ -288,8 +290,10 @@
   <body>
     <h1>go-error-family — Execution Plan</h1>
     <p>
-      <strong>Date:</strong> 2026-05-31 &nbsp;|&nbsp; <strong>Branch:</strong> master &nbsp;|&nbsp;
-      <strong>Commit:</strong> c94a267 &nbsp;|&nbsp; <strong>Version:</strong> v0.2.0
+      <strong>Date:</strong> 2026-05-31 &nbsp;|&nbsp;
+      <strong>Branch:</strong> master &nbsp;|&nbsp;
+      <strong>Commit:</strong> c94a267 &nbsp;|&nbsp;
+      <strong>Version:</strong> v0.2.0
     </p>
 
     <!-- ═══════════════════════════════════════════════════════════════ -->
@@ -331,30 +335,46 @@
 
     <h3>What's Already Done ✓</h3>
     <ul>
-      <li class="done">Five Families with Audience, Tone, Exit codes, retry semantics</li>
-      <li class="done">Consumer interfaces: Coded, Classified, Contextual, Retryable</li>
-      <li class="done">Error struct: fmt.Formatter (%v, %+v, %s), WithContext chain, Summary()</li>
       <li class="done">
-        Classify() with multi-error (errors.Join), registered sentinels, deadlock-safe
+        Five Families with Audience, Tone, Exit codes, retry semantics
       </li>
       <li class="done">
-        HandleError() CLI boundary — template system (register, override, defaults)
+        Consumer interfaces: Coded, Classified, Contextual, Retryable
       </li>
-      <li class="done">HandleErrorDetailed() for HTTP/gRPC structured results</li>
       <li class="done">
-        Diagnostic rules modularized: FilesystemRule + NetworkRule (zero-dep core)
+        Error struct: fmt.Formatter (%v, %+v, %s), WithContext chain, Summary()
+      </li>
+      <li class="done">
+        Classify() with multi-error (errors.Join), registered sentinels,
+        deadlock-safe
+      </li>
+      <li class="done">
+        HandleError() CLI boundary — template system (register, override,
+        defaults)
+      </li>
+      <li class="done">
+        HandleErrorDetailed() for HTTP/gRPC structured results
+      </li>
+      <li class="done">
+        Diagnostic rules modularized: FilesystemRule + NetworkRule (zero-dep
+        core)
       </li>
       <li class="done">
         GitRule → <code>diagnose/git</code> submodule, PostgresRule →
         <code>diagnose/postgres</code> submodule
       </li>
-      <li class="done">Agent: deterministic analysis-only (proposes, never executes)</li>
       <li class="done">
-        Dead code removed: SystemSnapshot, ApplyFixes, Involvement, RiskLevel, AutoFix
+        Agent: deterministic analysis-only (proposes, never executes)
+      </li>
+      <li class="done">
+        Dead code removed: SystemSnapshot, ApplyFixes, Involvement, RiskLevel,
+        AutoFix
       </li>
       <li class="done">Template registry replaced magic substring matching</li>
       <li class="done">Benchmarks, fuzz tests, 3 runnable examples</li>
-      <li class="done">Multi-module workspace (go.work), Nix flake, CI workflows</li>
+      <li class="done">
+        Multi-module workspace (go.work), Nix flake, CI workflows
+      </li>
     </ul>
 
     <!-- ═══════════════════════════════════════════════════════════════ -->
@@ -376,8 +396,8 @@
         <tr>
           <td>1</td>
           <td>
-            <strong>Coverage gaps in submodule rules</strong> — git 69.2%, postgres 58.6% —
-            shell-out commands untestable without mocking
+            <strong>Coverage gaps in submodule rules</strong> — git 69.2%,
+            postgres 58.6% — shell-out commands untestable without mocking
           </td>
           <td class="yellow">Medium</td>
           <td><span class="tag tag-test">test</span></td>
@@ -385,8 +405,8 @@
         <tr>
           <td>2</td>
           <td>
-            <strong>No RunCommand/CommandExists mock interface</strong> — diagnostic helpers are
-            concrete functions, not injectable
+            <strong>No RunCommand/CommandExists mock interface</strong> —
+            diagnostic helpers are concrete functions, not injectable
           </td>
           <td class="yellow">Medium</td>
           <td><span class="tag tag-refactor">refactor</span></td>
@@ -394,8 +414,8 @@
         <tr>
           <td>3</td>
           <td>
-            <strong>HandleError writes to stderr during benchmarks</strong> — HandleError benchmark
-            produces ~1M lines of noisy output
+            <strong>HandleError writes to stderr during benchmarks</strong> —
+            HandleError benchmark produces ~1M lines of noisy output
           </td>
           <td class="yellow">Medium</td>
           <td><span class="tag tag-fix">fix</span></td>
@@ -403,8 +423,8 @@
         <tr>
           <td>4</td>
           <td>
-            <strong>No Go API docs (pkg.go.dev quality)</strong> — exported types lack package-level
-            examples and godoc links
+            <strong>No Go API docs (pkg.go.dev quality)</strong> — exported
+            types lack package-level examples and godoc links
           </td>
           <td class="yellow">Medium</td>
           <td><span class="tag tag-docs">docs</span></td>
@@ -412,8 +432,8 @@
         <tr>
           <td>5</td>
           <td>
-            <strong>DiagnosticFunc receives context.Background()</strong> — HandleErrorWithConfig
-            doesn't propagate caller context
+            <strong>DiagnosticFunc receives context.Background()</strong> —
+            HandleErrorWithConfig doesn't propagate caller context
           </td>
           <td class="red">High</td>
           <td><span class="tag tag-fix">fix</span></td>
@@ -421,8 +441,8 @@
         <tr>
           <td>6</td>
           <td>
-            <strong>Typed context keys missing</strong> — stringly-typed context keys prone to typos
-            across rules
+            <strong>Typed context keys missing</strong> — stringly-typed context
+            keys prone to typos across rules
           </td>
           <td class="yellow">Medium</td>
           <td><span class="tag tag-feature">feature</span></td>
@@ -430,8 +450,9 @@
         <tr>
           <td>7</td>
           <td>
-            <strong>No HandleErrorDetailed template support</strong> — HandleError uses templates
-            but HandleErrorDetailed only uses lookupDefault
+            <strong>No HandleErrorDetailed template support</strong> —
+            HandleError uses templates but HandleErrorDetailed only uses
+            lookupDefault
           </td>
           <td class="yellow">Medium</td>
           <td><span class="tag tag-feature">feature</span></td>
@@ -439,8 +460,8 @@
         <tr>
           <td>8</td>
           <td>
-            <strong>No HandleErrorWithConfig context parameter</strong> — caller cannot pass context
-            for cancellation or deadlines
+            <strong>No HandleErrorWithConfig context parameter</strong> — caller
+            cannot pass context for cancellation or deadlines
           </td>
           <td class="red">High</td>
           <td><span class="tag tag-feature">feature</span></td>
@@ -453,27 +474,36 @@
     <!-- ═══════════════════════════════════════════════════════════════ -->
 
     <div class="rationale">
-      <strong>Pareto Analysis:</strong> Phases 1–2 fix correctness issues and unblock all other
-      work. Phases 3–4 raise test quality. Phases 5–6 add polish and features. Each phase is
-      independently committable with zero regressions.
+      <strong>Pareto Analysis:</strong> Phases 1–2 fix correctness issues and
+      unblock all other work. Phases 3–4 raise test quality. Phases 5–6 add
+      polish and features. Each phase is independently committable with zero
+      regressions.
     </div>
 
     <!-- ─────────────────────────────────────────────────────────────── -->
-    <div class="phase" data-phase="Phase 1 — Correctness Fixes" data-priority="p0">
-      <h3 style="margin-top: 0">Context Propagation &amp; HandleError Cleanup</h3>
+    <div
+      class="phase"
+      data-phase="Phase 1 — Correctness Fixes"
+      data-priority="p0"
+    >
+      <h3 style="margin-top: 0">
+        Context Propagation &amp; HandleError Cleanup
+      </h3>
 
       <p>
-        Two correctness bugs affect production consumers: missing context propagation in
-        HandleError, and benchmark noise from writing to stderr.
+        Two correctness bugs affect production consumers: missing context
+        propagation in HandleError, and benchmark noise from writing to stderr.
       </p>
 
       <ol class="task-list">
         <li>
           <div>
-            <strong>Add <code>HandleErrorWithContext(ctx, err, cfg)</code></strong> — new function
-            that accepts <code>context.Context</code>, propagates it to
-            <code>DiagnosticFunc</code> instead of <code>context.Background()</code> <br /><span
-              class="file-ref"
+            <strong
+              >Add <code>HandleErrorWithContext(ctx, err, cfg)</code></strong
+            >
+            — new function that accepts <code>context.Context</code>, propagates
+            it to <code>DiagnosticFunc</code> instead of
+            <code>context.Background()</code> <br /><span class="file-ref"
               >handle.go</span
             >
           </div>
@@ -481,34 +511,36 @@
         </li>
         <li>
           <div>
-            <strong>Fix HandleErrorWithConfig to use passed context</strong> — internal: extract the
-            context from the new API into the diagnose call <br /><span class="file-ref"
-              >handle.go</span
-            >
+            <strong>Fix HandleErrorWithConfig to use passed context</strong> —
+            internal: extract the context from the new API into the diagnose
+            call <br /><span class="file-ref">handle.go</span>
           </div>
           <span class="effort">5 min</span>
         </li>
         <li>
           <div>
             <strong>Fix HandleError benchmark noise</strong> — use
-            <code>HandleConfig{Output: io.Discard}</code> in benchmark to suppress stderr writes
-            <br /><span class="file-ref">benchmark_test.go</span>
+            <code>HandleConfig{Output: io.Discard}</code> in benchmark to
+            suppress stderr writes <br /><span class="file-ref"
+              >benchmark_test.go</span
+            >
           </div>
           <span class="effort">5 min</span>
         </li>
         <li>
           <div>
-            <strong>Add HandleErrorDetailed template support</strong> — use <code>renderCLI</code>'s
-            template lookup chain (consumer override → registered → default → family fallback) in
-            HandleErrorDetailed too <br /><span class="file-ref">handle.go</span>
+            <strong>Add HandleErrorDetailed template support</strong> — use
+            <code>renderCLI</code>'s template lookup chain (consumer override →
+            registered → default → family fallback) in HandleErrorDetailed too
+            <br /><span class="file-ref">handle.go</span>
           </div>
           <span class="effort">10 min</span>
         </li>
         <li>
           <div>
-            <strong>Tests for context propagation</strong> — verify context cancellation cancels
-            diagnostics, verify HandleErrorWithContext passes ctx through <br /><span
-              class="file-ref"
+            <strong>Tests for context propagation</strong> — verify context
+            cancellation cancels diagnostics, verify HandleErrorWithContext
+            passes ctx through <br /><span class="file-ref"
               >handle_test.go</span
             >
           </div>
@@ -526,24 +558,29 @@
       <h3 style="margin-top: 0">Mockable Diagnostic Helpers</h3>
 
       <p>
-        Git (69.2%) and Postgres (58.6%) coverage is low because <code>RunCommand</code> and
-        <code>CommandExists</code> are concrete functions shelling out to the OS. We need an
-        injectable layer.
+        Git (69.2%) and Postgres (58.6%) coverage is low because
+        <code>RunCommand</code> and <code>CommandExists</code> are concrete
+        functions shelling out to the OS. We need an injectable layer.
       </p>
 
       <div class="rationale">
-        <strong>Design Decision:</strong> Introduce a <code>CommandRunner</code> interface in the
-        diagnose package. Rules accept it as an optional field. Default behavior uses the existing
-        <code>RunCommand</code>/<code>CommandExists</code> functions. Tests inject mocks. This is
-        the lightest touch — no breaking changes to the public API, only new test-only capability.
+        <strong>Design Decision:</strong> Introduce a
+        <code>CommandRunner</code> interface in the diagnose package. Rules
+        accept it as an optional field. Default behavior uses the existing
+        <code>RunCommand</code>/<code>CommandExists</code> functions. Tests
+        inject mocks. This is the lightest touch — no breaking changes to the
+        public API, only new test-only capability.
       </div>
 
       <ol class="task-list">
         <li>
           <div>
             <strong>Define <code>CommandRunner</code> interface</strong> —
-            <code>Run(ctx, timeout, name, args...) → (stdout, exitCode, error)</code> +
-            <code>Exists(name) → bool</code> <br /><span class="file-ref"
+            <code
+              >Run(ctx, timeout, name, args...) → (stdout, exitCode,
+              error)</code
+            >
+            + <code>Exists(name) → bool</code> <br /><span class="file-ref"
               >diagnose/diagnose.go</span
             >
           </div>
@@ -551,53 +588,57 @@
         </li>
         <li>
           <div>
-            <strong>Add <code>DefaultCommandRunner</code> struct</strong> — wraps existing
-            <code>RunCommand</code>/<code>CommandExists</code> functions <br /><span
-              class="file-ref"
-              >diagnose/diagnose.go</span
-            >
+            <strong>Add <code>DefaultCommandRunner</code> struct</strong> —
+            wraps existing <code>RunCommand</code>/<code>CommandExists</code>
+            functions <br /><span class="file-ref">diagnose/diagnose.go</span>
           </div>
           <span class="effort">5 min</span>
         </li>
         <li>
           <div>
-            <strong>Add optional <code>CommandRunner</code> field to GitRule</strong> — defaults to
-            <code>DefaultCommandRunner{}</code>, tests inject mock <br /><span class="file-ref"
-              >diagnose/git/rules_git.go</span
+            <strong
+              >Add optional <code>CommandRunner</code> field to GitRule</strong
+            >
+            — defaults to <code>DefaultCommandRunner{}</code>, tests inject mock
+            <br /><span class="file-ref">diagnose/git/rules_git.go</span>
+          </div>
+          <span class="effort">10 min</span>
+        </li>
+        <li>
+          <div>
+            <strong
+              >Add optional <code>CommandRunner</code> field to
+              PostgresRule</strong
+            >
+            — same pattern <br /><span class="file-ref"
+              >diagnose/postgres/rules_postgres.go</span
             >
           </div>
           <span class="effort">10 min</span>
         </li>
         <li>
           <div>
-            <strong>Add optional <code>CommandRunner</code> field to PostgresRule</strong> — same
-            pattern <br /><span class="file-ref">diagnose/postgres/rules_postgres.go</span>
-          </div>
-          <span class="effort">10 min</span>
-        </li>
-        <li>
-          <div>
-            <strong>Write mock <code>CommandRunner</code> for tests</strong> — configurable
-            responses, call tracking <br /><span class="file-ref"
-              >diagnose/git/rules_git_test.go, diagnose/postgres/rules_postgres_test.go</span
+            <strong>Write mock <code>CommandRunner</code> for tests</strong> —
+            configurable responses, call tracking <br /><span class="file-ref"
+              >diagnose/git/rules_git_test.go,
+              diagnose/postgres/rules_postgres_test.go</span
             >
           </div>
           <span class="effort">20 min</span>
         </li>
         <li>
           <div>
-            <strong>Expand git tests with mocked scenarios</strong> — dirty working tree, merge
-            conflicts, unreachable remote, no git binary <br /><span class="file-ref"
-              >diagnose/git/rules_git_test.go</span
-            >
+            <strong>Expand git tests with mocked scenarios</strong> — dirty
+            working tree, merge conflicts, unreachable remote, no git binary
+            <br /><span class="file-ref">diagnose/git/rules_git_test.go</span>
           </div>
           <span class="effort">25 min</span>
         </li>
         <li>
           <div>
-            <strong>Expand postgres tests with mocked scenarios</strong> — pg_isready
-            success/failure, TCP-only mode, various resolveHost/resolvePort inputs <br /><span
-              class="file-ref"
+            <strong>Expand postgres tests with mocked scenarios</strong> —
+            pg_isready success/failure, TCP-only mode, various
+            resolveHost/resolvePort inputs <br /><span class="file-ref"
               >diagnose/postgres/rules_postgres_test.go</span
             >
           </div>
@@ -605,10 +646,8 @@
         </li>
         <li>
           <div>
-            <strong>Verify coverage targets met</strong> — git ≥80%, postgres ≥80% <br /><span
-              class="file-ref"
-              >go test -cover</span
-            >
+            <strong>Verify coverage targets met</strong> — git ≥80%, postgres
+            ≥80% <br /><span class="file-ref">go test -cover</span>
           </div>
           <span class="effort">5 min</span>
         </li>
@@ -616,20 +655,27 @@
     </div>
 
     <!-- ─────────────────────────────────────────────────────────────── -->
-    <div class="phase" data-phase="Phase 3 — Typed Context Keys" data-priority="p1">
+    <div
+      class="phase"
+      data-phase="Phase 3 — Typed Context Keys"
+      data-priority="p1"
+    >
       <h3 style="margin-top: 0">Compile-Time Context Key Safety</h3>
 
       <p>
-        Diagnostic rules use string literals for context key matching. Typos are invisible until
-        runtime.
+        Diagnostic rules use string literals for context key matching. Typos are
+        invisible until runtime.
       </p>
 
       <ol class="task-list">
         <li>
           <div>
-            <strong>Define <code>ContextKey</code> type in diagnose package</strong> —
-            <code>type ContextKey string</code> with exported constants for all common keys (Host,
-            Port, Path, DBHost, DBPort, etc.) <br /><span class="file-ref"
+            <strong
+              >Define <code>ContextKey</code> type in diagnose package</strong
+            >
+            — <code>type ContextKey string</code> with exported constants for
+            all common keys (Host, Port, Path, DBHost, DBPort, etc.) <br /><span
+              class="file-ref"
               >diagnose/diagnose.go</span
             >
           </div>
@@ -637,18 +683,21 @@
         </li>
         <li>
           <div>
-            <strong>Update <code>RuleSpec</code> to accept <code>[]ContextKey</code></strong> —
-            backwards-compatible: ContextKeys field changes from <code>[]string</code> to
-            <code>[]ContextKey</code>, helper functions accept both <br /><span class="file-ref"
-              >diagnose/diagnose.go</span
+            <strong
+              >Update <code>RuleSpec</code> to accept
+              <code>[]ContextKey</code></strong
             >
+            — backwards-compatible: ContextKeys field changes from
+            <code>[]string</code> to <code>[]ContextKey</code>, helper functions
+            accept both <br /><span class="file-ref">diagnose/diagnose.go</span>
           </div>
           <span class="effort">10 min</span>
         </li>
         <li>
           <div>
-            <strong>Replace string literals in all rules</strong> — FilesystemRule, NetworkRule,
-            GitRule, PostgresRule use typed constants <br /><span class="file-ref"
+            <strong>Replace string literals in all rules</strong> —
+            FilesystemRule, NetworkRule, GitRule, PostgresRule use typed
+            constants <br /><span class="file-ref"
               >diagnose/*.go, diagnose/git/*.go, diagnose/postgres/*.go</span
             >
           </div>
@@ -656,15 +705,21 @@
         </li>
         <li>
           <div>
-            <strong>Export <code>ErrorWithContext</code> helper</strong> — convenience for
-            consumers: <code>diagnose.ErrorWithContext(err, diagnose.HostKey, "localhost")</code>
+            <strong>Export <code>ErrorWithContext</code> helper</strong> —
+            convenience for consumers:
+            <code
+              >diagnose.ErrorWithContext(err, diagnose.HostKey,
+              "localhost")</code
+            >
             <br /><span class="file-ref">diagnose/diagnose.go</span>
           </div>
           <span class="effort">5 min</span>
         </li>
         <li>
           <div>
-            <strong>Tests: verify typed keys work identically to string keys</strong>
+            <strong
+              >Tests: verify typed keys work identically to string keys</strong
+            >
             <br /><span class="file-ref">diagnose/diagnose_test.go</span>
           </div>
           <span class="effort">10 min</span>
@@ -673,21 +728,26 @@
     </div>
 
     <!-- ─────────────────────────────────────────────────────────────── -->
-    <div class="phase" data-phase="Phase 4 — API Documentation & Examples" data-priority="p1">
+    <div
+      class="phase"
+      data-phase="Phase 4 — API Documentation & Examples"
+      data-priority="p1"
+    >
       <h3 style="margin-top: 0">pkg.go.dev Quality</h3>
 
       <p>
-        The library has good README and SKILL.md but exported symbols lack the doc comments and
-        examples that make pkg.go.dev useful.
+        The library has good README and SKILL.md but exported symbols lack the
+        doc comments and examples that make pkg.go.dev useful.
       </p>
 
       <ol class="task-list">
         <li>
           <div>
-            <strong>Audit all exported symbols for godoc quality</strong> — every exported type,
-            func, const, method needs a complete doc comment starting with its name <br /><span
-              class="file-ref"
-              >family.go, error.go, constructors.go, classify.go, interfaces.go, handle.go</span
+            <strong>Audit all exported symbols for godoc quality</strong> —
+            every exported type, func, const, method needs a complete doc
+            comment starting with its name <br /><span class="file-ref"
+              >family.go, error.go, constructors.go, classify.go, interfaces.go,
+              handle.go</span
             >
           </div>
           <span class="effort">30 min</span>
@@ -696,7 +756,8 @@
           <div>
             <strong>Add package-level example functions</strong> —
             <code>ExampleNewTransient()</code>, <code>ExampleClassify()</code>,
-            <code>ExampleHandleError()</code> in test files <br /><span class="file-ref"
+            <code>ExampleHandleError()</code> in test files <br /><span
+              class="file-ref"
               >errorfamily_test.go</span
             >
           </div>
@@ -704,30 +765,8 @@
         </li>
         <li>
           <div>
-            <strong>Add package doc comment to diagnose</strong> — expand the existing doc with
-            patterns, best practices <br /><span class="file-ref">diagnose/diagnose.go</span>
-          </div>
-          <span class="effort">10 min</span>
-        </li>
-        <li>
-          <div>
-            <strong>Update SKILL.md for new APIs</strong> — add HandleErrorWithContext,
-            CommandRunner, ContextKey docs <br /><span class="file-ref">SKILL.md</span>
-          </div>
-          <span class="effort">15 min</span>
-        </li>
-      </ol>
-    </div>
-
-    <!-- ─────────────────────────────────────────────────────────────── -->
-    <div class="phase" data-phase="Phase 5 — Diagnosis Enhancements" data-priority="p2">
-      <h3 style="margin-top: 0">Diagnostic Rule Improvements</h3>
-
-      <ol class="task-list">
-        <li>
-          <div>
-            <strong>Add <code>DiagnosticResult.Context</code> field</strong> — surface the error
-            context that triggered this rule, useful for programmatic consumers <br /><span
+            <strong>Add package doc comment to diagnose</strong> — expand the
+            existing doc with patterns, best practices <br /><span
               class="file-ref"
               >diagnose/diagnose.go</span
             >
@@ -736,17 +775,52 @@
         </li>
         <li>
           <div>
-            <strong>Populate Context in all rules</strong> — each Run() sets result.Context from the
-            error's ErrorContext() <br /><span class="file-ref"
-              >diagnose/rules_*.go, diagnose/git/*.go, diagnose/postgres/*.go</span
+            <strong>Update SKILL.md for new APIs</strong> — add
+            HandleErrorWithContext, CommandRunner, ContextKey docs <br /><span
+              class="file-ref"
+              >SKILL.md</span
+            >
+          </div>
+          <span class="effort">15 min</span>
+        </li>
+      </ol>
+    </div>
+
+    <!-- ─────────────────────────────────────────────────────────────── -->
+    <div
+      class="phase"
+      data-phase="Phase 5 — Diagnosis Enhancements"
+      data-priority="p2"
+    >
+      <h3 style="margin-top: 0">Diagnostic Rule Improvements</h3>
+
+      <ol class="task-list">
+        <li>
+          <div>
+            <strong>Add <code>DiagnosticResult.Context</code> field</strong> —
+            surface the error context that triggered this rule, useful for
+            programmatic consumers <br /><span class="file-ref"
+              >diagnose/diagnose.go</span
             >
           </div>
           <span class="effort">10 min</span>
         </li>
         <li>
           <div>
-            <strong>Add <code>Rule.Name()</code> to test assertions</strong> — verify every rule
-            returns the correct name in tests <br /><span class="file-ref"
+            <strong>Populate Context in all rules</strong> — each Run() sets
+            result.Context from the error's ErrorContext() <br /><span
+              class="file-ref"
+              >diagnose/rules_*.go, diagnose/git/*.go,
+              diagnose/postgres/*.go</span
+            >
+          </div>
+          <span class="effort">10 min</span>
+        </li>
+        <li>
+          <div>
+            <strong>Add <code>Rule.Name()</code> to test assertions</strong> —
+            verify every rule returns the correct name in tests <br /><span
+              class="file-ref"
               >diagnose/diagnose_test.go</span
             >
           </div>
@@ -756,36 +830,49 @@
     </div>
 
     <!-- ─────────────────────────────────────────────────────────────── -->
-    <div class="phase" data-phase="Phase 6 — Polish & Future-Proofing" data-priority="p3">
+    <div
+      class="phase"
+      data-phase="Phase 6 — Polish & Future-Proofing"
+      data-priority="p3"
+    >
       <h3 style="margin-top: 0">Nice-to-Have Improvements</h3>
 
       <ol class="task-list">
         <li>
           <div>
-            <strong>Add <code>Family.Tone()</code> accessor</strong> — already implemented, verify
-            it's documented <br /><span class="file-ref">family.go</span>
+            <strong>Add <code>Family.Tone()</code> accessor</strong> — already
+            implemented, verify it's documented <br /><span class="file-ref"
+              >family.go</span
+            >
           </div>
           <span class="effort">5 min</span>
         </li>
         <li>
           <div>
-            <strong>Add <code>Error.WithTimestamp()</code> mutator</strong> — for testing and
-            deterministic construction <br /><span class="file-ref">error.go</span>
+            <strong>Add <code>Error.WithTimestamp()</code> mutator</strong> —
+            for testing and deterministic construction <br /><span
+              class="file-ref"
+              >error.go</span
+            >
           </div>
           <span class="effort">5 min</span>
         </li>
         <li>
           <div>
             <strong>Add <code>errors.Join</code> composition helper</strong> —
-            <code>errorfamily.Compose(err1, err2)</code> that classifies the batch and picks the
-            worst family for exit code <br /><span class="file-ref">classify.go</span>
+            <code>errorfamily.Compose(err1, err2)</code> that classifies the
+            batch and picks the worst family for exit code <br /><span
+              class="file-ref"
+              >classify.go</span
+            >
           </div>
           <span class="effort">20 min</span>
         </li>
         <li>
           <div>
             <strong>Update README with v0.3 migration notes</strong> — document
-            HandleErrorWithContext, CommandRunner, ContextKey <br /><span class="file-ref"
+            HandleErrorWithContext, CommandRunner, ContextKey <br /><span
+              class="file-ref"
               >README.md</span
             >
           </div>
@@ -793,8 +880,8 @@
         </li>
         <li>
           <div>
-            <strong>Update CHANGELOG for v0.3.0</strong> — all new APIs, fixes, and improvements
-            <br /><span class="file-ref">CHANGELOG.md</span>
+            <strong>Update CHANGELOG for v0.3.0</strong> — all new APIs, fixes,
+            and improvements <br /><span class="file-ref">CHANGELOG.md</span>
           </div>
           <span class="effort">10 min</span>
         </li>
@@ -806,11 +893,12 @@
     <!-- ═══════════════════════════════════════════════════════════════ -->
 
     <div class="dep-graph">
-      Phase 1 (Correctness) ←── no deps, start here │ ├── Phase 2 (Mocks) ←── no hard dep on Phase
-      1, but Phase 1 should land first for clean diffs │ │ │ └── Phase 3 (ContextKey) ←── Phase 2
-      must land first (rules change in both) │ ├── Phase 4 (Docs) ←── can run in parallel with Phase
-      2–3 │ ├── Phase 5 (Diag) ←── depends on Phase 2 (CommandRunner) and Phase 3 (ContextKey) │ └──
-      Phase 6 (Polish) ←── depends on all above
+      Phase 1 (Correctness) ←── no deps, start here │ ├── Phase 2 (Mocks) ←── no
+      hard dep on Phase 1, but Phase 1 should land first for clean diffs │ │ │
+      └── Phase 3 (ContextKey) ←── Phase 2 must land first (rules change in
+      both) │ ├── Phase 4 (Docs) ←── can run in parallel with Phase 2–3 │ ├──
+      Phase 5 (Diag) ←── depends on Phase 2 (CommandRunner) and Phase 3
+      (ContextKey) │ └── Phase 6 (Polish) ←── depends on all above
     </div>
 
     <!-- ═══════════════════════════════════════════════════════════════ -->
@@ -864,7 +952,10 @@
     <h2>Benchmark Baselines</h2>
     <!-- ═══════════════════════════════════════════════════════════════ -->
 
-    <p>Current performance baselines (AMD RYZEN AI MAX+ 395). These must not regress.</p>
+    <p>
+      Current performance baselines (AMD RYZEN AI MAX+ 395). These must not
+      regress.
+    </p>
 
     <table>
       <thead>
@@ -1026,7 +1117,10 @@
     <h2>Commit Strategy</h2>
     <!-- ═══════════════════════════════════════════════════════════════ -->
 
-    <p>Each phase is a single logical commit (or 2–3 for large phases). All commits must pass:</p>
+    <p>
+      Each phase is a single logical commit (or 2–3 for large phases). All
+      commits must pass:
+    </p>
     <ul>
       <li><code>go test ./... -count=1 -race</code></li>
       <li><code>golangci-lint run ./...</code></li>
@@ -1047,8 +1141,8 @@
           <td>Phase 1</td>
           <td>
             <code
-              >feat(handle): add HandleErrorWithContext, fix benchmark noise, template support in
-              Detailed</code
+              >feat(handle): add HandleErrorWithContext, fix benchmark noise,
+              template support in Detailed</code
             >
           </td>
         </tr>
@@ -1056,35 +1150,52 @@
           <td>2</td>
           <td>Phase 2</td>
           <td>
-            <code>feat(diagnose): injectable CommandRunner for testable git/postgres rules</code>
+            <code
+              >feat(diagnose): injectable CommandRunner for testable
+              git/postgres rules</code
+            >
           </td>
         </tr>
         <tr>
           <td>3</td>
           <td>Phase 2 (tests)</td>
           <td>
-            <code>test(diagnose): expand git/postgres coverage to 80%+ with mocked commands</code>
+            <code
+              >test(diagnose): expand git/postgres coverage to 80%+ with mocked
+              commands</code
+            >
           </td>
         </tr>
         <tr>
           <td>4</td>
           <td>Phase 3</td>
-          <td><code>feat(diagnose): typed ContextKey constants for compile-time safety</code></td>
+          <td>
+            <code
+              >feat(diagnose): typed ContextKey constants for compile-time
+              safety</code
+            >
+          </td>
         </tr>
         <tr>
           <td>5</td>
           <td>Phase 4</td>
-          <td><code>docs: godoc audit, package examples, updated SKILL.md</code></td>
+          <td>
+            <code>docs: godoc audit, package examples, updated SKILL.md</code>
+          </td>
         </tr>
         <tr>
           <td>6</td>
           <td>Phase 5</td>
-          <td><code>feat(diagnose): add DiagnosticResult.Context field</code></td>
+          <td>
+            <code>feat(diagnose): add DiagnosticResult.Context field</code>
+          </td>
         </tr>
         <tr>
           <td>7</td>
           <td>Phase 6</td>
-          <td><code>feat: WithTimestamp, Compose helper, docs for v0.3.0</code></td>
+          <td>
+            <code>feat: WithTimestamp, Compose helper, docs for v0.3.0</code>
+          </td>
         </tr>
       </tbody>
     </table>
@@ -1095,28 +1206,29 @@
 
     <ul>
       <li>
-        <strong>No go-git migration</strong> — GitRule works fine with exec.Command; the dependency
-        cost isn't justified for a diagnostic rule that runs once per error
+        <strong>No go-git migration</strong> — GitRule works fine with
+        exec.Command; the dependency cost isn't justified for a diagnostic rule
+        that runs once per error
       </li>
       <li>
-        <strong>No pkg/ restructure</strong> — the flat package layout is correct for a focused
-        library
+        <strong>No pkg/ restructure</strong> — the flat package layout is
+        correct for a focused library
       </li>
       <li>
-        <strong>No Docker integration tests</strong> — mock-based testing achieves coverage targets
-        without CI complexity
+        <strong>No Docker integration tests</strong> — mock-based testing
+        achieves coverage targets without CI complexity
       </li>
       <li>
-        <strong>No coverage thresholds in CI yet</strong> — wait until coverage stabilizes at 80%+
-        across all packages
+        <strong>No coverage thresholds in CI yet</strong> — wait until coverage
+        stabilizes at 80%+ across all packages
       </li>
       <li>
-        <strong>No auto-fix capability</strong> — the agent is analysis-only by design; adding
-        execution violates the library's contract
+        <strong>No auto-fix capability</strong> — the agent is analysis-only by
+        design; adding execution violates the library's contract
       </li>
       <li>
-        <strong>No breaking changes to existing public API</strong> — all additions are additive;
-        CommandRunner defaults to existing behavior
+        <strong>No breaking changes to existing public API</strong> — all
+        additions are additive; CommandRunner defaults to existing behavior
       </li>
     </ul>
 
@@ -1150,18 +1262,30 @@
           <td>HandleErrorWithContext duplicates code</td>
           <td>Low</td>
           <td>Low</td>
-          <td>HandleError/HandleErrorWithConfig delegate to the new function internally</td>
+          <td>
+            HandleError/HandleErrorWithConfig delegate to the new function
+            internally
+          </td>
         </tr>
         <tr>
           <td>Coverage doesn't reach 80% despite mocks</td>
           <td>Low</td>
           <td>Low</td>
-          <td>Integration tests cover the remaining paths; 75%+ is acceptable</td>
+          <td>
+            Integration tests cover the remaining paths; 75%+ is acceptable
+          </td>
         </tr>
       </tbody>
     </table>
 
-    <p style="margin-top: 3rem; color: var(--text-muted); font-size: 0.8rem; text-align: center">
+    <p
+      style="
+        margin-top: 3rem;
+        color: var(--text-muted);
+        font-size: 0.8rem;
+        text-align: center;
+      "
+    >
       Generated 2026-05-31 ·
       <a href="https://github.com/larsartmann/go-error-family"
         >github.com/larsartmann/go-error-family</a

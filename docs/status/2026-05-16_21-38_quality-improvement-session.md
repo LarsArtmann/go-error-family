@@ -105,33 +105,33 @@ Go library for structured error classification. Three packages: root (`errorfami
 
 ## F) TOP #25 THINGS TO DO NEXT
 
-| #   | Priority    | Task                                                                                | Impact                               |
-| --- | ----------- | ----------------------------------------------------------------------------------- | ------------------------------------ |
-| 1   | 🔴 Critical | Push the 3 commits to origin/master                                                 | Unblocking: current work is unpushed |
-| 2   | 🔴 Critical | Add CI pipeline (GitHub Actions: `go test`, `go vet`, `go build`)                   | Prevent regressions                  |
-| 3   | 🟠 High     | Tighten `DiagnosticRunner` interface: return `[]*DiagnosticResult` instead of `any` | Type safety                          |
-| 4   | 🟠 High     | Wire or remove `HandleConfig.Verbose` field                                         | Dead config smell                    |
-| 5   | 🟠 High     | Add `UnregisterClassification` / `ClearClassifications` for test isolation          | Registry accumulates forever         |
-| 6   | 🟠 High     | Add integration tests for `diagnose/` rules with mocked command execution           | Push diagnose coverage to 80%+       |
-| 7   | 🟠 High     | Split `handle.go` into `handle.go` + `render.go` + `template.go`                    | Single file doing too much           |
-| 8   | 🟡 Medium   | Add `Error.WithTimestamp(t time.Time)` for testing/replay                           | Testing, error replay                |
-| 9   | 🟡 Medium   | Add example tests (`func ExampleNewRejection()`) for godoc                          | Documentation                        |
-| 10  | 🟡 Medium   | Add error code validation (dot-separated lowercase) in constructors                 | Prevent invalid codes at creation    |
-| 11  | 🟡 Medium   | Make `codeToWhat`/`codeToFix` configurable via `HandleConfig`                       | Extensibility                        |
-| 12  | 🟡 Medium   | Add benchmarks for `Classify()`, `Is()`, `Error()`, `Format()`                      | Performance baseline                 |
-| 13  | 🟡 Medium   | Add fuzz tests for `ParseFamily`, `errorCodeContains`, `hasContextSubstring`        | Edge case discovery                  |
-| 14  | 🟡 Medium   | Extract diagnose matching helpers into testable, interface-driven package           | Reduce coupling                      |
-| 15  | 🟡 Medium   | Audit `isSecretKey` regex against comprehensive secret key patterns                 | Security: leaked env vars            |
-| 16  | 🟢 Low      | Add `WithContextE()` that returns `error` instead of `*Error`                       | Convenience                          |
-| 17  | 🟢 Low      | Add `GoString()` method to `Error` for `%#v` formatting                             | Debugging                            |
-| 18  | 🟢 Low      | Document O(n) behavior of `lookupRegistered` for large sentinel counts              | Performance documentation            |
-| 19  | 🟢 Low      | Add `RegisterClassificationFunc` for dynamic classification                         | Complex classification logic         |
-| 20  | 🟢 Low      | Add `errors.Join` support for multi-error classification                            | Go 1.20+ multi-errors                |
-| 21  | 🟢 Low      | Add `Family.MarshalText`/`UnmarshalText` for JSON/YAML                              | Configuration files                  |
-| 22  | 🟢 Low      | Add `Error.MarshalJSON` for structured logging                                      | Observability                        |
-| 23  | 🟢 Low      | Create `flake.nix` for reproducible builds                                          | Nix ecosystem                        |
-| 24  | 🟢 Low      | Add `CHANGELOG.md` entry for this session's changes                                 | Documentation                        |
-| 25  | 🟢 Low      | Consider `context.Context` propagation through error chain                          | Cancellation in error handling       |
+| #  | Priority    | Task                                                                                | Impact                               |
+| -- | ----------- | ----------------------------------------------------------------------------------- | ------------------------------------ |
+| 1  | 🔴 Critical | Push the 3 commits to origin/master                                                 | Unblocking: current work is unpushed |
+| 2  | 🔴 Critical | Add CI pipeline (GitHub Actions: `go test`, `go vet`, `go build`)                   | Prevent regressions                  |
+| 3  | 🟠 High     | Tighten `DiagnosticRunner` interface: return `[]*DiagnosticResult` instead of `any` | Type safety                          |
+| 4  | 🟠 High     | Wire or remove `HandleConfig.Verbose` field                                         | Dead config smell                    |
+| 5  | 🟠 High     | Add `UnregisterClassification` / `ClearClassifications` for test isolation          | Registry accumulates forever         |
+| 6  | 🟠 High     | Add integration tests for `diagnose/` rules with mocked command execution           | Push diagnose coverage to 80%+       |
+| 7  | 🟠 High     | Split `handle.go` into `handle.go` + `render.go` + `template.go`                    | Single file doing too much           |
+| 8  | 🟡 Medium   | Add `Error.WithTimestamp(t time.Time)` for testing/replay                           | Testing, error replay                |
+| 9  | 🟡 Medium   | Add example tests (`func ExampleNewRejection()`) for godoc                          | Documentation                        |
+| 10 | 🟡 Medium   | Add error code validation (dot-separated lowercase) in constructors                 | Prevent invalid codes at creation    |
+| 11 | 🟡 Medium   | Make `codeToWhat`/`codeToFix` configurable via `HandleConfig`                       | Extensibility                        |
+| 12 | 🟡 Medium   | Add benchmarks for `Classify()`, `Is()`, `Error()`, `Format()`                      | Performance baseline                 |
+| 13 | 🟡 Medium   | Add fuzz tests for `ParseFamily`, `errorCodeContains`, `hasContextSubstring`        | Edge case discovery                  |
+| 14 | 🟡 Medium   | Extract diagnose matching helpers into testable, interface-driven package           | Reduce coupling                      |
+| 15 | 🟡 Medium   | Audit `isSecretKey` regex against comprehensive secret key patterns                 | Security: leaked env vars            |
+| 16 | 🟢 Low      | Add `WithContextE()` that returns `error` instead of `*Error`                       | Convenience                          |
+| 17 | 🟢 Low      | Add `GoString()` method to `Error` for `%#v` formatting                             | Debugging                            |
+| 18 | 🟢 Low      | Document O(n) behavior of `lookupRegistered` for large sentinel counts              | Performance documentation            |
+| 19 | 🟢 Low      | Add `RegisterClassificationFunc` for dynamic classification                         | Complex classification logic         |
+| 20 | 🟢 Low      | Add `errors.Join` support for multi-error classification                            | Go 1.20+ multi-errors                |
+| 21 | 🟢 Low      | Add `Family.MarshalText`/`UnmarshalText` for JSON/YAML                              | Configuration files                  |
+| 22 | 🟢 Low      | Add `Error.MarshalJSON` for structured logging                                      | Observability                        |
+| 23 | 🟢 Low      | Create `flake.nix` for reproducible builds                                          | Nix ecosystem                        |
+| 24 | 🟢 Low      | Add `CHANGELOG.md` entry for this session's changes                                 | Documentation                        |
+| 25 | 🟢 Low      | Consider `context.Context` propagation through error chain                          | Cancellation in error handling       |
 
 ---
 

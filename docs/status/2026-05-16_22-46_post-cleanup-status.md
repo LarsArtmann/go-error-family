@@ -139,19 +139,19 @@ Build clean. 121/121 tests pass. Race detector clean. `go vet` clean. Zero gopls
 
 ### Previously Fucked Up — Now Fixed (This Session)
 
-| #   | Issue                                                                 | Resolution                                                     |
-| --- | --------------------------------------------------------------------- | -------------------------------------------------------------- |
-| 1   | `ApplyFixes` marked steps as applied without executing                | Removed entirely — library proposes, consumer executes         |
-| 2   | `codeToWhat`/`codeToFix` magic substring matching                     | Replaced with exact-match template registry                    |
-| 3   | `DiagnosticRunner` returned `any`                                     | Replaced with `DiagnosticFunc` returning `[]DiagnosticFinding` |
-| 4   | `SystemSnapshot` — 47 lines, zero callers                             | Deleted                                                        |
-| 5   | `lookupRegistered` deadlock risk with `errors.Is` under RLock         | Lock-free snapshot iteration                                   |
-| 6   | `HandleResult.Diagnostics` always empty, `ErrorReported` never set    | Removed — split brains eliminated                              |
-| 7   | `HandleConfig.Verbose` declared but never checked                     | Removed                                                        |
-| 8   | Agent `Involvement`/`RiskLevel`/command configs guarded nothing       | All removed                                                    |
-| 9   | `FixStep.Applied`/`AutoApply`/`Output` implied execution              | Removed                                                        |
-| 10  | `DiagnosticResult.AutoFixable`/`AutoFix` — library shouldn't auto-fix | Removed                                                        |
-| 11  | `FixResult` struct only used by deleted AutoFix                       | Removed                                                        |
+| #  | Issue                                                                 | Resolution                                                     |
+| -- | --------------------------------------------------------------------- | -------------------------------------------------------------- |
+| 1  | `ApplyFixes` marked steps as applied without executing                | Removed entirely — library proposes, consumer executes         |
+| 2  | `codeToWhat`/`codeToFix` magic substring matching                     | Replaced with exact-match template registry                    |
+| 3  | `DiagnosticRunner` returned `any`                                     | Replaced with `DiagnosticFunc` returning `[]DiagnosticFinding` |
+| 4  | `SystemSnapshot` — 47 lines, zero callers                             | Deleted                                                        |
+| 5  | `lookupRegistered` deadlock risk with `errors.Is` under RLock         | Lock-free snapshot iteration                                   |
+| 6  | `HandleResult.Diagnostics` always empty, `ErrorReported` never set    | Removed — split brains eliminated                              |
+| 7  | `HandleConfig.Verbose` declared but never checked                     | Removed                                                        |
+| 8  | Agent `Involvement`/`RiskLevel`/command configs guarded nothing       | All removed                                                    |
+| 9  | `FixStep.Applied`/`AutoApply`/`Output` implied execution              | Removed                                                        |
+| 10 | `DiagnosticResult.AutoFixable`/`AutoFix` — library shouldn't auto-fix | Removed                                                        |
+| 11 | `FixResult` struct only used by deleted AutoFix                       | Removed                                                        |
 
 ### Remaining Concerns (Not Broken, But Worth Watching)
 
@@ -188,53 +188,53 @@ Build clean. 121/121 tests pass. Race detector clean. `go vet` clean. Zero gopls
 
 ### Critical — Honesty & Publishing
 
-| #   | Task                                  | Effort | Impact                 |
-| --- | ------------------------------------- | ------ | ---------------------- |
-| 1   | Update README.md for post-cleanup API | 30min  | Docs match reality     |
-| 2   | Update CHANGELOG.md                   | 20min  | Historical accuracy    |
-| 3   | Tag `v0.1.0-alpha`                    | 5min   | API stability signal   |
-| 4   | Add GitHub Actions CI                 | 1h     | Automated quality gate |
+| # | Task                                  | Effort | Impact                 |
+| - | ------------------------------------- | ------ | ---------------------- |
+| 1 | Update README.md for post-cleanup API | 30min  | Docs match reality     |
+| 2 | Update CHANGELOG.md                   | 20min  | Historical accuracy    |
+| 3 | Tag `v0.1.0-alpha`                    | 5min   | API stability signal   |
+| 4 | Add GitHub Actions CI                 | 1h     | Automated quality gate |
 
 ### High — Test Coverage
 
-| #   | Task                                                  | Effort | Impact                             |
-| --- | ----------------------------------------------------- | ------ | ---------------------------------- |
-| 5   | Extract CommandRunner interface in diagnose           | 1h     | Makes rules mockable               |
-| 6   | Integration tests for GitRule (dirty repo, conflicts) | 1h     | GitRule only tested for clean repo |
-| 7   | Integration tests for PostgresRule (mock server)      | 1h     | PostgresRule TCP path untested     |
-| 8   | Integration tests for NetworkRule (DNS, TCP, timeout) | 1h     | NetworkRule Run path untested      |
-| 9   | FilesystemRule writability + permission tests         | 30min  | Permission paths untested          |
-| 10  | Add `RegisterTemplate` tests                          | 15min  | New API untested in tests          |
+| #  | Task                                                  | Effort | Impact                             |
+| -- | ----------------------------------------------------- | ------ | ---------------------------------- |
+| 5  | Extract CommandRunner interface in diagnose           | 1h     | Makes rules mockable               |
+| 6  | Integration tests for GitRule (dirty repo, conflicts) | 1h     | GitRule only tested for clean repo |
+| 7  | Integration tests for PostgresRule (mock server)      | 1h     | PostgresRule TCP path untested     |
+| 8  | Integration tests for NetworkRule (DNS, TCP, timeout) | 1h     | NetworkRule Run path untested      |
+| 9  | FilesystemRule writability + permission tests         | 30min  | Permission paths untested          |
+| 10 | Add `RegisterTemplate` tests                          | 15min  | New API untested in tests          |
 
 ### High — Ecosystem Integration
 
-| #   | Task                                           | Effort | Impact                |
-| --- | ---------------------------------------------- | ------ | --------------------- |
-| 11  | Migrate go-cqrs-lite to import go-error-family | 2h     | First real consumer   |
-| 12  | Add go-error-family to workspace go.work       | 15min  | Workspace integration |
-| 13  | Add ErrorCode/ErrorContext to go-finding       | 30min  | Second consumer       |
-| 14  | Add ErrorCode/ErrorContext to docs-organizer   | 30min  | Third consumer        |
+| #  | Task                                           | Effort | Impact                |
+| -- | ---------------------------------------------- | ------ | --------------------- |
+| 11 | Migrate go-cqrs-lite to import go-error-family | 2h     | First real consumer   |
+| 12 | Add go-error-family to workspace go.work       | 15min  | Workspace integration |
+| 13 | Add ErrorCode/ErrorContext to go-finding       | 30min  | Second consumer       |
+| 14 | Add ErrorCode/ErrorContext to docs-organizer   | 30min  | Third consumer        |
 
 ### Medium — Feature Completeness
 
-| #   | Task                                               | Effort | Impact                                |
-| --- | -------------------------------------------------- | ------ | ------------------------------------- |
-| 15  | Add `Mark(err, sentinel)` identity stamping        | 30min  | Alternative to RegisterClassification |
-| 16  | Wire AI agent to real provider                     | 3h     | Agent actually works                  |
-| 17  | Add `.golangci.yml`                                | 30min  | Consistent linting                    |
-| 18  | Add `flake.nix`                                    | 1h     | Ecosystem standard                    |
-| 19  | Write ADR-001: Family design                       | 30min  | Architecture documentation            |
-| 20  | Add `DiagnosticFunc` adapter for `diagnose.Runner` | 15min  | Bridge between packages               |
+| #  | Task                                               | Effort | Impact                                |
+| -- | -------------------------------------------------- | ------ | ------------------------------------- |
+| 15 | Add `Mark(err, sentinel)` identity stamping        | 30min  | Alternative to RegisterClassification |
+| 16 | Wire AI agent to real provider                     | 3h     | Agent actually works                  |
+| 17 | Add `.golangci.yml`                                | 30min  | Consistent linting                    |
+| 18 | Add `flake.nix`                                    | 1h     | Ecosystem standard                    |
+| 19 | Write ADR-001: Family design                       | 30min  | Architecture documentation            |
+| 20 | Add `DiagnosticFunc` adapter for `diagnose.Runner` | 15min  | Bridge between packages               |
 
 ### Lower — Polish
 
-| #   | Task                                                         | Effort | Impact                             |
-| --- | ------------------------------------------------------------ | ------ | ---------------------------------- |
-| 21  | Write examples/ directory                                    | 1h     | GoDoc integration                  |
-| 22  | Update planning docs (mark items resolved)                   | 15min  | Keep docs honest                   |
-| 23  | Benchmark Classify() performance                             | 30min  | Performance baseline               |
-| 24  | Add BDD tests with Ginkgo                                    | 2h     | Higher-level behavior verification |
-| 25  | Write ADR-002: Why template registry over substring matching | 20min  | Records the decision               |
+| #  | Task                                                         | Effort | Impact                             |
+| -- | ------------------------------------------------------------ | ------ | ---------------------------------- |
+| 21 | Write examples/ directory                                    | 1h     | GoDoc integration                  |
+| 22 | Update planning docs (mark items resolved)                   | 15min  | Keep docs honest                   |
+| 23 | Benchmark Classify() performance                             | 30min  | Performance baseline               |
+| 24 | Add BDD tests with Ginkgo                                    | 2h     | Higher-level behavior verification |
+| 25 | Write ADR-002: Why template registry over substring matching | 20min  | Records the decision               |
 
 ---
 

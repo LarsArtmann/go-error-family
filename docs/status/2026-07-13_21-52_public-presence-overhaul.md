@@ -134,58 +134,58 @@ Nothing is irreversibly broken. But there are real problems:
 
 ## F) Up to 50 Things to Get Done Next
 
-| #   | Task                                                                                              | Priority | Effort |
-| --- | ------------------------------------------------------------------------------------------------- | -------- | ------ |
-| 1   | Add `GOEXPERIMENT=jsonv2` warning to README installation section                                  | Critical | 2 min  |
-| 2   | Create Firebase hosting site: `firebase hosting:sites:create errorfamily --project lars-software` | Critical | 1 min  |
-| 3   | Deploy website: `cd website && nix run .#deploy`                                                  | Critical | 5 min  |
-| 4   | Add custom domain in Firebase console after deploy                                                | Critical | 2 min  |
-| 5   | Add `_acme-challenge.errorfamily` TXT record to Terraform after Firebase generates it             | Critical | 2 min  |
-| 6   | Run `terraform apply` in domains/ to make DNS live                                                | Critical | 2 min  |
-| 7   | Generate `flake.lock` in website/                                                                 | High     | 1 min  |
-| 8   | Commit `package-lock.json`                                                                        | High     | 1 min  |
-| 9   | Add CSP to astro.config.mjs + fix-csp.mjs post-build script                                       | High     | 30 min |
-| 10  | Add website build job to `.github/workflows/ci.yml`                                               | High     | 15 min |
-| 11  | Design a proper logo for go-error-family                                                          | High     | 1 hr   |
-| 12  | Add `astro-og-canvas` for OG image generation                                                     | Medium   | 30 min |
-| 13  | Add Bridge package guide page (oops integration)                                                  | Medium   | 30 min |
-| 14  | Add `errorfamilytest` guide page                                                                  | Medium   | 20 min |
-| 15  | Add Examples page with inline snippets                                                            | Medium   | 20 min |
-| 16  | Add `.buildflow.yml` for website                                                                  | Medium   | 5 min  |
-| 17  | Run html-validate as part of build                                                                | Medium   | 10 min |
-| 18  | Add `dependents.astro` page (GitHub Code Search importers)                                        | Low      | 30 min |
-| 19  | Add canonical URLs to doc pages                                                                   | Low      | 10 min |
-| 20  | Add `errors.lars.software` as a shorter domain alias                                              | Low      | 10 min |
-| 21  | Add a "Philosophy" page explaining the design decisions                                           | Low      | 30 min |
-| 22  | Add interactive error classifier playground (web-based)                                           | Low      | 2 hr   |
-| 23  | Add search analytics / Pagefind optimization                                                      | Low      | 15 min |
-| 24  | Add `errtrace` or `panic` integration guide                                                       | Low      | 20 min |
-| 25  | Add a migration guide for users coming from `pkg/errors` or `emperror`                            | Low      | 30 min |
-| 26  | Add performance comparison chart (visual, not just table)                                         | Low      | 30 min |
-| 27  | Add video/screencast embed on landing page                                                        | Low      | 1 hr   |
-| 28  | Add "Star History" widget to landing page                                                         | Low      | 15 min |
-| 29  | Add contributing guidelines for the website itself                                                | Low      | 10 min |
-| 30  | Add `llms.txt` for AI agent discoverability                                                       | Low      | 15 min |
-| 31  | Add multi-language i18n support (Starlight supports it)                                           | Low      | 2 hr   |
-| 32  | Add a blog section for release announcements                                                      | Low      | 30 min |
-| 33  | Add a "Why not X?" FAQ comparing to palantir/stacktrace, emperror, etc.                           | Low      | 30 min |
-| 34  | Add structured testing guide with `errorfamilytest` examples                                      | Low      | 20 min |
-| 35  | Add a decision flowchart for choosing the right Family                                            | Low      | 30 min |
-| 36  | Add badge for test coverage on landing page                                                       | Low      | 5 min  |
-| 37  | Add badge for latest release version                                                              | Low      | 5 min  |
-| 38  | Add GitHub Discussions link in Header/Footer                                                      | Low      | 5 min  |
-| 39  | Add "Sponsors" section if applicable                                                              | Low      | 5 min  |
-| 40  | Add a CLI tool reference page (if a CLI exists or is planned)                                     | Low      | 20 min |
-| 41  | Add retry pattern guide (backoff, jitter, circuit breaker integration)                            | Low      | 30 min |
-| 42  | Add partial success recipe guide                                                                  | Low      | 20 min |
-| 43  | Add structured logging deep-dive (slog integration patterns)                                      | Low      | 20 min |
-| 44  | Add gRPC interceptor guide                                                                        | Low      | 20 min |
-| 45  | Add GraphQL error handling guide                                                                  | Low      | 20 min |
-| 46  | Add middleware chain composition guide                                                            | Low      | 20 min |
-| 47  | Add a "Common Pitfalls" / "Gotchas" page                                                          | Low      | 20 min |
-| 48  | Add versioned docs (v0.7, v0.6, etc.)                                                             | Low      | 1 hr   |
-| 49  | Add RSS feed for changelog                                                                        | Low      | 15 min |
-| 50  | Add analytics (Plausible/Umami privacy-friendly)                                                  | Low      | 15 min |
+| #  | Task                                                                                              | Priority | Effort |
+| -- | ------------------------------------------------------------------------------------------------- | -------- | ------ |
+| 1  | Add `GOEXPERIMENT=jsonv2` warning to README installation section                                  | Critical | 2 min  |
+| 2  | Create Firebase hosting site: `firebase hosting:sites:create errorfamily --project lars-software` | Critical | 1 min  |
+| 3  | Deploy website: `cd website && nix run .#deploy`                                                  | Critical | 5 min  |
+| 4  | Add custom domain in Firebase console after deploy                                                | Critical | 2 min  |
+| 5  | Add `_acme-challenge.errorfamily` TXT record to Terraform after Firebase generates it             | Critical | 2 min  |
+| 6  | Run `terraform apply` in domains/ to make DNS live                                                | Critical | 2 min  |
+| 7  | Generate `flake.lock` in website/                                                                 | High     | 1 min  |
+| 8  | Commit `package-lock.json`                                                                        | High     | 1 min  |
+| 9  | Add CSP to astro.config.mjs + fix-csp.mjs post-build script                                       | High     | 30 min |
+| 10 | Add website build job to `.github/workflows/ci.yml`                                               | High     | 15 min |
+| 11 | Design a proper logo for go-error-family                                                          | High     | 1 hr   |
+| 12 | Add `astro-og-canvas` for OG image generation                                                     | Medium   | 30 min |
+| 13 | Add Bridge package guide page (oops integration)                                                  | Medium   | 30 min |
+| 14 | Add `errorfamilytest` guide page                                                                  | Medium   | 20 min |
+| 15 | Add Examples page with inline snippets                                                            | Medium   | 20 min |
+| 16 | Add `.buildflow.yml` for website                                                                  | Medium   | 5 min  |
+| 17 | Run html-validate as part of build                                                                | Medium   | 10 min |
+| 18 | Add `dependents.astro` page (GitHub Code Search importers)                                        | Low      | 30 min |
+| 19 | Add canonical URLs to doc pages                                                                   | Low      | 10 min |
+| 20 | Add `errors.lars.software` as a shorter domain alias                                              | Low      | 10 min |
+| 21 | Add a "Philosophy" page explaining the design decisions                                           | Low      | 30 min |
+| 22 | Add interactive error classifier playground (web-based)                                           | Low      | 2 hr   |
+| 23 | Add search analytics / Pagefind optimization                                                      | Low      | 15 min |
+| 24 | Add `errtrace` or `panic` integration guide                                                       | Low      | 20 min |
+| 25 | Add a migration guide for users coming from `pkg/errors` or `emperror`                            | Low      | 30 min |
+| 26 | Add performance comparison chart (visual, not just table)                                         | Low      | 30 min |
+| 27 | Add video/screencast embed on landing page                                                        | Low      | 1 hr   |
+| 28 | Add "Star History" widget to landing page                                                         | Low      | 15 min |
+| 29 | Add contributing guidelines for the website itself                                                | Low      | 10 min |
+| 30 | Add `llms.txt` for AI agent discoverability                                                       | Low      | 15 min |
+| 31 | Add multi-language i18n support (Starlight supports it)                                           | Low      | 2 hr   |
+| 32 | Add a blog section for release announcements                                                      | Low      | 30 min |
+| 33 | Add a "Why not X?" FAQ comparing to palantir/stacktrace, emperror, etc.                           | Low      | 30 min |
+| 34 | Add structured testing guide with `errorfamilytest` examples                                      | Low      | 20 min |
+| 35 | Add a decision flowchart for choosing the right Family                                            | Low      | 30 min |
+| 36 | Add badge for test coverage on landing page                                                       | Low      | 5 min  |
+| 37 | Add badge for latest release version                                                              | Low      | 5 min  |
+| 38 | Add GitHub Discussions link in Header/Footer                                                      | Low      | 5 min  |
+| 39 | Add "Sponsors" section if applicable                                                              | Low      | 5 min  |
+| 40 | Add a CLI tool reference page (if a CLI exists or is planned)                                     | Low      | 20 min |
+| 41 | Add retry pattern guide (backoff, jitter, circuit breaker integration)                            | Low      | 30 min |
+| 42 | Add partial success recipe guide                                                                  | Low      | 20 min |
+| 43 | Add structured logging deep-dive (slog integration patterns)                                      | Low      | 20 min |
+| 44 | Add gRPC interceptor guide                                                                        | Low      | 20 min |
+| 45 | Add GraphQL error handling guide                                                                  | Low      | 20 min |
+| 46 | Add middleware chain composition guide                                                            | Low      | 20 min |
+| 47 | Add a "Common Pitfalls" / "Gotchas" page                                                          | Low      | 20 min |
+| 48 | Add versioned docs (v0.7, v0.6, etc.)                                                             | Low      | 1 hr   |
+| 49 | Add RSS feed for changelog                                                                        | Low      | 15 min |
+| 50 | Add analytics (Plausible/Umami privacy-friendly)                                                  | Low      | 15 min |
 
 ---
 

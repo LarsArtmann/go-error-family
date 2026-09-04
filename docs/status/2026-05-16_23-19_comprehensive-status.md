@@ -205,53 +205,53 @@ These methods on `*Error` duplicate logic that exists as package-level helpers i
 
 ### Tier 1: Honesty (1% effort, 51% impact)
 
-| #   | Task                                                | Effort | Impact                                |
-| --- | --------------------------------------------------- | ------ | ------------------------------------- |
-| 1   | **Fix README — remove deleted API (agent section)** | 15min  | Prevents compile errors for new users |
-| 2   | **Fix README — update architecture listing**        | 10min  | Matches reality                       |
-| 3   | **Update CHANGELOG.md with real changes**           | 20min  | Honest project history                |
-| 4   | **Fix AGENTS.md coverage table (88.3% → 90.8%)**    | 2min   | Correct docs                          |
-| 5   | **Fix AGENTS.md template tier 4 reference**         | 2min   | Correct docs                          |
+| # | Task                                                | Effort | Impact                                |
+| - | --------------------------------------------------- | ------ | ------------------------------------- |
+| 1 | **Fix README — remove deleted API (agent section)** | 15min  | Prevents compile errors for new users |
+| 2 | **Fix README — update architecture listing**        | 10min  | Matches reality                       |
+| 3 | **Update CHANGELOG.md with real changes**           | 20min  | Honest project history                |
+| 4 | **Fix AGENTS.md coverage table (88.3% → 90.8%)**    | 2min   | Correct docs                          |
+| 5 | **Fix AGENTS.md template tier 4 reference**         | 2min   | Correct docs                          |
 
 ### Tier 2: Quality (4% effort, 64% impact)
 
-| #   | Task                                                                                              | Effort | Impact                            |
-| --- | ------------------------------------------------------------------------------------------------- | ------ | --------------------------------- |
-| 6   | **Add godoc examples** (`ExampleNewRejection`, `ExampleHandleError`, `ExampleClassify`)           | 1hr    | pkg.go.dev renders properly       |
-| 7   | **Improve diagnose test coverage** (Runner concurrent logic, matching helpers, resolveContextKey) | 2hr    | 59.5% → 75%+                      |
-| 8   | **Add fuzz tests** for `Classify`, `ParseFamily`, `applyContext`                                  | 1hr    | Catches panics on arbitrary input |
-| 9   | **Add benchmarks** for `Classify`, `HandleError`, `Error.Error`                                   | 1hr    | Performance profile for hot paths |
-| 10  | **Clean up `formatWhy` unused parameters**                                                        | 5min   | Remove code smell                 |
+| #  | Task                                                                                              | Effort | Impact                            |
+| -- | ------------------------------------------------------------------------------------------------- | ------ | --------------------------------- |
+| 6  | **Add godoc examples** (`ExampleNewRejection`, `ExampleHandleError`, `ExampleClassify`)           | 1hr    | pkg.go.dev renders properly       |
+| 7  | **Improve diagnose test coverage** (Runner concurrent logic, matching helpers, resolveContextKey) | 2hr    | 59.5% → 75%+                      |
+| 8  | **Add fuzz tests** for `Classify`, `ParseFamily`, `applyContext`                                  | 1hr    | Catches panics on arbitrary input |
+| 9  | **Add benchmarks** for `Classify`, `HandleError`, `Error.Error`                                   | 1hr    | Performance profile for hot paths |
+| 10 | **Clean up `formatWhy` unused parameters**                                                        | 5min   | Remove code smell                 |
 
 ### Tier 3: Infrastructure (20% effort, 80% impact)
 
-| #   | Task                                                                           | Effort | Impact                              |
-| --- | ------------------------------------------------------------------------------ | ------ | ----------------------------------- |
-| 11  | **Tag v0.1.0**                                                                 | 1min   | Consumers get a real version        |
-| 12  | **Add GitHub Actions CI** (test -race, go vet, build on 1.26)                  | 30min  | Automated quality gate              |
-| 13  | **Add `go test` integration tests** for diagnostic rules (temp dirs, git init) | 2hr    | Real coverage for rule logic        |
-| 14  | **Remove or wire `Error.MatchesContext` / `MatchesContextValue`**              | 30min  | Eliminate cross-package duplication |
-| 15  | **Add `go vet` and `staticcheck` to CI**                                       | 15min  | Catch issues automatically          |
+| #  | Task                                                                           | Effort | Impact                              |
+| -- | ------------------------------------------------------------------------------ | ------ | ----------------------------------- |
+| 11 | **Tag v0.1.0**                                                                 | 1min   | Consumers get a real version        |
+| 12 | **Add GitHub Actions CI** (test -race, go vet, build on 1.26)                  | 30min  | Automated quality gate              |
+| 13 | **Add `go test` integration tests** for diagnostic rules (temp dirs, git init) | 2hr    | Real coverage for rule logic        |
+| 14 | **Remove or wire `Error.MatchesContext` / `MatchesContextValue`**              | 30min  | Eliminate cross-package duplication |
+| 15 | **Add `go vet` and `staticcheck` to CI**                                       | 15min  | Catch issues automatically          |
 
 ### Tier 4: Polish
 
-| #   | Task                                                                                   | Effort | Impact                     |
-| --- | -------------------------------------------------------------------------------------- | ------ | -------------------------- |
-| 16  | **Review all exported symbols for naming quality**                                     | 1hr    | Professional API surface   |
-| 17  | **Add CONTRIBUTING.md**                                                                | 30min  | Community readiness        |
-| 18  | **Review godoc on all exported types/functions**                                       | 1hr    | Professional documentation |
-| 19  | **Add error chain diagram to README**                                                  | 30min  | Conceptual clarity         |
-| 20  | **Consider `HandleError` → `cli` subpackage** (mentioned in resolution plan, not done) | 2hr    | Separation of concerns     |
+| #  | Task                                                                                   | Effort | Impact                     |
+| -- | -------------------------------------------------------------------------------------- | ------ | -------------------------- |
+| 16 | **Review all exported symbols for naming quality**                                     | 1hr    | Professional API surface   |
+| 17 | **Add CONTRIBUTING.md**                                                                | 30min  | Community readiness        |
+| 18 | **Review godoc on all exported types/functions**                                       | 1hr    | Professional documentation |
+| 19 | **Add error chain diagram to README**                                                  | 30min  | Conceptual clarity         |
+| 20 | **Consider `HandleError` → `cli` subpackage** (mentioned in resolution plan, not done) | 2hr    | Separation of concerns     |
 
 ### Tier 5: Hardening
 
-| #   | Task                                                                                   | Effort | Impact                          |
-| --- | -------------------------------------------------------------------------------------- | ------ | ------------------------------- |
-| 21  | **Performance audit of `lookupRegistered` snapshot** (full map copy on every Classify) | 1hr    | Hot path optimization           |
-| 22  | **Add `Family.MarshalJSON` / `UnmarshalJSON`** for API serialization                   | 30min  | REST/gRPC friendliness          |
-| 23  | **Add `Error.MarshalJSON` / `UnmarshalJSON`**                                          | 30min  | Structured logging friendliness |
-| 24  | **Consider `errors.Join` support** for multi-error scenarios                           | 1hr    | Go 1.20+ compatibility          |
-| 25  | **Consider `context.Context` integration** for error propagation                       | 2hr    | Distributed tracing             |
+| #  | Task                                                                                   | Effort | Impact                          |
+| -- | -------------------------------------------------------------------------------------- | ------ | ------------------------------- |
+| 21 | **Performance audit of `lookupRegistered` snapshot** (full map copy on every Classify) | 1hr    | Hot path optimization           |
+| 22 | **Add `Family.MarshalJSON` / `UnmarshalJSON`** for API serialization                   | 30min  | REST/gRPC friendliness          |
+| 23 | **Add `Error.MarshalJSON` / `UnmarshalJSON`**                                          | 30min  | Structured logging friendliness |
+| 24 | **Consider `errors.Join` support** for multi-error scenarios                           | 1hr    | Go 1.20+ compatibility          |
+| 25 | **Consider `context.Context` integration** for error propagation                       | 2hr    | Distributed tracing             |
 
 ---
 

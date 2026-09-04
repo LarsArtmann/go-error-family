@@ -16,18 +16,18 @@
 
 ## a) FULLY DONE
 
-| #   | Item                                                                                           | Verification                                               |
-| --- | ---------------------------------------------------------------------------------------------- | ---------------------------------------------------------- |
-| 1   | Reverted `encoding/json/v2` → `encoding/json` in `error.go` and `http.go`                      | grep confirms zero `json/v2` refs remain in any `.go` file |
-| 2   | Reverted `json.MarshalWrite(w, body)` → `json.NewEncoder(w).Encode(body)` in `http.go`         | Source matches pre-migration state                         |
-| 3   | Preserved the libs update (`samber/oops` v1.22.0→v1.23.0, `golang.org/x/text` v0.39.0→v0.40.0) | Confirmed in `bridge/go.mod` diff                          |
-| 4   | Root module builds + tests pass                                                                | `go test ./...` green                                      |
-| 5   | Bridge module builds + tests pass                                                              | `go test ./...` in `bridge/` green                         |
-| 6   | All submodules tested (agent, diagnose, diagnose/git, diagnose/postgres, examples build)       | All green                                                  |
-| 7   | `golangci-lint run ./...` clean on root + bridge                                               | 0 issues each                                              |
-| 8   | `go work sync` ran cleanly                                                                     | exit 0                                                     |
-| 9   | Committed with descriptive message                                                             | `7336b94`                                                  |
-| 10  | BuildFlow pre-commit hook passed 30/30                                                         | Confirmed in commit output                                 |
+| #  | Item                                                                                           | Verification                                               |
+| -- | ---------------------------------------------------------------------------------------------- | ---------------------------------------------------------- |
+| 1  | Reverted `encoding/json/v2` → `encoding/json` in `error.go` and `http.go`                      | grep confirms zero `json/v2` refs remain in any `.go` file |
+| 2  | Reverted `json.MarshalWrite(w, body)` → `json.NewEncoder(w).Encode(body)` in `http.go`         | Source matches pre-migration state                         |
+| 3  | Preserved the libs update (`samber/oops` v1.22.0→v1.23.0, `golang.org/x/text` v0.39.0→v0.40.0) | Confirmed in `bridge/go.mod` diff                          |
+| 4  | Root module builds + tests pass                                                                | `go test ./...` green                                      |
+| 5  | Bridge module builds + tests pass                                                              | `go test ./...` in `bridge/` green                         |
+| 6  | All submodules tested (agent, diagnose, diagnose/git, diagnose/postgres, examples build)       | All green                                                  |
+| 7  | `golangci-lint run ./...` clean on root + bridge                                               | 0 issues each                                              |
+| 8  | `go work sync` ran cleanly                                                                     | exit 0                                                     |
+| 9  | Committed with descriptive message                                                             | `7336b94`                                                  |
+| 10 | BuildFlow pre-commit hook passed 30/30                                                         | Confirmed in commit output                                 |
 
 ---
 
@@ -39,10 +39,10 @@ Nothing. The task was small and binary (revert + commit).
 
 ## c) NOT STARTED
 
-| #   | Item                 | Why it matters                                                                                                                       |
-| --- | -------------------- | ------------------------------------------------------------------------------------------------------------------------------------ |
-| 1   | **Push to remote**   | Commit is local only. AGENTS.md says never push unless asked — so this is correctly deferred, but the user should know it's pending. |
-| 2   | **AGENTS.md update** | "Last Updated: 2026-07-05" — the dependency bump could warrant a one-line note, though this is minor and arguably out of scope.      |
+| # | Item                 | Why it matters                                                                                                                       |
+| - | -------------------- | ------------------------------------------------------------------------------------------------------------------------------------ |
+| 1 | **Push to remote**   | Commit is local only. AGENTS.md says never push unless asked — so this is correctly deferred, but the user should know it's pending. |
+| 2 | **AGENTS.md update** | "Last Updated: 2026-07-05" — the dependency bump could warrant a one-line note, though this is minor and arguably out of scope.      |
 
 ---
 

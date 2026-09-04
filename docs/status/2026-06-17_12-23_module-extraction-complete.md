@@ -70,16 +70,16 @@ The plan (`docs/planning/2026-06-17_11-51_module-extraction-and-polish.md`) has 
 
 ## c) NOT STARTED
 
-| #   | Task                                                   | Impact | Effort |
-| --- | ------------------------------------------------------ | ------ | ------ |
-| 9   | `Registry.Clone()` method                              | Medium | 20min  |
-| 10  | `Registry.RegisterTemplates()` batch                   | Low    | 15min  |
-| 11  | DRY `resolveSuggestedFix` / `renderCLI`                | Medium | 30min  |
-| 12  | Update README for new module structure                 | Medium | 30min  |
-| 13  | Update AGENTS.md build commands per module             | Medium | 20min  |
-| 14  | Update SKILL.md details (beyond architecture overview) | Low    | 20min  |
-| 16  | Check/update DOMAIN_LANGUAGE.md                        | Low    | 10min  |
-| 17  | Final full verification + release prep                 | Low    | 10min  |
+| #  | Task                                                   | Impact | Effort |
+| -- | ------------------------------------------------------ | ------ | ------ |
+| 9  | `Registry.Clone()` method                              | Medium | 20min  |
+| 10 | `Registry.RegisterTemplates()` batch                   | Low    | 15min  |
+| 11 | DRY `resolveSuggestedFix` / `renderCLI`                | Medium | 30min  |
+| 12 | Update README for new module structure                 | Medium | 30min  |
+| 13 | Update AGENTS.md build commands per module             | Medium | 20min  |
+| 14 | Update SKILL.md details (beyond architecture overview) | Low    | 20min  |
+| 16 | Check/update DOMAIN_LANGUAGE.md                        | Low    | 10min  |
+| 17 | Final full verification + release prep                 | Low    | 10min  |
 
 ---
 

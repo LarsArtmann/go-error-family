@@ -24,26 +24,26 @@ The prior session implemented 4 BuildFlow-inspired APIs (`ExitCoder`, `WrapOnce`
 
 ### Code Changes (this session)
 
-| #   | Change                                                                          | File                                                                                    | Status         |
-| --- | ------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------- | -------------- |
-| 1   | `formatVerbose` shows `exit_code` when non-zero                                 | `error.go:137-139`                                                                      | DONE, tested   |
-| 2   | `jsonError` documents why `exitCode` is excluded                                | `error.go:300-302`                                                                      | DONE           |
-| 3   | `WrapOncef` — formatted variant of `WrapOnce`                                   | `constructors.go:154-158`                                                               | DONE, tested   |
-| 4   | Split `buildflow_learnings_test.go` into 4 focused files                        | `wraponce_test.go`, `exitcode_test.go`, `context_any_test.go`, `panic_recovery_test.go` | DONE           |
-| 5   | `AssertExitCode(tb, err, want)` helper                                          | `errorfamilytest/errorfamilytest.go`                                                    | DONE, tested   |
-| 6   | 4 Example functions (WrapOnce, WithExitCode, WithContextAny, ExitCode)          | `example_test.go`                                                                       | DONE, verified |
-| 7   | 4 Benchmarks (WrapOnceWrap, WrapOnceIdempotent, WithExitCode, ExitCodeOverride) | `benchmark_test.go`                                                                     | DONE           |
+| # | Change                                                                          | File                                                                                    | Status         |
+| - | ------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------- | -------------- |
+| 1 | `formatVerbose` shows `exit_code` when non-zero                                 | `error.go:137-139`                                                                      | DONE, tested   |
+| 2 | `jsonError` documents why `exitCode` is excluded                                | `error.go:300-302`                                                                      | DONE           |
+| 3 | `WrapOncef` — formatted variant of `WrapOnce`                                   | `constructors.go:154-158`                                                               | DONE, tested   |
+| 4 | Split `buildflow_learnings_test.go` into 4 focused files                        | `wraponce_test.go`, `exitcode_test.go`, `context_any_test.go`, `panic_recovery_test.go` | DONE           |
+| 5 | `AssertExitCode(tb, err, want)` helper                                          | `errorfamilytest/errorfamilytest.go`                                                    | DONE, tested   |
+| 6 | 4 Example functions (WrapOnce, WithExitCode, WithContextAny, ExitCode)          | `example_test.go`                                                                       | DONE, verified |
+| 7 | 4 Benchmarks (WrapOnceWrap, WrapOnceIdempotent, WithExitCode, ExitCodeOverride) | `benchmark_test.go`                                                                     | DONE           |
 
 ### Documentation Updates (this session)
 
-| #   | File                                         | What changed                                                                           |
-| --- | -------------------------------------------- | -------------------------------------------------------------------------------------- |
-| 1   | `CHANGELOG.md`                               | v0.8.0 entry with all new APIs                                                         |
-| 2   | `SKILL.md`                                   | ExitCoder interface, WithExitCode, WithContextAny, WrapOnce/WrapOncef in API reference |
-| 3   | `README.md`                                  | Restored Go Report Card badge (was phantom-removed), added ExitCoder/WrapOnce/features |
-| 4   | `FEATURES.md`                                | New FULLY_FUNCTIONAL entries, verified date bumped to 0.8.0                            |
-| 5   | `website/src/content/docs/api-reference.mdx` | ExitCoder interface, WrapOnce/WrapOncef, ExitCode description                          |
-| 6   | `AGENTS.md`                                  | WrapOncef mention, AssertExitCode added to errorfamilytest list                        |
+| # | File                                         | What changed                                                                           |
+| - | -------------------------------------------- | -------------------------------------------------------------------------------------- |
+| 1 | `CHANGELOG.md`                               | v0.8.0 entry with all new APIs                                                         |
+| 2 | `SKILL.md`                                   | ExitCoder interface, WithExitCode, WithContextAny, WrapOnce/WrapOncef in API reference |
+| 3 | `README.md`                                  | Restored Go Report Card badge (was phantom-removed), added ExitCoder/WrapOnce/features |
+| 4 | `FEATURES.md`                                | New FULLY_FUNCTIONAL entries, verified date bumped to 0.8.0                            |
+| 5 | `website/src/content/docs/api-reference.mdx` | ExitCoder interface, WrapOnce/WrapOncef, ExitCode description                          |
+| 6 | `AGENTS.md`                                  | WrapOncef mention, AssertExitCode added to errorfamilytest list                        |
 
 ### Prior Session (commit `fa60334` — already committed)
 

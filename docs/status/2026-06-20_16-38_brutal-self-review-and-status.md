@@ -28,15 +28,15 @@ All 6 workspace modules pass `-race`; 0 lint; gofmt clean. That part is real. Th
 
 These met or exceeded the plan. No caveats.
 
-| #   | Item                                                | Evidence                                                                                                                                          |
-| --- | --------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------- |
-| 1   | **Zero-alloc atomic sentinel lookup**               | `lookupSentinel` measured: 51 sentinels `287 ns / 0 B / 0 allocs` (was `1330 ns / 1832 B / 3 allocs`). Permanent regression benchmark checked in. |
-| 2   | **Severity-ordered multi-error classification**     | `Family.Severity()` total order; order-independence test cases pass; fail-closed retry semantics preserved.                                       |
-| 3   | **DRY template resolution**                         | `resolveTemplate` shared helper; `renderCLI` and `resolveSuggestedFix` cannot diverge.                                                            |
-| 4   | **Registry.Clone + RegisterTemplates**              | Independence test proves mutation isolation; case-insensitive batch tested.                                                                       |
-| 5   | **`Compose` removal + CHANGELOG split brain fixed** | No callers; stdlib `errors.Join` is the documented path.                                                                                          |
-| 6   | **Fuzz for `{key}` templates**                      | 8s / 37k execs crash-free; initial invariant was wrong (nested braces), corrected to honest crash-safety check.                                   |
-| 7   | **MockCommandRunner coverage**                      | 75.3% → 82.7%; honest about remaining gaps being fragile `exec` wrappers.                                                                         |
+| # | Item                                                | Evidence                                                                                                                                          |
+| - | --------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------- |
+| 1 | **Zero-alloc atomic sentinel lookup**               | `lookupSentinel` measured: 51 sentinels `287 ns / 0 B / 0 allocs` (was `1330 ns / 1832 B / 3 allocs`). Permanent regression benchmark checked in. |
+| 2 | **Severity-ordered multi-error classification**     | `Family.Severity()` total order; order-independence test cases pass; fail-closed retry semantics preserved.                                       |
+| 3 | **DRY template resolution**                         | `resolveTemplate` shared helper; `renderCLI` and `resolveSuggestedFix` cannot diverge.                                                            |
+| 4 | **Registry.Clone + RegisterTemplates**              | Independence test proves mutation isolation; case-insensitive batch tested.                                                                       |
+| 5 | **`Compose` removal + CHANGELOG split brain fixed** | No callers; stdlib `errors.Join` is the documented path.                                                                                          |
+| 6 | **Fuzz for `{key}` templates**                      | 8s / 37k execs crash-free; initial invariant was wrong (nested braces), corrected to honest crash-safety check.                                   |
+| 7 | **MockCommandRunner coverage**                      | 75.3% → 82.7%; honest about remaining gaps being fragile `exec` wrappers.                                                                         |
 
 ---
 
@@ -128,17 +128,17 @@ No `Backoff(attempt int) time.Duration` method, no jitter guidance, no "next del
 
 Carried over from the original plan as "decision-gated" or deprioritized. Listing for completeness.
 
-| #   | Item                                                              | Why not started                                           |
-| --- | ----------------------------------------------------------------- | --------------------------------------------------------- |
-| 1   | Rename `agent` package (RCA / Synthesizer / DiagnosticAnalyzer)   | User explicitly deferred for design discussion.           |
-| 2   | Tag root module v1.0                                              | User: "ignore version numbers".                           |
-| 3   | Publish root version deleting `agent/` and `diagnose/` dirs       | Depends on #2.                                            |
-| 4   | Remove replace-directive chain                                    | Depends on #3.                                            |
-| 5   | `errors.Join` pre-classifying wrapper returning `(error, Family)` | Marked YAGNI in plan.                                     |
-| 6   | i18n hook for `familyData` messages                               | No current consumer.                                      |
-| 7   | Shorter import alias (`errfam`)                                   | Cosmetic, breaking.                                       |
-| 8   | Lower Go 1.26 requirement (the `errors.AsType` dep)               | I flagged this CONTRA, then silently accepted it. See d2. |
-| 9   | CONTRIBUTING.md section on the Registry pattern                   | Skipped.                                                  |
+| # | Item                                                              | Why not started                                           |
+| - | ----------------------------------------------------------------- | --------------------------------------------------------- |
+| 1 | Rename `agent` package (RCA / Synthesizer / DiagnosticAnalyzer)   | User explicitly deferred for design discussion.           |
+| 2 | Tag root module v1.0                                              | User: "ignore version numbers".                           |
+| 3 | Publish root version deleting `agent/` and `diagnose/` dirs       | Depends on #2.                                            |
+| 4 | Remove replace-directive chain                                    | Depends on #3.                                            |
+| 5 | `errors.Join` pre-classifying wrapper returning `(error, Family)` | Marked YAGNI in plan.                                     |
+| 6 | i18n hook for `familyData` messages                               | No current consumer.                                      |
+| 7 | Shorter import alias (`errfam`)                                   | Cosmetic, breaking.                                       |
+| 8 | Lower Go 1.26 requirement (the `errors.AsType` dep)               | I flagged this CONTRA, then silently accepted it. See d2. |
+| 9 | CONTRIBUTING.md section on the Registry pattern                   | Skipped.                                                  |
 
 ---
 
@@ -267,33 +267,33 @@ Structured by theme, not priority (priority is section f).
 
 Sorted by **impact ÷ effort** (high impact / low effort first). "Impact" here means: correctness > architecture > ergonomics > docs.
 
-| #   | Task                                                                                                 | Theme           | Impact (1-5) | Effort (h) | Ratio |
-| --- | ---------------------------------------------------------------------------------------------------- | --------------- | :----------: | :--------: | :---: |
-| 1   | **Add `Rationale` to `Fix` triple** (restore dropped field)                                          | Type model      |      5       |    0.5     | 10.0  |
-| 2   | **`Severity(invalid) → MaxInt`** (fail-closed multi-error)                                           | Correctness     |      5       |    0.3     | 16.7  |
-| 3   | **`Registry.Clone()` consistent snapshot** (one lock)                                                | Correctness     |      4       |    0.5     |  8.0  |
-| 4   | **`Classify(nil)` redesign** — return zero Family or panic, document loudly                          | Honesty         |      5       |    1.0     |  5.0  |
-| 5   | **Delete `TestExtractCommand_REMOVED` tombstone**                                                    | Cleanup         |      1       |    0.1     | 10.0  |
-| 6   | **`Error.JSON()` consistent omitempty**                                                              | Polish          |      2       |    0.2     | 10.0  |
-| 7   | **`Family.RetryPolicy().Backoff(attempt)`** method                                                   | Type model      |      3       |    0.5     |  6.0  |
-| 8   | **Bridge composition example** (oops → bridge → classify, end-to-end)                                | Architecture    |      4       |    1.0     |  4.0  |
-| 9   | **slog helper `SlogAttr(err)`**                                                                      | Composition     |      3       |    0.5     |  6.0  |
-| 10  | **HTTP helper `WriteFamilyError(w, err)`** promoted to library                                       | Composition     |      4       |    1.0     |  4.0  |
-| 11  | **OTel helper `SetSpanAttributes(span, err)`**                                                       | Composition     |      3       |    0.5     |  6.0  |
-| 12  | **`Family` as `string` not `int`** (breaking, but right)                                             | Type model      |      5       |    2.0     |  2.5  |
-| 13  | **Lower Go requirement to 1.21** (drop `errors.AsType`)                                              | Reach           |      4       |    1.5     |  2.7  |
-| 14  | **Test asserting severity ordering rationale** (document _why_ in code)                              | Honesty         |      3       |    0.5     |  6.0  |
-| 15  | **Add `Abort` family for `context.Canceled`** (or document collapse rule)                            | Taxonomy        |      4       |    1.5     |  2.7  |
-| 16  | **`RegisterStdlibDefaults` return cleanup func**                                                     | API hygiene     |      2       |    0.3     |  6.7  |
-| 17  | **Remaining godoc examples** (WithContextMap, Clone, RegisterStdlibDefaults, RetryPolicy)            | Discoverability |      2       |    0.5     |  4.0  |
-| 18  | **Audit `HTTPStatus()` mappings** — is 503 right for Infrastructure? Document the retry implication. | Honesty         |      2       |    0.5     |  4.0  |
-| 19  | **`Error.Is` semantics documented in error.go** (not just AGENTS.md)                                 | Docs            |      1       |    0.2     |  5.0  |
-| 20  | **Document `failsafe-go` / `avast/retry-go` integration** instead of building a loop                 | Composition     |      3       |    1.0     |  3.0  |
-| 21  | **CONTRIBUTING.md: Registry pattern section**                                                        | Docs            |      1       |    0.5     |  2.0  |
-| 22  | **Migrate docs/status & docs/planning to docs/archive/**                                             | Cleanup         |      1       |    0.5     |  2.0  |
-| 23  | **Add `Auth` family OR `IsAuthError(err)` helper**                                                   | Taxonomy        |      3       |    1.0     |  3.0  |
-| 24  | **Decide: is Corruption really worse than Infrastructure?** Write the ADR.                           | Honesty         |      2       |    0.5     |  4.0  |
-| 25  | **Rename `agent` → RCA/Synthesizer** (decision-gated, but ripe)                                      | Architecture    |      3       |    1.0     |  3.0  |
+| #  | Task                                                                                                 | Theme           | Impact (1-5) | Effort (h) | Ratio |
+| -- | ---------------------------------------------------------------------------------------------------- | --------------- | :----------: | :--------: | :---: |
+| 1  | **Add `Rationale` to `Fix` triple** (restore dropped field)                                          | Type model      |      5       |    0.5     | 10.0  |
+| 2  | **`Severity(invalid) → MaxInt`** (fail-closed multi-error)                                           | Correctness     |      5       |    0.3     | 16.7  |
+| 3  | **`Registry.Clone()` consistent snapshot** (one lock)                                                | Correctness     |      4       |    0.5     |  8.0  |
+| 4  | **`Classify(nil)` redesign** — return zero Family or panic, document loudly                          | Honesty         |      5       |    1.0     |  5.0  |
+| 5  | **Delete `TestExtractCommand_REMOVED` tombstone**                                                    | Cleanup         |      1       |    0.1     | 10.0  |
+| 6  | **`Error.JSON()` consistent omitempty**                                                              | Polish          |      2       |    0.2     | 10.0  |
+| 7  | **`Family.RetryPolicy().Backoff(attempt)`** method                                                   | Type model      |      3       |    0.5     |  6.0  |
+| 8  | **Bridge composition example** (oops → bridge → classify, end-to-end)                                | Architecture    |      4       |    1.0     |  4.0  |
+| 9  | **slog helper `SlogAttr(err)`**                                                                      | Composition     |      3       |    0.5     |  6.0  |
+| 10 | **HTTP helper `WriteFamilyError(w, err)`** promoted to library                                       | Composition     |      4       |    1.0     |  4.0  |
+| 11 | **OTel helper `SetSpanAttributes(span, err)`**                                                       | Composition     |      3       |    0.5     |  6.0  |
+| 12 | **`Family` as `string` not `int`** (breaking, but right)                                             | Type model      |      5       |    2.0     |  2.5  |
+| 13 | **Lower Go requirement to 1.21** (drop `errors.AsType`)                                              | Reach           |      4       |    1.5     |  2.7  |
+| 14 | **Test asserting severity ordering rationale** (document _why_ in code)                              | Honesty         |      3       |    0.5     |  6.0  |
+| 15 | **Add `Abort` family for `context.Canceled`** (or document collapse rule)                            | Taxonomy        |      4       |    1.5     |  2.7  |
+| 16 | **`RegisterStdlibDefaults` return cleanup func**                                                     | API hygiene     |      2       |    0.3     |  6.7  |
+| 17 | **Remaining godoc examples** (WithContextMap, Clone, RegisterStdlibDefaults, RetryPolicy)            | Discoverability |      2       |    0.5     |  4.0  |
+| 18 | **Audit `HTTPStatus()` mappings** — is 503 right for Infrastructure? Document the retry implication. | Honesty         |      2       |    0.5     |  4.0  |
+| 19 | **`Error.Is` semantics documented in error.go** (not just AGENTS.md)                                 | Docs            |      1       |    0.2     |  5.0  |
+| 20 | **Document `failsafe-go` / `avast/retry-go` integration** instead of building a loop                 | Composition     |      3       |    1.0     |  3.0  |
+| 21 | **CONTRIBUTING.md: Registry pattern section**                                                        | Docs            |      1       |    0.5     |  2.0  |
+| 22 | **Migrate docs/status & docs/planning to docs/archive/**                                             | Cleanup         |      1       |    0.5     |  2.0  |
+| 23 | **Add `Auth` family OR `IsAuthError(err)` helper**                                                   | Taxonomy        |      3       |    1.0     |  3.0  |
+| 24 | **Decide: is Corruption really worse than Infrastructure?** Write the ADR.                           | Honesty         |      2       |    0.5     |  4.0  |
+| 25 | **Rename `agent` → RCA/Synthesizer** (decision-gated, but ripe)                                      | Architecture    |      3       |    1.0     |  3.0  |
 
 **The 80/20:** tasks 1-6 deliver the correctness fixes and the cheapest cleanups. ~2.6 hours total for tasks that materially improve the library's honesty. Do those first.
 

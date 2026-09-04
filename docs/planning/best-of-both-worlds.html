@@ -790,9 +790,11 @@
             <div class="doc-id">PLN-2026-INT-001 · Integration Blueprint</div>
             <h1>Best of<br /><span>Both Worlds</span></h1>
             <p class="lead">
-              A three-phase integration plan for combining <strong>go-error-family</strong>'s
-              behavioral classification with <strong>samber/oops</strong>'s context enrichment. One
-              owns <em>what happened</em>. The other owns <em>what to do about it</em>.
+              A three-phase integration plan for combining
+              <strong>go-error-family</strong>'s behavioral classification with
+              <strong>samber/oops</strong>'s context enrichment. One owns
+              <em>what happened</em>. The other owns
+              <em>what to do about it</em>.
             </p>
           </div>
           <div class="header-meta">
@@ -810,41 +812,44 @@
         <div class="section-label">Foundations</div>
         <h2>Design Axioms</h2>
         <p style="color: var(--muted); max-width: 600px; margin-bottom: 2rem">
-          These constraints shape every decision below. Violating any axiom weakens the integration.
+          These constraints shape every decision below. Violating any axiom
+          weakens the integration.
         </p>
         <div class="principle-grid">
           <div class="principle-card teal">
             <div class="icon">Axiom 01</div>
             <h4>Thin Bridge, Never a Fork</h4>
             <p>
-              The integration layer is an adapter — a few dozen lines that connect interfaces. Never
-              embed, never fork, never vendor. Both libraries update independently.
+              The integration layer is an adapter — a few dozen lines that
+              connect interfaces. Never embed, never fork, never vendor. Both
+              libraries update independently.
             </p>
           </div>
           <div class="principle-card red">
             <div class="icon">Axiom 02</div>
             <h4>Own Different Things</h4>
             <p>
-              Oops owns <em>context</em> (what happened, where, who, when). Error-family owns
-              <em>behavior</em> (retry? exit? whose fault?). No overlap, no ambiguity about who owns
-              what.
+              Oops owns <em>context</em> (what happened, where, who, when).
+              Error-family owns <em>behavior</em> (retry? exit? whose fault?).
+              No overlap, no ambiguity about who owns what.
             </p>
           </div>
           <div class="principle-card blue">
             <div class="icon">Axiom 03</div>
             <h4>Interface, Not Inheritance</h4>
             <p>
-              Go composition over inheritance. The bridge uses interfaces both libraries already
-              expose. No shared base type, no type coupling. Either library can be swapped without
-              the other noticing.
+              Go composition over inheritance. The bridge uses interfaces both
+              libraries already expose. No shared base type, no type coupling.
+              Either library can be swapped without the other noticing.
             </p>
           </div>
           <div class="principle-card amber">
             <div class="icon">Axiom 04</div>
             <h4>Both Optional, Either First</h4>
             <p>
-              Use error-family alone. Use oops alone. Use both. The integration is additive — it
-              never requires both to function, and it never degrades either when used solo.
+              Use error-family alone. Use oops alone. Use both. The integration
+              is additive — it never requires both to function, and it never
+              degrades either when used solo.
             </p>
           </div>
         </div>
@@ -863,14 +868,17 @@
               <span class="phase-tag today">Ship Today · ~30 lines</span>
               <h3>ClassifiedOops — A Thin Wrapper</h3>
               <p class="subtitle">
-                Make OopsError satisfy error-family's Classified and Retryable interfaces.
+                Make OopsError satisfy error-family's Classified and Retryable
+                interfaces.
               </p>
               <p>
-                The simplest possible integration: a wrapper struct that carries an
-                <code>OopsError</code> and a <code>Family</code>. It delegates <code>Error()</code>,
-                <code>Unwrap()</code>, and <code>ErrorContext()</code> to oops while exposing
-                <code>ErrorFamily()</code> and <code>IsRetryable()</code> for error-family's
-                classification cascade.
+                The simplest possible integration: a wrapper struct that carries
+                an
+                <code>OopsError</code> and a <code>Family</code>. It delegates
+                <code>Error()</code>, <code>Unwrap()</code>, and
+                <code>ErrorContext()</code> to oops while exposing
+                <code>ErrorFamily()</code> and <code>IsRetryable()</code> for
+                error-family's classification cascade.
               </p>
             </div>
           </div>
@@ -920,9 +928,10 @@
           <span class="annotation-icon">Note</span>
           <p>
             <code>Classify()</code> checks the <code>Classified</code> interface
-            <strong>before</strong> the <code>Retryable</code> interface in its cascade (step 2 vs
-            step 3). This means <code>ClassifiedOops</code>
-            is picked up immediately — no sentinel registration needed, no ambiguity.
+            <strong>before</strong> the <code>Retryable</code> interface in its
+            cascade (step 2 vs step 3). This means <code>ClassifiedOops</code>
+            is picked up immediately — no sentinel registration needed, no
+            ambiguity.
           </p>
         </div>
 
@@ -930,7 +939,9 @@
           <div class="code-bar">
             <span class="code-dot r"></span><span class="code-dot y"></span
             ><span class="code-dot g"></span>
-            <span class="code-filename">usage.go — CLI boundary with both libraries</span>
+            <span class="code-filename"
+              >usage.go — CLI boundary with both libraries</span
+            >
           </div>
           <pre><span class="cm">// Enrich with oops</span>
 rich := oops.<span class="fn">In</span>(<span class="str">"database"</span>).
@@ -963,14 +974,15 @@ classified.<span class="fn">Trace</span>()                    <span class="cm">/
               <span class="phase-tag next">Next Iteration · ~80 lines</span>
               <h3>Derive Family from Oops Metadata</h3>
               <p class="subtitle">
-                Replace manual family assignment with inference from oops' domain, tags, and
-                context.
+                Replace manual family assignment with inference from oops'
+                domain, tags, and context.
               </p>
               <p>
-                Instead of hard-coding <code>errorfamily.Transient</code> at every call site, build
-                a classification function that reads oops' structured metadata — domain, tags, error
-                codes, hints — and derives the family. This makes the mapping centralized, testable,
-                and evolveable without touching call sites.
+                Instead of hard-coding <code>errorfamily.Transient</code> at
+                every call site, build a classification function that reads
+                oops' structured metadata — domain, tags, error codes, hints —
+                and derives the family. This makes the mapping centralized,
+                testable, and evolveable without touching call sites.
               </p>
             </div>
           </div>
@@ -980,7 +992,9 @@ classified.<span class="fn">Trace</span>()                    <span class="cm">/
           <div class="code-bar">
             <span class="code-dot r"></span><span class="code-dot y"></span
             ><span class="code-dot g"></span>
-            <span class="code-filename">classify.go — Infer family from oops metadata</span>
+            <span class="code-filename"
+              >classify.go — Infer family from oops metadata</span
+            >
           </div>
           <pre><span class="kw">package</span> bridge
 
@@ -1018,9 +1032,11 @@ classified.<span class="fn">Trace</span>()                    <span class="cm">/
         <div class="annotation">
           <span class="annotation-icon">Note</span>
           <p>
-            The inference cascade mirrors error-family's own: explicit → structural → default. Tags
-            are the most intentional signal (developer chose them), domain is structural, and the
-            default is <code>Transient</code> — consistent with error-family's fail-open philosophy.
+            The inference cascade mirrors error-family's own: explicit →
+            structural → default. Tags are the most intentional signal
+            (developer chose them), domain is structural, and the default is
+            <code>Transient</code> — consistent with error-family's fail-open
+            philosophy.
           </p>
         </div>
 
@@ -1030,7 +1046,10 @@ classified.<span class="fn">Trace</span>()                    <span class="cm">/
             <h4>Domain → Family Defaults</h4>
             <ul>
               <li><code>validation</code>, <code>auth</code> → Rejection</li>
-              <li><code>database</code>, <code>network</code>, <code>cache</code> → Transient</li>
+              <li>
+                <code>database</code>, <code>network</code>,
+                <code>cache</code> → Transient
+              </li>
               <li><code>storage</code>, <code>infra</code> → Infrastructure</li>
               <li><code>data</code>, <code>schema</code> → Corruption</li>
               <li><em>anything else</em> → Transient (fail-open)</li>
@@ -1041,9 +1060,16 @@ classified.<span class="fn">Trace</span>()                    <span class="cm">/
             <h4>Tag-Based Override</h4>
             <ul>
               <li>Tags are developer-intentional — checked first</li>
-              <li>Any oops tag matching a family name overrides the domain default</li>
-              <li><code>.Tags("retryable")</code> forces Transient regardless of domain</li>
-              <li>Zero-cost when unused — no tags means pure domain inference</li>
+              <li>
+                Any oops tag matching a family name overrides the domain default
+              </li>
+              <li>
+                <code>.Tags("retryable")</code> forces Transient regardless of
+                domain
+              </li>
+              <li>
+                Zero-cost when unused — no tags means pure domain inference
+              </li>
             </ul>
           </div>
         </div>
@@ -1059,17 +1085,22 @@ classified.<span class="fn">Trace</span>()                    <span class="cm">/
           <div class="phase">
             <div class="phase-marker l3">L3</div>
             <div class="phase-body">
-              <span class="phase-tag vision">Ecosystem Vision · ~200 lines</span>
+              <span class="phase-tag vision"
+                >Ecosystem Vision · ~200 lines</span
+              >
               <h3>The Handle Package — Orchestrate Both</h3>
               <p class="subtitle">
-                A single entry point that enriches, classifies, diagnoses, analyzes, and emits.
+                A single entry point that enriches, classifies, diagnoses,
+                analyzes, and emits.
               </p>
               <p>
-                The architectural sweet spot. A <code>handle</code> package that sits at the program
-                boundary — <code>main()</code>, HTTP middleware, gRPC interceptor — and orchestrates
-                all five steps in sequence. Each step is optional. Each step uses the best tool for
-                its job. The result: one function call that produces a complete error response with
-                behavioral decisions, forensic context, diagnostic findings, and structured logging.
+                The architectural sweet spot. A <code>handle</code> package that
+                sits at the program boundary — <code>main()</code>, HTTP
+                middleware, gRPC interceptor — and orchestrates all five steps
+                in sequence. Each step is optional. Each step uses the best tool
+                for its job. The result: one function call that produces a
+                complete error response with behavioral decisions, forensic
+                context, diagnostic findings, and structured logging.
               </p>
             </div>
           </div>
@@ -1235,66 +1266,80 @@ classified.<span class="fn">Trace</span>()                    <span class="cm">/
           </thead>
           <tbody>
             <tr>
-              <td><span class="tag dont">Don't</span> Fork oops into error-family</td>
               <td>
-                Different authors, release cadences, and audiences. Forking creates a maintenance
-                monster that drifts from both upstreams.
+                <span class="tag dont">Don't</span> Fork oops into error-family
+              </td>
+              <td>
+                Different authors, release cadences, and audiences. Forking
+                creates a maintenance monster that drifts from both upstreams.
               </td>
               <td>Keep them separate. Connect via a thin bridge package.</td>
             </tr>
             <tr>
-              <td><span class="tag dont">Don't</span> Build a unified error type</td>
               <td>
-                A mega-struct with all fields from both libraries is the worst of both worlds:
-                bloated, opinionated, and impossible to evolve.
+                <span class="tag dont">Don't</span> Build a unified error type
               </td>
               <td>
-                Use composition. OopsError carries context, Error carries family. Bridge via
-                interface.
-              </td>
-            </tr>
-            <tr>
-              <td><span class="tag dont">Don't</span> Couple at the type level</td>
-              <td>
-                If error-family imports oops (or vice versa), you can't use one without the other.
-                Zero-optional becomes zero-mandatory.
+                A mega-struct with all fields from both libraries is the worst
+                of both worlds: bloated, opinionated, and impossible to evolve.
               </td>
               <td>
-                The bridge package is the only place that imports both. Everything else imports one
-                or the other.
+                Use composition. OopsError carries context, Error carries
+                family. Bridge via interface.
               </td>
             </tr>
             <tr>
-              <td><span class="tag dont">Don't</span> Duplicate context in both</td>
               <td>
-                Setting <code>WithContext("host", "db1")</code> on both oops and error-family is
-                redundant and creates sync bugs.
+                <span class="tag dont">Don't</span> Couple at the type level
               </td>
               <td>
-                Oops owns context. Error-family reads it via the bridge. Single source of truth.
+                If error-family imports oops (or vice versa), you can't use one
+                without the other. Zero-optional becomes zero-mandatory.
+              </td>
+              <td>
+                The bridge package is the only place that imports both.
+                Everything else imports one or the other.
               </td>
             </tr>
             <tr>
-              <td><span class="tag dont">Don't</span> Use oops for retry decisions</td>
+              <td>
+                <span class="tag dont">Don't</span> Duplicate context in both
+              </td>
+              <td>
+                Setting <code>WithContext("host", "db1")</code> on both oops and
+                error-family is redundant and creates sync bugs.
+              </td>
+              <td>
+                Oops owns context. Error-family reads it via the bridge. Single
+                source of truth.
+              </td>
+            </tr>
+            <tr>
+              <td>
+                <span class="tag dont">Don't</span> Use oops for retry decisions
+              </td>
               <td>
                 Oops has no classification model. Tag-checking
-                <code>if hasTag("retryable")</code> is ad-hoc and doesn't compose with third-party
-                errors.
+                <code>if hasTag("retryable")</code> is ad-hoc and doesn't
+                compose with third-party errors.
               </td>
               <td>
-                Use <code>errorfamily.Classify()</code> — it handles multi-error, sentinels,
-                interfaces, and defaults.
+                Use <code>errorfamily.Classify()</code> — it handles
+                multi-error, sentinels, interfaces, and defaults.
               </td>
             </tr>
             <tr>
-              <td><span class="tag maybe">Consider</span> Bridge as separate module</td>
               <td>
-                If the bridge gains weight, it becomes a coupling point. But for ~30–200 lines, a
-                sub-package is fine.
+                <span class="tag maybe">Consider</span> Bridge as separate
+                module
               </td>
               <td>
-                Start as <code>bridge/</code> in your app. Extract to a library only if multiple
-                services need it.
+                If the bridge gains weight, it becomes a coupling point. But for
+                ~30–200 lines, a sub-package is fine.
+              </td>
+              <td>
+                Start as <code>bridge/</code> in your app. Extract to a library
+                only if multiple services need it.
               </td>
             </tr>
           </tbody>
@@ -1309,7 +1354,9 @@ classified.<span class="fn">Trace</span>()                    <span class="cm">/
 
         <div class="two-col">
           <div class="col-card">
-            <div class="card-label" style="color: var(--teal)">samber/oops owns</div>
+            <div class="card-label" style="color: var(--teal)">
+              samber/oops owns
+            </div>
             <h4>Context &amp; Observability</h4>
             <ul>
               <li>Stack traces and source code fragments</li>
@@ -1325,7 +1372,9 @@ classified.<span class="fn">Trace</span>()                    <span class="cm">/
             </ul>
           </div>
           <div class="col-card">
-            <div class="card-label" style="color: var(--accent)">go-error-family owns</div>
+            <div class="card-label" style="color: var(--accent)">
+              go-error-family owns
+            </div>
             <h4>Behavior &amp; Decisions</h4>
             <ul>
               <li>Error family classification</li>
@@ -1345,10 +1394,11 @@ classified.<span class="fn">Trace</span>()                    <span class="cm">/
         <div class="annotation">
           <span class="annotation-icon">Bridge</span>
           <p>
-            The bridge package owns <strong>one thing</strong>: mapping between the two domains.
-            <code>InferFamily()</code> converts oops metadata → error-family classification.
-            <code>ClassifiedOops</code> satisfies error-family interfaces using oops data. That's
-            the entire contract. No more, no less.
+            The bridge package owns <strong>one thing</strong>: mapping between
+            the two domains. <code>InferFamily()</code> converts oops metadata →
+            error-family classification. <code>ClassifiedOops</code> satisfies
+            error-family interfaces using oops data. That's the entire contract.
+            No more, no less.
           </p>
         </div>
       </section>
@@ -1371,19 +1421,27 @@ classified.<span class="fn">Trace</span>()                    <span class="cm">/
           <tbody>
             <tr>
               <td><strong>1</strong></td>
-              <td>Create <code>bridge/</code> package with <code>ClassifiedOops</code> wrapper</td>
+              <td>
+                Create <code>bridge/</code> package with
+                <code>ClassifiedOops</code> wrapper
+              </td>
               <td>~30</td>
               <td>Both libraries imported</td>
             </tr>
             <tr>
               <td><strong>2</strong></td>
-              <td>Write tests: Classify(ClassifiedOops) returns correct family</td>
+              <td>
+                Write tests: Classify(ClassifiedOops) returns correct family
+              </td>
               <td>~50</td>
               <td>Step 1</td>
             </tr>
             <tr>
               <td><strong>3</strong></td>
-              <td>Add <code>InferFamily()</code> with domain → family mapping table</td>
+              <td>
+                Add <code>InferFamily()</code> with domain → family mapping
+                table
+              </td>
               <td>~40</td>
               <td>Step 1</td>
             </tr>
@@ -1449,7 +1507,9 @@ classified.<span class="fn">Trace</span>()                    <span class="cm">/
             <strong>Connects both</strong>
           </div>
         </div>
-        <div class="footer-bottom">Integration Blueprint · PLN-2026-INT-001 · 2026-06-05</div>
+        <div class="footer-bottom">
+          Integration Blueprint · PLN-2026-INT-001 · 2026-06-05
+        </div>
       </footer>
     </div>
   </body>

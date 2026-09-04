@@ -80,7 +80,7 @@
 ## C) NOT STARTED
 
 1. **`Compose` doc fix** — comment claims it returns "worst Family" but it just calls `errors.Join`
-2. **`extractCommand` in agent** — looks for `$ ` and `Run: ` prefixes but no rule produces those formats. `FixStep.Command` is always empty in practice
+2. **`extractCommand` in agent** — looks for `$` and `Run:` prefixes but no rule produces those formats. `FixStep.Command` is always empty in practice
 3. **`NetworkRule.resolveHost`** — naive URL parsing breaks on IPv6, user:pass@host, query strings
 4. **Test pollution cleanup** — global registries mutated in tests without `t.Cleanup`
 5. **Family-specific format constructors** — `NewRejectionf`, `WrapTransientf` etc. missing
@@ -99,7 +99,7 @@
 
 ### 2. `extractCommand` Never Works
 
-`agent/agent.go:151-162` — Searches for `$ ` and `Run: ` prefixes in `SuggestedFix`. But ALL diagnostic rules produce suggestions like `"Start PostgreSQL:\n  brew services start postgresql"`. None use `$ ` or `Run: `. So `FixStep.Command` is always `""`. This is a dead feature that looks like it works.
+`agent/agent.go:151-162` — Searches for `$` and `Run:` prefixes in `SuggestedFix`. But ALL diagnostic rules produce suggestions like `"Start PostgreSQL:\n  brew services start postgresql"`. None use `$` or `Run:`. So `FixStep.Command` is always `""`. This is a dead feature that looks like it works.
 
 ### 3. Test Registry Pollution
 
@@ -151,33 +151,33 @@
 
 Sorted by impact × effort (highest first):
 
-| #   | Task                                                                 | Impact   | Effort | Category     |
-| --- | -------------------------------------------------------------------- | -------- | ------ | ------------ |
-| 1   | Fix `Compose` doc comment (it's a lie)                               | Critical | 2min   | Bug          |
-| 2   | Fix `extractCommand` to match actual fix formats                     | Critical | 10min  | Bug          |
-| 3   | Add `t.Cleanup()` for test registry pollution                        | High     | 15min  | Bug          |
-| 4   | Fix `FilesystemRule.suggestCreate` file/dir detection                | High     | 10min  | Bug          |
-| 5   | Fix `NetworkRule.resolveHost` with `net/url.Parse`                   | Medium   | 15min  | Bug          |
-| 6   | Use `net.Dialer` + `DialContext` in NetworkRule                      | Medium   | 10min  | Bug          |
-| 7   | Rename `diagnose/context.go` → `diagnose/command.go`                 | Low      | 1min   | Cleanup      |
-| 8   | Deduplicate mock runners to shared helper                            | Low      | 20min  | Cleanup      |
-| 9   | Use `diagnose.KeyGit` in git spec instead of raw string              | Low      | 2min   | Cleanup      |
-| 10  | Add missing `ContextKey` constants for postgres_port, PGHOST, PGPORT | Low      | 5min   | Feature      |
-| 11  | Use ContextKey constants in PostgresRule.resolvePort                 | Low      | 5min   | Cleanup      |
-| 12  | Update SKILL.md for v0.3.0 APIs                                      | High     | 30min  | Docs         |
-| 13  | Remove dead `var _ = fmt.Sprintf` from postgres tests                | Low      | 1min   | Cleanup      |
-| 14  | Add `Runner.Run` context cancellation enforcement                    | Medium   | 20min  | Feature      |
-| 15  | Add concurrent safety tests for registries                           | Medium   | 15min  | Test         |
-| 16  | Add `applyContext` unit tests                                        | Low      | 10min  | Test         |
-| 17  | Add family-specific format constructors                              | Low      | 15min  | Feature      |
-| 18  | Consolidate `DiagnosticFinding` vs `DiagnosticResult` types          | High     | 60min  | Architecture |
-| 19  | Consider renaming `DebugAgent` → `Agent` interface                   | Low      | 10min  | API          |
-| 20  | Remove unused `IsPostgresRunning` or add real tests                  | Low      | 10min  | Cleanup      |
-| 21  | Add `HandleErrorWithContext` direct tests                            | Medium   | 10min  | Test         |
-| 22  | Add `Error.Is` tests through wrapped error chains                    | Low      | 5min   | Test         |
-| 23  | Add godoc examples for diagnose package helpers                      | Low      | 20min  | Docs         |
-| 24  | Consider removing `KeyDirectory` alias (just use `KeyDir`)           | Low      | 5min   | Cleanup      |
-| 25  | Remove unused `KeyRepoPath` or document why it exists                | Low      | 5min   | Cleanup      |
+| #  | Task                                                                 | Impact   | Effort | Category     |
+| -- | -------------------------------------------------------------------- | -------- | ------ | ------------ |
+| 1  | Fix `Compose` doc comment (it's a lie)                               | Critical | 2min   | Bug          |
+| 2  | Fix `extractCommand` to match actual fix formats                     | Critical | 10min  | Bug          |
+| 3  | Add `t.Cleanup()` for test registry pollution                        | High     | 15min  | Bug          |
+| 4  | Fix `FilesystemRule.suggestCreate` file/dir detection                | High     | 10min  | Bug          |
+| 5  | Fix `NetworkRule.resolveHost` with `net/url.Parse`                   | Medium   | 15min  | Bug          |
+| 6  | Use `net.Dialer` + `DialContext` in NetworkRule                      | Medium   | 10min  | Bug          |
+| 7  | Rename `diagnose/context.go` → `diagnose/command.go`                 | Low      | 1min   | Cleanup      |
+| 8  | Deduplicate mock runners to shared helper                            | Low      | 20min  | Cleanup      |
+| 9  | Use `diagnose.KeyGit` in git spec instead of raw string              | Low      | 2min   | Cleanup      |
+| 10 | Add missing `ContextKey` constants for postgres_port, PGHOST, PGPORT | Low      | 5min   | Feature      |
+| 11 | Use ContextKey constants in PostgresRule.resolvePort                 | Low      | 5min   | Cleanup      |
+| 12 | Update SKILL.md for v0.3.0 APIs                                      | High     | 30min  | Docs         |
+| 13 | Remove dead `var _ = fmt.Sprintf` from postgres tests                | Low      | 1min   | Cleanup      |
+| 14 | Add `Runner.Run` context cancellation enforcement                    | Medium   | 20min  | Feature      |
+| 15 | Add concurrent safety tests for registries                           | Medium   | 15min  | Test         |
+| 16 | Add `applyContext` unit tests                                        | Low      | 10min  | Test         |
+| 17 | Add family-specific format constructors                              | Low      | 15min  | Feature      |
+| 18 | Consolidate `DiagnosticFinding` vs `DiagnosticResult` types          | High     | 60min  | Architecture |
+| 19 | Consider renaming `DebugAgent` → `Agent` interface                   | Low      | 10min  | API          |
+| 20 | Remove unused `IsPostgresRunning` or add real tests                  | Low      | 10min  | Cleanup      |
+| 21 | Add `HandleErrorWithContext` direct tests                            | Medium   | 10min  | Test         |
+| 22 | Add `Error.Is` tests through wrapped error chains                    | Low      | 5min   | Test         |
+| 23 | Add godoc examples for diagnose package helpers                      | Low      | 20min  | Docs         |
+| 24 | Consider removing `KeyDirectory` alias (just use `KeyDir`)           | Low      | 5min   | Cleanup      |
+| 25 | Remove unused `KeyRepoPath` or document why it exists                | Low      | 5min   | Cleanup      |
 
 ---
 

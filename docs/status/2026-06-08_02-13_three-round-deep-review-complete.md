@@ -64,18 +64,18 @@
 
 ## C) NOT STARTED ⬜
 
-| #   | Item                                                                              | Effort  | Impact                                                        |
-| --- | --------------------------------------------------------------------------------- | ------- | ------------------------------------------------------------- |
-| 1   | Add `result` to `.gitignore` and remove from tracking                             | Trivial | Low (cosmetic)                                                |
-| 2   | `ParseFamily` could use a map instead of iterating `familyData`                   | Small   | Low (5 entries, nanosecond difference)                        |
-| 3   | `ClassifiedError` pointer-embed `oops.OopsError` instead of value-embed           | Medium  | Medium (defensive but API-breaking)                           |
-| 4   | `agent.Config.Enabled` → return error instead of synthetic result                 | Small   | Medium (breaking change)                                      |
-| 5   | `applyContext` HTML-safe variant for HTTP consumers                               | Small   | Low (CLI is the primary use case)                             |
-| 6   | `Tone.IsValid()` — `Tone` is a string type, no validation possible without switch | N/A     | N/A (string types can't have range validation like int enums) |
-| 7   | Comprehensive integration tests for diagnostic rules (real system calls)          | Large   | Medium                                                        |
-| 8   | `examples/cmd/http` test using `httptest`                                         | Medium  | Low (example code)                                            |
-| 9   | Benchmarks for bridge submodule (only basic ones exist)                           | Small   | Low                                                           |
-| 10  | `diagnose/git` and `diagnose/postgres` `//nolint:gochecknoglobals` on rule specs  | Trivial | Low (lint compliance for submodules)                          |
+| #  | Item                                                                              | Effort  | Impact                                                        |
+| -- | --------------------------------------------------------------------------------- | ------- | ------------------------------------------------------------- |
+| 1  | Add `result` to `.gitignore` and remove from tracking                             | Trivial | Low (cosmetic)                                                |
+| 2  | `ParseFamily` could use a map instead of iterating `familyData`                   | Small   | Low (5 entries, nanosecond difference)                        |
+| 3  | `ClassifiedError` pointer-embed `oops.OopsError` instead of value-embed           | Medium  | Medium (defensive but API-breaking)                           |
+| 4  | `agent.Config.Enabled` → return error instead of synthetic result                 | Small   | Medium (breaking change)                                      |
+| 5  | `applyContext` HTML-safe variant for HTTP consumers                               | Small   | Low (CLI is the primary use case)                             |
+| 6  | `Tone.IsValid()` — `Tone` is a string type, no validation possible without switch | N/A     | N/A (string types can't have range validation like int enums) |
+| 7  | Comprehensive integration tests for diagnostic rules (real system calls)          | Large   | Medium                                                        |
+| 8  | `examples/cmd/http` test using `httptest`                                         | Medium  | Low (example code)                                            |
+| 9  | Benchmarks for bridge submodule (only basic ones exist)                           | Small   | Low                                                           |
+| 10 | `diagnose/git` and `diagnose/postgres` `//nolint:gochecknoglobals` on rule specs  | Trivial | Low (lint compliance for submodules)                          |
 
 ---
 
@@ -123,48 +123,48 @@ Sorted by impact × effort (Pareto order):
 
 ### Tier 1: High Impact, Low Effort (do immediately)
 
-| #   | Task                                                       | Why                                                 | Effort |
-| --- | ---------------------------------------------------------- | --------------------------------------------------- | ------ |
-| 1   | Add `result` to `.gitignore` and `git rm --cached result`  | Every commit triggers `go-structure-linter` warning | 1 min  |
-| 2   | Add `go build ./examples/...` to CI workflow               | Catch example breakage automatically                | 2 min  |
-| 3   | Add `//nolint:gochecknoglobals` to git/postgres rule specs | Submodule lint consistency                          | 2 min  |
-| 4   | Tag v0.4.0 release                                         | 8 commits of improvements since v0.3.0              | 2 min  |
-| 5   | Add `go test -coverprofile` to CI with 70% threshold       | Coverage regression protection                      | 5 min  |
+| # | Task                                                       | Why                                                 | Effort |
+| - | ---------------------------------------------------------- | --------------------------------------------------- | ------ |
+| 1 | Add `result` to `.gitignore` and `git rm --cached result`  | Every commit triggers `go-structure-linter` warning | 1 min  |
+| 2 | Add `go build ./examples/...` to CI workflow               | Catch example breakage automatically                | 2 min  |
+| 3 | Add `//nolint:gochecknoglobals` to git/postgres rule specs | Submodule lint consistency                          | 2 min  |
+| 4 | Tag v0.4.0 release                                         | 8 commits of improvements since v0.3.0              | 2 min  |
+| 5 | Add `go test -coverprofile` to CI with 70% threshold       | Coverage regression protection                      | 5 min  |
 
 ### Tier 2: High Impact, Medium Effort (do this week)
 
-| #   | Task                                                          | Why                                      | Effort |
-| --- | ------------------------------------------------------------- | ---------------------------------------- | ------ |
-| 6   | Write integration tests for `FilesystemRule` (temp dir)       | Close the 66.8% → 85%+ gap               | 30 min |
-| 7   | Write integration tests for `NetworkRule` (localhost DNS)     | Network rule coverage                    | 30 min |
-| 8   | Add `TestExamplesCompile` that runs `go build ./examples/...` | Prevent example rot                      | 10 min |
-| 9   | Deprecate or document `Compose` with clear rationale          | Consumers might wonder why it exists     | 5 min  |
-| 10  | Add `ExampleHandleErrorDetailed()` to example_test.go         | The detailed handler has no example      | 10 min |
-| 11  | Add `ExampleHandleErrorWithContext()`                         | Context-accepting variant has no example | 10 min |
-| 12  | Add `ExampleRegisterClassification()`                         | Sentinel registration has no example     | 10 min |
+| #  | Task                                                          | Why                                      | Effort |
+| -- | ------------------------------------------------------------- | ---------------------------------------- | ------ |
+| 6  | Write integration tests for `FilesystemRule` (temp dir)       | Close the 66.8% → 85%+ gap               | 30 min |
+| 7  | Write integration tests for `NetworkRule` (localhost DNS)     | Network rule coverage                    | 30 min |
+| 8  | Add `TestExamplesCompile` that runs `go build ./examples/...` | Prevent example rot                      | 10 min |
+| 9  | Deprecate or document `Compose` with clear rationale          | Consumers might wonder why it exists     | 5 min  |
+| 10 | Add `ExampleHandleErrorDetailed()` to example_test.go         | The detailed handler has no example      | 10 min |
+| 11 | Add `ExampleHandleErrorWithContext()`                         | Context-accepting variant has no example | 10 min |
+| 12 | Add `ExampleRegisterClassification()`                         | Sentinel registration has no example     | 10 min |
 
 ### Tier 3: Medium Impact, Medium Effort (do this month)
 
-| #   | Task                                                                        | Why                                                                             | Effort               |
-| --- | --------------------------------------------------------------------------- | ------------------------------------------------------------------------------- | -------------------- |
-| 13  | Add `httptest`-based test for HTTP example                                  | Validate the HTTP integration pattern works                                     | 30 min               |
-| 14  | Add bridge benchmarks for `Wrap`, `InferFamily`, `AutoWrap`, `ErrorContext` | Already exist — verify coverage                                                 | 0 min (already done) |
-| 15  | Consider `errors.Join` multi-error support in `HandleErrorWithContext`      | Currently Classify handles it but HandleError doesn't surface individual errors | 1 hr                 |
-| 16  | Add `Family.UnmarshalText` / `MarshalText` for YAML/JSON config             | Enable configuration-driven family selection                                    | 30 min               |
-| 17  | Add `DiagnosticResult.Duration` to `HandleResult` (CLI output)              | Duration is collected but not surfaced in handle output                         | 15 min               |
-| 18  | Write a `CONTRIBUTING.md` update with new `//nolint` convention             | Contributors need to know the pattern                                           | 15 min               |
-| 19  | Add `go vet` to CI (if not already via golangci-lint)                       | Defense in depth                                                                | 2 min                |
+| #  | Task                                                                        | Why                                                                             | Effort               |
+| -- | --------------------------------------------------------------------------- | ------------------------------------------------------------------------------- | -------------------- |
+| 13 | Add `httptest`-based test for HTTP example                                  | Validate the HTTP integration pattern works                                     | 30 min               |
+| 14 | Add bridge benchmarks for `Wrap`, `InferFamily`, `AutoWrap`, `ErrorContext` | Already exist — verify coverage                                                 | 0 min (already done) |
+| 15 | Consider `errors.Join` multi-error support in `HandleErrorWithContext`      | Currently Classify handles it but HandleError doesn't surface individual errors | 1 hr                 |
+| 16 | Add `Family.UnmarshalText` / `MarshalText` for YAML/JSON config             | Enable configuration-driven family selection                                    | 30 min               |
+| 17 | Add `DiagnosticResult.Duration` to `HandleResult` (CLI output)              | Duration is collected but not surfaced in handle output                         | 15 min               |
+| 18 | Write a `CONTRIBUTING.md` update with new `//nolint` convention             | Contributors need to know the pattern                                           | 15 min               |
+| 19 | Add `go vet` to CI (if not already via golangci-lint)                       | Defense in depth                                                                | 2 min                |
 
 ### Tier 4: Strategic / Architectural (plan carefully)
 
-| #   | Task                                                            | Why                                             | Effort           |
-| --- | --------------------------------------------------------------- | ----------------------------------------------- | ---------------- |
-| 20  | Evaluate `ClassifiedError` pointer-embed `*oops.OopsError`      | More defensive, but API-breaking                | 2 hr + migration |
-| 21  | Evaluate `agent.Config.Enabled` → return error pattern          | Eliminates silent synthetic result footgun      | 1 hr + migration |
-| 22  | Add `ParseAudience` function (mirrors `ParseFamily`)            | Currently no way to parse audience from string  | 15 min           |
-| 23  | Add `ParseStatus` function (mirrors `ParseFamily`)              | Currently no way to parse status from string    | 15 min           |
-| 24  | Consider `Tone` as int-based enum (like Family/Status/Audience) | String-based Tone can't have `IsValid()`        | 30 min           |
-| 25  | Add `Family.UnmarshalJSON` for REST API consumers               | Enable JSON request/response with Family fields | 30 min           |
+| #  | Task                                                            | Why                                             | Effort           |
+| -- | --------------------------------------------------------------- | ----------------------------------------------- | ---------------- |
+| 20 | Evaluate `ClassifiedError` pointer-embed `*oops.OopsError`      | More defensive, but API-breaking                | 2 hr + migration |
+| 21 | Evaluate `agent.Config.Enabled` → return error pattern          | Eliminates silent synthetic result footgun      | 1 hr + migration |
+| 22 | Add `ParseAudience` function (mirrors `ParseFamily`)            | Currently no way to parse audience from string  | 15 min           |
+| 23 | Add `ParseStatus` function (mirrors `ParseFamily`)              | Currently no way to parse status from string    | 15 min           |
+| 24 | Consider `Tone` as int-based enum (like Family/Status/Audience) | String-based Tone can't have `IsValid()`        | 30 min           |
+| 25 | Add `Family.UnmarshalJSON` for REST API consumers               | Enable JSON request/response with Family fields | 30 min           |
 
 ---
 
