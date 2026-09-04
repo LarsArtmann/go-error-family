@@ -25,18 +25,25 @@ jobs:
     steps:
       - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
 
+      - name: Enable pnpm via corepack
+        run: |
+          mkdir -p "$HOME/.local/bin"
+          corepack enable --install-directory "$HOME/.local/bin"
+          corepack prepare pnpm@11.20.0 --activate
+          echo "$HOME/.local/bin" >> "$GITHUB_PATH"
+
       - name: Set up Node.js
         uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4
         with:
           node-version-file: "website/.node-version"
           cache: pnpm
-          cache-dependency-path: website/package-lock.json
+          cache-dependency-path: website/pnpm-lock.yaml
 
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
 
       - name: Type check
-        run: pnpm dlx astro check
+        run: pnpm exec astro check
 
       - name: Build
         run: pnpm run build
