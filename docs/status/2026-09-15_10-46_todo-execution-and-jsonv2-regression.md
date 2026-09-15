@@ -117,3 +117,9 @@ Executed all three Medium-Priority items from the active TODO list: added exampl
 ---
 
 _Point-in-time snapshot. Verify claims against the repo before acting on them. WAITING FOR INSTRUCTIONS._
+
+---
+
+## CORRECTION (2026-09-15 ~11:00)
+
+Sections a.7 and c.2 claimed the ACME TXT record for `errorfamily.lars.software` was externally blocked (placeholder Namecheap API key). **Verified false ~11:00 same day:** a read-only `nix run .#plan` in `/home/lars/projects/domains` succeeds (credentials + IP accepted), shows **no pending diff for `lars.software`**, and `dig TXT _acme-challenge.errorfamily.lars.software` answers authoritatively. The record was committed 2026-07-23 04:40 (`domains` repo, `12a4efc`) and applied at some point after the 05:07 status report was written. The TODO item was stale; removed from TODO_LIST.md. Remaining real problems in the domains repo: the perpetual `larsartmann.com` primary-MX plan diff (silent `setHosts` drop, needs panel inspection — domains TODO_LIST 2026-09-08) and missing Namecheap GitHub secrets for CI plans.

@@ -10,10 +10,6 @@ traceable to its source. When an item ships, remove it here and record it in
 
 ## Active
 
-### Low Priority
-
-- [ ] **Apply ACME TXT DNS record** — staged in Terraform but not applied (Namecheap API key is a placeholder). The HTTP challenge works now, but DNS-based verification is more robust for cert renewals. Source: status report 2026-07-23_05-07 section b.1. **Blocked externally:** requires a real Namecheap API key and IP whitelisting in the `domains` repo (`domains/lars.software.tf`); manual step.
-
 ---
 
 ## Design Decisions Resolved (2026-07-23)
