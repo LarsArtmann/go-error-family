@@ -1,7 +1,7 @@
 package errorfamily
 
 import (
-	"encoding/json"
+	"encoding/json/v2"
 	"fmt"
 	"maps"
 	"strconv"
@@ -117,7 +117,7 @@ func (e *Error) Cause() error {
 func (e *Error) Format(f fmt.State, verb rune) {
 	switch verb {
 	case 's':
-		_, _ = fmt.Fprint(
+		_, _ = fmt.Fprint( //nolint:legacyerrors // fmt.State write errors cannot be propagated (fmt.Formatter has no error return)
 			f,
 			e.message,
 		)
