@@ -25,7 +25,7 @@ const (
 //   - Exit codes: "Which exit code for the shell?" (maps to BSD sysexits.h)
 //   - Presentation: "Whose fault is it?" (determines tone and framing in user messages)
 //
-
+//nolint:recvcheck // UnmarshalText must use pointer receiver per encoding.TextUnmarshaler contract.
 type Family int
 
 const (
@@ -279,7 +279,7 @@ func (f Family) DefaultFix() string {
 
 // Audience describes who should be notified about this error.
 //
-
+//nolint:recvcheck // UnmarshalText must use pointer receiver per encoding.TextUnmarshaler contract.
 type Audience int
 
 const (
