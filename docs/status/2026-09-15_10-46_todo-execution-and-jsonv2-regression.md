@@ -23,7 +23,7 @@ Executed all three Medium-Priority items from the active TODO list: added exampl
 
 ## b) PARTIALLY DONE
 
-1. **The new CI steps are proven locally, not in CI** — the commands were run exactly as CI will run them, but the actual workflow hasn't executed on GitHub yet. And due to c.1 (json/v2), the first CI run on master would fail in the *pre-existing* workspace/GOWORK=off steps regardless of my additions.
+1. **The new CI steps are proven locally, not in CI** — the commands were run exactly as CI will run them, but the actual workflow hasn't executed on GitHub yet. And due to c.1 (json/v2), the first CI run on master would fail in the _pre-existing_ workspace/GOWORK=off steps regardless of my additions.
 2. **Examples lint verified with a different binary than CI pins** — local golangci-lint is v2.13.2; CI pins v2.12.2. High confidence (config unchanged, other modules pass on both), but not the exact pinned binary.
 3. **pnpm-lock.yaml rewrite not diff-audited** — the TS 6 pin triggered a 1518-line lockfile rewrite (mostly deletions). Build + check are green after, but I did not attribute every removed resolution variant (TS 7 peer-variant cleanup vs pnpm normalization). Future lockfile diffs will be noisier to read.
 4. **Git history quality — daemon interleaving** — the auto-commit daemon swept my four content files into commit 8bc15f2 together with 11 files from the concurrent session (error.go, http.go, README, SKILL.md, flake.lock, tests…), then committed my doc/lockfile changes separately (52cdfc8). My content is committed and correct, but the commits tell no story and mix two sessions' authorship. Same failure mode the 10:29 session reported for itself — now repeated with two concurrent sessions.
@@ -49,13 +49,13 @@ Executed all three Medium-Priority items from the active TODO list: added exampl
 - **CI-parity verification as a reflex** — before declaring any build/test green, run it with local env overrides unset (`GOEXPERIMENT= go build ./...`). This machine's global `GOEXPERIMENT=jsonv2` turned every local check into a different environment than CI. This is now a documented gotcha class, not a one-off.
 - **Session-start situational awareness** — `git status` + `git log -3` + newest `docs/status/*` at the start of every session in this repo. Two sessions in one tree on the same day is real here; daemon interleaving garbles history and authorship unless detected early.
 - **Per-task explicit commits when authorized** — second consecutive session ending with interleaved "auto-commit (heuristic)" history. The daemon is fine as a safety net, but meaningful work needs explicit commits the moment each task verifies green.
-- **Documented invocation paths first** — check AGENTS.md for *how* to run a toolchain (nix develop, pnpm, flake apps) before improvising with system binaries.
+- **Documented invocation paths first** — check AGENTS.md for _how_ to run a toolchain (nix develop, pnpm, flake apps) before improvising with system binaries.
 - **State behavioral tradeoffs in the change record** — CI step replacements, dependency pins, and lockfile rewrites deserve one honest sentence about cost, not just benefit.
 - **HEADLINE CLAIMS STILL LIE** — AGENTS.md's "0 lint issues" status line remains false (17 error-severity BuildFlow findings per the 10:29 session's report) and my session didn't fix it because it's that session's declared P0 and requires the findings-gate decision. Point-in-time claims need a refresh cadence or a removal.
 
 ## f) Up to 50 things we should get done next
 
-*A brainstorm sorted by impact, not a commitment list. Items 1–5 are P0; most of 20+ are ROADMAP fuel for docs-health HARVEST routing. Inherited items (from the concurrent 10:29 session's report) are marked (inh).*
+_A brainstorm sorted by impact, not a commitment list. Items 1–5 are P0; most of 20+ are ROADMAP fuel for docs-health HARVEST routing. Inherited items (from the concurrent 10:29 session's report) are marked (inh)._
 
 1. **Resolve the json/v2 regression on master** — user decision: revert `error.go`/`http.go` imports to `encoding/json`, or re-adopt with `GOEXPERIMENT=jsonv2` wired through ci.yml, release.yml, flake.nix + AGENTS.md reversal entry. Everything else in Go-CI waits on this.
 2. **Add a CI-parity canary** — a CI step (or BuildFlow check) that builds with env overrides explicitly unset, so an env-masked breakage like this one can never reach master green again.
