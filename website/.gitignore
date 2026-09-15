@@ -20,3 +20,6 @@ Thumbs.db
 
 # Bun (CI uses npm)
 bun.lock
+
+# Tailwind CLI output artifacts
+*.out.css
