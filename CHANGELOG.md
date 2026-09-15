@@ -8,6 +8,21 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ### Added
 
+- Nothing yet.
+
+### Fixed
+
+- Nothing yet.
+
+## [0.10.1] - 2026-09-15
+
+Documentation, CI-reliability, and error-handling-hardening release. **No
+public API changes** — every Go diff in the root module is comments or lint
+directives. The conditional-request classification guidance (issue #5), the
+json/v2 incident resolution, and the erraudit cleanup land here.
+
+### Added
+
 - **CI: examples module test and lint steps** — the `test` job now runs `go test -race -count=1 ./...` in `./examples` (19 bridge-reference tests + checkout tests), and the `lint` job runs golangci-lint there, matching every other workspace module. Replaces the old examples `go build` step (`go test` compiles everything it tests).
 - **Website: Bridge Patterns guide** (`guides/bridge`) — the classify→enrich→handle walkthrough: libraries classify, applications enrich; the three patterns (pass-through, `AutoWrap`, explicit `Wrap`), the oops tag/domain inference cascade, the one-error-two-representations table, and the decision guide. Linked from the sidebar and from `related-tools`.
 - **Documentation: conditional-request classification guidance** (README, website HTTP guide, SKILL.md) — how to handle RFC 9110 §13 conditional-request outcomes: **304 Not Modified** is a success path (write the response and return `nil`; never classify it — every family implies 4xx/5xx plus retry/exit semantics), **412 Precondition Failed** is `Conflict` + `WithHTTPStatus(412)` (client-asserted state no longer holds = version mismatch), **428 Precondition Required** (RFC 6585 §3) is `Rejection` + `WithHTTPStatus(428)` (omitted required precondition = incomplete input, not a state clash), and **416 Range Not Satisfiable** is `Rejection` + `WithHTTPStatus(416)`. Includes a compiled, tested example (`Example_conditionalRequests`). Resolves #5.
@@ -20,9 +35,22 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 - **Root module re-reverted to `encoding/json`** — a fleet-wide `buildflow --fix` orchestrator run invoked `go-auto-upgrade`, whose `jsonv1tov2` migrator rewrote `encoding/json` → `encoding/json/v2` in `error.go`/`http.go` (+ tests and `examples/cmd/bridge`). The rewrite compiled locally only because this machine exports `GOEXPERIMENT=jsonv2` globally; the hermetic nix derivations (`checks.x86_64-linux.build`, `build-standalone`) and CI failed to compile. Restored the documented v0.8.0 no-experiment policy; `json.MarshalWrite` became `json.NewEncoder(w).Encode`.
 - **All 36 erraudit findings resolved across 6 modules** — real error handling added in `diagnose/git` (`git status`/`remote`/`ls-remote` failures now surface as `StatusUnknown` with the run error instead of being conflated with exit codes; `git remote` failure no longer misdiagnoses as "no remotes: healthy"), `diagnose/postgres` (`pg_isready` run errors recorded in Details; `IsPostgresRunning` returns false on run error), `diagnose/command.go` migrated `errors.As` → `errors.AsType[*exec.ExitError]`, and `examples/cmd/http` now attaches `WithContext("id", userID)` on the missing-id and db-timeout paths (the not-found path already did) and fails loudly on `ListenAndServe` error. Deliberate unpropagatable writes (fmt.State formatting, best-effort CLI output, post-status HTTP body writes, reachability-probe `Close`) carry `//nolint:legacyerrors` with per-site reasons.
-- **Website: `astro check` broken by TypeScript 7** — a dependency bump moved the website to `typescript ^7.0.2`, whose native compiler no longer exposes the programmatic API `astro check` (`@astrojs/language-server`) relies on, failing the `website-deploy` workflow's check step on every run. Pinned back to `^6.0.0` (resolves 6.0.3) per the upstream guidance to stay on 6.x until Astro supports the native compiler; `astro check` is green again (0 errors/warnings/hints).
+- **Website: `astro check` broken by TypeScript 7** — a dependency bump moved the website to `typescript ^7.0.2`, whose native compiler no longer exposes the programmatic API `astro check` (`@astrojs/language-server`) relies on, failing the `website-deploy` workflow's check step on every run. Pinned back to `^6.0.0` (resolves 6.0.3) per the upstream guidance to stay on 6.x until Astro supports the native compiler; `astro check` is green again (0 errors/warnings/hints). The same fleet `buildflow --fix` pass that re-introduced `encoding/json/v2` also re-bumped `package.json` to `typescript ^7.0.2` (and `@astrojs/starlight` to `^0.42.1`) while the lockfile stayed at 6.0.3/0.42.0, so `pnpm install --frozen-lockfile` failed in `website-deploy` with a manifest/lockfile mismatch. Reverted both to the lockfile state and re-verified `astro check` + `astro build` (15 pages).
 - **Workspace build: stale `go.work.sum` checksum for `diagnose v0.2.2`** — the recorded `go.mod` checksum no longer matched the tag's bits (tag was re-pointed after the sum was recorded; `GOPRIVATE` skips sumdb verification, so the drift surfaced as a SECURITY ERROR on every workspace build). Removed the stale line; `go build ./...` re-resolves via the workspace `use` directive.
 - **Website: stray compiled Tailwind artifact** — `website/src/styles/global.out.css` (build output, referenced nowhere) was accidentally committed; removed and `*.out.css` added to `website/.gitignore`.
+- **CI lint version split-brain (golangci-lint v2.12.2 → v2.13.2)** — CI's pinned v2.12.2 fired `recvcheck` on `Family` and `Audience` (mixed value/pointer receivers — the pointer receiver on `UnmarshalText` is required by the `encoding.TextUnmarshaler` contract), while local/BuildFlow v2.13.2 no longer flags the pattern at all. The interim `//nolint:recvcheck` directives could not satisfy both: they sat on the line before the reported finding (no suppression in v2.12.2) and were "unused" under v2.13.2 (a `nolintlint` error — which is what auto-removed them, re-breaking CI). Fix: version parity — all ten `version:` pins across `ci.yml` and `release.yml` bumped to v2.13.2 and the directives removed. All seven modules lint clean under v2.13.2 (the `exhaustruct` deprecation warning is cosmetic; the `exhaustruct` → `exhaustruct_v5` rename stays a standalone follow-up).
+
+### Modules
+
+Coordinated multi-module release. Submodule `go.mod` files now reference root **v0.10.1** and diagnose **v0.2.3**.
+
+- `github.com/larsartmann/go-error-family` → **v0.10.1** (docs, CI lint parity, website fixes; no API changes)
+- `github.com/larsartmann/go-error-family/diagnose` → **v0.2.3** (erraudit fixes: git/pg run errors surface as `StatusUnknown`, `errors.As` → `errors.AsType` migration)
+- `github.com/larsartmann/go-error-family/agent` → **v0.2.3** (pin-only; doc comments on published protocol fields)
+- `github.com/larsartmann/go-error-family/bridge` → **v0.3.3** (pin-only; lint-directive comments in `Format`)
+- `github.com/larsartmann/go-error-family/diagnose/git` → **v0.5.3** (`git status`/`remote`/`ls-remote` failures surface as `StatusUnknown` with the run error)
+- `github.com/larsartmann/go-error-family/diagnose/postgres` → **v0.5.3** (`pg_isready` run errors recorded; `IsPostgresRunning` false on run error)
+- `github.com/larsartmann/go-error-family/examples` → **v0.3.1** (http example attaches request-id context, fails loudly on `ListenAndServe`)
 
 ## [0.10.0] - 2026-07-26
 
