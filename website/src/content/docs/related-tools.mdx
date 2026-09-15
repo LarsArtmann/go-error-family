@@ -18,6 +18,8 @@ The `bridge/` submodule provides:
 | `bridge.AutoWrap(err)`     | Infer Family from oops metadata (tags + domain)            |
 | `bridge.InferFamily(err)`  | Derive Family from oops tags then domain                   |
 
+For the full classify→enrich→handle walkthrough, see the [Bridge Patterns guide](/guides/bridge). The runnable reference implementation — a checkout app with a classified library layer, oops enrichment, and all three bridge patterns — lives in [`examples/cmd/bridge`](https://github.com/LarsArtmann/go-error-family/tree/master/examples/cmd/bridge).
+
 ## go-atomic-write
 
 [go-atomic-write](https://github.com/larsartmann/go-atomic-write) provides crash-safe, race-free file writes for Go. Use it alongside go-error-family in CLI tools and services that need both safe I/O and structured error handling.

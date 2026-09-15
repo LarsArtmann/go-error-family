@@ -372,12 +372,12 @@ directly.
 Every family maps to an error status (4xx/5xx), so conditional-request outcomes
 (RFC 9110 §13) need explicit handling:
 
-| Outcome                                            | Classification                                                                                                                                             |
-| -------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| **304 Not Modified**                               | Not an error. Write the 304 (plus `ETag`/`Cache-Control`) yourself and return `nil` — `HTTPHandler` treats `nil` as "fully handled". Classifying it would attach wrong retry/exit semantics. |
-| **412 Precondition Failed** (RFC 9110 §15.5.13)    | `Conflict` + `WithHTTPStatus(412)`. The client asserted state (`If-Match: "abc"`) that no longer holds — a version mismatch. Not retryable; remediation is "refresh and reapply", exactly `Conflict`'s. |
-| **428 Precondition Required** (RFC 6585 §3)        | `Rejection` + `WithHTTPStatus(428)`. The request omitted a required precondition — incomplete input, not a state clash. Remediation is "fix the request", exactly `Rejection`'s. |
-| **416 Range Not Satisfiable** (RFC 9110 §15.5.17)  | `Rejection` + `WithHTTPStatus(416)`. The `Range` value doesn't overlap the resource — a bad input value.                                                      |
+| Outcome                                           | Classification                                                                                                                                                                                          |
+| ------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **304 Not Modified**                              | Not an error. Write the 304 (plus `ETag`/`Cache-Control`) yourself and return `nil` — `HTTPHandler` treats `nil` as "fully handled". Classifying it would attach wrong retry/exit semantics.            |
+| **412 Precondition Failed** (RFC 9110 §15.5.13)   | `Conflict` + `WithHTTPStatus(412)`. The client asserted state (`If-Match: "abc"`) that no longer holds — a version mismatch. Not retryable; remediation is "refresh and reapply", exactly `Conflict`'s. |
+| **428 Precondition Required** (RFC 6585 §3)       | `Rejection` + `WithHTTPStatus(428)`. The request omitted a required precondition — incomplete input, not a state clash. Remediation is "fix the request", exactly `Rejection`'s.                        |
+| **416 Range Not Satisfiable** (RFC 9110 §15.5.17) | `Rejection` + `WithHTTPStatus(416)`. The `Range` value doesn't overlap the resource — a bad input value.                                                                                                |
 
 ```go
 func getWidget(w http.ResponseWriter, r *http.Request) error {

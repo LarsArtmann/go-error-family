@@ -60,6 +60,7 @@ export default defineConfig({
 					items: [
 						{ label: "Classification", slug: "guides/classification" },
 						{ label: "Custom Error Types", slug: "guides/error-types" },
+						{ label: "Bridge Patterns", slug: "guides/bridge" },
 						{ label: "HTTP & CLI Boundaries", slug: "guides/http-and-cli" },
 						{ label: "Diagnostics", slug: "guides/diagnostics" },
 						{ label: "Performance", slug: "guides/benchmarks" },

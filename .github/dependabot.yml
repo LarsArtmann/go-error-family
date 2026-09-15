@@ -78,4 +78,4 @@ updates:
     groups:
       actions:
         patterns:
-          - '*'
+          - "*"

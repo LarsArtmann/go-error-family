@@ -31,7 +31,7 @@
 package main
 
 import (
-	"encoding/json"
+	"encoding/json/v2"
 	"fmt"
 	"log/slog"
 	"net/http"
@@ -191,7 +191,7 @@ func writeOrderResponse(w http.ResponseWriter, order *checkout.Order, traceID st
 		"trace_id":     traceID,
 	}
 
-	return json.NewEncoder(w).Encode(resp)
+	return json.MarshalWrite(w, resp)
 }
 
 // applyFailMode sets the store's failure simulation based on the demo ?fail= param.

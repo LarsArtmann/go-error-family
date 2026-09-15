@@ -40,7 +40,7 @@ Fetched issue #5 (document 304/412/428 conditional-request classification guidan
 5. **`astro build`** — only `astro check` ran; the full 14-page build and the auto-deploy path (`website-deploy.yml` fires on master pushes touching `website/**`) are unexercised.
 6. **BuildFlow gate debt triage** — 17 pre-existing error findings (go-structure-linter ×12, erraudit ×3, branching-flow ×2) all predate this session and were left alone.
 7. **nolintlint ×2 in family.go** — unused `//nolint:recvcheck` directives under the newer local golangci; removal blocked on CI's pinned golangci version question.
-8. **Named guard test** for the 304-nil + 412-through-HTTPHandler path (the pattern is proven by the example + existing override tests, but no test *named* for conditional requests exists in `http_test.go`).
+8. **Named guard test** for the 304-nil + 412-through-HTTPHandler path (the pattern is proven by the example + existing override tests, but no test _named_ for conditional requests exists in `http_test.go`).
 
 ## d) TOTALLY FUCKED UP!
 
@@ -53,14 +53,15 @@ Nothing repo-damaging; zero data loss; all suites green. Honest near-misses:
 ## e) WHAT WE SHOULD IMPROVE (self-review)
 
 - **Forgot:** closing the GitHub issue loop; harvesting found-not-fixed items into TODO_LIST.md; refreshing AGENTS.md's stale status header; correcting the AGENTS.md quick-start command (`go test ./...` from workspace root only runs the root module — submodules need per-directory runs; I discovered this and documented nothing).
-- **Stupid we do anyway:** the project's headline status claims ("0 lint issues", "BuildFlow 38/39 passing") are point-in-time snapshots that silently rot — they are false *right now* and nothing flags them. Also: `GOPRIVATE` + movable tags = go.work.sum time bombs with no canary.
-- **Could have done better:** run `git status` before and after every long verification; load the `docs-health` skill for what was ultimately a documentation-maintenance task; verify the formatter actually ran on my files rather than trusting the aggregate gate; ask about a clean per-task commit *while* the work was in flight instead of after.
+- **Stupid we do anyway:** the project's headline status claims ("0 lint issues", "BuildFlow 38/39 passing") are point-in-time snapshots that silently rot — they are false _right now_ and nothing flags them. Also: `GOPRIVATE` + movable tags = go.work.sum time bombs with no canary.
+- **Could have done better:** run `git status` before and after every long verification; load the `docs-health` skill for what was ultimately a documentation-maintenance task; verify the formatter actually ran on my files rather than trusting the aggregate gate; ask about a clean per-task commit _while_ the work was in flight instead of after.
 - **Ghost systems:** none found. **Split brains:** the 3-surface doc duplication (deliberate, bounded, worth watching). **Nothing useful was removed.**
 - **Testing:** strong where it counts (docs = executable example). Improvement: one named `TestHTTPHandlerConditionalRequests` covering the 304-nil and 412-override end-to-end paths in `http_test.go`.
 
 ## f) Next tasks (prioritized)
 
 **P0 — now**
+
 1. Confirm daemon committed the final CHANGELOG line; `git status` clean.
 2. Comment on / close issue #5 with the two deviations and their justification.
 3. Fix AGENTS.md status header (lint claims) + quick-start test command (per-module test invocation).
@@ -90,7 +91,7 @@ Nothing repo-damaging; zero data loss; all suites green. Honest near-misses:
 21. `diagnose/postgres` coverage is 80.3% — lowest in the repo; add scenario tests.
 22. Root coverage 97.1% → push `handle.go` diagnostics branches to close the gap.
 23. `agent.Config.Enabled` error contract is documented but could carry a sentinel for programmatic checks.
-24. Evaluate whether `HTTPHandler` should support a per-code template *status* hint (currently template→message only) — possibly out of scope by design.
+24. Evaluate whether `HTTPHandler` should support a per-code template _status_ hint (currently template→message only) — possibly out of scope by design.
 25. Consider an `errors.Join` + conditional-request interaction test (worst-severity wins with a 412 Conflict in the mix).
 26. Website: add anchor links from the family table to the conditional-requests section.
 27. CI: pin `actions/setup-go` to the same Go version as flake's `go_1_26` for reproducibility.
@@ -106,4 +107,4 @@ Nothing repo-damaging; zero data loss; all suites green. Honest near-misses:
 
 ---
 
-*Point-in-time snapshot. Verify claims against the repo before acting on them. WAITING FOR INSTRUCTIONS.*
+_Point-in-time snapshot. Verify claims against the repo before acting on them. WAITING FOR INSTRUCTIONS._

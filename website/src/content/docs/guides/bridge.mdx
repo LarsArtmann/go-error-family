@@ -1,0 +1,95 @@
+---
+title: Bridge Patterns
+description: Combining samber/oops enrichment with go-error-family classification through the bridge submodule.
+---
+
+The architecture rule is **libraries classify, applications enrich**. A library knows its domain contract (404 = Rejection, timeout = Transient) but must not presume the application's observability stack — so it imports go-error-family only and never imports oops. The application layer imports oops for enrichment (stack traces, trace IDs, request context) and reaches for the `bridge/` submodule only where it creates its own errors and needs them classified.
+
+```
+LIBRARY LAYER          imports go-error-family ONLY, never oops
+      │ returns classified errors (NewRejection, NewTransient, ...)
+      ▼
+APPLICATION LAYER      imports oops + bridge; enriches with stack traces,
+      │                trace IDs, domain context
+      ▼
+BOUNDARY               errorfamily.HTTPHandler / HandleError
+                       classifies once → HTTP status / exit code
+```
+
+The three patterns below come from the [bridge reference implementation](https://github.com/LarsArtmann/go-error-family/tree/master/examples/cmd/bridge) — a runnable HTTP server demonstrating each one end-to-end.
+
+## Pattern 1: Pass Through (no bridge needed)
+
+**When:** the library already classified the error. Enrich it with oops and let classification travel the `Unwrap` chain:
+
+```go
+order, err := store.GetOrder(orderID) // library returns NewRejection(...)
+if err != nil {
+    enriched := oops.In("checkout").
+        Trace(traceID).
+        With("user_id", userID).
+        Wrap(err) // oops enrichment wraps the classified error
+
+    return enriched // Classify() finds Rejection through the chain
+}
+```
+
+No bridge call is needed because `Classify` walks `Unwrap` chains: the oops wrapper's `Unwrap()` returns the library's `*Error`, which implements `Classified`. **This is the most common case — the bridge is not a mandatory pipeline stage.**
+
+## Pattern 2: AutoWrap (oops-first, bridge infers the family)
+
+**When:** the application creates its own errors with oops and wants the family inferred from oops metadata:
+
+```go
+rich := oops.In("validation").
+    Tags("rejection").
+    Code("order.id_format").
+    With("received", orderID).
+    Errorf("invalid order ID format")
+
+return bridge.AutoWrap(rich) // infers Rejection
+```
+
+The inference cascade is: **tags** (developer-intentional: `retryable`, `transient`, `conflict`, `corruption`, `rejection`, `infrastructure`) → **domain** (structural: `validation`/`auth` → Rejection, `database`/`network` → Transient, `storage` → Infrastructure, `data`/`schema` → Corruption) → **Transient** (fail-open, same default as `Classify` on unknown errors).
+
+## Pattern 3: Explicit Wrap (application knows the family)
+
+**When:** the application knows the exact family and wants full control:
+
+```go
+rich := oops.In("checkout").
+    Code("checkout.inventory_blocked").
+    Trace(traceID).
+    Wrap(invErr)
+
+return bridge.Wrap(rich, errorfamily.Conflict) // explicit family
+```
+
+`bridge.Wrap` attaches the Family while preserving the full `OopsError` — so the same error still renders stack traces and context for operators.
+
+## One Error, Two Representations
+
+The value of enrich-then-classify: the same error object serves two audiences.
+
+| Audience     | What they see                                   | How                                      |
+| ------------ | ----------------------------------------------- | ---------------------------------------- |
+| Operator     | Stack trace, trace ID, every context field      | `logger.Error(fmt.Sprintf("%+v", err))`  |
+| HTTP client  | Safe `{family, code, message}` — no internals   | `errorfamily.HTTPHandler`                |
+
+The raw `err.Error()` is never sent to the client — `HTTPHandler` responds with family, code, and optionally a registered `MessageTemplate`.
+
+## Decision Guide
+
+| Situation                               | Use                          |
+| --------------------------------------- | ---------------------------- |
+| Library already classified the error    | `oops.Wrap(err)` — done      |
+| Application creates errors with oops    | `bridge.AutoWrap(err)`       |
+| Application knows the exact family      | `bridge.Wrap(err, family)`   |
+| Need just the family from an oops error | `bridge.InferFamily(err)`    |
+| Don't use oops at all                   | `errorfamily.New*` / `Wrap*` |
+
+## Reference Implementation
+
+The full runnable version lives in [`examples/cmd/bridge`](https://github.com/LarsArtmann/go-error-family/tree/master/examples/cmd/bridge), with `examples/checkout` as the classified library layer and tests proving each pattern end-to-end.
+
+See [Classification](/guides/classification) for how `Classify` resolves families through wrapper chains, and [HTTP & CLI Boundaries](/guides/http-and-cli) for what happens at the boundary.
