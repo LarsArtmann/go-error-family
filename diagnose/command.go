@@ -30,8 +30,7 @@ func RunCommand(
 	stdout = strings.TrimSpace(outBuf.String())
 
 	if err != nil {
-		exitErr := &exec.ExitError{}
-		if errors.As(err, &exitErr) {
+		if exitErr, ok := errors.AsType[*exec.ExitError](err); ok {
 			exitCode = exitErr.ExitCode()
 			err = nil
 		} else {

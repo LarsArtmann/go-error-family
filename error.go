@@ -128,14 +128,14 @@ func (e *Error) Format(f fmt.State, verb rune) {
 			return
 		}
 
-		_, _ = fmt.Fprint(f, e.Error())
+		_, _ = fmt.Fprint(f, e.Error()) //nolint:legacyerrors // fmt.State write errors cannot be propagated (fmt.Formatter has no error return)
 	default:
-		_, _ = fmt.Fprint(f, e.Error())
+		_, _ = fmt.Fprint(f, e.Error()) //nolint:legacyerrors // fmt.State write errors cannot be propagated (fmt.Formatter has no error return)
 	}
 }
 
 func (e *Error) formatVerbose(f fmt.State) {
-	_, _ = fmt.Fprintf(
+	_, _ = fmt.Fprintf( //nolint:legacyerrors // fmt.State write errors cannot be propagated (fmt.Formatter has no error return)
 		f,
 		"[%s] %s: %s",
 		e.family,
@@ -144,9 +144,9 @@ func (e *Error) formatVerbose(f fmt.State) {
 	)
 
 	if len(e.context) > 0 {
-		_, _ = fmt.Fprint(f, "\n  context:")
+		_, _ = fmt.Fprint(f, "\n  context:") //nolint:legacyerrors // fmt.State write errors cannot be propagated (fmt.Formatter has no error return)
 		for k, v := range e.context {
-			_, _ = fmt.Fprintf(
+			_, _ = fmt.Fprintf( //nolint:legacyerrors // fmt.State write errors cannot be propagated (fmt.Formatter has no error return)
 				f,
 				"\n    %s: %s",
 				k,
@@ -156,7 +156,7 @@ func (e *Error) formatVerbose(f fmt.State) {
 	}
 
 	if !e.timestamp.IsZero() {
-		_, _ = fmt.Fprintf(
+		_, _ = fmt.Fprintf( //nolint:legacyerrors // fmt.State write errors cannot be propagated (fmt.Formatter has no error return)
 			f,
 			"\n  at: %s",
 			e.timestamp.Format(time.RFC3339),
@@ -164,7 +164,7 @@ func (e *Error) formatVerbose(f fmt.State) {
 	}
 
 	if e.exitCode != 0 {
-		_, _ = fmt.Fprintf(
+		_, _ = fmt.Fprintf( //nolint:legacyerrors // fmt.State write errors cannot be propagated (fmt.Formatter has no error return)
 			f,
 			"\n  exit_code: %d",
 			e.exitCode,
@@ -174,7 +174,7 @@ func (e *Error) formatVerbose(f fmt.State) {
 	if e.cause != nil {
 		causeMsg := safeCauseString(e.cause)
 		if causeMsg != "" {
-			_, _ = fmt.Fprintf(
+			_, _ = fmt.Fprintf( //nolint:legacyerrors // fmt.State write errors cannot be propagated (fmt.Formatter has no error return)
 				f,
 				"\n  caused by: %s",
 				causeMsg,

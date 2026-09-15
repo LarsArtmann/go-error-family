@@ -190,37 +190,37 @@ func (c *ClassifiedError) Format(f fmt.State, verb rune) {
 	switch verb {
 	case 's':
 		if c.OopsError.Error() != "" {
-			_, _ = fmt.Fprintf(
+			_, _ = fmt.Fprintf( //nolint:legacyerrors // fmt.State write errors cannot be propagated (fmt.Formatter has no error return)
 				f,
 				"%s",
 				c.OopsError.Error(),
 			)
 		} else if c.original != nil && c.original.Error() != "" {
-			_, _ = fmt.Fprintf(
+			_, _ = fmt.Fprintf( //nolint:legacyerrors // fmt.State write errors cannot be propagated (fmt.Formatter has no error return)
 				f,
 				"%s",
 				c.original.Error(),
 			)
 		} else {
-			_, _ = fmt.Fprintf(f, "[%s]", c.family)
+			_, _ = fmt.Fprintf(f, "[%s]", c.family) //nolint:legacyerrors // fmt.State write errors cannot be propagated (fmt.Formatter has no error return)
 		}
 	case 'v':
 		if f.Flag('+') {
 			if c.OopsError.Error() != "" {
-				_, _ = fmt.Fprintf(
+				_, _ = fmt.Fprintf( //nolint:legacyerrors // fmt.State write errors cannot be propagated (fmt.Formatter has no error return)
 					f,
 					"%+v",
 					&c.OopsError,
 				)
 			} else if c.original != nil {
-				_, _ = fmt.Fprintf(
+				_, _ = fmt.Fprintf( //nolint:legacyerrors // fmt.State write errors cannot be propagated (fmt.Formatter has no error return)
 					f,
 					"[%s] %+v",
 					c.family,
 					c.original,
 				)
 			} else {
-				_, _ = fmt.Fprintf(
+				_, _ = fmt.Fprintf( //nolint:legacyerrors // fmt.State write errors cannot be propagated (fmt.Formatter has no error return)
 					f,
 					"[%s]",
 					c.family,
@@ -230,8 +230,8 @@ func (c *ClassifiedError) Format(f fmt.State, verb rune) {
 			return
 		}
 
-		_, _ = fmt.Fprint(f, c.Error())
+		_, _ = fmt.Fprint(f, c.Error()) //nolint:legacyerrors // fmt.State write errors cannot be propagated (fmt.Formatter has no error return)
 	default:
-		_, _ = fmt.Fprint(f, c.Error())
+		_, _ = fmt.Fprint(f, c.Error()) //nolint:legacyerrors // fmt.State write errors cannot be propagated (fmt.Formatter has no error return)
 	}
 }

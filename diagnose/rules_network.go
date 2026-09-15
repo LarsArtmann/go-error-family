@@ -72,7 +72,7 @@ func (r *NetworkRule) Run(
 			SetFix(result, "Check connectivity to "+addr, "nc -zv "+host+" "+port)
 			return result, nil
 		}
-		_ = conn.Close()
+		_ = conn.Close() //nolint:legacyerrors // reachability proven; Close failure is irrelevant (mirrors errcheck (net.Conn).Close exclusion)
 		result.Details["tcp_reachable"] = strTrue
 	}
 

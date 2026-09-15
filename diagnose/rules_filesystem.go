@@ -135,8 +135,8 @@ func (r *FilesystemRule) checkDirWritable(result *DiagnosticResult, path string)
 		)
 		return
 	}
-	_ = f.Close()
-	_ = os.Remove(testFile)
+	_ = f.Close()   //nolint:legacyerrors // best-effort cleanup: the writability verdict is already decided (mirrors errcheck Close exclusions)
+	_ = os.Remove(testFile) //nolint:legacyerrors // best-effort cleanup of the probe file; failure leaves a harmless temp file
 	setAccessSuccess(result, "writable", "Path exists and is writable: "+path)
 }
 
@@ -151,7 +151,7 @@ func (r *FilesystemRule) checkFileReadable(result *DiagnosticResult, path string
 		)
 		return
 	}
-	_ = f.Close()
+	_ = f.Close() //nolint:legacyerrors // best-effort cleanup: the readability verdict is already decided (mirrors errcheck Close exclusions)
 	setAccessSuccess(result, "readable", fmt.Sprintf(
 		"File exists and is readable: %s (%s)",
 		path,
