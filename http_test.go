@@ -2,7 +2,7 @@ package errorfamily
 
 import (
 	"context"
-	"encoding/json/v2"
+	"encoding/json"
 	"errors"
 	"net/http"
 	"net/http/httptest"

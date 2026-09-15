@@ -31,7 +31,7 @@
 package main
 
 import (
-	"encoding/json/v2"
+	"encoding/json"
 	"fmt"
 	"log/slog"
 	"net/http"
@@ -176,7 +176,7 @@ func checkInventory(
 
 	logger.Error(fmt.Sprintf("%+v", rich), "trace_id", traceID)
 
-	return bridge.Wrap(rich, errorfamily.Conflict)
+	return bridge.Wrap(rich, errorfamily.Conflict) //nolint:legacyerrors // trace_id and user_id already ride in the oops layer (With calls above); bridge.Wrap preserves the OopsError chain
 }
 
 // writeOrderResponse encodes a successful order response as JSON.
@@ -191,7 +191,7 @@ func writeOrderResponse(w http.ResponseWriter, order *checkout.Order, traceID st
 		"trace_id":     traceID,
 	}
 
-	return json.MarshalWrite(w, resp)
+	return json.NewEncoder(w).Encode(resp)
 }
 
 // applyFailMode sets the store's failure simulation based on the demo ?fail= param.

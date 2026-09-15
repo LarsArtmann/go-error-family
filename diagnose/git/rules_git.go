@@ -97,7 +97,7 @@ func (r *GitRule) checkWorkingTree(
 	result *diagnose.DiagnosticResult,
 	repoPath string,
 ) bool {
-	stdout, exitCode, _ := r.cmdRunner().Run(
+	stdout, exitCode, runErr := r.cmdRunner().Run(
 		ctx,
 		5*time.Second,
 		"git",
@@ -106,6 +106,11 @@ func (r *GitRule) checkWorkingTree(
 		"status",
 		"--porcelain",
 	)
+	if runErr != nil {
+		result.Status = diagnose.StatusUnknown
+		result.Summary = "git status failed in " + repoPath + ": " + runErr.Error()
+		return true
+	}
 	if exitCode != 0 {
 		result.Status = diagnose.StatusUnknown
 		result.Summary = "git status failed in " + repoPath
@@ -151,9 +156,14 @@ func (r *GitRule) checkRemote(
 	result *diagnose.DiagnosticResult,
 	repoPath string,
 ) {
-	remotesStdout, _, _ := r.cmdRunner().Run(
+	remotesStdout, remotesExitCode, runErr := r.cmdRunner().Run(
 		ctx, 3*time.Second, "git", "-C", repoPath, "remote",
 	)
+	if runErr != nil || remotesExitCode != 0 {
+		result.Status = diagnose.StatusUnknown
+		result.Summary = "git remote failed in " + repoPath
+		return
+	}
 	if strings.TrimSpace(remotesStdout) == "" {
 		result.Status = diagnose.StatusHealthy
 		result.Summary = "Git repo is clean, no remotes configured: " + repoPath
@@ -161,7 +171,7 @@ func (r *GitRule) checkRemote(
 		return
 	}
 
-	_, remoteExitCode, _ := r.cmdRunner().Run(
+	_, remoteExitCode, runErr := r.cmdRunner().Run(
 		ctx,
 		10*time.Second,
 		"git",
@@ -171,6 +181,11 @@ func (r *GitRule) checkRemote(
 		"--heads",
 		"origin",
 	)
+	if runErr != nil {
+		result.Status = diagnose.StatusUnknown
+		result.Summary = "git ls-remote failed for " + repoPath + ": " + runErr.Error()
+		return
+	}
 	if remoteExitCode != 0 {
 		result.Status = diagnose.StatusDegraded
 		result.Summary = "Git repo is clean but remote is unreachable: " + repoPath

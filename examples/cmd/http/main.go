@@ -10,6 +10,7 @@ package main
 
 import (
 	"fmt"
+	"log"
 	"net/http"
 
 	errorfamily "github.com/larsartmann/go-error-family"
@@ -18,7 +19,8 @@ import (
 func getUser(w http.ResponseWriter, r *http.Request) error {
 	userID := r.URL.Query().Get("id")
 	if userID == "" {
-		return errorfamily.NewRejection("user.missing_id", "id query parameter is required")
+		return errorfamily.NewRejection("user.missing_id", "id query parameter is required").
+			WithContext("id", userID)
 	}
 
 	if userID == "notfound" {
@@ -27,10 +29,11 @@ func getUser(w http.ResponseWriter, r *http.Request) error {
 	}
 
 	if userID == "dbfail" {
-		return errorfamily.NewTransient("db.timeout", "database connection timed out")
+		return errorfamily.NewTransient("db.timeout", "database connection timed out").
+			WithContext("id", userID)
 	}
 
-	_, _ = fmt.Fprintf(w, `{"user": {"id": %q}}`+"\n", userID)
+	_, _ = fmt.Fprintf(w, `{"user": {"id": %q}}`+"\n", userID) //nolint:legacyerrors // example: success-path response write; the client is gone on failure
 
 	return nil
 }
@@ -50,5 +53,5 @@ func main() {
 	fmt.Println("curl 'http://localhost:8080/user?id=notfound' → 400 (Rejection)")
 	fmt.Println("curl 'http://localhost:8080/user?id=dbfail'   → 503 (Transient)")
 
-	_ = http.ListenAndServe(":8080", mux)
+	log.Fatal(http.ListenAndServe(":8080", mux))
 }

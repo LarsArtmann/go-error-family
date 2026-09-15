@@ -1,12 +1,19 @@
-# pnpm-audit runs at the repo root, but the only pnpm-lock.yaml lives in
-# website/ — a separate Node project with its own flake.nix and deploy
-# pipeline. Website dependency vulnerabilities are covered by GitHub
-# Dependabot alerts on website/package.json.
-#
 # Note on GOEXPERIMENT: do NOT add an `env:` override here — BuildFlow's
 # ApplyConfigEnv never overrides shell-exported values, and this machine
 # exports GOEXPERIMENT=jsonv2 globally (required by the BuildFlow repo
-# itself). The no-json/v2 policy is enforced instead by a depguard deny
-# rule in .golangci.yml, which fails lint locally, in BuildFlow, and in CI.
+# itself). The no-json/v2 policy is enforced instead by a depguard deny rule
+# in .golangci.yml, which fails lint locally, in BuildFlow, and in CI.
 skip_steps:
+  # go-auto-upgrade's `fix` command runs the jsonv1tov2 migrator, which
+  # rewrites encoding/json → encoding/json/v2 whenever GOEXPERIMENT=jsonv2 is
+  # active (it is, machine-globally). For this library that rewrite violates
+  # the documented no-json/v2 policy (v0.8.0 reverted it: GOEXPERIMENT was
+  # the #1 adoption barrier) and breaks the hermetic nix builds and CI. This
+  # skip stops the fleet-wide `buildflow --fix` orchestrator from re-breaking
+  # the repo on every pass.
+  - go-auto-upgrade
+  # pnpm-audit runs at the repo root, but the only pnpm-lock.yaml lives in
+  # website/ — a separate Node project with its own flake.nix and deploy
+  # pipeline. Website dependency vulnerabilities are covered by GitHub
+  # Dependabot alerts on website/package.json.
   - pnpm-audit

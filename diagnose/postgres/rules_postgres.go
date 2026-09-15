@@ -72,7 +72,7 @@ func (r *PostgresRule) Run(
 
 	// Check 1: pg_isready
 	if r.cmdRunner().Exists("pg_isready") {
-		stdout, exitCode, _ := r.cmdRunner().Run(
+		stdout, exitCode, runErr := r.cmdRunner().Run(
 			ctx,
 			5*time.Second,
 			"pg_isready",
@@ -82,6 +82,9 @@ func (r *PostgresRule) Run(
 			port,
 		)
 		result.Details["pg_isready"] = stdout
+		if runErr != nil {
+			result.Details["pg_isready_error"] = runErr.Error()
+		}
 		if exitCode == 0 {
 			result.Status = diagnose.StatusHealthy
 			result.Summary = fmt.Sprintf("PostgreSQL is running on %s:%s", host, port)
@@ -105,7 +108,7 @@ func (r *PostgresRule) Run(
 	addr := net.JoinHostPort(host, port)
 	conn, dialErr := net.DialTimeout("tcp", addr, 3*time.Second)
 	if dialErr == nil {
-		_ = conn.Close()
+		_ = conn.Close() //nolint:legacyerrors // reachability proven; Close failure is irrelevant (mirrors errcheck (net.Conn).Close exclusion)
 		result.Status = diagnose.StatusHealthy
 		result.Summary = fmt.Sprintf(
 			"TCP connection to %s succeeded — PostgreSQL may be running",
@@ -185,7 +188,7 @@ func IsPostgresRunning(ctx context.Context, host, port string) bool {
 
 	runner := diagnose.DefaultCommandRunner{}
 	if runner.Exists("pg_isready") {
-		_, exitCode, _ := runner.Run(
+		_, exitCode, runErr := runner.Run(
 			ctx,
 			5*time.Second,
 			"pg_isready",
@@ -194,6 +197,10 @@ func IsPostgresRunning(ctx context.Context, host, port string) bool {
 			"-p",
 			port,
 		)
+		if runErr != nil {
+			return false
+		}
+
 		return exitCode == 0
 	}
 
@@ -202,6 +209,6 @@ func IsPostgresRunning(ctx context.Context, host, port string) bool {
 	if err != nil {
 		return false
 	}
-	_ = conn.Close()
+	_ = conn.Close() //nolint:legacyerrors // reachability proven; Close failure is irrelevant (mirrors errcheck (net.Conn).Close exclusion)
 	return true
 }
