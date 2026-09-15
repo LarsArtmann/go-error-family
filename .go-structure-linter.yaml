@@ -1,0 +1,9 @@
+# This repository is a published Go LIBRARY: the root package IS the public
+# API (github.com/larsartmann/go-error-family), imported by 50+ downstream
+# projects. Moving it into /pkg/ or /internal/ would change the import path —
+# a breaking restructure. The "flat" exclusion preset disables the layout
+# rules (root-package-files, root-main-go, cmd/internal/pkg-directory) that
+# reject a deliberately-flat library package. All other rule categories
+# (security, naming, documentation, configuration) stay active.
+presets:
+  - flat

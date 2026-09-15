@@ -202,7 +202,11 @@ func (c *ClassifiedError) Format(f fmt.State, verb rune) {
 				c.original.Error(),
 			)
 		} else {
-			_, _ = fmt.Fprintf(f, "[%s]", c.family) //nolint:legacyerrors // fmt.State write errors cannot be propagated (fmt.Formatter has no error return)
+			_, _ = fmt.Fprintf(
+				f,
+				"[%s]",
+				c.family,
+			) //nolint:legacyerrors // fmt.State write errors cannot be propagated (fmt.Formatter has no error return)
 		}
 	case 'v':
 		if f.Flag('+') {
@@ -230,8 +234,14 @@ func (c *ClassifiedError) Format(f fmt.State, verb rune) {
 			return
 		}
 
-		_, _ = fmt.Fprint(f, c.Error()) //nolint:legacyerrors // fmt.State write errors cannot be propagated (fmt.Formatter has no error return)
+		_, _ = fmt.Fprint(
+			f,
+			c.Error(),
+		) //nolint:legacyerrors // fmt.State write errors cannot be propagated (fmt.Formatter has no error return)
 	default:
-		_, _ = fmt.Fprint(f, c.Error()) //nolint:legacyerrors // fmt.State write errors cannot be propagated (fmt.Formatter has no error return)
+		_, _ = fmt.Fprint(
+			f,
+			c.Error(),
+		) //nolint:legacyerrors // fmt.State write errors cannot be propagated (fmt.Formatter has no error return)
 	}
 }

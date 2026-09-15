@@ -64,9 +64,13 @@ type FixStep struct {
 	Description string
 
 	// Command is the shell command to execute, if applicable.
+	//
+	//branching-flow:ignore — published protocol struct; phantom types would be a breaking change for agent implementors
 	Command string
 
 	// Rationale explains WHY this step is needed.
+	//
+	//branching-flow:ignore — published protocol struct; phantom types would be a breaking change for agent implementors
 	Rationale string
 }
 
