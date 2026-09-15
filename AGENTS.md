@@ -38,6 +38,9 @@ The classification protocol is the **six interfaces** (`Coded`/`Classified`/`Con
 - **`ExitCode(err)` checks `ExitCoder` before family** — an error implementing `ExitCoder` with a non-zero code overrides the family-based BSD exit code. `*Error` always implements `ExitCoder`, but returns 0 (meaning "use family default") unless `WithExitCode` was called.
 - **`WrapOnce` is idempotent** — if the error chain already contains a `*Error`, it is returned unchanged. This prevents double-wrapping at API boundaries.
 - **`Orchestration` is the 6th family** (v0.10.0) — internal coordination failures (program's own logic bug), severity 5, exit 70, HTTP 500. `Corruption` severity bumped 5 to 6 to preserve total order. Relative ordering of the original 5 families is unchanged.
+- **Conditional requests are documented (issue #5)** — 304 Not Modified is a success path (write it, return `nil`; NEVER classify). 412 = `NewConflict(...).WithHTTPStatus(412)` (asserted state stale). 428 = `NewRejection(...).WithHTTPStatus(428)` (omitted precondition = incomplete input, NOT Conflict). 416 = `Rejection` + `WithHTTPStatus(416)`. See README "Conditional Requests" section; guarded by `Example_conditionalRequests`.
+- **Embedding `*Error` in a custom wrapper struct does NOT compile** — the embedded field named `Error` shadows the promoted `Error() string` method (wrapper fails `error` satisfaction), and declaring your own `Error()` method collides ("field and method with the same name Error"). Use `WithHTTPStatus`/`WithExitCode` or a named field + explicit `Error`/`Unwrap` forwarding.
+- **go.work.sum can hold stale checksums because `GOPRIVATE` skips sumdb** — the `diagnose v0.2.2` tag was re-pointed after its sum was recorded, so every workspace build failed with a SECURITY ERROR (checksum mismatch). Fix: delete the stale line from `go.work.sum` and rebuild — the workspace `use` directive re-resolves locally, no re-record needed.
 
 ## API Surface (v0.10.0)
 

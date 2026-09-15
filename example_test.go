@@ -167,6 +167,25 @@ func ExampleHTTPStatus() {
 	// 404
 }
 
+// Conditional requests (RFC 9110 §13): families are behavioral, statuses are
+// wire-level — WithHTTPStatus is the seam. A 304 is a success outcome, never
+// a classified error: write it and return nil.
+func Example_conditionalRequests() {
+	// 412 Precondition Failed: the client's If-Match ETag no longer matches
+	// the current state — a version mismatch, so Conflict.
+	err := NewConflict("etag.precondition_failed", "If-Match precondition failed").
+		WithHTTPStatus(412)
+	fmt.Println(HTTPStatus(err), Classify(err), IsRetryable(err), ExitCode(err))
+
+	// 428 Precondition Required (RFC 6585 §3): the request omitted a required
+	// precondition — incomplete input, so Rejection.
+	err = NewRejection("etag.precondition_required", "conditional request required").
+		WithHTTPStatus(428)
+	fmt.Println(HTTPStatus(err), Classify(err), IsRetryable(err), ExitCode(err))
+	// Output: 412 conflict false 1
+	// 428 rejection false 1
+}
+
 func ExampleRegisterClassificationType() {
 	// RegisterClassificationType maps any error of type T to a Family.
 	// Useful for dynamic third-party errors where every instance is fresh.
