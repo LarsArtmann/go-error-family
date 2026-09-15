@@ -14,6 +14,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 ### Fixed
 
 - **Workspace build: stale `go.work.sum` checksum for `diagnose v0.2.2`** — the recorded `go.mod` checksum no longer matched the tag's bits (tag was re-pointed after the sum was recorded; `GOPRIVATE` skips sumdb verification, so the drift surfaced as a SECURITY ERROR on every workspace build). Removed the stale line; `go build ./...` re-resolves via the workspace `use` directive.
+- **Website: stray compiled Tailwind artifact** — `website/src/styles/global.out.css` (build output, referenced nowhere) was accidentally committed; removed and `*.out.css` added to `website/.gitignore`.
 
 ## [0.10.0] - 2026-07-26
 
