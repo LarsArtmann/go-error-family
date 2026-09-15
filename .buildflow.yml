@@ -17,3 +17,10 @@ skip_steps:
   # pipeline. Website dependency vulnerabilities are covered by GitHub
   # Dependabot alerts on website/package.json.
   - pnpm-audit
+  # BuildFlow's embedded go-structure-linter snapshot predates project-config
+  # support: it ignores this repo's .go-structure-linter.yaml (which uses the
+  # "flat" preset because the root package IS the published library API —
+  # /pkg/ restructure would break 50+ consumers) and keeps erroring on the
+  # deliberate flat layout. Run `go-structure-linter .` directly instead; it
+  # honors the config and passes.
+  - go-structure-linter
