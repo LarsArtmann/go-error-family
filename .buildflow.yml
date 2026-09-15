@@ -1,0 +1,12 @@
+# pnpm-audit runs at the repo root, but the only pnpm-lock.yaml lives in
+# website/ — a separate Node project with its own flake.nix and deploy
+# pipeline. Website dependency vulnerabilities are covered by GitHub
+# Dependabot alerts on website/package.json.
+#
+# Note on GOEXPERIMENT: do NOT add an `env:` override here — BuildFlow's
+# ApplyConfigEnv never overrides shell-exported values, and this machine
+# exports GOEXPERIMENT=jsonv2 globally (required by the BuildFlow repo
+# itself). The no-json/v2 policy is enforced instead by a depguard deny
+# rule in .golangci.yml, which fails lint locally, in BuildFlow, and in CI.
+skip_steps:
+  - pnpm-audit

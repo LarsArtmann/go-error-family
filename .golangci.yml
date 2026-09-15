@@ -27,6 +27,7 @@ linters:
     - copyloopvar
     - cyclop
     - decorder
+    - depguard
     - dogsled
     - dupl
     - dupword
@@ -123,11 +124,15 @@ linters:
     - wrapcheck
     - wsl_v5
     - zerologlint
-  disable:
-    - depguard
   settings:
     cyclop:
       max-complexity: 12
+    depguard:
+      rules:
+        no-encoding-json-v2:
+          deny:
+            - pkg: encoding/json/v2
+              desc: requires GOEXPERIMENT=jsonv2 — reverted by policy 2026-07-23, use encoding/json (AGENTS.md)
     dupl:
       threshold: 100
     errcheck:
