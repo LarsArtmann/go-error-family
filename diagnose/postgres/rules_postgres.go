@@ -179,7 +179,8 @@ func (r *PostgresRule) suggestStartFix() string {
 // IsPostgresRunning is a standalone helper that checks if PostgreSQL is accessible.
 // Useful for health checks and startup validation.
 //
-// branching-flow:ignore — host/port are a published API taking user-supplied strings; phantom types here would be a breaking signature change
+// host/port are plain strings by design: this is a published API receiving
+// user-supplied values — phantom types would be a breaking signature change.
 func IsPostgresRunning(ctx context.Context, host, port string) bool {
 	if host == "" {
 		host = strLocalhost
