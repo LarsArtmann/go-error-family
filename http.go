@@ -93,5 +93,7 @@ func writeHTTPError(w http.ResponseWriter, err error) {
 		return
 	}
 
-	_, _ = w.Write(data) //nolint:legacyerrors // status code is already sent; a body-write failure cannot be reported to the client
+	_, _ = w.Write(
+		data,
+	) //nolint:legacyerrors // status code is already sent; a body-write failure cannot be reported to the client
 }

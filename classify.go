@@ -179,7 +179,9 @@ func RegisterClassificationTypeFor[T error](
 	family Family,
 ) {
 	r.RegisterClassifier(func(err error) (Family, bool) {
-		if _, ok := errors.AsType[T](err); ok { //nolint:legacyerrors // presence check only: the typed value is intentionally unused, ok is checked
+		if _, ok := errors.AsType[T](
+			err,
+		); ok { //nolint:legacyerrors // presence check only: the typed value is intentionally unused, ok is checked
 			return family, true
 		}
 

@@ -176,7 +176,10 @@ func checkInventory(
 
 	logger.Error(fmt.Sprintf("%+v", rich), "trace_id", traceID)
 
-	return bridge.Wrap(rich, errorfamily.Conflict) //nolint:legacyerrors // trace_id and user_id already ride in the oops layer (With calls above); bridge.Wrap preserves the OopsError chain
+	return bridge.Wrap(
+		rich,
+		errorfamily.Conflict,
+	) //nolint:legacyerrors // trace_id and user_id already ride in the oops layer (With calls above); bridge.Wrap preserves the OopsError chain
 }
 
 // writeOrderResponse encodes a successful order response as JSON.

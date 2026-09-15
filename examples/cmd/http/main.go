@@ -33,7 +33,11 @@ func getUser(w http.ResponseWriter, r *http.Request) error {
 			WithContext("id", userID)
 	}
 
-	_, _ = fmt.Fprintf(w, `{"user": {"id": %q}}`+"\n", userID) //nolint:legacyerrors // example: success-path response write; the client is gone on failure
+	_, _ = fmt.Fprintf(
+		w,
+		`{"user": {"id": %q}}`+"\n",
+		userID,
+	) //nolint:legacyerrors // example: success-path response write; the client is gone on failure
 
 	return nil
 }
