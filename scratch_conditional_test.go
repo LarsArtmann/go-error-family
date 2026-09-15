@@ -38,13 +38,18 @@ func TestScratchWithHTTPStatusPattern(t *testing.T) {
 	}
 }
 
-// The wrapper-struct pattern proposed verbatim in the issue.
-type scratchPreconditionFailed struct{ *Error }
+// Corrected consumer-owned wrapper (named field + explicit forwarding — the
+// verbatim issue snippet does not compile: the embedded field named Error
+// shadows the promoted Error() string method, and adding an explicit
+// Error() string method collides with the embedded field name).
+type scratchPreconditionFailed struct{ inner *Error }
 
+func (e *scratchPreconditionFailed) Error() string   { return e.inner.Error() }
+func (e *scratchPreconditionFailed) Unwrap() error   { return e.inner }
 func (e *scratchPreconditionFailed) HTTPStatus() int { return http.StatusPreconditionFailed }
 
 func TestScratchWrapperStructPattern(t *testing.T) {
-	err := &scratchPreconditionFailed{NewConflict(
+	err := &scratchPreconditionFailed{inner: NewConflict(
 		"etag.precondition_failed",
 		"If-Match precondition failed",
 	)}
