@@ -123,3 +123,18 @@ _Point-in-time snapshot. Verify claims against the repo before acting on them. W
 ## CORRECTION (2026-09-15 ~11:00)
 
 Sections a.7 and c.2 claimed the ACME TXT record for `errorfamily.lars.software` was externally blocked (placeholder Namecheap API key). **Verified false ~11:00 same day:** a read-only `nix run .#plan` in `/home/lars/projects/domains` succeeds (credentials + IP accepted), shows **no pending diff for `lars.software`**, and `dig TXT _acme-challenge.errorfamily.lars.software` answers authoritatively. The record was committed 2026-07-23 04:40 (`domains` repo, `12a4efc`) and applied at some point after the 05:07 status report was written. The TODO item was stale; removed from TODO_LIST.md. Remaining real problems in the domains repo: the perpetual `larsartmann.com` primary-MX plan diff (silent `setHosts` drop, needs panel inspection — domains TODO_LIST 2026-09-08) and missing Namecheap GitHub secrets for CI plans.
+
+---
+
+## RESOLUTION (2026-09-15 ~18:15)
+
+The blocked decision (g.1) was resolved by user directive ("make everything work" + the failing BuildFlow log): **revert**, per the documented standing policy. Items 1-3 and 12 of section f are DONE, plus the recurrence root cause was found — it was NOT the daemon and NOT a concurrent session's intent:
+
+- **Root cause of the json/v2 regression:** the fleet orchestrator (`projects-management-automation run --command buildflow --fix`, running continuously since 14:05) invoked `go-auto-upgrade`, whose `jsonv1tov2` migrator rewrites `encoding/json` → `encoding/json/v2` under the machine-global `GOEXPERIMENT=jsonv2`. It re-broke the repo a SECOND time at 17:35 (commit eb986b8) while the fix was being verified. Fixed durably: `skip_steps: [go-auto-upgrade]` in the new `.buildflow.yml`, plus a depguard deny rule on `encoding/json/v2` (lint canary).
+- **Item f.2 (CI-parity canary):** answered by the depguard rule + the standing nix/`GOWORK=off` checks; a `.buildflow.yml` `env:` override does NOT work (ApplyConfigEnv never overrides shell-exported values — verified in BuildFlow source).
+- **Item f.3 (verification battery):** done — all 8 module suites `-race` with `GOEXPERIMENT=` unset, `GOWORK=off go build`, nix checks, `buildflow` exit 0.
+- **Item f.12 (erraudit):** all 36 findings across 6 modules resolved (real fixes in diagnose git/postgres run paths, AsType migration, examples context attachment; reasoned `//nolint:legacyerrors` on deliberate ignores). erraudit now 0 everywhere.
+- **Item f.6 (go-structure-linter):** suppressed via `.go-structure-linter.yaml` `flat` preset (CLI honors it, exits 0); BuildFlow's embedded snapshot ignores project configs, so the step is also skipped in `.buildflow.yml` with rationale. `branching-flow` skipped too — its phantom analyzer doesn't honor its own ignore directives (IsIgnored not wired into pkg/phantom) and only suggests breaking changes to published API strings.
+- **Item f.4 (headline):** AGENTS.md status line replaced with the verified 2026-09-15 state.
+
+Final state: `buildflow` exit 0 (89/89 steps), all tests green in CI-parity env.

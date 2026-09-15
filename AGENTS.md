@@ -2,7 +2,7 @@
 
 Structured error protocol library. Library only — no `main`, no build system, no external deps. Full API reference: `SKILL.md`.
 
-**Status:** All tests pass (root + bridge + submodules), 0 lint issues, 0 race conditions
+**Status:** Verified green (2026-09-15): all tests pass with `-race` across root + all submodules in a CI-parity env (`GOEXPERIMENT=` unset), `buildflow` exits 0 (89 steps, 0 failed), erraudit 0 findings in all 6 modules, nix checks build, `GOWORK=off go build` clean
 **Workspace modules:** root (zero-dep), `agent`, `bridge` (oops integration), `diagnose`, `diagnose/git`, `diagnose/postgres`, `examples`, `website`
 
 ## Quick Start
@@ -208,7 +208,7 @@ The bridge is correct, tested (95.6%), and fuzzed. The reference implementation 
 - `ParseAudience` and `ParseStatus` mirror `ParseFamily` — case-insensitive string parsing for all enums.
 - `Family` and `Audience` implement `encoding.TextMarshaler`/`TextUnmarshaler` for YAML/JSON config.
 - `agent.Config.Enabled` now returns `(nil, error)` instead of synthetic result — calling `Analyze` on a disabled agent is a programming error.
-- **depguard** allows `$gostd`, `$module`, `github.com/larsartmann/go-error-family` (all workspace modules), and `github.com/samber/oops` (bridge dependency). The root module's zero-dep guarantee is enforced by `go.mod` + CI's `GOWORK=off go build`, not depguard alone — depguard's `files` patterns are working-directory-relative and can't distinguish modules in a workspace.
+- **depguard is enabled with a single deny-only rule (2026-09-15):** it denies `encoding/json/v2` repo-wide (lax list-mode — allow-lists are not used because depguard's `files` patterns are working-directory-relative and can't distinguish modules in a workspace). This is the lint-level canary for the no-GOEXPERIMENT policy. The root module's zero-dep guarantee is still primarily enforced by `go.mod` + CI's `GOWORK=off go build`.
 - **Test files** (`_test.go`) exclude: `err113`, `testpackage`, `fatcontext`, `funlen`, `containedctx`, `cyclop`, `gocyclo`, `gocognit`, `maintidx` — internal tests access unexported identifiers and legitimately create dynamic errors, capture contexts, and exceed complexity/length thresholds due to many subtests.
 - **mnd** ignores `family.go` — the `familyData` table contains intentional HTTP status codes, exit codes, and severity values with inline comments. Extracting 15+ named constants would reduce readability.
 - **varnamelen** ignore-names includes Go-idiomatic short names: `tc` (test case), `f` (fmt.State — Go stdlib convention), `w` (http.ResponseWriter), `ag` (agent).
