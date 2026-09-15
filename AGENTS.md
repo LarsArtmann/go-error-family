@@ -2,7 +2,7 @@
 
 Structured error protocol library. Library only — no `main`, no build system, no external deps. Full API reference: `SKILL.md`.
 
-**Status:** Verified green (2026-09-15): all tests pass with `-race` across root + all submodules in a CI-parity env (`GOEXPERIMENT=` unset), `buildflow` exits 0 (89 steps, 0 failed), erraudit 0 findings in all 6 modules, nix checks build, `GOWORK=off go build` clean
+**Status:** v0.10.1 released (2026-09-15): CI + Release + Deploy Website all green on origin/master, all 7 module tags proxy-indexed, pkg.go.dev serving v0.10.1. Local: all tests pass with `-race` across root + all submodules, golangci-lint v2.13.2 = 0 issues in all 7 modules, erraudit 0 findings
 **Workspace modules:** root (zero-dep), `agent`, `bridge` (oops integration), `diagnose`, `diagnose/git`, `diagnose/postgres`, `examples`, `website`
 
 ## Quick Start
@@ -213,7 +213,7 @@ The bridge is correct, tested (95.6%), and fuzzed. The reference implementation 
 - **mnd** ignores `family.go` — the `familyData` table contains intentional HTTP status codes, exit codes, and severity values with inline comments. Extracting 15+ named constants would reduce readability.
 - **varnamelen** ignore-names includes Go-idiomatic short names: `tc` (test case), `f` (fmt.State — Go stdlib convention), `w` (http.ResponseWriter), `ag` (agent).
 - **`//nolint:hierarchical-errors` directives were removed (2026-07-26):** The `hierarchical-errors` linter was never installed — not as a binary, not as a golangci-lint linter, not as a BuildFlow step. The 52 directives across 13 files only produced "unknown linters" warnings on every golangci-lint run. Removed entirely with no new lint issues.
-- **Release workflow pins `v2.12.2`:** Both `ci.yml` and `release.yml` pin the same golangci-lint-action version. Previously `release.yml` used `version: latest` (supply-chain reproducibility risk).
+- **golangci-lint pins are `v2.13.2` everywhere (ci.yml + release.yml, 2026-09-15):** fixes a version split-brain — CI's old v2.12.2 fired `recvcheck` on `Family`/`Audience` (mixed receivers required by `encoding.TextUnmarshaler`) while v2.13.2 does not, so `//nolint:recvcheck` directives were simultaneously required (CI) and "unused" (local/BuildFlow → nolintlint error → auto-removed → CI red). Do NOT re-add those directives; keep the pins in sync with the local/BuildFlow binary instead. The `exhaustruct` → `exhaustruct_v5` rename (deprecation warning in v2.13.x) is the remaining standalone follow-up.
 - **BuildFlow passes:** `buildflow --dry-run` reports 38/39 steps passing (1 skipped via config). The `gitignore-upserter:detect` step and `nix-hash-fix` repair both succeed.
 
 ## Known Limitations
