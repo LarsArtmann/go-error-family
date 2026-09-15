@@ -109,7 +109,7 @@ See [examples/](examples/) for runnable CLI, HTTP, and custom diagnostic rule de
 - **`WrapOnce(err, family, code, msg)`** — idempotent wrap that prevents double-wrapping at API boundaries
 - **`WithExitCode(code)` / `WithContextAny(key, value)`** — per-error exit code override and type-safe context attachment
 
-## The Five Families
+## The Six Families
 
 | Family             | Retryable | Exit Code | Whose Fault             | Tone          |
 | ------------------ | --------- | --------- | ----------------------- | ------------- |
@@ -366,6 +366,45 @@ The response body contains only `family`, `code`, and a user-facing `message`
 
 For a custom response shape, write your own response and use `HTTPStatus(err)`
 directly.
+
+### Conditional Requests (304, 412, 428, 416)
+
+Every family maps to an error status (4xx/5xx), so conditional-request outcomes
+(RFC 9110 §13) need explicit handling:
+
+| Outcome                                            | Classification                                                                                                                                             |
+| -------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **304 Not Modified**                               | Not an error. Write the 304 (plus `ETag`/`Cache-Control`) yourself and return `nil` — `HTTPHandler` treats `nil` as "fully handled". Classifying it would attach wrong retry/exit semantics. |
+| **412 Precondition Failed** (RFC 9110 §15.5.13)    | `Conflict` + `WithHTTPStatus(412)`. The client asserted state (`If-Match: "abc"`) that no longer holds — a version mismatch. Not retryable; remediation is "refresh and reapply", exactly `Conflict`'s. |
+| **428 Precondition Required** (RFC 6585 §3)        | `Rejection` + `WithHTTPStatus(428)`. The request omitted a required precondition — incomplete input, not a state clash. Remediation is "fix the request", exactly `Rejection`'s. |
+| **416 Range Not Satisfiable** (RFC 9110 §15.5.17)  | `Rejection` + `WithHTTPStatus(416)`. The `Range` value doesn't overlap the resource — a bad input value.                                                      |
+
+```go
+func getWidget(w http.ResponseWriter, r *http.Request) error {
+    // RFC 9110 §13.2.2: If-Match evaluates before If-None-Match
+    if im := r.Header.Get("If-Match"); im != "" && !etagMatches(im, currentETag) {
+        return errorfamily.NewConflict("etag.precondition_failed", "If-Match precondition failed").
+            WithHTTPStatus(http.StatusPreconditionFailed) // 412, not the family default 409
+    }
+    if etagMatches(r.Header.Get("If-None-Match"), currentETag) {
+        w.Header().Set("ETag", currentETag)
+        w.WriteHeader(http.StatusNotModified) // success outcome — no error, no body
+        return nil
+    }
+    // ...serve the current representation
+    return nil
+}
+
+mux.Handle("/widgets/{id}", errorfamily.HTTPHandler(getWidget))
+// HTTPStatus(err) == 412 · Classify(err) == Conflict · IsRetryable(err) == false · ExitCode(err) == 1
+```
+
+Families stay behavioral (retry, exit code, tone); statuses stay wire-level.
+`WithHTTPStatus` is the intended seam between them — the same pattern as a 404
+Not Found `Rejection`. If you don't construct errors with this package,
+implement the `HTTPStatuser` interface on your own type instead. To control the
+client-facing `message` in `HTTPHandler` responses, register a template for the
+code — `HTTPHandler` never leaks `err.Error()`.
 
 ## Structured Logging
 

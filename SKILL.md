@@ -55,7 +55,7 @@ examples/             ← OWN MODULE: runnable examples (depends on root + diagn
 
 ---
 
-## The Five Families
+## The Six Families
 
 | Family           | Retry?  | Exit | Whose fault | Audience | Tone          | When                                             |
 | ---------------- | ------- | ---- | ----------- | -------- | ------------- | ------------------------------------------------ |
@@ -372,6 +372,38 @@ mux.Handle("/api/orders", errorfamily.HTTPHandler(func(w http.ResponseWriter, r 
 `HTTPHandler` writes `{"family","code","message"}` where `message` comes only from a
 registered `MessageTemplate` — it NEVER includes the raw `err.Error()` (no internal leak).
 
+### Conditional Requests (304, 412, 428, 416)
+
+Every family maps to a 4xx/5xx, so RFC 9110 §13 conditional-request outcomes need explicit handling:
+
+| Outcome | Recipe |
+| --- | --- |
+| 304 Not Modified | NOT an error. Write the 304 (plus `ETag`) yourself, return `nil` (`HTTPHandler` treats nil as fully handled). Never classify it. |
+| 412 Precondition Failed | `NewConflict(...).WithHTTPStatus(http.StatusPreconditionFailed)` — client-asserted state (`If-Match`) no longer holds = version mismatch = Conflict semantics. |
+| 428 Precondition Required (RFC 6585 §3) | `NewRejection(...).WithHTTPStatus(http.StatusPreconditionRequired)` — request omitted a required precondition = incomplete input = Rejection semantics (NOT Conflict: nothing contradicts current state; the fix is "fix the request", not "refresh and reapply"). |
+| 416 Range Not Satisfiable | `NewRejection(...).WithHTTPStatus(http.StatusRequestedRangeNotSatisfiable)` — unsatisfiable `Range` = bad input value. |
+
+```go
+// RFC 9110 §13.2.2: If-Match evaluates before If-None-Match
+if im := r.Header.Get("If-Match"); im != "" && !etagMatches(im, currentETag) {
+    return errorfamily.NewConflict("etag.precondition_failed", "If-Match precondition failed").
+        WithHTTPStatus(http.StatusPreconditionFailed) // 412, not family default 409
+}
+if etagMatches(r.Header.Get("If-None-Match"), currentETag) {
+    w.Header().Set("ETag", currentETag)
+    w.WriteHeader(http.StatusNotModified) // success outcome — no error, no body
+    return nil
+}
+```
+
+`WithHTTPStatus` is the intended behavioral/wire-level seam (same pattern as 404-over-Rejection).
+For error types NOT built with this package, implement the `HTTPStatuser` interface on your own type.
+
+**TRAP:** do NOT build a wrapper that embeds `*errorfamily.Error` to add `HTTPStatus()` — it does not compile.
+The embedded field named `Error` shadows the promoted `Error() string` method (wrapper fails `error` satisfaction),
+and declaring your own `Error() string` method collides with the embedded field name ("field and method with the
+same name Error"). Use `.WithHTTPStatus(...)` on the `*Error`, or a named field + explicit `Error`/`Unwrap` forwarding.
+
 ### Look Up a Template Without the CLI Pipeline
 
 ```go
@@ -504,6 +536,9 @@ result, err := ag.Analyze(ctx, err, diagnosis)
 | Template `{key}` uses `strings.ReplaceAll`                  | Not html/template — just simple substitution; NOT HTML-escaped (unsafe for HTML rendering) |
 | `DiagnosticFunc` is a function type, not interface          | Avoids circular import between root and diagnose packages                                  |
 | `diagnose/` and `agent/` are separate modules               | Opt-in: skip them unless you need infrastructure debugging or AI analysis                  |
+| `HTTPStatus(nil)` returns `400`                            | Nil reaching the HTTP layer classifies as Rejection — check nil first                       |
+| 304 Not Modified must never be classified                  | Every family implies 4xx/5xx + retry/exit semantics a 304 doesn't have — write it, return nil |
+| Embedding `*Error` in a custom wrapper struct won't compile | Embedded field `Error` shadows the promoted `Error()` method; own `Error()` method collides with the field name. Use `WithHTTPStatus` or a named field + forwarding |
 
 ---
 
