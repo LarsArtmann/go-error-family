@@ -4,21 +4,15 @@ Short- and mid-term actionable improvement tasks. Each item is bounded and
 traceable to its source. When an item ships, remove it here and record it in
 `CHANGELOG.md` under the version it shipped in.
 
-**Last updated:** 2026-07-26
+**Last updated:** 2026-09-15
 
 ---
 
 ## Active
 
-### Medium Priority
-
-- [ ] **Add test and lint CI steps for the examples module** — CI currently only runs `go build ./...` for examples. The bridge reference implementation added 19 tests and lint-sensitive code, but neither runs in CI. Add `go test -race -count=1 ./...` and `golangci-lint run ./...` steps to `ci.yml`. Source: bridge reference session 2026-07-26.
-- [ ] **Add bridge guide to the website** — `website/src/content/docs/guides/` has pages for classification, diagnostics, HTTP/CLI, logs, benchmarks, and error-types, but NOT bridge patterns. The reference implementation (`examples/cmd/bridge/`) is the #1 adoption unblocker and should have a corresponding guide page. Link from `related-tools.mdx`. Source: bridge reference session 2026-07-26.
-- [ ] **Link the reference implementation from `related-tools.mdx`** — the website page mentions bridge APIs but doesn't link to `examples/cmd/bridge/`. Source: bridge reference session 2026-07-26.
-
 ### Low Priority
 
-- [ ] **Apply ACME TXT DNS record** — staged in Terraform but not applied (Namecheap API key is a placeholder). The HTTP challenge works now, but DNS-based verification is more robust for cert renewals. Source: status report 2026-07-23_05-07 section b.1.
+- [ ] **Apply ACME TXT DNS record** — staged in Terraform but not applied (Namecheap API key is a placeholder). The HTTP challenge works now, but DNS-based verification is more robust for cert renewals. Source: status report 2026-07-23_05-07 section b.1. **Blocked externally:** requires a real Namecheap API key and IP whitelisting in the `domains` repo (`domains/lars.software.tf`); manual step.
 
 ---
 

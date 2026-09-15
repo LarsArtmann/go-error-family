@@ -8,11 +8,14 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ### Added
 
+- **CI: examples module test and lint steps** — the `test` job now runs `go test -race -count=1 ./...` in `./examples` (19 bridge-reference tests + checkout tests), and the `lint` job runs golangci-lint there, matching every other workspace module. Replaces the old examples `go build` step (`go test` compiles everything it tests).
+- **Website: Bridge Patterns guide** (`guides/bridge`) — the classify→enrich→handle walkthrough: libraries classify, applications enrich; the three patterns (pass-through, `AutoWrap`, explicit `Wrap`), the oops tag/domain inference cascade, the one-error-two-representations table, and the decision guide. Linked from the sidebar and from `related-tools`.
 - **Documentation: conditional-request classification guidance** (README, website HTTP guide, SKILL.md) — how to handle RFC 9110 §13 conditional-request outcomes: **304 Not Modified** is a success path (write the response and return `nil`; never classify it — every family implies 4xx/5xx plus retry/exit semantics), **412 Precondition Failed** is `Conflict` + `WithHTTPStatus(412)` (client-asserted state no longer holds = version mismatch), **428 Precondition Required** (RFC 6585 §3) is `Rejection` + `WithHTTPStatus(428)` (omitted required precondition = incomplete input, not a state clash), and **416 Range Not Satisfiable** is `Rejection` + `WithHTTPStatus(416)`. Includes a compiled, tested example (`Example_conditionalRequests`). Resolves #5.
 - **Documentation fix:** "The Five Families" headings in README and SKILL.md renamed to "The Six Families" — stale since `Orchestration` was added in 0.10.0.
 
 ### Fixed
 
+- **Website: `astro check` broken by TypeScript 7** — a dependency bump moved the website to `typescript ^7.0.2`, whose native compiler no longer exposes the programmatic API `astro check` (`@astrojs/language-server`) relies on, failing the `website-deploy` workflow's check step on every run. Pinned back to `^6.0.0` (resolves 6.0.3) per the upstream guidance to stay on 6.x until Astro supports the native compiler; `astro check` is green again (0 errors/warnings/hints).
 - **Workspace build: stale `go.work.sum` checksum for `diagnose v0.2.2`** — the recorded `go.mod` checksum no longer matched the tag's bits (tag was re-pointed after the sum was recorded; `GOPRIVATE` skips sumdb verification, so the drift surfaced as a SECURITY ERROR on every workspace build). Removed the stale line; `go build ./...` re-resolves via the workspace `use` directive.
 - **Website: stray compiled Tailwind artifact** — `website/src/styles/global.out.css` (build output, referenced nowhere) was accidentally committed; removed and `*.out.css` added to `website/.gitignore`.
 
