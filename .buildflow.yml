@@ -40,3 +40,11 @@ skip_steps:
   # roleak/do/panic but NOT pkg/phantom — see branching-flow source). Until
   # the phantom analyzer grows ignore support, it cannot be scoped down here.
   - branching-flow
+  # nix-hash-fix repairs vendorHash FOD mismatches, but this flake has no
+  # vendorHash (plain go build via pkgs.go_1_26; no vendor/ directory), so
+  # the step's default-package probe fails structurally: it targets
+  # packages.x86_64-linux.default, which this flake does not provide (it
+  # exposes named checks like checks.format instead). Deterministic failure,
+  # verified 2026-09-18 (42/42 historical failures). Re-add if a vendored
+  # Go build with vendorHash is ever introduced.
+  - nix-hash-fix
