@@ -39,7 +39,7 @@ linters:
     - errname
     - errorlint
     - exhaustive
-    - exhaustruct
+    - exhaustruct_v5
     - exptostd
     - fatcontext
     - forbidigo
@@ -131,8 +131,8 @@ linters:
       rules:
         no-encoding-json-v2:
           deny:
-            - pkg: encoding/json/v2
-              desc: requires GOEXPERIMENT=jsonv2 — reverted by policy 2026-07-23, use encoding/json (AGENTS.md)
+            - desc: requires GOEXPERIMENT=jsonv2 — reverted by policy 2026-07-23, use encoding/json (AGENTS.md)
+              pkg: encoding/json/v2
     dupl:
       threshold: 100
     errcheck:
@@ -153,8 +153,8 @@ linters:
         - fmt.Println
         - (*strings.Builder).WriteString
         - (*bytes.Buffer).WriteString
-    exhaustruct:
-      exclude:
+    exhaustruct_v5:
+      ignore-patterns:
         - os/exec.Cmd
         - os/exec.ExitError
         - net.Dialer
@@ -294,6 +294,7 @@ linters:
           - recvcheck
           - contextcheck
           - exhaustive
+          - exhaustruct_v5
       - path: diagnose/
         linters:
           - wrapcheck
