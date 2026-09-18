@@ -1,8 +1,14 @@
 package errorfamily
 
 import (
+	"context"
 	"errors"
 	"fmt"
+	"io"
+	"log/slog"
+	"net/http"
+	"net/http/httptest"
+	"os"
 	"time"
 )
 
@@ -195,6 +201,85 @@ func ExampleRegisterClassificationType() {
 	err := &exampleSQLError{msg: "database is locked"}
 	fmt.Println(reg.Classify(err))
 	// Output: transient
+}
+
+func ExampleWrap() {
+	// Wrap attaches a behavioral family to an error from a lower layer
+	// (stdlib, driver, another library) at the layer that knows the domain.
+	_, openErr := os.Open("/etc/app/config.yaml")
+
+	err := Wrap(openErr, Infrastructure, "config.unreadable", "cannot read config")
+
+	fmt.Println(err)
+	fmt.Println(Classify(err))
+	// Output:
+	// [infrastructure:config.unreadable] cannot read config: open /etc/app/config.yaml: no such file or directory
+	// infrastructure
+}
+
+func ExampleHandleErrorWithContext() {
+	// HandleErrorWithContext is the canonical entry point — HandleError and
+	// HandleErrorWithConfig delegate to it. Prefer it whenever a
+	// context.Context is available.
+	err := NewRejection("file.not_found", "config missing").
+		WithContext("path", "/etc/app/config.yaml")
+	code := HandleErrorWithContext(context.Background(), err, HandleConfig{
+		Output: io.Discard,
+	})
+	fmt.Println(code)
+	// Output: 1
+}
+
+func ExampleIsRetryable() {
+	fmt.Println(IsRetryable(NewTransient("db.timeout", "query timed out")))
+	fmt.Println(IsRetryable(NewRejection("bad.input", "invalid input")))
+	fmt.Println(IsRetryable(errors.New("unknown origin")))
+	// Output: true
+	// false
+	// true
+}
+
+func ExampleFamily_RetryPolicy() {
+	// RetryPolicy exposes advisory defaults — the library does not run the
+	// retry loop. Only Transient gets more than a single attempt.
+	fmt.Println(Transient.RetryPolicy().MaxAttempts)
+	fmt.Println(Rejection.RetryPolicy().MaxAttempts)
+	// Output: 3
+	// 1
+}
+
+func ExampleLogError() {
+	// LogError maps the behavioral family onto slog severity: Transient
+	// (expected to self-heal) logs at Warn, everything else at Error.
+	logger := slog.New(slog.NewTextHandler(os.Stdout, &slog.HandlerOptions{
+		ReplaceAttr: func(_ []string, a slog.Attr) slog.Attr {
+			if a.Key == slog.TimeKey {
+				return slog.Attr{}
+			}
+
+			return a
+		},
+	}))
+	err := NewTransient("db.timeout", "query timed out").
+		WithContext("host", "db1")
+	LogError(err, logger)
+	// Output: level=WARN msg="[transient:db.timeout] query timed out" family=transient code=db.timeout retryable=true exit_code=75 context.host=db1
+}
+
+func ExampleHTTPHandler() {
+	// HTTPHandler bridges classification into net/http: any error returned
+	// by the handler is classified and written as a safe JSON response.
+	// The body never contains the raw error message.
+	fetch := HTTPHandler(func(w http.ResponseWriter, r *http.Request) error {
+		return NewRejection("battle.not_found", "battle 42 missing").WithHTTPStatus(404)
+	})
+
+	rec := httptest.NewRecorder()
+	fetch.ServeHTTP(rec, httptest.NewRequestWithContext(context.Background(), http.MethodGet, "/battles/42", nil))
+	fmt.Println(rec.Code)
+	fmt.Println(rec.Body.String())
+	// Output: 404
+	// {"code":"battle.not_found","family":"rejection"}
 }
 
 type exampleSQLError struct{ msg string }

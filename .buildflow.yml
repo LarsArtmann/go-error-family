@@ -12,11 +12,13 @@ skip_steps:
   # skip stops the fleet-wide `buildflow --fix` orchestrator from re-breaking
   # the repo on every pass.
   - go-auto-upgrade
-  # pnpm-audit runs at the repo root, but the only pnpm-lock.yaml lives in
-  # website/ — a separate Node project with its own flake.nix and deploy
-  # pipeline. Website dependency vulnerabilities are covered by GitHub
-  # Dependabot alerts on website/package.json.
-  - pnpm-audit
+  # pnpm-audit re-enabled 2026-09-18 (removed from skip_steps): Dependabot
+  # alerts still detect website vulnerabilities, but Dependabot's automatic
+  # security-update jobs fail on this repo (npm updater vs pnpm v9 lockfile +
+  # overrides — every job since 2026-09-15 errored out). The audit step is
+  # the working remediation gate; the 8 transitive vulnerabilities (devalue,
+  # fast-uri, js-yaml, svgo) were fixed 2026-09-18 via
+  # `pnpm update --depth Infinity` in website/.
   # BuildFlow's embedded go-structure-linter snapshot predates project-config
   # support: it ignores this repo's .go-structure-linter.yaml (which uses the
   # "flat" preset because the root package IS the published library API —
