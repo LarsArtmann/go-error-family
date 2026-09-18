@@ -4,11 +4,25 @@ Short- and mid-term actionable improvement tasks. Each item is bounded and
 traceable to its source. When an item ships, remove it here and record it in
 `CHANGELOG.md` under the version it shipped in.
 
-**Last updated:** 2026-09-15
+**Last updated:** 2026-09-18
 
 ---
 
 ## Active
+
+1. **Announce the Bridge Patterns guide** (source: ROADMAP theme 4) — the
+   classify→enrich→handle walkthrough shipped in v0.10.1
+   (`website/src/content/docs/guides/bridge.mdx`), but nothing has put it in
+   front of consumers who use `samber/oops`. Draft a public announcement (r/golang
+   post or a linkable short post) that leads with the three patterns and the
+   decision guide. Bounded: one draft, review, publish.
+
+2. **Retract the broken v0.6.0 tag family** (source: ROADMAP theme 3) — the
+   phantom-`replace` v0.6.x tags still resolve from the module proxy and can be
+   `go get`-ed by consumers. Add `retract` directives to `go.mod` (with reason
+   comments pointing at the replacement version), release, and verify
+   `go list -m -versions` shows them as retracted. Bounded: one go.mod edit +
+   release + verification.
 
 ---
 

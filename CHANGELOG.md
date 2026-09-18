@@ -8,11 +8,18 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ### Added
 
-- Nothing yet.
+- **Six godoc example functions for the under-adopted API surface** (pkg.go.dev discoverability) — `ExampleWrap` (the most-used constructor previously had no example), `ExampleHandleErrorWithContext` (the canonical entry point), `ExampleIsRetryable` (including the unknown-error fail-open default), `ExampleFamily_RetryPolicy` (advisory single-attempt vs Transient defaults), `ExampleLogError` (family→severity mapping: Transient→Warn, others→Error, with time-stripped deterministic output), and `ExampleHTTPHandler` (end-to-end: handler returns a classified error, response is a safe JSON body with per-error `WithHTTPStatus(404)` override). Root package now carries 26 runnable examples.
+
+### Changed
+
+- **Lint: completed the `exhaustruct` → `exhaustruct_v5` migration** in `.golangci.yml` (deprecation-warning follow-up from v0.10.1) — the linter block and its os/exec/net exclusion list moved to the v5 key (`ignore-patterns`), and test files exclude `exhaustruct_v5` alongside the other structural linters. Verified 0 issues across all 7 modules on golangci-lint v2.13.2.
+- **Go directive normalized to `go 1.26.7` in all 7 modules + `go.work`** — automated dependency churn had regressed the root and `diagnose` modules to `go 1.26` and set `bridge` to `go 1.26.0`, splitting the uniform `go 1.26.7` floor that the deliberate toolchain bump (dprint adoption) established. All builds and tests re-verified after normalization.
+- **`.buildflow.yml`: re-enabled the `pnpm-audit` step** — its skip rationale ("Dependabot covers it") was detection-only: Dependabot alerts still flag website vulnerabilities, but Dependabot's *automatic security-update jobs* fail on this repo (npm updater vs pnpm v9 lockfile + overrides — every job since 2026-09-15 errored out). The audit step is the working remediation gate.
 
 ### Fixed
 
-- Nothing yet.
+- **Website: TypeScript 7 re-bump recurrence and stale lockfile (third occurrence of this class)** — `website/package.json` drifted to `typescript ^7.0.2` (against the documented 6.x policy) and `@astrojs/starlight ^0.42.1`/`astro ^7.3.2` while `pnpm-lock.yaml` stayed at 6.0.3/0.42.0, failing `pnpm install --frozen-lockfile` in `website-deploy` (manifest/lockfile specifier mismatch). Reverted `typescript` to `^6.0.0`, kept the in-range starlight/astro/html-validate bumps, regenerated the lockfile, and re-verified `astro check` (0 issues) + `astro build` (15 pages).
+- **Website: 8 transitive dependency vulnerabilities resolved** (6 high, 2 moderate) — `devalue < 5.9.1` (DoS), `fast-uri`, `js-yaml`, and `svgo` advisories across multiple major lines, all reachable through `astro`/`starlight`/`html-validate` whose latest releases don't yet pull patched transitives. `pnpm update --depth Infinity` bumped every transitive within its declared range (no overrides needed); `pnpm audit` is clean. This also removes the alert source that kept triggering the failing Dependabot update jobs.
 
 ## [0.10.1] - 2026-09-15
 

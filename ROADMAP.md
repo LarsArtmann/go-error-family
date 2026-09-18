@@ -3,7 +3,7 @@
 Long-term direction and raw ideas not yet refined into actionable tasks.
 When an idea becomes bounded and actionable, it moves to `TODO_LIST.md`.
 
-**Last updated:** 2026-07-26
+**Last updated:** 2026-09-18
 
 ---
 
@@ -11,19 +11,14 @@ When an idea becomes bounded and actionable, it moves to `TODO_LIST.md`.
 
 go-error-family is a stable classification core with a growing ecosystem
 of opt-in modules (`diagnose`, `agent`, `bridge`). The taxonomy is proven across
-multiple consumers (DiscordSync, browser-history, SwettySwipperWeb). The CLI
-story was strengthened with per-error exit code overrides (`ExitCoder`),
-idempotent wrapping (`WrapOnce`), typed context values (`WithContextAny`), and
-panic-safe cause rendering (`safeCauseString`), structured-logging hook
-(`HandleConfig.Logger`), and HTTP error-path fix (`writeHTTPError` respects
-per-error `WithHTTPStatus`). v0.9.0 is released; `[Unreleased]` adds the
-`Orchestration` family (6th family for internal coordination failures). The
-focus now is: improving consumer discoverability of the higher-level boundary
-handlers (`HTTPHandler`, `LogError`, `diagnose`), and resolving the few open
-design tensions from consumer feedback. The CI module-graph gate and
-consumer-simulation job shipped; lint is at zero golangci-lint issues across
-all modules. The 52 phantom `//nolint:hierarchical-errors` directives (for a
-linter that was never installed) have been removed.
+multiple consumers (DiscordSync, browser-history, SwettySwipperWeb). v0.10.1 is
+released (2026-09-15) with the `Orchestration` family (6th family), CI +
+Release + Website pipelines, and all 7 module tags proxy-indexed. The focus
+now is: improving consumer discoverability of the higher-level boundary
+handlers (`HTTPHandler`, `LogError`, `diagnose`) — the pkg.go.dev example
+surface now covers all six families plus the boundary APIs (26 examples) —
+and keeping the supply-chain gates honest (pnpm-audit re-enabled;
+Dependabot's npm updater cannot drive the pnpm website lockfile).
 
 ## Themes
 
@@ -36,7 +31,7 @@ where they are.
 
 **Raw ideas:**
 
-- Example functions (`ExampleClassify`, `ExampleWrap`, etc.) visible on pkg.go.dev
+- ~~Example functions (`ExampleClassify`, `ExampleWrap`, etc.) visible on pkg.go.dev~~ — **SHIPPED (2026-09-18):** 26 runnable examples covering all six families, the classification precedence (`Classify`, `IsRetryable`, `ParseFamily`), registry patterns, CLI handling (`HandleError`, `HandleErrorWithContext`, `HandleErrorDetailed`), and the HTTP boundary (`HTTPHandler`, `HTTPStatus`, `Error_JSON`, conditional requests). Remaining gap: `errorfamilytest` and `diagnose` subpackages have no examples yet.
 - A "common patterns" section that grows from real consumer usage
 - Consider whether `Code()` vs `ErrorCode()` dual accessors should converge in a future major version
 
@@ -85,7 +80,7 @@ handle). The reference implementation shipped (2026-07-26: `examples/cmd/bridge/
 
 **Raw ideas:**
 
-- ~~**Reference implementation for oops + bridge + error-family stack**~~ — **SHIPPED (2026-07-26):** `examples/cmd/bridge/` + `examples/checkout/`. Three patterns, 19 tests, pattern documentation in `cmd/bridge/README.md`. Next: website guide page and announcement.
+- ~~**Reference implementation for oops + bridge + error-family stack**~~ — **SHIPPED (2026-07-26):** `examples/cmd/bridge/` + `examples/checkout/`. Three patterns, 19 tests, pattern documentation in `cmd/bridge/README.md`. ~~Next: website guide page~~ — **guide page SHIPPED (v0.10.1):** `website/src/content/docs/guides/bridge.mdx`. Remaining: public announcement.
 - More diagnostic submodules (`redis`, `docker`, `kubectl`)
 - Bridge packages for other error enrichment libraries beyond oops (only after oops bridge has proven consumers)
 - Integration guides for common frameworks (Echo, Gin, Chi, gRPC interceptors)
