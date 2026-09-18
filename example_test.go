@@ -275,7 +275,10 @@ func ExampleHTTPHandler() {
 	})
 
 	rec := httptest.NewRecorder()
-	fetch.ServeHTTP(rec, httptest.NewRequestWithContext(context.Background(), http.MethodGet, "/battles/42", nil))
+	fetch.ServeHTTP(
+		rec,
+		httptest.NewRequestWithContext(context.Background(), http.MethodGet, "/battles/42", nil),
+	)
 	fmt.Println(rec.Code)
 	fmt.Println(rec.Body.String())
 	// Output: 404
