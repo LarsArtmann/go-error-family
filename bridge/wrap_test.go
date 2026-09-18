@@ -300,3 +300,29 @@ func TestWrap_Format(t *testing.T) {
 		})
 	}
 }
+
+// TestWrap_MessageIsCleanForPlainErrors pins the contract the
+// templ-components errorpage package relies on: Message() returns the
+// original error's message WITHOUT the "[family]" classification prefix, so
+// user-facing renderers that prefer Message() over Error() don't display
+// internal classification decoration. (Scenario S5 of the 2026-09-17
+// templ-components bridge probe: a page rendered "[conflict] connection
+// refused after 30s" to end users.)
+func TestWrap_MessageIsCleanForPlainErrors(t *testing.T) {
+	base := errors.New("connection refused after 30s")
+	classified := Wrap(base, errorfamily.Conflict)
+
+	if got, want := classified.Message(), "connection refused after 30s"; got != want {
+		t.Errorf("Message() = %q, want %q (no [family] prefix)", got, want)
+	}
+}
+
+// TestWrap_MessageNonEmptyForOopsErrors verifies the oops path keeps a
+// non-empty clean message (the OopsError's own content, not a bare prefix).
+func TestWrap_MessageNonEmptyForOopsErrors(t *testing.T) {
+	classified := Wrap(oops.Errorf("quota exceeded"), errorfamily.Rejection)
+
+	if got := classified.Message(); got == "" {
+		t.Fatal("Message() = empty for oops error, want non-empty")
+	}
+}

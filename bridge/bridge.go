@@ -86,6 +86,22 @@ func (c *ClassifiedError) Error() string {
 	return fmt.Sprintf("[%s]", c.family)
 }
 
+// Message returns the clean, user-presentable message: the original error's
+// message without the "[family]" classification prefix that Error() adds for
+// plain errors. User-facing renderers that prefer a Message() method over
+// Error() (the convention templ-components' errorpage package uses) get the
+// bare message and keep classification out of end-user-visible text.
+//
+// Falls back to Error() when there is no original error, so Message never
+// returns an empty string for a constructed ClassifiedError.
+func (c *ClassifiedError) Message() string {
+	if c.original != nil {
+		return c.original.Error()
+	}
+
+	return c.Error()
+}
+
 // Unwrap returns the underlying error for chain traversal.
 // Returns the OopsError's wrapped error when present, otherwise returns
 // the original error. This ensures errors.Is always reaches the root cause.
