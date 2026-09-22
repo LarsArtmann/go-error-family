@@ -33,12 +33,13 @@ skip_steps:
   # go-structure-linter snapshot ignores this repo's .go-structure-linter.yaml
   # (see above), so it is skipped too.
   - go-structure-linter
-  # branching-flow's phantom analyzer (a) suggests phantom-typing every
-  # exported string field/parameter of this library's published protocol
-  # types — a breaking API change by definition, and (b) does not honor its
-  # own // branching-flow:ignore directives (IsIgnored is wired into
-  # roleak/do/panic but NOT pkg/phantom — see branching-flow source). Until
-  # the phantom analyzer grows ignore support, it cannot be scoped down here.
+  # POLICY, deliberate: the published protocol types keep string-typed
+  # fields/parameters. branching-flow's phantom analyzer flags every one of
+  # them, and adopting its suggestions would be a breaking API change the
+  # maintainers reject by design — this skip is a standing design opinion,
+  # not a bug workaround. (The analyzer's old ignore-directive gap in
+  # pkg/phantom is fixed upstream as of v0.6.x — IsIgnored is now honored —
+  # so per-field ignores are available if the policy ever narrows.)
   - branching-flow
   # nix-hash-fix repairs vendorHash FOD mismatches, but this flake has no
   # vendorHash (plain go build via pkgs.go_1_26; no vendor/ directory), so
