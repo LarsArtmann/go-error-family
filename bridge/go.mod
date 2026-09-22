@@ -9,8 +9,6 @@ require (
 
 require (
 	github.com/cespare/xxhash/v2 v2.3.0 // indirect
-	github.com/larsartmann/go-error-family/bridge v0.3.4
-	github.com/larsartmann/go-error-family/diagnose v0.2.4
 	github.com/oklog/ulid/v2 v2.1.2 // indirect
 	github.com/samber/lo v1.53.0 // indirect
 	go.opentelemetry.io/otel v1.46.0 // indirect

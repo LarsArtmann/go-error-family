@@ -1,4 +1,4 @@
 github.com/larsartmann/go-error-family v0.10.1 h1:lf1RNjpdK7k+tCzphkg5qRolAY76U8OGEc09ZsZ5S6A=
 github.com/larsartmann/go-error-family v0.10.1/go.mod h1:SYSVwVMTkw2GcqXI4khjMYOg7ey39o8sh7rXC9LfNcY=
-github.com/larsartmann/go-error-family/diagnose v0.2.3 h1:HAlXTQlgiOo8wyS1ULV38Hv7q5xMKGzuFZOzONh80KI=
-github.com/larsartmann/go-error-family/diagnose v0.2.3/go.mod h1:1q8BpUiImBkEErM4gEVplXQw8inuV3qZ1MELJ7dVJJ4=
+github.com/larsartmann/go-error-family/diagnose v0.2.4 h1:KkqA4rmFbeBGzb4nqMWOvUww9vBptjdqBS3udaP0wEo=
+github.com/larsartmann/go-error-family/diagnose v0.2.4/go.mod h1:WHGGUQ7Y1XKnqQoAYwzzva6biYipT9pol31CsRzVlKU=
