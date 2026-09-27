@@ -129,17 +129,19 @@ Not a library type — partial success is a consumption pattern, not a classific
 
 ## Test Coverage
 
+Live `go test -cover` run, 2026-09-27:
+
 | Package              | Coverage |
 | -------------------- | -------- |
 | root (`errorfamily`) | 97.1%    |
 | `errorfamilytest`    | 96.3%    |
 | `agent`              | 100.0%   |
-| `bridge`             | 95.6%    |
-| `diagnose` (core)    | 83.9%    |
-| `diagnose/git`       | 98.5%    |
-| `diagnose/postgres`  | 80.3%    |
+| `bridge`             | 94.4%    |
+| `diagnose` (core)    | 84.2%    |
+| `diagnose/git`       | 91.0%    |
+| `diagnose/postgres`  | 78.5%    |
 
-All packages at 80%+; root and `diagnose/git` near-complete. (`errorfamilytest` is intentionally thin — assertion helpers delegating to the main package.)
+Root and `agent` near-complete. `diagnose/git` dropped 98.5% → 91.0% and `diagnose/postgres` 80.3% → 78.5% with the v0.10.1 erraudit run-path rewrites (new error branches, untested); lift targets live in TODO_LIST. (`errorfamilytest` is intentionally thin — assertion helpers delegating to the main package.)
 
 ## Fuzz Tests
 
@@ -170,7 +172,7 @@ Connects go-error-family with `samber/oops`. Separate module with its own `go.mo
 2. **The enrichment layer is skipped in practice** — consumers call `HandleError(err)` at the top with whatever error bubbled up, without adding stack traces, trace IDs, or domain context. The typical flow is classify→handle, not classify→enrich→handle.
 3. **~~No reference implementation~~** — **RESOLVED (2026-07-26):** `examples/cmd/bridge/` now demonstrates the full classify→enrich→handle flow with three patterns (pass-through, AutoWrap, explicit Wrap). See `examples/cmd/bridge/README.md` for the pattern documentation and decision guide.
 
-The bridge is correct, tested (95.6%), and fuzzed. The reference implementation (`examples/cmd/bridge/` + `examples/checkout/`) proves the pattern works end-to-end and documents when to use each bridge API.
+The bridge is correct, tested (94.4%), and fuzzed. The reference implementation (`examples/cmd/bridge/` + `examples/checkout/`) proves the pattern works end-to-end and documents when to use each bridge API.
 
 | API                        | Purpose                                                                               |
 | -------------------------- | ------------------------------------------------------------------------------------- |

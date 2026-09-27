@@ -50,9 +50,11 @@ traceable to its source. When an item ships, remove it here and record it in
    `-t 1` or `-t 5` is the routine gate and record the policy in AGENTS.md.
    Bounded: one capability check + one config/doc edit.
 
-6. **Lift diagnose-family coverage** (source: docs/status/2026-09-22 §f18–f19)
-   — `diagnose` core 83.9% → ≥90% (targeted tests on uncovered rule paths),
-   `diagnose/postgres` 80.3% → ≥85%. Bounded: two test additions.
+6. **Lift diagnose-family coverage** (source: docs/status/2026-09-22 §f18–f19;
+   baselines re-measured 2026-09-27) — `diagnose` core 84.2% → ≥90% (targeted
+   tests on uncovered rule paths), `diagnose/postgres` 78.5% → ≥85%, and
+   recover the `diagnose/git` regression 98.5% → 91.0% (new erraudit error
+   branches from v0.10.1 are untested). Bounded: three test additions.
 
 7. **Re-verify the standing claims battery** (source: docs/status/2026-09-22
    §f15, §f20, §f38) — erraudit (0-findings claim), `go-structure-linter` CLI

@@ -32,9 +32,9 @@
 
 | # | Item                             | What's done                                                                                           | What remains                                                                                                                                                                               |
 | - | -------------------------------- | ----------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| 1 | **Cross-module pin consistency** | Tags cut; committed go.mod files reference valid older versions (v0.6.0, diagnose v0.1.0) — MVS-valid | BuildFlow auto-generated pin bumps to the fresh tags (v0.6.1, diagnose v0.1.1) sitting **uncommitted** in the working tree. Committing them would require yet another tag round (chasing). |
-| 2 | **Release publication**          | Tags exist locally                                                                                    | **Not pushed to remote** (no explicit push run). `origin/master` tracking ref shows `48d7e70` but this is suspicious — see (d). Tags definitely not pushed.                                |
-| 3 | **CI hardening**                 | Source go.mod files are correct                                                                       | No CI gate added yet to prevent recurrence (`GOWORK=off go list -m all` check)                                                                                                             |
+| ~~1~~ | ~~**Cross-module pin consistency**~~ done — resolved — coordinated releases bump pins in lockstep; sub-tags-first sequencing ended the chasing | ~~Tags cut; committed go.mod files reference valid older versions (v0.6.0, diagnose v0.1.0) — MVS-valid~~ | ~~BuildFlow auto-generated pin bumps to the fresh tags (v0.6.1, diagnose v0.1.1) sitting **uncommitted** in the working tree. Committing them would require yet another tag round (chasing).~~ |
+| ~~2~~ | ~~**Release publication**~~ done — pushed 2026-07-05; release live on the proxy | ~~Tags exist locally~~ | ~~**Not pushed to remote** (no explicit push run). `origin/master` tracking ref shows `48d7e70` but this is suspicious — see (d). Tags definitely not pushed.~~ |
+| ~~3~~ | ~~**CI hardening**~~ done — GOWORK=off gates shipped in v0.8.0 | ~~Source go.mod files are correct~~ | ~~No CI gate added yet to prevent recurrence (`GOWORK=off go list -m all` check)~~ |
 
 ---
 
@@ -42,12 +42,12 @@
 
 | # | Item                                                                     |
 | - | ------------------------------------------------------------------------ |
-| 1 | Pushing commit + tags to remote (`git push origin master --tags`)        |
-| 2 | CI gate: `GOWORK=off go list -m all` per module                          |
-| 3 | CI consumer-simulation job (`go get ...@tag` in throwaway module)        |
-| 4 | CI invariant: root `go list -m all` returns exactly 1 line               |
-| 5 | SKILL.md audit for stale "replace" / "not yet published" language        |
-| 6 | Release-notes / README note deprecating the broken v0.6.0 family of tags |
+| ~~1~~ | ~~Pushing commit + tags to remote (`git push origin master --tags`)~~ done — commit + tags pushed 2026-07-05 |
+| ~~2~~ | ~~CI gate: `GOWORK=off go list -m all` per module~~ done — ci.yml GOWORK=off graph gate (v0.8.0) |
+| ~~3~~ | ~~CI consumer-simulation job (`go get ...@tag` in throwaway module)~~ done — consumer-simulation job in ci.yml (v0.8.0) |
+| ~~4~~ | ~~CI invariant: root `go list -m all` returns exactly 1 line~~ done — GOWORK=off go list -m all in ci.yml |
+| ~~5~~ | ~~SKILL.md audit for stale "replace" / "not yet published" language~~ done — SKILL.md overhauled in later passes |
+| ~~6~~ | ~~Release-notes / README note deprecating the broken v0.6.0 family of tags~~ done — routed — TODO_LIST #2 (retract directives still pending) |
 
 ---
 
@@ -88,11 +88,11 @@ I did **not** run `git push`. Before my commit, `origin/master` was at `7605190`
 
 ## e) WHAT WE SHOULD IMPROVE 🛠️
 
-1. **BuildFlow's auto-push behavior must be explicit and logged.** A post-commit hook that silently pushes violates the "never push without permission" invariant and makes release state ambiguous. Either disable auto-push or make it loud/opt-in.
-2. **Version-pin chasing is inherent to this multi-module layout.** Every tag cut regenerates pin bumps. Consider: (a) accept MVS-valid-but-lagging pins as fine and stop chasing, or (b) cut tags in strict topological order and re-tag, or (c) use a release tool that handles this (e.g., `go-releaser` multi-module).
-3. **`flake.lock` churn** — BuildFlow's freshness check re-bumps nixpkgs on every commit. Either commit the bump (and stop discarding it) or configure BuildFlow to skip `flake-lock-freshness` on non-nix commits.
-4. **The commit-then-tag sequence leaks intermediate state.** A better workflow: stage everything → cut tags on the _intended_ commit → push commit+tags atomically. Tagging after commit (as I did) means the tagged commit's go.mod never references the tag's own version.
-5. **No CI gate yet** for the exact class of bug we just fixed. Highest-ROI improvement possible.
+1. ~~**BuildFlow's auto-push behavior must be explicit and logged.** A post-commit hook that silently pushes violates the "never push without permission" invariant and makes release state ambiguous. Either disable auto-push or make it loud/opt-in.~~ done — resolved — pushes are explicit since; release state verified post-2026-07-05
+2. ~~**Version-pin chasing is inherent to this multi-module layout.** Every tag cut regenerates pin bumps. Consider: (a) accept MVS-valid-but-lagging pins as fine and stop chasing, or (b) cut tags in strict topological order and re-tag, or (c) use a release tool that handles this (e.g., `go-releaser` multi-module).~~ done — resolved — sub-tags-before-root-tag sequencing adopted and documented in AGENTS.md
+3. ~~**`flake.lock` churn** — BuildFlow's freshness check re-bumps nixpkgs on every commit. Either commit the bump (and stop discarding it) or configure BuildFlow to skip `flake-lock-freshness` on non-nix commits.~~ done — resolved — flake.lock churn stabilized; bumps committed going forward
+4. ~~**The commit-then-tag sequence leaks intermediate state.** A better workflow: stage everything → cut tags on the _intended_ commit → push commit+tags atomically. Tagging after commit (as I did) means the tagged commit's go.mod never references the tag's own version.~~ done — resolved — v0.10.x releases tag the release commit; sequence documented
+5. ~~**No CI gate yet** for the exact class of bug we just fixed. Highest-ROI improvement possible.~~ done — CI gates shipped in v0.8.0
 
 ---
 
@@ -100,37 +100,37 @@ I did **not** run `git push`. Before my commit, `origin/master` was at `7605190`
 
 | #  | Task                                                                                                                  | Impact                                     |
 | -- | --------------------------------------------------------------------------------------------------------------------- | ------------------------------------------ |
-| 1  | **Confirm whether `48d7e70` is actually on the remote** (`git ls-remote origin master`)                               | 🔴 Critical — determines release state     |
-| 2  | **Push tags to remote** (`git push origin --tags`) if commit is there, else push both                                 | 🔴 Makes the release real                  |
-| 3  | **Decide on the dirty pin bumps** — commit them + cut v0.6.2/diagnose-v0.1.2/etc., OR discard and accept lagging pins | 🔴 Unblocks clean tree                     |
-| 4  | **Resolve flake.lock churn** — commit the nixpkgs bump or configure BuildFlow to skip it                              | 🟠 Stops recurring dirt                    |
-| 5  | **Add CI gate: `GOWORK=off go list -m all`** per module                                                               | 🔴 Prevents recurrence of the original bug |
-| 6  | **Add CI consumer-simulation job** (`go get @tag` in throwaway module)                                                | 🔴 Honest release proof                    |
-| 7  | **Add CI invariant: root `go list -m all` = 1 line**                                                                  | 🟠 Enforces zero-dep                       |
-| 8  | **Audit BuildFlow config** for auto-push hooks; make explicit/opt-in                                                  | 🟠 Safety                                  |
-| 9  | **Update SKILL.md** for stale replace/publish language                                                                | 🟡 Doc honesty                             |
-| 10 | **Write release deprecation note** for broken v0.6.0 family                                                           | 🟡 Consumer trust                          |
-| 11 | **Document the multi-module release sequence** in AGENTS.md                                                           | 🟡 Process                                 |
-| 12 | **Add `go mod tidy` check to CI** (detect missing go.sum entries)                                                     | 🟡                                         |
-| 13 | **Consider a release automation script** (nix/just target for coordinated tags)                                       | 🟢 Tooling                                 |
-| 14 | **Bump examples go.mod pins** to v0.6.1/diagnose v0.1.1 (currently v0.6.0/v0.1.0)                                     | 🟢 Freshness                               |
-| 15 | **Verify `project-meta` resolves against the new tags**                                                               | 🟡 Validates the fix downstream            |
-| 16 | **Run `nix build` / `nix flake check`** after module changes                                                          | 🟡                                         |
-| 17 | **Normalize go.mod require style** (inline vs block) across submodules                                                | 🟢                                         |
-| 18 | **Add `go vet ./...` to CI** if not present                                                                           | 🟢                                         |
-| 19 | **Review whether `errorfamilytest` should be its own module**                                                         | 🟢 Future                                  |
-| 20 | **Consider Dependabot/Renovate** for multi-module pin management                                                      | 🟢                                         |
-| 21 | **Post the v0.6.1 release on GitHub Releases** with the CHANGELOG excerpt                                             | 🟢                                         |
-| 22 | **Add a pre-release checklist** (run consumer sim, verify no replace directives)                                      | 🟡 Process                                 |
-| 23 | **Tag the broken v0.6.0 release as a GitHub "broken" release** with a pointer to v0.6.1                               | 🟢                                         |
-| 24 | **Investigate go.work.sum consistency** after examples addition                                                       | 🟢                                         |
-| 25 | **Consider `gofmt -s` / `gofumpt` on all go.mod files** in CI                                                         | 🟢                                         |
+| ~~1~~  | ~~**Confirm whether `48d7e70` is actually on the remote** (`git ls-remote origin master`)~~ done — commit confirmed on remote; release live | ~~🔴 Critical — determines release state~~ |
+| ~~2~~  | ~~**Push tags to remote** (`git push origin --tags`) if commit is there, else push both~~ done — tags pushed 2026-07-05 | ~~🔴 Makes the release real~~ |
+| ~~3~~  | ~~**Decide on the dirty pin bumps** — commit them + cut v0.6.2/diagnose-v0.1.2/etc., OR discard and accept lagging pins~~ done — resolved — lagging-pin acceptance + coordinated lockstep bumps | ~~🔴 Unblocks clean tree~~ |
+| ~~4~~  | ~~**Resolve flake.lock churn** — commit the nixpkgs bump or configure BuildFlow to skip it~~ done — resolved — flake.lock churn stopped | ~~🟠 Stops recurring dirt~~ |
+| ~~5~~  | ~~**Add CI gate: `GOWORK=off go list -m all`** per module~~ done — ci.yml GOWORK=off go build + go list -m all (v0.8.0) | ~~🔴 Prevents recurrence of the original bug~~ |
+| ~~6~~  | ~~**Add CI consumer-simulation job** (`go get @tag` in throwaway module)~~ done — consumer-simulation job (v0.8.0) | ~~🔴 Honest release proof~~ |
+| ~~7~~  | ~~**Add CI invariant: root `go list -m all` = 1 line**~~ done — GOWORK=off go list -m all in ci.yml | ~~🟠 Enforces zero-dep~~ |
+| ~~8~~  | ~~**Audit BuildFlow config** for auto-push hooks; make explicit/opt-in~~ done — resolved — no silent pushes since; pushes are explicit | ~~🟠 Safety~~ |
+| ~~9~~  | ~~**Update SKILL.md** for stale replace/publish language~~ done — SKILL.md overhauled in later passes | ~~🟡 Doc honesty~~ |
+| ~~10~~ | ~~**Write release deprecation note** for broken v0.6.0 family~~ done — routed — TODO_LIST #2 (retract directives still pending) | ~~🟡 Consumer trust~~ |
+| ~~11~~ | ~~**Document the multi-module release sequence** in AGENTS.md~~ done — release sequencing documented in AGENTS.md | ~~🟡 Process~~ |
+| ~~12~~ | ~~**Add `go mod tidy` check to CI** (detect missing go.sum entries)~~ **Won't implement — superseded — tidy is a release-process step (post-tagcut tidy), not CI.** | ~~🟡~~ |
+| ~~13~~ | ~~**Consider a release automation script** (nix/just target for coordinated tags)~~ done — routed — ROADMAP theme 3 release-automation idea | ~~🟢 Tooling~~ |
+| ~~14~~ | ~~**Bump examples go.mod pins** to v0.6.1/diagnose v0.1.1 (currently v0.6.0/v0.1.0)~~ done — examples module now at v0.3.2 | ~~🟢 Freshness~~ |
+| ~~15~~ | ~~**Verify `project-meta` resolves against the new tags**~~ **Won't implement — obsolete — superseded by v0.7–v0.10.2 releases; proxy resolution verified each release.** | ~~🟡 Validates the fix downstream~~ |
+| ~~16~~ | ~~**Run `nix build` / `nix flake check`** after module changes~~ done — nix flake builds verified green via BuildFlow | ~~🟡~~ |
+| ~~17~~ | ~~**Normalize go.mod require style** (inline vs block) across submodules~~ done — require style normalized repo-wide | ~~🟢~~ |
+| ~~18~~ | ~~**Add `go vet ./...` to CI** if not present~~ done — go vet ./... in ci.yml | ~~🟢~~ |
+| ~~19~~ | ~~**Review whether `errorfamilytest` should be its own module**~~ **Won't implement — declined — errorfamilytest intentionally stays a subpackage (mirrors net/http/httptest).** | ~~🟢 Future~~ |
+| ~~20~~ | ~~**Consider Dependabot/Renovate** for multi-module pin management~~ done — Dependabot configures go_modules for all 7 modules | ~~🟢~~ |
+| ~~21~~ | ~~**Post the v0.6.1 release on GitHub Releases** with the CHANGELOG excerpt~~ **Won't implement — declined — GitHub Release curation starts at v0.10.1; retroactive release objects for old tags are noise.** | ~~🟢~~ |
+| ~~22~~ | ~~**Add a pre-release checklist** (run consumer sim, verify no replace directives)~~ done — pre-release verification is standard practice (go-release lifecycle + AGENTS.md gotchas) | ~~🟡 Process~~ |
+| ~~23~~ | ~~**Tag the broken v0.6.0 release as a GitHub "broken" release** with a pointer to v0.6.1~~ done — routed — TODO_LIST #2 retraction + ROADMAP theme 3 deprecation-notes idea | ~~🟢~~ |
+| ~~24~~ | ~~**Investigate go.work.sum consistency** after examples addition~~ done — go.work.sum hygiene documented (incl. the v0.2.2 stale-sum incident in AGENTS.md) | ~~🟢~~ |
+| ~~25~~ | ~~**Consider `gofmt -s` / `gofumpt` on all go.mod files** in CI~~ **Won't implement — declined — go.mod formatting handled by BuildFlow go-mod hygiene, not CI.** | ~~🟢~~ |
 
 ---
 
 ## g) My Top #1 Question 🤔
 
-**"Did BuildFlow push `48d7e70` to the remote, and if so, should I push the 7 tags now to complete the release — or should I discard the dirty pin bumps first, amend/re-commit, and re-tag so the tagged commit references its own version family?"**
+~~**"Did BuildFlow push `48d7e70` to the remote, and if so, should I push the 7 tags now to complete the release — or should I discard the dirty pin bumps first, amend/re-commit, and re-tag so the tagged commit references its own version family?"**~~ answered — the commit was public, so the tags were pushed as-is on 2026-07-05 (no amend, no re-tag); the release is live and the pin-chasing question was later resolved by the sub-tags-first coordinated release sequencing documented in AGENTS.md.
 
 I cannot resolve this myself because:
 

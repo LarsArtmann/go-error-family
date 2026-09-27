@@ -207,6 +207,7 @@ func (r *MyToolRule) Run(ctx context.Context, err error) (*diagnose.DiagnosticRe
 2. **Small PRs** — focused changes are easier to review
 3. **Explain why** — not just what changed, but the rationale
 4. **Update docs** — if you add an API, update README.md and AGENTS.md
+5. **Never ship a `replace` directive in a tagged `go.mod`** — Go strips `replace` on fetch, so consumers hit an unresolvable module-graph edge (the v0.6.0 incident). Use `go.work` for local multi-module development; tag real versions instead.
 
 ### Branch Naming
 

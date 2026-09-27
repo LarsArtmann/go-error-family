@@ -3,7 +3,7 @@
 Honest inventory of what exists, what works, and what doesn't. Every claim is
 verifiable against the code — citations point at the source.
 
-**Last verified:** 2026-07-26 against v0.10.0 (Orchestration family)
+**Last verified:** 2026-09-27 against v0.10.2 (live `go test -cover` run across all modules)
 
 ---
 
@@ -217,17 +217,17 @@ Separate Go module so root stays zero-dependency.
 
 ---
 
-## Test Coverage (verified 2026-07-23)
+## Test Coverage (verified 2026-09-27, live `go test -cover` run)
 
 | Package              | Coverage |
 | -------------------- | -------- |
 | root (`errorfamily`) | 97.1%    |
 | `errorfamilytest`    | 96.3%    |
 | `agent`              | 100.0%   |
-| `bridge`             | 95.6%    |
-| `diagnose` (core)    | 83.9%    |
-| `diagnose/git`       | 98.5%    |
-| `diagnose/postgres`  | 80.3%    |
+| `bridge`             | 94.4%    |
+| `diagnose` (core)    | 84.2%    |
+| `diagnose/git`       | 91.0%    |
+| `diagnose/postgres`  | 78.5%    |
 
 All packages at 80%+. Fuzz tests (16 total):
 
@@ -240,6 +240,6 @@ All packages at 80%+. Fuzz tests (16 total):
 ## Known Gaps
 
 - ~~**No per-error HTTP status override**~~ — **SHIPPED (v0.8.0).** `WithHTTPStatus(int)` + `HTTPStatuser` interface provide per-error overrides of family-level defaults. Mirrors `ExitCoder`/`WithExitCode` pattern exactly.
-- **`Classify(nil)` returns Rejection** — resolved design decision (2026-07-23). Kept as Rejection: nil = caller bug, and changing to Transient would make `HTTPStatus(nil)` return 503. See TODO_LIST "Design Decisions Resolved" #2.
-- **Constructor context ergonomics** — resolved design decision (2026-07-23). WON'T FIX: `WithContextMap(map[string]string{...})` already exists for multi-value context. Functional options would conflict with copy-on-write design. See TODO_LIST "Design Decisions Resolved" #3.
+- **`Classify(nil)` returns Rejection** — resolved design decision (2026-07-23). Kept as Rejection: nil = caller bug, and changing to Transient would make `HTTPStatus(nil)` return 503. Decision rationale recorded in `docs/status/2026-07-23_17-56_design-decisions-resolved-json-v2-revert.html`.
+- **Constructor context ergonomics** — resolved design decision (2026-07-23). WON'T FIX: `WithContextMap(map[string]string{...})` already exists for multi-value context. Functional options would conflict with copy-on-write design. Same decision record as above.
 - **`encoding/json` (stdlib)** — the root module uses standard `encoding/json`. The v0.7.0 json/v2 experiment was reverted in v0.8.0; no `GOEXPERIMENT` required.
