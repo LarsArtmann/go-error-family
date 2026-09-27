@@ -207,51 +207,51 @@ These methods on `*Error` duplicate logic that exists as package-level helpers i
 
 | # | Task                                                | Effort | Impact                                |
 | - | --------------------------------------------------- | ------ | ------------------------------------- |
-| 1 | **Fix README — remove deleted API (agent section)** | 15min  | Prevents compile errors for new users |
-| 2 | **Fix README — update architecture listing**        | 10min  | Matches reality                       |
-| 3 | **Update CHANGELOG.md with real changes**           | 20min  | Honest project history                |
-| 4 | **Fix AGENTS.md coverage table (88.3% → 90.8%)**    | 2min   | Correct docs                          |
-| 5 | **Fix AGENTS.md template tier 4 reference**         | 2min   | Correct docs                          |
+| ~~1~~ | ~~**Fix README — remove deleted API (agent section)**~~ done — README rewritten | ~~15min~~ | ~~Prevents compile errors for new users~~ |
+| ~~2~~ | ~~**Fix README — update architecture listing**~~ done — README rewritten | ~~10min~~ | ~~Matches reality~~ |
+| ~~3~~ | ~~**Update CHANGELOG.md with real changes**~~ done — CHANGELOG maintained | ~~20min~~ | ~~Honest project history~~ |
+| ~~4~~ | ~~**Fix AGENTS.md coverage table (88.3% → 90.8%)**~~ done — AGENTS coverage re-verified 2026-09-27 | ~~2min~~ | ~~Correct docs~~ |
+| ~~5~~ | ~~**Fix AGENTS.md template tier 4 reference**~~ done — reference cleaned up | ~~2min~~ | ~~Correct docs~~ |
 
 ### Tier 2: Quality (4% effort, 64% impact)
 
 | #  | Task                                                                                              | Effort | Impact                            |
 | -- | ------------------------------------------------------------------------------------------------- | ------ | --------------------------------- |
-| 6  | **Add godoc examples** (`ExampleNewRejection`, `ExampleHandleError`, `ExampleClassify`)           | 1hr    | pkg.go.dev renders properly       |
-| 7  | **Improve diagnose test coverage** (Runner concurrent logic, matching helpers, resolveContextKey) | 2hr    | 59.5% → 75%+                      |
-| 8  | **Add fuzz tests** for `Classify`, `ParseFamily`, `applyContext`                                  | 1hr    | Catches panics on arbitrary input |
-| 9  | **Add benchmarks** for `Classify`, `HandleError`, `Error.Error`                                   | 1hr    | Performance profile for hot paths |
-| 10 | **Clean up `formatWhy` unused parameters**                                                        | 5min   | Remove code smell                 |
+| ~~6~~  | ~~**Add godoc examples** (`ExampleNewRejection`, `ExampleHandleError`, `ExampleClassify`)~~ done — 26 godoc examples | ~~1hr~~ | ~~pkg.go.dev renders properly~~ |
+| ~~7~~  | ~~**Improve diagnose test coverage** (Runner concurrent logic, matching helpers, resolveContextKey)~~ done — diagnose split into 3 modules, 78-91% | ~~2hr~~ | ~~59.5% → 75%+~~ |
+| ~~8~~  | ~~**Add fuzz tests** for `Classify`, `ParseFamily`, `applyContext`~~ done — 16 fuzz targets | ~~1hr~~ | ~~Catches panics on arbitrary input~~ |
+| ~~9~~  | ~~**Add benchmarks** for `Classify`, `HandleError`, `Error.Error`~~ done — benchmark suite | ~~1hr~~ | ~~Performance profile for hot paths~~ |
+| ~~10~~ | ~~**Clean up `formatWhy` unused parameters**~~ done — formatWhy cleaned up | ~~5min~~ | ~~Remove code smell~~ |
 
 ### Tier 3: Infrastructure (20% effort, 80% impact)
 
 | #  | Task                                                                           | Effort | Impact                              |
 | -- | ------------------------------------------------------------------------------ | ------ | ----------------------------------- |
-| 11 | **Tag v0.1.0**                                                                 | 1min   | Consumers get a real version        |
-| 12 | **Add GitHub Actions CI** (test -race, go vet, build on 1.26)                  | 30min  | Automated quality gate              |
-| 13 | **Add `go test` integration tests** for diagnostic rules (temp dirs, git init) | 2hr    | Real coverage for rule logic        |
-| 14 | **Remove or wire `Error.MatchesContext` / `MatchesContextValue`**              | 30min  | Eliminate cross-package duplication |
-| 15 | **Add `go vet` and `staticcheck` to CI**                                       | 15min  | Catch issues automatically          |
+| ~~11~~ | ~~**Tag v0.1.0**~~ done — v0.1.x shipped | ~~1min~~ | ~~Consumers get a real version~~ |
+| ~~12~~ | ~~**Add GitHub Actions CI** (test -race, go vet, build on 1.26)~~ done — three workflows live | ~~30min~~ | ~~Automated quality gate~~ |
+| ~~13~~ | ~~**Add `go test` integration tests** for diagnostic rules (temp dirs, git init)~~ done — rules tested | ~~2hr~~ | ~~Real coverage for rule logic~~ |
+| ~~14~~ | ~~**Remove or wire `Error.MatchesContext` / `MatchesContextValue`**~~ done — MatchesContext shipped as RuleSpec.Matches | ~~30min~~ | ~~Eliminate cross-package duplication~~ |
+| ~~15~~ | ~~**Add `go vet` and `staticcheck` to CI**~~ done — vet runs in CI | ~~15min~~ | ~~Catch issues automatically~~ |
 
 ### Tier 4: Polish
 
 | #  | Task                                                                                   | Effort | Impact                     |
 | -- | -------------------------------------------------------------------------------------- | ------ | -------------------------- |
-| 16 | **Review all exported symbols for naming quality**                                     | 1hr    | Professional API surface   |
-| 17 | **Add CONTRIBUTING.md**                                                                | 30min  | Community readiness        |
-| 18 | **Review godoc on all exported types/functions**                                       | 1hr    | Professional documentation |
-| 19 | **Add error chain diagram to README**                                                  | 30min  | Conceptual clarity         |
-| 20 | **Consider `HandleError` → `cli` subpackage** (mentioned in resolution plan, not done) | 2hr    | Separation of concerns     |
+| ~~16~~ | ~~**Review all exported symbols for naming quality**~~ done — naming stabilized | ~~1hr~~ | ~~Professional API surface~~ |
+| ~~17~~ | ~~**Add CONTRIBUTING.md**~~ done — CONTRIBUTING.md exists | ~~30min~~ | ~~Community readiness~~ |
+| ~~18~~ | ~~**Review godoc on all exported types/functions**~~ done — godoc reviewed in later passes | ~~1hr~~ | ~~Professional documentation~~ |
+| ~~19~~ | ~~**Add error chain diagram to README**~~ done — error-chain docs in README/SKILL | ~~30min~~ | ~~Conceptual clarity~~ |
+| ~~20~~ | ~~**Consider `HandleError` → `cli` subpackage** (mentioned in resolution plan, not done)~~ **Won't implement — declined — HandleError stays in root (flat structure).** | ~~2hr~~ | ~~Separation of concerns~~ |
 
 ### Tier 5: Hardening
 
 | #  | Task                                                                                   | Effort | Impact                          |
 | -- | -------------------------------------------------------------------------------------- | ------ | ------------------------------- |
-| 21 | **Performance audit of `lookupRegistered` snapshot** (full map copy on every Classify) | 1hr    | Hot path optimization           |
-| 22 | **Add `Family.MarshalJSON` / `UnmarshalJSON`** for API serialization                   | 30min  | REST/gRPC friendliness          |
-| 23 | **Add `Error.MarshalJSON` / `UnmarshalJSON`**                                          | 30min  | Structured logging friendliness |
-| 24 | **Consider `errors.Join` support** for multi-error scenarios                           | 1hr    | Go 1.20+ compatibility          |
-| 25 | **Consider `context.Context` integration** for error propagation                       | 2hr    | Distributed tracing             |
+| ~~21~~ | ~~**Performance audit of `lookupRegistered` snapshot** (full map copy on every Classify)~~ done — atomic.Pointer snapshot | ~~1hr~~ | ~~Hot path optimization~~ |
+| ~~22~~ | ~~**Add `Family.MarshalJSON` / `UnmarshalJSON`** for API serialization~~ done — TextMarshal/Unmarshal shipped (JSON via Error.JSON) | ~~30min~~ | ~~REST/gRPC friendliness~~ |
+| ~~23~~ | ~~**Add `Error.MarshalJSON` / `UnmarshalJSON`**~~ done — Error.JSON() | ~~30min~~ | ~~Structured logging friendliness~~ |
+| ~~24~~ | ~~**Consider `errors.Join` support** for multi-error scenarios~~ done — worst-severity multi-error | ~~1hr~~ | ~~Go 1.20+ compatibility~~ |
+| ~~25~~ | ~~**Consider `context.Context` integration** for error propagation~~ done — HandleErrorWithContext | ~~2hr~~ | ~~Distributed tracing~~ |
 
 ---
 

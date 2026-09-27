@@ -105,40 +105,40 @@ The library is **functionally complete** for v1.0. The remaining work is polish,
 
 ### Tier 1: Quick Wins (minutes each)
 
-1. **Fix `parentDir()` → `filepath.Dir()`** — 1 line, eliminates reimplementation
-2. **Inline `stripAfter()`** — trivial, removes unnecessary helper
-3. **Extract confidence constants** — name the magic numbers (e.g., `confidenceNotRootCause = 0.3`)
-4. **Fill DOMAIN_LANGUAGE.md** — define actual terms: Family, Code, Context, Classification, etc.
-5. **Update CHANGELOG.md** — add recent doc/cleanup commits
-6. **Add `//go:build` tags to diagnose rules** — make integration vs unit test distinction explicit
+1. ~~**Fix `parentDir()` → `filepath.Dir()`** — 1 line, eliminates reimplementation~~ done — fixed
+2. ~~**Inline `stripAfter()`** — trivial, removes unnecessary helper~~ done — inlined
+3. ~~**Extract confidence constants** — name the magic numbers (e.g., `confidenceNotRootCause = 0.3`)~~ done — Confidence constants shipped
+4. ~~**Fill DOMAIN_LANGUAGE.md** — define actual terms: Family, Code, Context, Classification, etc.~~ done — DOMAIN_LANGUAGE.md filled
+5. ~~**Update CHANGELOG.md** — add recent doc/cleanup commits~~ done — CHANGELOG maintained
+6. ~~**Add `//go:build` tags to diagnose rules** — make integration vs unit test distinction explicit~~ done — build tags applied to integration tests
 
 ### Tier 2: Medium Impact (1-2 hours each)
 
-7. **Consolidate `DiagnosticFinding` → use `DiagnosticResult`** — eliminate the type duplication. Make `DiagnosticFunc` return `[]DiagnosticResult` or define a shared struct.
-8. **Add basic CI pipeline** — test-on-push + `go vet` + coverage gate
-9. **Add `errors.Join` handling in `Classify`** — check if error implements `Unwrap() []error` and classify the first applicable error
-10. **Add `Example_*` test functions** — godoc-rendered examples for key APIs
-11. **Add integration test stubs for diagnose rules** — at least test the match/Applicable paths with mock commands
-12. **Review all doc comments for godoc rendering** — ensure first sentence is summary, proper formatting
+7. ~~**Consolidate `DiagnosticFinding` → use `DiagnosticResult`** — eliminate the type duplication. Make `DiagnosticFunc` return `[]DiagnosticResult` or define a shared struct.~~ done — DiagnosticResult carries Fix struct
+8. ~~**Add basic CI pipeline** — test-on-push + `go vet` + coverage gate~~ done — ci.yml live
+9. ~~**Add `errors.Join` handling in `Classify`** — check if error implements `Unwrap() []error` and classify the first applicable error~~ done — worst-severity multi-error classification
+10. ~~**Add `Example_*` test functions** — godoc-rendered examples for key APIs~~ done — 26 Example_ functions
+11. ~~**Add integration test stubs for diagnose rules** — at least test the match/Applicable paths with mock commands~~ done — integration tests in place
+12. ~~**Review all doc comments for godoc rendering** — ensure first sentence is summary, proper formatting~~ done — godoc reviewed in later passes
 
 ### Tier 3: Strategic (half-day+)
 
-13. **Real-world example project** — a small CLI tool using the library end-to-end
-14. **Benchmark suite** — `Classify`, `HandleError`, `Runner.Run` performance baselines
-15. **Fuzz tests for `ParseFamily`, `applyContext`** — input is external, should be fuzzed
-16. **Consider `Status` as string enum** — eliminates `default` branches, trivial serialization
-17. **Add `Family.IsValid()` set-based check** — more robust than range check
-18. **Versioned module path** — decide if v1.0.0 is ready, tag it
-19. **API stability review** — audit all exported types for breaking change potential
-20. **Add `Errors(ctx, err) []error` helper** — unwrap `errors.Join` into flat list for batch scenarios
-21. **Add `HandleBatchError` recipe to README** — make the partial success pattern discoverable
+13. ~~**Real-world example project** — a small CLI tool using the library end-to-end~~ done — examples/ module with 5 demos
+14. ~~**Benchmark suite** — `Classify`, `HandleError`, `Runner.Run` performance baselines~~ done — benchmark suite
+15. ~~**Fuzz tests for `ParseFamily`, `applyContext`** — input is external, should be fuzzed~~ done — 16 fuzz targets
+16. ~~**Consider `Status` as string enum** — eliminates `default` branches, trivial serialization~~ done — Status constants + IsValid + ParseStatus
+17. ~~**Add `Family.IsValid()` set-based check** — more robust than range check~~ done — IsValid set-based checks
+18. ~~**Versioned module path** — decide if v1.0.0 is ready, tag it~~ **Won't implement — declined — project stays 0.x by choice.**
+19. ~~**API stability review** — audit all exported types for breaking change potential~~ done — API stabilized; six-interface contract
+20. ~~**Add `Errors(ctx, err) []error` helper** — unwrap `errors.Join` into flat list for batch scenarios~~ **Won't implement — declined — errors.Join + Classify chosen instead.**
+21. ~~**Add `HandleBatchError` recipe to README** — make the partial success pattern discoverable~~ done — partial-success recipe in SKILL.md
 
 ### Tier 4: Long-term / Nice-to-have
 
-22. **OpenAPI/JSON schema for `HandleResult`** — for HTTP/gRPC consumers
-23. **Structured logging bridge** — `slog` integration for error context
-24. **Prometheus metrics bridge** — error family/code counters
-25. **`go generate` for message templates** — extract templates from YAML/JSON
+22. ~~**OpenAPI/JSON schema for `HandleResult`** — for HTTP/gRPC consumers~~ **Won't implement — declined — schema generation is a ROADMAP idea.**
+23. ~~**Structured logging bridge** — `slog` integration for error context~~ done — LogError slog integration
+24. ~~**Prometheus metrics bridge** — error family/code counters~~ **Won't implement — declined — not demanded; ROADMAP idea at most.**
+25. ~~**`go generate` for message templates** — extract templates from YAML/JSON~~ **Won't implement — declined — templates are code, not generated.**
 
 ---
 

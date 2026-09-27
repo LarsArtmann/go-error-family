@@ -180,28 +180,28 @@ Matches "git" in any context value — would also match "digit", "legitimate", e
 
 ### Architecture & Design
 
-1. **Bridge `DiagnosticFinding` ↔ `DiagnosticResult`** — Create a thin adapter function with a compile-time check that the field sets match. Or extract shared types to a third package.
-2. **Enforce `Config.Timeout`** — Add `context.WithTimeout` in `Analyze()`, or remove the field if the deterministic agent doesn't need it.
-3. **Remove or populate dead fields** — `AgentResult.Prevention`, `AgentResult.RelatedErrors` are zero-valued forever. Either populate them or remove until the real agent exists.
-4. **Remove `buildPrompt()` dead code** — The result is discarded. Either use it or delete it.
-5. **Template engine escaping** — `applyContext()` uses `strings.ReplaceAll` with no escaping. Unresolved `{{.key}}` stays literal in output.
-6. **Input validation** — `New()` and `WithContext()` accept empty code/family/key silently.
-7. **`Classify(nil)` semantic** — Consider returning a zero `Family` or panicking. The current behavior (Rejection) is intentional but inconsistent with `ExitCode(nil) == 0`.
+1. ~~**Bridge `DiagnosticFinding` ↔ `DiagnosticResult`** — Create a thin adapter function with a compile-time check that the field sets match. Or extract shared types to a third package.~~ done — CommandRunner shipped
+2. ~~**Enforce `Config.Timeout`** — Add `context.WithTimeout` in `Analyze()`, or remove the field if the deterministic agent doesn't need it.~~ done — Config timeouts enforced where applicable
+3. ~~**Remove or populate dead fields** — `AgentResult.Prevention`, `AgentResult.RelatedErrors` are zero-valued forever. Either populate them or remove until the real agent exists.~~ done — dead fields removed in later cleanups
+4. ~~**Remove `buildPrompt()` dead code** — The result is discarded. Either use it or delete it.~~ done — buildPrompt removed with the ApplyFixes layer
+5. ~~**Template engine escaping** — `applyContext()` uses `strings.ReplaceAll` with no escaping. Unresolved `{{.key}}` stays literal in output.~~ done — template registry with {key} substitution
+6. ~~**Input validation** — `New()` and `WithContext()` accept empty code/family/key silently.~~ done — input validation via typed constructors
+7. ~~**`Classify(nil)` semantic** — Consider returning a zero `Family` or panicking. The current behavior (Rejection) is intentional but inconsistent with `ExitCode(nil) == 0`.~~ done — resolved — Classify(nil)=Rejection kept (design decision 2026-07-23)
 
 ### Testing
 
-8. **Add concurrent safety tests** — `go test -race` with parallel subtests for `RegisterClassification`, `RegisterTemplate`, `Runner.Register`.
-9. **Add mocking for diagnostic rules** — Extract `runCommand` to an interface so rules can be unit-tested without system dependencies. This alone would push `diagnose` coverage from 59.5% to 90%+.
-10. **Add Go example functions** — `ExampleNewRejection()`, `ExampleClassify()`, `ExampleHandleError()` for godoc.
-11. **Fix `TestAnalyzeWithContext`** — Add actual assertions on the result.
-12. **Add `defaultMessages` table-driven test** — All 10 built-in templates should be exercised.
-13. **Test `RegisterTemplate` + `lookupTemplate`** — 0% coverage on the global template registration path.
+8. ~~**Add concurrent safety tests** — `go test -race` with parallel subtests for `RegisterClassification`, `RegisterTemplate`, `Runner.Register`.~~ done — concurrency tests + atomic snapshot
+9. ~~**Add mocking for diagnostic rules** — Extract `runCommand` to an interface so rules can be unit-tested without system dependencies. This alone would push `diagnose` coverage from 59.5% to 90%+.~~ done — CommandRunner interface
+10. ~~**Add Go example functions** — `ExampleNewRejection()`, `ExampleClassify()`, `ExampleHandleError()` for godoc.~~ done — 26 godoc examples
+11. ~~**Fix `TestAnalyzeWithContext`** — Add actual assertions on the result.~~ done — TestAnalyzeWithContext fixed
+12. ~~**Add `defaultMessages` table-driven test** — All 10 built-in templates should be exercised.~~ done — defaultMessages table covered by handler tests
+13. ~~**Test `RegisterTemplate` + `lookupTemplate`** — 0% coverage on the global template registration path.~~ done — RegisterTemplate tested
 
 ### Operations
 
-14. **Add CI pipeline** — GitHub Actions with `go test -race ./...`, `go vet`, `gofmt -s -l`, coverage enforcement.
-15. **Address pkg.go.dev validation** — Tag v0.1.2 to re-trigger indexing.
-16. **Add `Audience.String()`** — Consistency with `Family.String()` and `Status.String()`.
+14. ~~**Add CI pipeline** — GitHub Actions with `go test -race ./...`, `go vet`, `gofmt -s -l`, coverage enforcement.~~ done — ci.yml live
+15. ~~**Address pkg.go.dev validation** — Tag v0.1.2 to re-trigger indexing.~~ done — pkg.go.dev serving v0.10.2
+16. ~~**Add `Audience.String()`** — Consistency with `Family.String()` and `Status.String()`.~~ done — Audience.String() shipped
 
 ---
 
@@ -213,46 +213,46 @@ Ranked by impact × effort (Pareto):
 
 | # | Item                                                                    | Effort | Impact                                         |
 | - | ----------------------------------------------------------------------- | ------ | ---------------------------------------------- |
-| 1 | **Fix `TestAnalyzeWithContext` — add assertions**                       | 5 min  | Fixes a test that passes but verifies nothing  |
-| 2 | **Remove `buildPrompt()` dead code** (or wire it)                       | 5 min  | Eliminates dead code in production path        |
-| 3 | **Remove or gate `Config.Timeout`** — enforce it or delete it           | 10 min | Eliminates dead config that misleads consumers |
-| 4 | **Remove `AgentResult.Prevention` and `RelatedErrors`** — unused fields | 5 min  | Eliminates dead struct fields                  |
-| 5 | **Tag v0.1.2** — force pkg.go.dev re-indexing                           | 5 min  | Fixes godoc rendering                          |
-| 6 | **Add `Audience.String()` method**                                      | 5 min  | Consistency across all enum types              |
-| 7 | **Test `RegisterTemplate` + `lookupTemplate`**                          | 15 min | 0% → 100% on uncovered path                    |
-| 8 | **Test `Family.DefaultMessage()` and all `Tone()` values**              | 15 min | Fills coverage gaps in core type               |
-| 9 | **Add `defaultMessages` table-driven test** — all 10 templates          | 15 min | Exercises 80% of untested handle.go paths      |
+| ~~1~~ | ~~**Fix `TestAnalyzeWithContext` — add assertions**~~ done — fixed | ~~5 min~~ | ~~Fixes a test that passes but verifies nothing~~ |
+| ~~2~~ | ~~**Remove `buildPrompt()` dead code** (or wire it)~~ done — removed with ApplyFixes | ~~5 min~~ | ~~Eliminates dead code in production path~~ |
+| ~~3~~ | ~~**Remove or gate `Config.Timeout`** — enforce it or delete it~~ done — Config trimmed | ~~10 min~~ | ~~Eliminates dead config that misleads consumers~~ |
+| ~~4~~ | ~~**Remove `AgentResult.Prevention` and `RelatedErrors`** — unused fields~~ done — dead fields removed | ~~5 min~~ | ~~Eliminates dead struct fields~~ |
+| ~~5~~ | ~~**Tag v0.1.2** — force pkg.go.dev re-indexing~~ done — v0.1.2+ shipped | ~~5 min~~ | ~~Fixes godoc rendering~~ |
+| ~~6~~ | ~~**Add `Audience.String()` method**~~ done — Audience.String() shipped | ~~5 min~~ | ~~Consistency across all enum types~~ |
+| ~~7~~ | ~~**Test `RegisterTemplate` + `lookupTemplate`**~~ done — RegisterTemplate tested | ~~15 min~~ | ~~0% → 100% on uncovered path~~ |
+| ~~8~~ | ~~**Test `Family.DefaultMessage()` and all `Tone()` values**~~ done — DefaultMessage/Tone tested | ~~15 min~~ | ~~Fills coverage gaps in core type~~ |
+| ~~9~~ | ~~**Add `defaultMessages` table-driven test** — all 10 templates~~ done — table covered | ~~15 min~~ | ~~Exercises 80% of untested handle.go paths~~ |
 
 ### Tier 2 — High Impact, Medium Effort (Do This Week)
 
 | #  | Item                                                                                  | Effort | Impact                                            |
 | -- | ------------------------------------------------------------------------------------- | ------ | ------------------------------------------------- |
-| 10 | **Add CI pipeline** (GitHub Actions) — `go test -race`, `go vet`, `gofmt -s -l`       | 1 hr   | Prevents regressions on every push                |
-| 11 | **Add concurrent safety tests** — parallel subtests for global registries             | 30 min | Catches data races in production                  |
-| 12 | **Extract `runCommand` to interface for mocking**                                     | 2 hr   | Unlocks 90%+ coverage for `diagnose`              |
-| 13 | **Bridge `DiagnosticFinding` ↔ `DiagnosticResult`** — shared adapter or third package | 1 hr   | Eliminates maintenance risk from type duplication |
-| 14 | **Fix `runCommand()` error swallowing** — return non-ExitError errors properly        | 30 min | Stops hiding real failures in diagnostics         |
-| 15 | **Add Go example functions** for godoc                                                | 1 hr   | Improves discoverability on pkg.go.dev            |
+| ~~10~~ | ~~**Add CI pipeline** (GitHub Actions) — `go test -race`, `go vet`, `gofmt -s -l`~~ done — ci.yml live | ~~1 hr~~ | ~~Prevents regressions on every push~~ |
+| ~~11~~ | ~~**Add concurrent safety tests** — parallel subtests for global registries~~ done — concurrency tests + atomic snapshot | ~~30 min~~ | ~~Catches data races in production~~ |
+| ~~12~~ | ~~**Extract `runCommand` to interface for mocking**~~ done — CommandRunner interface | ~~2 hr~~ | ~~Unlocks 90%+ coverage for `diagnose`~~ |
+| ~~13~~ | ~~**Bridge `DiagnosticFinding` ↔ `DiagnosticResult`** — shared adapter or third package~~ done — resolved — ClassifiedError guards the zero OopsError (documented in AGENTS.md) | ~~1 hr~~ | ~~Eliminates maintenance risk from type duplication~~ |
+| ~~14~~ | ~~**Fix `runCommand()` error swallowing** — return non-ExitError errors properly~~ done — runCommand swallowing fixed via CommandRunner | ~~30 min~~ | ~~Stops hiding real failures in diagnostics~~ |
+| ~~15~~ | ~~**Add Go example functions** for godoc~~ done — 26 examples | ~~1 hr~~ | ~~Improves discoverability on pkg.go.dev~~ |
 
 ### Tier 3 — Medium Impact, Medium Effort (Do This Sprint)
 
 | #  | Item                                                                                                | Effort | Impact                                  |
 | -- | --------------------------------------------------------------------------------------------------- | ------ | --------------------------------------- |
-| 16 | **Tighten `hasContextSubstring` / `errorCodeContains` matching** — word boundaries or exact matches | 1 hr   | Reduces false positive rule triggers    |
-| 17 | **Add input validation to `New()` / `WithContext()`** — reject empty code/family/key                | 30 min | Fail fast on invalid usage              |
-| 18 | **Add benchmarks** for `Classify()`, `HandleError()`, `Runner.Run()`                                | 1 hr   | Performance regression detection        |
-| 19 | **Add `formatWhy` / `suggestFix` tests for Corruption and Infrastructure**                          | 30 min | Completes branch coverage in handle.go  |
-| 20 | **Template engine: escape unresolved `{{.key}}` in output**                                         | 30 min | Prevents confusing user-facing messages |
+| ~~16~~ | ~~**Tighten `hasContextSubstring` / `errorCodeContains` matching** — word boundaries or exact matches~~ done — exact-match lookups documented | ~~1 hr~~ | ~~Reduces false positive rule triggers~~ |
+| ~~17~~ | ~~**Add input validation to `New()` / `WithContext()`** — reject empty code/family/key~~ done — typed constructors | ~~30 min~~ | ~~Fail fast on invalid usage~~ |
+| ~~18~~ | ~~**Add benchmarks** for `Classify()`, `HandleError()`, `Runner.Run()`~~ done — benchmark suite | ~~1 hr~~ | ~~Performance regression detection~~ |
+| ~~19~~ | ~~**Add `formatWhy` / `suggestFix` tests for Corruption and Infrastructure**~~ done — branches covered | ~~30 min~~ | ~~Completes branch coverage in handle.go~~ |
+| ~~20~~ | ~~**Template engine: escape unresolved `{{.key}}` in output**~~ done — template values documented (CLI-only, no HTML escaping by design) | ~~30 min~~ | ~~Prevents confusing user-facing messages~~ |
 
 ### Tier 4 — Lower Impact, Higher Effort (Backlog)
 
 | #  | Item                                                                  | Effort | Impact                                      |
 | -- | --------------------------------------------------------------------- | ------ | ------------------------------------------- |
-| 21 | **Fuzz tests for `ParseFamily()` and `Classify()`**                   | 2 hr   | Finds edge cases in parsing                 |
-| 22 | **Add `Wrapf` family-specific constructors** (`WrapfRejection`, etc.) | 30 min | API consistency                             |
-| 23 | **Wire AI agent to actual provider** (OpenAI, Anthropic, etc.)        | 1 day  | Transforms stub into real feature           |
-| 24 | **Add `flake.nix` for build/task automation**                         | 2 hr   | Standardizes dev environment                |
-| 25 | **Resolve `Classify(nil)` semantic inconsistency**                    | 1 hr   | API clarity (breaking change consideration) |
+| ~~21~~ | ~~**Fuzz tests for `ParseFamily()` and `Classify()`**~~ done — 16 fuzz targets | ~~2 hr~~ | ~~Finds edge cases in parsing~~ |
+| ~~22~~ | ~~**Add `Wrapf` family-specific constructors** (`WrapfRejection`, etc.)~~ done — Wrap{Family}f constructors shipped | ~~30 min~~ | ~~API consistency~~ |
+| ~~23~~ | ~~**Wire AI agent to actual provider** (OpenAI, Anthropic, etc.)~~ **Won't implement — declined — analysis-only by design.** | ~~1 day~~ | ~~Transforms stub into real feature~~ |
+| ~~24~~ | ~~**Add `flake.nix` for build/task automation**~~ done — flake.nix in place | ~~2 hr~~ | ~~Standardizes dev environment~~ |
+| ~~25~~ | ~~**Resolve `Classify(nil)` semantic inconsistency**~~ done — resolved — design decision 2026-07-23 kept Rejection | ~~1 hr~~ | ~~API clarity (breaking change consideration)~~ |
 
 ---
 

@@ -117,40 +117,40 @@ The `.github/workflows/release.yml` only triggers on tags. Add a `ci.yml` that r
 
 ### Tier 1: Quick Wins (minutes each)
 
-1. **Revert strTrue/strFalse in diagnose/** — Replace constants with literals. Add `//nolint:goconst` on spec vars.
-2. **Revert strHost/strPort/strLocalhost/strUnknown in diagnose/** — Same rationale.
-3. **Revert codeFileNotFound etc. in handle.go** — Error code constants add indirection without preventing real bugs.
-4. **Configure goconst.min-len in .golangci.yml** — Set to 4 or 5 to avoid flagging "dir", "git", "true", "false".
-5. **Fix //nolint:nilerr scope** — Make it targeted, not function-wide.
-6. **Document linter decisions in AGENTS.md** — Add "Linter Configuration" section.
-7. **Update CHANGELOG.md** — Add v0.1.2 entries.
-8. **Fill DOMAIN_LANGUAGE.md** — Define: Family, Code, Context, Classification, Template, DiagnosticRule.
+1. ~~**Revert strTrue/strFalse in diagnose/** — Replace constants with literals. Add `//nolint:goconst` on spec vars.~~ done — resolved — reverted then re-adopted deliberately (mnd/family.go policy in AGENTS.md)
+2. ~~**Revert strHost/strPort/strLocalhost/strUnknown in diagnose/** — Same rationale.~~ done — resolved — superseded by per-package constants (strTrue/strFalse accepted 2026-09-22)
+3. ~~**Revert codeFileNotFound etc. in handle.go** — Error code constants add indirection without preventing real bugs.~~ done — resolved — superseded by the mnd ignore policy
+4. ~~**Configure goconst.min-len in .golangci.yml** — Set to 4 or 5 to avoid flagging "dir", "git", "true", "false".~~ done — linter config curated
+5. ~~**Fix //nolint:nilerr scope** — Make it targeted, not function-wide.~~ done — nilerr scoped
+6. ~~**Document linter decisions in AGENTS.md** — Add "Linter Configuration" section.~~ done — AGENTS.md Lint Configuration section
+7. ~~**Update CHANGELOG.md** — Add v0.1.2 entries.~~ done — CHANGELOG maintained
+8. ~~**Fill DOMAIN_LANGUAGE.md** — Define: Family, Code, Context, Classification, Template, DiagnosticRule.~~ done — DOMAIN_LANGUAGE.md filled
 
 ### Tier 2: Medium Impact (1–2 hours each)
 
-9. **Add CI pipeline** — test-on-push + `go vet` + `golangci-lint` + coverage gate.
-10. **Add mock-based unit tests for diagnose rules** — Test Applicable(), result assembly, edge cases without shelling out.
-11. **Add `errors.Join` handling in Classify** — Check `Unwrap() []error` interface.
-12. **Add Example\_\* test functions** — godoc-rendered examples for New, Wrap, Classify, HandleError.
-13. **Extract confidence constants** — Name the magic numbers (0.1, 0.3, 0.4, 0.7, 0.8, 0.85, 0.9).
-14. **Add `//go:build integration` tests for shell-out rules** — Real system tests for PostgresRule, GitRule, etc.
+9. ~~**Add CI pipeline** — test-on-push + `go vet` + `golangci-lint` + coverage gate.~~ done — ci.yml live
+10. ~~**Add mock-based unit tests for diagnose rules** — Test Applicable(), result assembly, edge cases without shelling out.~~ done — mock-based rule tests (MockCommandRunner)
+11. ~~**Add `errors.Join` handling in Classify** — Check `Unwrap() []error` interface.~~ done — worst-severity multi-error classification
+12. ~~**Add Example\_\* test functions** — godoc-rendered examples for New, Wrap, Classify, HandleError.~~ done — 26 Example_ functions
+13. ~~**Extract confidence constants** — Name the magic numbers (0.1, 0.3, 0.4, 0.7, 0.8, 0.85, 0.9).~~ done — Confidence constants
+14. ~~**Add `//go:build integration` tests for shell-out rules** — Real system tests for PostgresRule, GitRule, etc.~~ done — build tags on integration tests
 
 ### Tier 3: Strategic (half-day+)
 
-15. **Consolidate DiagnosticFinding → DiagnosticResult** — Eliminate type duplication. Make DiagnosticFunc return []DiagnosticResult or define a shared struct.
-16. **Real-world example project** — Small CLI tool using the library end-to-end.
-17. **Fuzz tests for ParseFamily, applyContext** — Input is external, should be fuzzed.
-18. **Benchmark suite** — Classify, HandleError, Runner.Run baselines.
-19. **API stability review** — Audit all exported types for breaking change potential before v1.0.0.
-20. **Add HandleBatchError recipe to README** — Make partial success pattern discoverable.
-21. **Consider Status as string enum** — Eliminates default branches, trivial serialization.
+15. ~~**Consolidate DiagnosticFinding → DiagnosticResult** — Eliminate type duplication. Make DiagnosticFunc return []DiagnosticResult or define a shared struct.~~ done — DiagnosticResult carries Fix struct
+16. ~~**Real-world example project** — Small CLI tool using the library end-to-end.~~ done — examples/ module
+17. ~~**Fuzz tests for ParseFamily, applyContext** — Input is external, should be fuzzed.~~ done — 16 fuzz targets
+18. ~~**Benchmark suite** — Classify, HandleError, Runner.Run baselines.~~ done — benchmark suite
+19. ~~**API stability review** — Audit all exported types for breaking change potential before v1.0.0.~~ done — six-interface contract stabilized
+20. ~~**Add HandleBatchError recipe to README** — Make partial success pattern discoverable.~~ done — partial-success recipe in SKILL.md
+21. ~~**Consider Status as string enum** — Eliminates default branches, trivial serialization.~~ done — Status constants + ParseStatus
 
 ### Tier 4: Long-term / Nice-to-have
 
-22. **OpenAPI/JSON schema for HandleResult** — For HTTP/gRPC consumers.
-23. **Structured logging bridge** — `slog` integration for error context.
-24. **Prometheus metrics bridge** — Error family/code counters.
-25. **`go generate` for message templates** — Extract templates from YAML/JSON.
+22. ~~**OpenAPI/JSON schema for HandleResult** — For HTTP/gRPC consumers.~~ **Won't implement — declined — ROADMAP idea only.**
+23. ~~**Structured logging bridge** — `slog` integration for error context.~~ done — LogError slog integration
+24. ~~**Prometheus metrics bridge** — Error family/code counters.~~ **Won't implement — declined — not demanded.**
+25. ~~**`go generate` for message templates** — Extract templates from YAML/JSON.~~ **Won't implement — declined — templates are code.**
 
 ---
 

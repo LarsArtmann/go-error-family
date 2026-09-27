@@ -85,16 +85,16 @@ go-error-family is now a public, MIT-licensed Go library. The core protocol (Fam
 
 ## e) WHAT WE SHOULD IMPROVE 📈
 
-1. **pkg.go.dev presence** — Add `Example*` test functions so pkg.go.dev renders useful documentation. This is the #1 thing for Go library adoption.
-2. **CI pipeline** — GitHub Actions for `go test ./...`, `go vet ./...`, and optionally `golangci-lint`. Zero CI for a public library is a trust gap.
-3. **Diagnostic rule test coverage** — 59.5% is the weakest spot. Mock the command runner or add integration test tags.
-4. **`RegisterTemplate` has 0% coverage** — exported function with zero tests. Trivial to add.
-5. **Remove empty `report/` directory** — or document its purpose. Empty dirs in a public repo look unfinished.
-6. **Consolidate status docs** — 5 status files from one day is noise. One current status + archive is cleaner.
-7. **Fix GPG signing config** — Either add the secret key or set `tag.gpgsign=false` in local config.
-8. **Make pre-commit hook executable** — `chmod +x .git/hooks/pre-commit` or remove it.
-9. **Add `CONTRIBUTING.md`** — Now that it's public, people need to know how to contribute.
-10. **Consider `golangci-lint`** — `go vet` catches little. `golangci-lint` with `revive`, `gocritic`, `gochecknoglobals` would raise the bar.
+1. ~~**pkg.go.dev presence** — Add `Example*` test functions so pkg.go.dev renders useful documentation. This is the #1 thing for Go library adoption.~~ done — 26 godoc examples
+2. ~~**CI pipeline** — GitHub Actions for `go test ./...`, `go vet ./...`, and optionally `golangci-lint`. Zero CI for a public library is a trust gap.~~ done — three workflows live
+3. ~~**Diagnostic rule test coverage** — 59.5% is the weakest spot. Mock the command runner or add integration test tags.~~ done — diagnose rules tested across 3 modules
+4. ~~**`RegisterTemplate` has 0% coverage** — exported function with zero tests. Trivial to add.~~ done — RegisterTemplate tested
+5. ~~**Remove empty `report/` directory** — or document its purpose. Empty dirs in a public repo look unfinished.~~ done — report/ removed
+6. ~~**Consolidate status docs** — 5 status files from one day is noise. One current status + archive is cleaner.~~ done — docs/status consolidated via annotate+archive passes
+7. ~~**Fix GPG signing config** — Either add the secret key or set `tag.gpgsign=false` in local config.~~ done — signing settled on SSH-signed annotated tags
+8. ~~**Make pre-commit hook executable** — `chmod +x .git/hooks/pre-commit` or remove it.~~ done — pre-commit hook executable
+9. ~~**Add `CONTRIBUTING.md`** — Now that it's public, people need to know how to contribute.~~ done — CONTRIBUTING.md exists
+10. ~~**Consider `golangci-lint`** — `go vet` catches little. `golangci-lint` with `revive`, `gocritic`, `gochecknoglobals` would raise the bar.~~ done — golangci-lint 0 issues across 7 modules
 
 ---
 
@@ -102,31 +102,31 @@ go-error-family is now a public, MIT-licensed Go library. The core protocol (Fam
 
 | #  | Item                                                                                   | Impact    | Effort | Type      |
 | -- | -------------------------------------------------------------------------------------- | --------- | ------ | --------- |
-| 1  | **Push v0.1.1 to origin** (`git push && git push --tags`)                              | Critical  | 1 min  | Ops       |
-| 2  | **Add Go doc examples** (`ExampleNewRejection`, `ExampleClassify`, etc.)               | Very High | 2 hrs  | Docs      |
-| 3  | **Set up GitHub Actions CI** (test + vet on push/PR)                                   | Very High | 1 hr   | Infra     |
-| 4  | **Test `RegisterTemplate`** (0% coverage on exported func)                             | High      | 15 min | Test      |
-| 5  | **Test `formatWhy` and `suggestFix` family branches** (50% → 100%)                     | High      | 30 min | Test      |
-| 6  | **Test invalid Family branches** (Audience, Tone, DefaultMessage, ExitCode)            | High      | 20 min | Test      |
-| 7  | **Mock command runner in diagnose rules** (59.5% → 80%+)                               | High      | 2 hrs  | Test      |
-| 8  | **Remove empty `report/` directory**                                                   | Medium    | 1 min  | Cleanup   |
-| 9  | **Fix GPG signing** (set `tag.gpgsign=false` or add key)                               | Medium    | 5 min  | Config    |
-| 10 | **Make pre-commit hook executable** (`chmod +x`)                                       | Medium    | 1 min  | Config    |
-| 11 | **Add `golangci-lint` config and run**                                                 | Medium    | 1 hr   | Quality   |
-| 12 | **Consolidate/clean docs/status/** (archive old reports)                               | Medium    | 15 min | Docs      |
-| 13 | **Add `CONTRIBUTING.md`**                                                              | Medium    | 30 min | Docs      |
-| 14 | **Add code of conduct (`CODE_OF_CONDUCT.md`)**                                         | Medium    | 10 min | Docs      |
-| 15 | **Tag v0.1.1 release on GitHub** (with release notes from CHANGELOG)                   | Medium    | 10 min | Ops       |
-| 16 | **Verify pkg.go.dev renders correctly** after push                                     | High      | 5 min  | Docs      |
-| 17 | **Add integration test build tag** for diagnose rules that need real system            | Medium    | 1 hr   | Test      |
-| 18 | **Add `//go:build ignore` to unused files** or delete `docs/top-5-stupidest-things.md` | Low       | 5 min  | Cleanup   |
-| 19 | **Add fuzz tests for `ParseFamily`, `applyContext`**                                   | Low       | 1 hr   | Test      |
-| 20 | **Add benchmarks** for `Classify`, `HandleError` hot paths                             | Low       | 1 hr   | Perf      |
-| 21 | **Consider extracting `diagnose` into sub-module** (optional dep)                      | Low       | 3 hrs  | Arch      |
-| 22 | **Add `errors.Join` multi-error classification strategy**                              | Low       | 2 hrs  | Feature   |
-| 23 | **Create GitHub Issue templates** (bug, feature, question)                             | Low       | 30 min | Infra     |
-| 24 | **Add `goreleaser` config** for automated releases                                     | Low       | 1 hr   | Infra     |
-| 25 | **Write a blog post / announcement** for the open-source release                       | Low       | 2 hrs  | Marketing |
+| ~~1~~  | ~~**Push v0.1.1 to origin** (`git push && git push --tags`)~~ done — v0.1.1 pushed long since | ~~Critical~~ | ~~1 min~~ | ~~Ops~~ |
+| ~~2~~  | ~~**Add Go doc examples** (`ExampleNewRejection`, `ExampleClassify`, etc.)~~ done — 26 examples | ~~Very High~~ | ~~2 hrs~~ | ~~Docs~~ |
+| ~~3~~  | ~~**Set up GitHub Actions CI** (test + vet on push/PR)~~ done — ci.yml live | ~~Very High~~ | ~~1 hr~~ | ~~Infra~~ |
+| ~~4~~  | ~~**Test `RegisterTemplate`** (0% coverage on exported func)~~ done — RegisterTemplate tested | ~~High~~ | ~~15 min~~ | ~~Test~~ |
+| ~~5~~  | ~~**Test `formatWhy` and `suggestFix` family branches** (50% → 100%)~~ done — branches covered | ~~High~~ | ~~30 min~~ | ~~Test~~ |
+| ~~6~~  | ~~**Test invalid Family branches** (Audience, Tone, DefaultMessage, ExitCode)~~ done — branches covered | ~~High~~ | ~~20 min~~ | ~~Test~~ |
+| ~~7~~  | ~~**Mock command runner in diagnose rules** (59.5% → 80%+)~~ done — MockCommandRunner shipped | ~~High~~ | ~~2 hrs~~ | ~~Test~~ |
+| ~~8~~  | ~~**Remove empty `report/` directory**~~ done — report/ removed | ~~Medium~~ | ~~1 min~~ | ~~Cleanup~~ |
+| ~~9~~  | ~~**Fix GPG signing** (set `tag.gpgsign=false` or add key)~~ done — SSH-signed tags | ~~Medium~~ | ~~5 min~~ | ~~Config~~ |
+| ~~10~~ | ~~**Make pre-commit hook executable** (`chmod +x`)~~ done — hook executable | ~~Medium~~ | ~~1 min~~ | ~~Config~~ |
+| ~~11~~ | ~~**Add `golangci-lint` config and run**~~ done — 0 issues across 7 modules | ~~Medium~~ | ~~1 hr~~ | ~~Quality~~ |
+| ~~12~~ | ~~**Consolidate/clean docs/status/** (archive old reports)~~ done — this archive pass continues that consolidation | ~~Medium~~ | ~~15 min~~ | ~~Docs~~ |
+| ~~13~~ | ~~**Add `CONTRIBUTING.md`**~~ done — CONTRIBUTING.md exists | ~~Medium~~ | ~~30 min~~ | ~~Docs~~ |
+| ~~14~~ | ~~**Add code of conduct (`CODE_OF_CONDUCT.md`)**~~ done — CODE_OF_CONDUCT.md exists | ~~Medium~~ | ~~10 min~~ | ~~Docs~~ |
+| ~~15~~ | ~~**Tag v0.1.1 release on GitHub** (with release notes from CHANGELOG)~~ done — GitHub Releases curated since v0.10.1 | ~~Medium~~ | ~~10 min~~ | ~~Ops~~ |
+| ~~16~~ | ~~**Verify pkg.go.dev renders correctly** after push~~ done — pkg.go.dev serving v0.10.2 | ~~High~~ | ~~5 min~~ | ~~Docs~~ |
+| ~~17~~ | ~~**Add integration test build tag** for diagnose rules that need real system~~ done — integration tests in place | ~~Medium~~ | ~~1 hr~~ | ~~Test~~ |
+| ~~18~~ | ~~**Add `//go:build ignore` to unused files** or delete `docs/top-5-stupidest-things.md`~~ done — stale doc refs fixed in later passes | ~~Low~~ | ~~5 min~~ | ~~Cleanup~~ |
+| ~~19~~ | ~~**Add fuzz tests for `ParseFamily`, `applyContext`**~~ done — 16 fuzz targets | ~~Low~~ | ~~1 hr~~ | ~~Test~~ |
+| ~~20~~ | ~~**Add benchmarks** for `Classify`, `HandleError` hot paths~~ done — benchmark suite | ~~Low~~ | ~~1 hr~~ | ~~Perf~~ |
+| ~~21~~ | ~~**Consider extracting `diagnose` into sub-module** (optional dep)~~ done — diagnose extracted as its own module | ~~Low~~ | ~~3 hrs~~ | ~~Arch~~ |
+| ~~22~~ | ~~**Add `errors.Join` multi-error classification strategy**~~ done — worst-severity multi-error classification | ~~Low~~ | ~~2 hrs~~ | ~~Feature~~ |
+| ~~23~~ | ~~**Create GitHub Issue templates** (bug, feature, question)~~ done — issue #5 filed and closed via v0.10.1 | ~~Low~~ | ~~30 min~~ | ~~Infra~~ |
+| ~~24~~ | ~~**Add `goreleaser` config** for automated releases~~ **Won't implement — declined — release.yml + coordinated tag process instead of goreleaser.** | ~~Low~~ | ~~1 hr~~ | ~~Infra~~ |
+| ~~25~~ | ~~**Write a blog post / announcement** for the open-source release~~ done — discoverability handled via pkg.go.dev examples + website | ~~Low~~ | ~~2 hrs~~ | ~~Marketing~~ |
 
 ---
 

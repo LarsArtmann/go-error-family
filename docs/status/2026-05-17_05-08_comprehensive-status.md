@@ -139,19 +139,19 @@ The diagnose package works correctly but has significant coverage gaps:
 
 ## c) NOT STARTED ⬜
 
-1. **GitHub Actions CI** — no workflows for test, vet, lint on push/PR
-2. **GoReleaser config** — no automated release pipeline for tagging
-3. **flake.nix** — no Nix build configuration (per AGENTS.md policy, should use flake.nix instead of justfile)
-4. **`diagnose/context_test.go`** — no direct tests for `runCommand()` or `commandExists()`
-5. **Integration tests for diagnose rules** — no test harness for rules that shell out
-6. **`PostgresRule.suggestStartFix()` tests** — 4 OS-detection branches untested
-7. **Concurrent `Runner.Run()` test** — no test for goroutine interleaving or race conditions
-8. **`ruleSpec.matches()` direct tests** — no isolated unit tests for the matching logic
-9. **README missing items** — no license badge, no changelog link, no test coverage badge
-10. **CHANGELOG `[Unreleased]` section** — empty, should document the 2 unpushed commits
-11. **v0.2.0 release planning** — no milestone or release planning document
-12. **API stability guarantees** — no versioning policy documented
-13. **Example application** — no `example/` directory showing real-world usage
+1. ~~**GitHub Actions CI** — no workflows for test, vet, lint on push/PR~~ done — ci.yml live
+2. ~~**GoReleaser config** — no automated release pipeline for tagging~~ **Won't implement — declined — release.yml + coordinated tags instead of GoReleaser.**
+3. ~~**flake.nix** — no Nix build configuration (per AGENTS.md policy, should use flake.nix instead of justfile)~~ done — flake.nix in place
+4. ~~**`diagnose/context_test.go`** — no direct tests for `runCommand()` or `commandExists()`~~ done — diagnose fully tested
+5. ~~**Integration tests for diagnose rules** — no test harness for rules that shell out~~ done — rule integration tests in place
+6. ~~**`PostgresRule.suggestStartFix()` tests** — 4 OS-detection branches untested~~ done — suggestStartFix covered
+7. ~~**Concurrent `Runner.Run()` test** — no test for goroutine interleaving or race conditions~~ done — Runner concurrency tested
+8. ~~**`ruleSpec.matches()` direct tests** — no isolated unit tests for the matching logic~~ done — ruleSpec.Matches tested
+9. ~~**README missing items** — no license badge, no changelog link, no test coverage badge~~ done — README complete
+10. ~~**CHANGELOG `[Unreleased]` section** — empty, should document the 2 unpushed commits~~ done — CHANGELOG maintained
+11. ~~**v0.2.0 release planning** — no milestone or release planning document~~ done — v0.2.0+ shipped
+12. ~~**API stability guarantees** — no versioning policy documented~~ done — resolved — stability via 0.x discipline + retract policy (TODO_LIST #2)
+13. ~~**Example application** — no `example/` directory showing real-world usage~~ done — examples/ module with 5 demos
 
 ---
 
@@ -182,31 +182,31 @@ Anyone can `git push --force` or merge broken code. There's no CI to catch regre
 
 ### Architecture
 
-1. **Extract command executor interface in diagnose** — Replace `exec.CommandContext` direct calls with an interface (`CommandRunner`) so rules can be unit-tested with mock command outputs. This is the single highest-leverage architectural change.
+1. ~~**Extract command executor interface in diagnose** — Replace `exec.CommandContext` direct calls with an interface (`CommandRunner`) so rules can be unit-tested with mock command outputs. This is the single highest-leverage architectural change.~~ done — CommandRunner shipped
 
-2. **Move `stripAfter`, `resolvePort`, `resolvePath`, `resolveRepoPath` to pure functions** — These are currently methods on rule structs, making them hard to test in isolation. Make them package-level functions that take explicit inputs.
+2. ~~**Move `stripAfter`, `resolvePort`, `resolvePath`, `resolveRepoPath` to pure functions** — These are currently methods on rule structs, making them hard to test in isolation. Make them package-level functions that take explicit inputs.~~ done — helpers extracted in diagnose
 
-3. **Consider `errors.Join` for multi-diagnostic results** — The `Runner` currently collects `[]*DiagnosticResult`. Could return a joined error for failed diagnostics.
+3. ~~**Consider `errors.Join` for multi-diagnostic results** — The `Runner` currently collects `[]*DiagnosticResult`. Could return a joined error for failed diagnostics.~~ done — worst-severity multi-error classification
 
 ### Code Quality
 
-4. **Name() methods on rules are untested** — Trivial to add but 0% coverage on all 4 rules.
+4. ~~**Name() methods on rules are untested** — Trivial to add but 0% coverage on all 4 rules.~~ done — rule Name() covered
 
-5. **`HandleErrorDetailed` trailing whitespace** — `handle.go` has a minor alignment diff (`ExitCode:`/`Message:` alignment changed). Cosmetic only.
+5. ~~**`HandleErrorDetailed` trailing whitespace** — `handle.go` has a minor alignment diff (`ExitCode:`/`Message:` alignment changed). Cosmetic only.~~ done — HandleErrorDetailed output cleaned
 
-6. **Runner.Run() nil-result filtering** — The path at `diagnose.go:168-172` (filtering nil results from rules) is untested.
+6. ~~**Runner.Run() nil-result filtering** — The path at `diagnose.go:168-172` (filtering nil results from rules) is untested.~~ done — nil-result filter tested
 
 ### Documentation
 
-7. **README license badge** — Simple addition, professional polish.
+7. ~~**README license badge** — Simple addition, professional polish.~~ done — README complete with badges
 
-8. **CHANGELOG update** — The 2 unpushed commits should be documented under `[Unreleased]`.
+8. ~~**CHANGELOG update** — The 2 unpushed commits should be documented under `[Unreleased]`.~~ done — CHANGELOG maintained
 
-9. ** CONTRIBUTING.md** — No contribution guidelines for the open-source project.
+9. ~~** CONTRIBUTING.md** — No contribution guidelines for the open-source project.~~ done — CONTRIBUTING.md exists
 
 ### DevOps
 
-10. **GitHub Actions CI** — The single most impactful DevOps improvement. Even a basic `go test ./...` on push would be transformative.
+10. ~~**GitHub Actions CI** — The single most impactful DevOps improvement. Even a basic `go test ./...` on push would be transformative.~~ done — ci.yml live
 
 ---
 
@@ -218,46 +218,46 @@ Ranked by impact × effort (Pareto ordering):
 
 | # | Task                                                                                                            | Effort | Impact                                      |
 | - | --------------------------------------------------------------------------------------------------------------- | ------ | ------------------------------------------- |
-| 1 | **Push 2 unpushed commits to origin**                                                                           | 1 min  | Prevents data loss                          |
-| 2 | **Add GitHub Actions CI** (`go test`, `go vet`, `go build` on push/PR)                                          | 15 min | Safety net for all future work              |
-| 3 | **Update CHANGELOG `[Unreleased]`** with refactoring changes                                                    | 5 min  | Honest docs                                 |
-| 4 | **Add `diagnose/context_test.go`** — direct tests for `runCommand()` (mockable scenarios) and `commandExists()` | 20 min | Closes 2 coverage gaps                      |
-| 5 | **Add `ruleSpec.matches()` direct unit test**                                                                   | 10 min | Closes coverage gap for core matching logic |
-| 6 | **Add `*Rule.Name()` tests** (all 4 rules)                                                                      | 5 min  | Trivial 0% → 100% on 4 functions            |
-| 7 | **Add `PostgresRule.suggestStartFix()` table-driven test**                                                      | 10 min | 0% → ~100% on 4 branches                    |
-| 8 | **Add README license badge + changelog link**                                                                   | 5 min  | Professional polish                         |
+| ~~1~~ | ~~**Push 2 unpushed commits to origin**~~ done — pushed | ~~1 min~~ | ~~Prevents data loss~~ |
+| ~~2~~ | ~~**Add GitHub Actions CI** (`go test`, `go vet`, `go build` on push/PR)~~ done — ci.yml live | ~~15 min~~ | ~~Safety net for all future work~~ |
+| ~~3~~ | ~~**Update CHANGELOG `[Unreleased]`** with refactoring changes~~ done — CHANGELOG maintained | ~~5 min~~ | ~~Honest docs~~ |
+| ~~4~~ | ~~**Add `diagnose/context_test.go`** — direct tests for `runCommand()` (mockable scenarios) and `commandExists()`~~ done — diagnose fully tested | ~~20 min~~ | ~~Closes 2 coverage gaps~~ |
+| ~~5~~ | ~~**Add `ruleSpec.matches()` direct unit test**~~ done — ruleSpec.Matches tested | ~~10 min~~ | ~~Closes coverage gap for core matching logic~~ |
+| ~~6~~ | ~~**Add `*Rule.Name()` tests** (all 4 rules)~~ done — Name() covered | ~~5 min~~ | ~~Trivial 0% → 100% on 4 functions~~ |
+| ~~7~~ | ~~**Add `PostgresRule.suggestStartFix()` table-driven test**~~ done — suggestStartFix covered | ~~10 min~~ | ~~0% → ~100% on 4 branches~~ |
+| ~~8~~ | ~~**Add README license badge + changelog link**~~ done — README complete | ~~5 min~~ | ~~Professional polish~~ |
 
 ### Tier 2: HIGH IMPACT, MEDIUM EFFORT
 
 | #  | Task                                                                        | Effort | Impact                                 |
 | -- | --------------------------------------------------------------------------- | ------ | -------------------------------------- |
-| 9  | **Extract `CommandRunner` interface in diagnose**                           | 1 hr   | Unlocks full unit testing of all rules |
-| 10 | **Add GoReleaser config** for automated releases                            | 30 min | Professional release pipeline          |
-| 11 | **Add `flake.nix`** for reproducible builds                                 | 30 min | Per AGENTS.md policy                   |
-| 12 | **Add concurrent `Runner.Run()` test** with `-race`                         | 20 min | Verifies thread safety                 |
-| 13 | **Add `Runner.Run()` nil-result filtering test**                            | 10 min | Closes untested path                   |
-| 14 | **Test `GitRule.Run()` branches** — merge conflicts, dirty tree, no remotes | 30 min | 17.3% → ~70% coverage                  |
-| 15 | **Test `PostgresRule.Run()` branches** — TCP fallback, pg_isready success   | 20 min | 35.5% → ~70%                           |
+| ~~9~~  | ~~**Extract `CommandRunner` interface in diagnose**~~ done — CommandRunner shipped | ~~1 hr~~ | ~~Unlocks full unit testing of all rules~~ |
+| ~~10~~ | ~~**Add GoReleaser config** for automated releases~~ **Won't implement — declined — release.yml instead.** | ~~30 min~~ | ~~Professional release pipeline~~ |
+| ~~11~~ | ~~**Add `flake.nix`** for reproducible builds~~ done — flake.nix in place | ~~30 min~~ | ~~Per AGENTS.md policy~~ |
+| ~~12~~ | ~~**Add concurrent `Runner.Run()` test** with `-race`~~ done — Runner concurrency tested | ~~20 min~~ | ~~Verifies thread safety~~ |
+| ~~13~~ | ~~**Add `Runner.Run()` nil-result filtering test**~~ done — filter tested | ~~10 min~~ | ~~Closes untested path~~ |
+| ~~14~~ | ~~**Test `GitRule.Run()` branches** — merge conflicts, dirty tree, no remotes~~ done — GitRule branches covered | ~~30 min~~ | ~~17.3% → ~70% coverage~~ |
+| ~~15~~ | ~~**Test `PostgresRule.Run()` branches** — TCP fallback, pg_isready success~~ done — PostgresRule branches covered | ~~20 min~~ | ~~35.5% → ~70%~~ |
 
 ### Tier 3: MEDIUM IMPACT, LOW EFFORT
 
 | #  | Task                                                                                              | Effort | Impact                             |
 | -- | ------------------------------------------------------------------------------------------------- | ------ | ---------------------------------- |
-| 16 | **Add `FilesystemRule.Run()` error branch tests** — permission denied, not writable, not readable | 20 min | 47.5% → ~80%                       |
-| 17 | **Test `NetworkRule.Run()` uncovered branches**                                                   | 15 min | 59.3% → ~80%                       |
-| 18 | **Extract pure helper functions** (`stripAfter`, `resolvePort`, `resolvePath`, `resolveRepoPath`) | 20 min | Testability                        |
-| 19 | **Add `CONTRIBUTING.md`** for open-source contributors                                            | 15 min | Community readiness                |
-| 20 | **Add Go Report Card badge** to README                                                            | 2 min  | Already has it — verify link works |
+| ~~16~~ | ~~**Add `FilesystemRule.Run()` error branch tests** — permission denied, not writable, not readable~~ done — FilesystemRule branches covered | ~~20 min~~ | ~~47.5% → ~80%~~ |
+| ~~17~~ | ~~**Test `NetworkRule.Run()` uncovered branches**~~ done — NetworkRule branches covered | ~~15 min~~ | ~~59.3% → ~80%~~ |
+| ~~18~~ | ~~**Extract pure helper functions** (`stripAfter`, `resolvePort`, `resolvePath`, `resolveRepoPath`)~~ done — helpers extracted | ~~20 min~~ | ~~Testability~~ |
+| ~~19~~ | ~~**Add `CONTRIBUTING.md`** for open-source contributors~~ done — CONTRIBUTING.md exists | ~~15 min~~ | ~~Community readiness~~ |
+| ~~20~~ | ~~**Add Go Report Card badge** to README~~ done — badge live | ~~2 min~~ | ~~Already has it — verify link works~~ |
 
 ### Tier 4: NICE TO HAVE
 
 | #  | Task                                                                  | Effort | Impact                 |
 | -- | --------------------------------------------------------------------- | ------ | ---------------------- |
-| 21 | **Add `example/` directory** with a working CLI app                   | 30 min | Discoverability        |
-| 22 | **Add `NetworkRule.resolvePort()` direct test**                       | 10 min | Closes untested helper |
-| 23 | **Add versioning policy** to README (semver compatibility guarantees) | 15 min | Consumer confidence    |
-| 24 | **Plan v0.2.0 release** — milestone document with breaking changes    | 20 min | Release management     |
-| 25 | **Add `IsPostgresRunning()` assertions** in existing smoke test       | 5 min  | 53.8% → higher         |
+| ~~21~~ | ~~**Add `example/` directory** with a working CLI app~~ done — examples/ module | ~~30 min~~ | ~~Discoverability~~ |
+| ~~22~~ | ~~**Add `NetworkRule.resolvePort()` direct test**~~ done — resolvePort tested | ~~10 min~~ | ~~Closes untested helper~~ |
+| ~~23~~ | ~~**Add versioning policy** to README (semver compatibility guarantees)~~ done — resolved — 0.x discipline + retract policy | ~~15 min~~ | ~~Consumer confidence~~ |
+| ~~24~~ | ~~**Plan v0.2.0 release** — milestone document with breaking changes~~ done — v0.2.0 shipped | ~~20 min~~ | ~~Release management~~ |
+| ~~25~~ | ~~**Add `IsPostgresRunning()` assertions** in existing smoke test~~ done — IsPostgresRunning tested | ~~5 min~~ | ~~53.8% → higher~~ |
 
 ---
 
