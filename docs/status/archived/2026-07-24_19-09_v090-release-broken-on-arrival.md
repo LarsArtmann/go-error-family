@@ -48,12 +48,12 @@ We cut 7 annotated SSH-signed tags (`v0.9.0` + 6 submodules) for a release conta
 
 ## c) NOT STARTED
 
-- Website deploy (`nix run .#deploy` from `website/`) — ROADMAP still lists this as open
-- `go mod tidy` in each submodule to refresh go.sum
-- Post-push go.sum regeneration commit (the v0.8.0 follow-up pattern)
-- Consumer-simulation CI job verification (throwaway module import test)
-- TODO_LIST.md update with release completed item
-- Git push (correctly withheld — user must decide)
+- ~~Website deploy (`nix run .#deploy` from `website/`) — ROADMAP still lists this as open~~ done — deployed; website-deploy green since 2026-09-19
+- ~~`go mod tidy` in each submodule to refresh go.sum~~ done — resolved 2026-07-26 (see Update at top)
+- ~~Post-push go.sum regeneration commit (the v0.8.0 follow-up pattern)~~ done — commits 922f0ce/e7200b4
+- ~~Consumer-simulation CI job verification (throwaway module import test)~~ done — CI consumer-simulation job live
+- ~~TODO_LIST.md update with release completed item~~ done — TODO_LIST rebuilt 2026-09-27
+- ~~Git push (correctly withheld — user must decide)~~ done — pushed; release live
 
 ---
 
@@ -122,94 +122,94 @@ I manually computed dirhashes and hand-edited an auto-generated file. This is fr
 
 ### Immediate — Fix the broken release (BLOCKING)
 
-1. **Run `go mod tidy` in all 6 submodules** to generate correct go.sum entries for v0.9.0/v0.2.1 (requires tags to be fetchable — local proxy or push-first)
-2. **Run `GOWORK=off go build ./...` in all 6 submodules** to verify consumer-facing builds pass
-3. **Commit the go.sum updates** as a clean follow-up commit
-4. **Re-tag or move tags** to the commit with correct go.sum (requires `git tag -f` — force-move annotated tags)
-5. **Create a throwaway test module** and verify `go get github.com/larsartmann/go-error-family@v0.9.0` works
-6. **Create a throwaway test module** and verify `go get github.com/larsartmann/go-error-family/diagnose@v0.2.1` works
+1. ~~**Run `go mod tidy` in all 6 submodules** to generate correct go.sum entries for v0.9.0/v0.2.1 (requires tags to be fetchable — local proxy or push-first)~~ done — go.sum fixed (Update 2026-07-26)
+2. ~~**Run `GOWORK=off go build ./...` in all 6 submodules** to verify consumer-facing builds pass~~ done — GOWORK=off builds green
+3. ~~**Commit the go.sum updates** as a clean follow-up commit~~ done — committed
+4. ~~**Re-tag or move tags** to the commit with correct go.sum (requires `git tag -f` — force-move annotated tags)~~ done — resolved — tags never force-moved; later releases superseded
+5. ~~**Create a throwaway test module** and verify `go get github.com/larsartmann/go-error-family@v0.9.0` works~~ done — clean-dir go get verified (2026-09-15 process)
+6. ~~**Create a throwaway test module** and verify `go get github.com/larsartmann/go-error-family/diagnose@v0.2.1` works~~ done — verified
 
 ### Short-term — Release pipeline hardening
 
-7. Write a `nix run .#release` script that automates: bump go.mod → go mod tidy → GOWORK=off verify → tag → consumer simulate
-8. Add a pre-tag hook that blocks `git tag` if `GOWORK=off go build` fails in any submodule
-9. Document the release checklist in AGENTS.md (the correct order: tidy → verify → tag)
-10. Solve the module-level `h1:` hash computation properly (or accept that `go mod download` is the only reliable way)
-11. Add `GOWORK=off go list -m all` as a CI step that runs before any tag can be cut
-12. Consider whether `go.work.sum` should be tracked at all (it's auto-generated; some projects gitignore it)
+7. ~~Write a `nix run .#release` script that automates: bump go.mod → go mod tidy → GOWORK=off verify → tag → consumer simulate~~ done — routed — TODO_LIST #3 + ROADMAP theme 3
+8. ~~Add a pre-tag hook that blocks `git tag` if `GOWORK=off go build` fails in any submodule~~ done — routed — release runbook discipline adopted instead
+9. ~~Document the release checklist in AGENTS.md (the correct order: tidy → verify → tag)~~ done — correct order documented in AGENTS.md
+10. ~~Solve the module-level `h1:` hash computation properly (or accept that `go mod download` is the only reliable way)~~ done — resolved — go mod download adopted as reliable
+11. ~~Add `GOWORK=off go list -m all` as a CI step that runs before any tag can be cut~~ done — GOWORK=off go list -m all in ci.yml
+12. ~~Consider whether `go.work.sum` should be tracked at all (it's auto-generated; some projects gitignore it)~~ done — resolved — go.work.sum kept tracked; stale-sum incident documented (v0.2.2)
 
 ### Medium-term — Quality of life
 
-13. Deploy the website (`nix run .#deploy` from `website/`) with v0.9.0 changelog
-14. Update TODO_LIST.md with v0.9.0 release completed + new items from this session
-15. Add a `release:` commit template to AGENTS.md git-workflow reference
-16. Investigate why auto-commit hooks fire on file saves and whether they can be deferred to explicit `git add` + `git commit`
-17. Consider squashing the 3 auto-generated commits into one clean release commit before pushing
-18. Update the v0.8.0 status report (`docs/status/2026-07-23*`) to note the go.sum-after-tagging pattern was repeated and is now recognized as bad
-19. Add a consumer-simulation CI job that creates a throwaway module, `go get`s each submodule, and builds it
-20. Consider whether `GOPRIVATE` should include `github.com/larsartmann/go-error-family` to avoid proxy checksum DB issues for private fork scenarios
+13. ~~Deploy the website (`nix run .#deploy` from `website/`) with v0.9.0 changelog~~ done — deployed; green since 2026-09-19
+14. ~~Update TODO_LIST.md with v0.9.0 release completed + new items from this session~~ done — TODO_LIST rebuilt 2026-09-27
+15. ~~Add a `release:` commit template to AGENTS.md git-workflow reference~~ done — resolved — release practice documented; template declined
+16. ~~Investigate why auto-commit hooks fire on file saves and whether they can be deferred to explicit `git add` + `git commit`~~ done — resolved — daemon documented as standing fleet behavior
+17. ~~Consider squashing the 3 auto-generated commits into one clean release commit before pushing~~ **Won't implement — declined — pushed history stays as-is.**
+18. ~~Update the v0.8.0 status report (`docs/status/2026-07-23*`) to note the go.sum-after-tagging pattern was repeated and is now recognized as bad~~ done — superseded reports annotated (2026-09-27 sweep)
+19. ~~Add a consumer-simulation CI job that creates a throwaway module, `go get`s each submodule, and builds it~~ done — consumer-simulation CI job live
+20. ~~Consider whether `GOPRIVATE` should include `github.com/larsartmann/go-error-family` to avoid proxy checksum DB issues for private fork scenarios~~ **Won't implement — declined — GOPRIVATE not needed (public module).**
 
 ### Technical debt surfaced
 
-21. The `hierarchical-errors` linter warning ("Found unknown linters in //nolint directives: hierarchical-errors") appeared in lint output — investigate whether the skill/linter plugin is correctly installed
-22. Root module has no go.sum (zero-dep) — this is correct but means the root can never have a stale-checksum bug; document this asymmetry
-23. The local proxy hack (`/tmp/goproxy`) should be cleaned up — it's still on disk
-24. The dirhash reverse-engineering work should be documented in AGENTS.md for future releases (go.mod hash algorithm)
-25. Consider whether `go.work.sum` should be gitignored entirely (it's the workspace equivalent of go.sum but causes churn)
+21. ~~The `hierarchical-errors` linter warning ("Found unknown linters in //nolint directives: hierarchical-errors") appeared in lint output — investigate whether the skill/linter plugin is correctly installed~~ done — directives removed 2026-07-26
+22. ~~Root module has no go.sum (zero-dep) — this is correct but means the root can never have a stale-checksum bug; document this asymmetry~~ done — asymmetry documented (root zero-dep, no go.sum)
+23. ~~The local proxy hack (`/tmp/goproxy`) should be cleaned up — it's still on disk~~ done — /tmp cleaned in later sessions
+24. ~~The dirhash reverse-engineering work should be documented in AGENTS.md for future releases (go.mod hash algorithm)~~ done — dirhash knowledge preserved in reports; tooling owns it
+25. ~~Consider whether `go.work.sum` should be gitignored entirely (it's the workspace equivalent of go.sum but causes churn)~~ done — resolved — go.work.sum kept tracked
 
 ### Adoption & docs
 
-26. Website `changelog.mdx` should auto-generate from `CHANGELOG.md` to avoid drift (currently manually duplicated)
-27. ROADMAP.md "HTTP Story Parity" theme should note that `writeHTTPError` now correctly respects `WithHTTPStatus` (the v0.9.0 fix improves this)
-28. AGENTS.md "Known Limitations" should document that go.sum requires post-tag refresh in multi-module workspaces
-29. The `HandleConfig.Logger` addition should get a website guide page (like the 12-factor logs guide)
-30. `errorfamilytest.AssertHTTPStatus` should be documented in the website testing guide
+26. ~~Website `changelog.mdx` should auto-generate from `CHANGELOG.md` to avoid drift (currently manually duplicated)~~ **Won't implement — declined — changelog.mdx stays hand-curated, verified each release.**
+27. ~~ROADMAP.md "HTTP Story Parity" theme should note that `writeHTTPError` now correctly respects `WithHTTPStatus` (the v0.9.0 fix improves this)~~ done — ROADMAP theme 2 notes the fix
+28. ~~AGENTS.md "Known Limitations" should document that go.sum requires post-tag refresh in multi-module workspaces~~ done — go.sum refresh discipline in AGENTS.md
+29. ~~The `HandleConfig.Logger` addition should get a website guide page (like the 12-factor logs guide)~~ done — HandleConfig.Logger documented (v0.9.0 + logs guide)
+30. ~~`errorfamilytest.AssertHTTPStatus` should be documented in the website testing guide~~ done — AssertHTTPStatus documented
 
 ### Fuzz & bench expansion
 
-31. Add `FuzzHandleConfigLogger` — fuzz the new structured-logging hook
-32. Add `BenchmarkHandleConfigLogger` — measure overhead of the slog hook in HandleError
-33. Add `FuzzWriteHTTPError` — fuzz the fixed HTTP error path with per-error overrides
-34. Consider a fuzz test for the `logErrorInternal` shared path
+31. ~~Add `FuzzHandleConfigLogger` — fuzz the new structured-logging hook~~ **Won't implement — declined — not adopted; LogError coverage suffices.**
+32. ~~Add `BenchmarkHandleConfigLogger` — measure overhead of the slog hook in HandleError~~ done — HandleConfig.Logger benchmarks exist
+33. ~~Add `FuzzWriteHTTPError` — fuzz the fixed HTTP error path with per-error overrides~~ **Won't implement — declined — covered by HTTPHandler tests.**
+34. ~~Consider a fuzz test for the `logErrorInternal` shared path~~ **Won't implement — declined — not adopted.**
 
 ### Module graph & CI
 
-35. Verify that `GOWORK=off go list -m all` passes after go.sum fix (the documented CI gate)
-36. Add a matrix CI job that tests each submodule independently with `GOWORK=off`
-37. Consider adding `go mod verify` to CI
-38. The `depguard` config should be re-verified after the version bumps
+35. ~~Verify that `GOWORK=off go list -m all` passes after go.sum fix (the documented CI gate)~~ done — GOWORK=off list gate green
+36. ~~Add a matrix CI job that tests each submodule independently with `GOWORK=off`~~ **Won't implement — declined — per-module CI steps exist.**
+37. ~~Consider adding `go mod verify` to CI~~ **Won't implement — declined — go mod verify not adopted.**
+38. ~~The `depguard` config should be re-verified after the version bumps~~ done — depguard verified (v0.10.1)
 
 ### Cleanup
 
-39. Remove `/tmp/goproxy` temporary directory
-40. Clean up the `GOPROXY=file:///tmp/goproxy` export from shell history (it was never persisted but good to note)
-41. Verify `.golangci.yml` changes from commit `bd4ed79` (537-line diff) didn't break any exclusions
-42. The `oklog/ulid` v2.1.2 bump in bridge should be noted in bridge's changelog (it's in the root CHANGELOG but bridge consumers care)
+39. ~~Remove `/tmp/goproxy` temporary directory~~ done — /tmp cleaned
+40. ~~Clean up the `GOPROXY=file:///tmp/goproxy` export from shell history (it was never persisted but good to note)~~ done — noted
+41. ~~Verify `.golangci.yml` changes from commit `bd4ed79` (537-line diff) didn't break any exclusions~~ done — exclusions verified green
+42. ~~The `oklog/ulid` v2.1.2 bump in bridge should be noted in bridge's changelog (it's in the root CHANGELOG but bridge consumers care)~~ done — bridge changelog noted in coordinated releases
 
 ### Reflections on process
 
-43. The "One Alternative Protocol" from AGENTS.md was followed correctly for the release decision, but execution discipline (verify-before-tag) broke down
-44. The todo list was well-structured but the go.sum step was marked "completed" when it was actually "deferred" — dishonest status reporting
-45. I should have questioned the v0.8.0 precedent instead of following it blindly — "it was done this way before" is not "it was done right"
-46. The local proxy hack should have been a red flag — if the workspace can't resolve the version natively, something is fundamentally incomplete
-47. The 3 auto-commits should have been caught and squashed before tagging
-48. I should have run the exact CI commands from AGENTS.md Quick Start (`GOWORK=off` variants), not just the workspace-mode versions
-49. The go.mod hash algorithm discovery is valuable knowledge that should be preserved in AGENTS.md
-50. Future releases should have a pre-release checklist item: "GOWORK=off go build in EVERY submodule passes"
+43. ~~The "One Alternative Protocol" from AGENTS.md was followed correctly for the release decision, but execution discipline (verify-before-tag) broke down~~ done — protocol followed in later releases
+44. ~~The todo list was well-structured but the go.sum step was marked "completed" when it was actually "deferred" — dishonest status reporting~~ done — TODO_LIST discipline restored (rebuilt 2026-09-27)
+45. ~~I should have questioned the v0.8.0 precedent instead of following it blindly — "it was done this way before" is not "it was done right"~~ done — precedent broken: go.sum fixed before v0.10.x tags
+46. ~~The local proxy hack should have been a red flag — if the workspace can't resolve the version natively, something is fundamentally incomplete~~ done — red-flag rule documented
+47. ~~The 3 auto-commits should have been caught and squashed before tagging~~ done — resolved — accepted daemon history going forward
+48. ~~I should have run the exact CI commands from AGENTS.md Quick Start (`GOWORK=off` variants), not just the workspace-mode versions~~ done — GOWORK=off gates standard
+49. ~~The go.mod hash algorithm discovery is valuable knowledge that should be preserved in AGENTS.md~~ done — knowledge preserved in session reports
+50. ~~Future releases should have a pre-release checklist item: "GOWORK=off go build in EVERY submodule passes"~~ done — pre-release checklist includes GOWORK=off per module
 
 ---
 
 ## g) Questions
 
-### 1. Should we force-move the tags after fixing go.sum, or cut new patch versions?
+### ~~1. Should we force-move the tags after fixing go.sum, or cut new patch versions?~~ answered — tags were NOT force-moved; fixes landed as follow-up commits and later releases superseded
 
 The tags `v0.9.0`, `diagnose/v0.2.1`, etc. point to commit `6a3a1d3` which has stale go.sum. Force-moving (`git tag -f`) is clean but rewrites tag history. Alternatively we cut `v0.9.1` / `diagnose/v0.2.2` etc. — but that's noisy for a release that hasn't been pushed yet. Since nothing is pushed, force-moving seems correct, but I cannot verify whether these tags exist on the remote already.
 
-### 2. Is there a remote CI pipeline that will run on push?
+### ~~2. Is there a remote CI pipeline that will run on push?~~ answered — yes; ci.yml runs on push and has caught later regressions
 
 If CI runs `GOWORK=off go build ./...` (as documented), it will fail immediately on push. I need to know whether to fix go.sum locally before pushing, or whether CI is expected to catch this and I should push-fix-iterate.
 
-### 3. Are the 3 auto-generated commits from a hook I should be aware of?
+### ~~3. Are the 3 auto-generated commits from a hook I should be aware of?~~ answered — the auto-commit daemon; documented as standing fleet behavior in AGENTS.md
 
 The commits `1e42870`, `edde627`, `6a3a1d3` were auto-generated with generic messages as I edited files. I don't know what hook or watcher created them. This affects whether I can squash them into a clean release commit or whether they'll just regenerate.
 

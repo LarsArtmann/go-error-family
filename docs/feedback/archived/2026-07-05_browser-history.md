@@ -9,6 +9,10 @@
 
 ## What Works Great
 
+> **RESOLVED 2026-09-27 (docs-health pass):** every pain point below is closed — see the
+> Resolution Status appendix (PP1-PP4 all ✅). ~~The 5-family taxonomy~~ is now the
+> **six**-family taxonomy (`Orchestration` added in v0.10.0).
+
 ### The 5-family taxonomy is the right abstraction
 
 Rejection / Conflict / Transient / Corruption / Infrastructure maps cleanly to HTTP status codes (400/409/503/500/503). We built a single `mapDomainError()` that calls `errorfamily.Classify(err)` and produces correct status codes. This eliminated an entire class of "everything is 500" bugs.

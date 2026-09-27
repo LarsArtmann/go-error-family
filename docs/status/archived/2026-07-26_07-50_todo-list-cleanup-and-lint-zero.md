@@ -60,11 +60,11 @@ Work through `TODO_LIST.md` — break down into actionable steps, execute, verif
 
 ## b) PARTIALLY DONE
 
-### Website deploy — build verified, deploy not executed
+### ~~Website deploy — build verified, deploy not executed~~ done — deployed; website-deploy green since 2026-09-19
 
 The website builds cleanly and a CI workflow exists, but the actual deploy to `errorfamily.lars.software` has not happened. The workflow requires the `FIREBASE_SERVICE_ACCOUNT_LARS_SOFTWARE` GitHub secret, which has not been verified to exist. The first push to master with `website/**` changes (or a manual `workflow_dispatch` trigger) will either deploy successfully or fail on the missing secret.
 
-### CHANGELOG.md — not updated
+### ~~CHANGELOG.md — not updated~~ done — CHANGELOG gained the entries (0.10.x sections document this work)
 
 The TODO_LIST.md says: "When an item ships, remove it here and record it in `CHANGELOG.md` under the version it shipped in." I removed 5 items from TODO_LIST.md but **did not add entries to CHANGELOG.md**. This is a process violation — the shipped work is not recorded in the changelog. (See section d.)
 
@@ -72,9 +72,9 @@ The TODO_LIST.md says: "When an item ships, remove it here and record it in `CHA
 
 ## c) NOT STARTED (from original TODO_LIST.md)
 
-- **Create reference implementation for oops + bridge stack** — the `bridge/` module has zero external consumers. Needs a real application wired through oops + bridge + error-family end-to-end. Scope decision required.
-- **Apply ACME TXT DNS record** — staged in Terraform, blocked on Namecheap API key (placeholder). External dependency.
-- **Deploy website** — blocked on Firebase service account secret.
+- ~~**Create reference implementation for oops + bridge stack** — the `bridge/` module has zero external consumers. Needs a real application wired through oops + bridge + error-family end-to-end. Scope decision required.~~ done — examples/cmd/bridge shipped 2026-07-26
+- ~~**Apply ACME TXT DNS record** — staged in Terraform, blocked on Namecheap API key (placeholder). External dependency.~~ done — record live (verified 2026-09-15)
+- ~~**Deploy website** — blocked on Firebase service account secret.~~ done — secret set; deploys green since 2026-09-19
 
 ---
 
@@ -102,20 +102,20 @@ The AGENTS.md documents 10 root fuzz tests and 5 bridge fuzz tests. After removi
 
 ### Process Discipline
 
-1. **Follow the documented shipping contract.** TODO_LIST.md says "record in CHANGELOG.md." If the process says to do it, do it — don't skip it.
-2. **Run fuzz tests after broad mechanical changes.** Even comment-only changes across 13 files deserve a quick fuzz pass.
-3. **Prefer root-cause fixes over linter exclusions.** A project-wide test-file exclusion for 4 complexity linters is a sledgehammer for one function's complexity.
+1. ~~**Follow the documented shipping contract.** TODO_LIST.md says "record in CHANGELOG.md." If the process says to do it, do it — don't skip it.~~ done — contract followed in later releases
+2. ~~**Run fuzz tests after broad mechanical changes.** Even comment-only changes across 13 files deserve a quick fuzz pass.~~ done — fuzz runs standard since
+3. ~~**Prefer root-cause fixes over linter exclusions.** A project-wide test-file exclusion for 4 complexity linters is a sledgehammer for one function's complexity.~~ done — exclusion policy documented in AGENTS.md
 
 ### Pre-Existing Issues Noticed (not addressed, out of session scope)
 
-4. **11 `root-package-files` structure errors** from `go-structure-linter` — all `.go` files at the project root are flagged as "should be in /internal/ or /pkg/." This is an intentional design choice (the library IS the public API at root) that conflicts with go-structure-linter's application-project conventions. BuildFlow counts these as errors but the build still passes. Could suppress via buildflow config or restructure (controversial — would break all 50+ consumers' import paths).
-5. **`diagnose/mock.go` flagged for testdata-directory** — the linter suggests it belongs in `testdata/`. This is a mock, not a test fixture, so the suggestion is wrong for this case.
-6. **`gopls nilness` warning at `error_test.go:567`** — `panicNilError.Error()` intentionally panics with nil. This is a test type for panic-recovery testing. The warning is a false positive — the panic is the point.
+4. ~~**11 `root-package-files` structure errors** from `go-structure-linter` — all `.go` files at the project root are flagged as "should be in /internal/ or /pkg/." This is an intentional design choice (the library IS the public API at root) that conflicts with go-structure-linter's application-project conventions. BuildFlow counts these as errors but the build still passes. Could suppress via buildflow config or restructure (controversial — would break all 50+ consumers' import paths).~~ done — flat preset suppresses them (structure-linter config 2026-09-15)
+5. ~~**`diagnose/mock.go` flagged for testdata-directory** — the linter suggests it belongs in `testdata/`. This is a mock, not a test fixture, so the suggestion is wrong for this case.~~ done — testdata-directory suppression reviewed (2026-09-15)
+6. ~~**`gopls nilness` warning at `error_test.go:567`** — `panicNilError.Error()` intentionally panics with nil. This is a test type for panic-recovery testing. The warning is a false positive — the panic is the point.~~ done — nilness fixture documented as deliberate
 
 ### Tooling
 
-7. **The `hierarchical-errors` directives should never have been committed in the first place.** A previous session added 52 `//nolint` directives for a linter that doesn't exist. This suggests the directives were cargo-culted from the skill description without verifying the linter was installed. The lesson: verify the linter exists before suppressing its findings.
-8. **`bun.lock` was generated** by `bun install` during website verification. It's in `.gitignore` so it's harmless, but the CI workflow uses `pnpm install --frozen-lockfile` (requires `package-lock.json`). The two lockfiles could drift if someone runs `bun install` and adds a dependency that isn't reflected in `package-lock.json`. Consider standardizing on one package manager for the website.
+7. ~~**The `hierarchical-errors` directives should never have been committed in the first place.** A previous session added 52 `//nolint` directives for a linter that doesn't exist. This suggests the directives were cargo-culted from the skill description without verifying the linter was installed. The lesson: verify the linter exists before suppressing its findings.~~ done — lesson recorded; directives removed same day
+8. ~~**`bun.lock` was generated** by `bun install` during website verification. It's in `.gitignore` so it's harmless, but the CI workflow uses `pnpm install --frozen-lockfile` (requires `package-lock.json`). The two lockfiles could drift if someone runs `bun install` and adds a dependency that isn't reflected in `package-lock.json`. Consider standardizing on one package manager for the website.~~ done — pnpm standardized; bun.lock gitignored
 
 ---
 

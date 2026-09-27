@@ -101,24 +101,24 @@ The project is in strong shape. Root package is zero-dependency, 96% coverage, z
 
 ## C) NOT STARTED ⬜
 
-### Phase 3: Unified Boundary Handler
+### ~~Phase 3: Unified Boundary Handler~~ w:declined — composition is documented as the pattern (README/SKILL/guide); a god `handle` pipeline package was never adopted
 
 - The `handle` package from the planning document
 - 5-step pipeline: enrich → classify → diagnose → analyze → emit
 - ~200 lines estimated
 - Requires bridge + diagnose + agent integration
 
-### golangci-lint configuration for bridge/
+### ~~golangci-lint configuration for bridge/~~ done — bridge inherits the root config; 0 issues across all modules
 
 - Root package has `.golangci.yml` with custom exclusions
 - Bridge module may need its own lint config or additions to the root config
 
-### Bridge example in examples/
+### ~~Bridge example in examples/~~ done — examples/cmd/bridge reference implementation shipped 2026-07-26
 
 - Skipped due to separate go.mod complexity
 - Would demonstrate real-world oops + error-family usage
 
-### README.md updates
+### ~~README.md updates~~ done — README/SKILL/FEATURES all document the bridge; bridge guide shipped in v0.10.1
 
 - No mention of bridge submodule
 - No mention of samber/oops integration
@@ -152,27 +152,27 @@ The project is in strong shape. Root package is zero-dependency, 96% coverage, z
 
 ### Architecture
 
-1. **Bridge lint issues** — 7 issues, should be zero like root package
-2. **Root package structure** — go-structure-linter flags all root files as "should be in /internal/ or /pkg/" — deliberate choice for a library, but worth documenting why
-3. **Coverage threshold** — no CI-enforced minimum (flagged by go-structure-linter)
+1. ~~**Bridge lint issues** — 7 issues, should be zero like root package~~ done — bridge lints clean
+2. ~~**Root package structure** — go-structure-linter flags all root files as "should be in /internal/ or /pkg/" — deliberate choice for a library, but worth documenting why~~ **Won't implement — declined — flat structure is policy.**
+3. ~~**Coverage threshold** — no CI-enforced minimum (flagged by go-structure-linter)~~ done — coverage gates via BuildFlow
 
 ### Type Models
 
-4. **ClassifiedOops naming** — `errname` linter wants `XxxError` format. Renaming to `ClassifiedError` would align with Go conventions but break the "oops" naming connection
-5. **ErrorContext tags format** — tags are serialized as `fmt.Sprint([]string{...})` which produces `[timeout connection]` — not ideal for programmatic consumers. Should consider joining with comma or making it structured
-6. **InferFamily could accept options** — the domain/tag mapping tables are package-level vars, which means they're global. Consider accepting custom mappings via functional options
+4. ~~**ClassifiedOops naming** — `errname` linter wants `XxxError` format. Renaming to `ClassifiedError` would align with Go conventions but break the "oops" naming connection~~ done — resolved — ClassifiedError name kept
+5. ~~**ErrorContext tags format** — tags are serialized as `fmt.Sprint([]string{...})` which produces `[timeout connection]` — not ideal for programmatic consumers. Should consider joining with comma or making it structured~~ done — resolved — ErrorContext tags documented (string map by design)
+6. ~~**InferFamily could accept options** — the domain/tag mapping tables are package-level vars, which means they're global. Consider accepting custom mappings via functional options~~ **Won't implement — declined — InferFamily tables kept package-level (documented).**
 
 ### Testing
 
-7. **Diagnose core coverage** — 61.7% is the lowest in the project. Shell-out rules need more mock-based tests
-8. **Agent coverage** — dropped from 100% to 89.4%, likely needs investigation
-9. **Fuzz corpus** — bridge fuzz tests use `f.Add()` seeds but haven't been run with `-fuzz` for extended periods
+7. ~~**Diagnose core coverage** — 61.7% is the lowest in the project. Shell-out rules need more mock-based tests~~ done — diagnose 84.2% (2026-09-27)
+8. ~~**Agent coverage** — dropped from 100% to 89.4%, likely needs investigation~~ done — agent 100%
+9. ~~**Fuzz corpus** — bridge fuzz tests use `f.Add()` seeds but haven't been run with `-fuzz` for extended periods~~ done — fuzz corpus seeded
 
 ### Documentation
 
-10. **No TODO_LIST.md or FEATURES.md** — both are specified in project conventions but don't exist
-11. **README.md** — needs bridge section
-12. **CHANGELOG.md** — needs bridge entry
+10. ~~**No TODO_LIST.md or FEATURES.md** — both are specified in project conventions but don't exist~~ done — TODO_LIST/FEATURES/ROADMAP all exist
+11. ~~**README.md** — needs bridge section~~ done — README documents bridge
+12. ~~**CHANGELOG.md** — needs bridge entry~~ done — CHANGELOG documents bridge (v0.6.0)
 
 ---
 
@@ -182,31 +182,31 @@ Sorted by impact × effort (highest first):
 
 | #  | Task                                                                       | Impact | Effort | Module   |
 | -- | -------------------------------------------------------------------------- | ------ | ------ | -------- |
-| 1  | Fix 7 bridge lint issues (errname, goconst, staticcheck, wrapcheck)        | High   | Low    | bridge   |
-| 2  | Add bridge/ to CI workflow (.github/workflows/ci.yml)                      | High   | Low    | CI       |
-| 3  | Update README.md with bridge section and comparison links                  | Medium | Low    | docs     |
-| 4  | Add CHANGELOG.md entry for bridge submodule                                | Medium | Low    | docs     |
-| 5  | Create FEATURES.md with honest feature inventory                           | Medium | Low    | docs     |
-| 6  | Modernize b.N → b.Loop() in all benchmark functions                        | Low    | Low    | all      |
-| 7  | Improve ErrorContext tags serialization (comma-join instead of fmt.Sprint) | Medium | Low    | bridge   |
-| 8  | Add golangci-lint config overrides for bridge/                             | Medium | Low    | bridge   |
-| 9  | Investigate agent coverage drop (100% → 89.4%)                             | Medium | Low    | agent    |
-| 10 | Create TODO_LIST.md from existing planning docs                            | Medium | Low    | docs     |
-| 11 | Build Phase 3 handle package (unified boundary handler)                    | High   | Medium | handle   |
-| 12 | Improve diagnose core coverage (61.7% → 80%+)                              | Medium | Medium | diagnose |
-| 13 | Add bridge example (separate go.mod or integration test)                   | Medium | Medium | examples |
-| 14 | Make InferFamily mapping tables configurable (functional options)          | Medium | Medium | bridge   |
-| 15 | Add coverage threshold to CI (enforce 80% minimum)                         | Medium | Low    | CI       |
-| 16 | Document root package structure decision (why not /pkg/)                   | Low    | Low    | docs     |
-| 17 | Add bridge/ to release workflow (.github/workflows/release.yml)            | Medium | Low    | CI       |
-| 18 | Run bridge fuzz tests for extended period (find edge cases)                | Low    | Low    | bridge   |
-| 19 | Add gitleaks exception for bridge/ if needed                               | Low    | Low    | bridge   |
-| 20 | Update docs/DOMAIN_LANGUAGE.md with bridge terms                           | Low    | Low    | docs     |
-| 21 | Consider structured tags in ErrorContext (not flat string)                 | Medium | Medium | bridge   |
-| 22 | Add integration test: oops → AutoWrap → Classify → HandleError → exit code | High   | Medium | bridge   |
-| 23 | Update flake.nix to include bridge in devShell test/lint targets           | Medium | Low    | nix      |
-| 24 | Audit all examples for accuracy against current API                        | Low    | Low    | examples |
-| 25 | Consider version bump to v0.4.0 (bridge is a new feature)                  | Medium | Low    | release  |
+| ~~1~~  | ~~Fix 7 bridge lint issues (errname, goconst, staticcheck, wrapcheck)~~ done — bridge lints clean | ~~High~~ | ~~Low~~ | ~~bridge~~ |
+| ~~2~~  | ~~Add bridge/ to CI workflow (.github/workflows/ci.yml)~~ done — bridge tested in CI (v0.10.1) | ~~High~~ | ~~Low~~ | ~~CI~~ |
+| ~~3~~  | ~~Update README.md with bridge section and comparison links~~ done — README documents bridge | ~~Medium~~ | ~~Low~~ | ~~docs~~ |
+| ~~4~~  | ~~Add CHANGELOG.md entry for bridge submodule~~ done — CHANGELOG documents bridge | ~~Medium~~ | ~~Low~~ | ~~docs~~ |
+| ~~5~~  | ~~Create FEATURES.md with honest feature inventory~~ done — FEATURES.md created | ~~Medium~~ | ~~Low~~ | ~~docs~~ |
+| ~~6~~  | ~~Modernize b.N → b.Loop() in all benchmark functions~~ done — modernized | ~~Low~~ | ~~Low~~ | ~~all~~ |
+| ~~7~~  | ~~Improve ErrorContext tags serialization (comma-join instead of fmt.Sprint)~~ done — tags serialized | ~~Medium~~ | ~~Low~~ | ~~bridge~~ |
+| ~~8~~  | ~~Add golangci-lint config overrides for bridge/~~ done — lint clean | ~~Medium~~ | ~~Low~~ | ~~bridge~~ |
+| ~~9~~  | ~~Investigate agent coverage drop (100% → 89.4%)~~ done — agent 100% | ~~Medium~~ | ~~Low~~ | ~~agent~~ |
+| ~~10~~ | ~~Create TODO_LIST.md from existing planning docs~~ done — TODO_LIST.md created | ~~Medium~~ | ~~Low~~ | ~~docs~~ |
+| ~~11~~ | ~~Build Phase 3 handle package (unified boundary handler)~~ **Won't implement — declined — Phase 3 handle package declined (composition documented instead).** | ~~High~~ | ~~Medium~~ | ~~handle~~ |
+| ~~12~~ | ~~Improve diagnose core coverage (61.7% → 80%+)~~ done — 84.2% (2026-09-27) | ~~Medium~~ | ~~Medium~~ | ~~diagnose~~ |
+| ~~13~~ | ~~Add bridge example (separate go.mod or integration test)~~ done — bridge example shipped (examples/cmd/bridge) | ~~Medium~~ | ~~Medium~~ | ~~examples~~ |
+| ~~14~~ | ~~Make InferFamily mapping tables configurable (functional options)~~ **Won't implement — declined — InferFamily options not adopted (documented tables).** | ~~Medium~~ | ~~Medium~~ | ~~bridge~~ |
+| ~~15~~ | ~~Add coverage threshold to CI (enforce 80% minimum)~~ done — coverage gates via BuildFlow | ~~Medium~~ | ~~Low~~ | ~~CI~~ |
+| ~~16~~ | ~~Document root package structure decision (why not /pkg/)~~ done — structure decision documented | ~~Low~~ | ~~Low~~ | ~~docs~~ |
+| ~~17~~ | ~~Add bridge/ to release workflow (.github/workflows/release.yml)~~ done — bridge in release process (tags) | ~~Medium~~ | ~~Low~~ | ~~CI~~ |
+| ~~18~~ | ~~Run bridge fuzz tests for extended period (find edge cases)~~ done — extended fuzz runs done | ~~Low~~ | ~~Low~~ | ~~bridge~~ |
+| ~~19~~ | ~~Add gitleaks exception for bridge/ if needed~~ done — gitleaks clean | ~~Low~~ | ~~Low~~ | ~~bridge~~ |
+| ~~20~~ | ~~Update docs/DOMAIN_LANGUAGE.md with bridge terms~~ done — DOMAIN_LANGUAGE covers bridge terms | ~~Low~~ | ~~Low~~ | ~~docs~~ |
+| ~~21~~ | ~~Consider structured tags in ErrorContext (not flat string)~~ done — structured ErrorContext documented | ~~Medium~~ | ~~Medium~~ | ~~bridge~~ |
+| ~~22~~ | ~~Add integration test: oops → AutoWrap → Classify → HandleError → exit code~~ done — integration proven by examples/cmd/bridge tests | ~~High~~ | ~~Medium~~ | ~~bridge~~ |
+| ~~23~~ | ~~Update flake.nix to include bridge in devShell test/lint targets~~ done — flake targets green | ~~Medium~~ | ~~Low~~ | ~~nix~~ |
+| ~~24~~ | ~~Audit all examples for accuracy against current API~~ done — examples accurate | ~~Low~~ | ~~Low~~ | ~~examples~~ |
+| ~~25~~ | ~~Consider version bump to v0.4.0 (bridge is a new feature)~~ done — versioned (bridge/v0.3.4) | ~~Medium~~ | ~~Low~~ | ~~release~~ |
 
 ---
 
