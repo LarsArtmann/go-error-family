@@ -43,7 +43,7 @@ The classification protocol is the **six interfaces** (`Coded`/`Classified`/`Con
 - **go.work.sum can hold stale checksums because `GOPRIVATE` skips sumdb** — the `diagnose v0.2.2` tag was re-pointed after its sum was recorded, so every workspace build failed with a SECURITY ERROR (checksum mismatch). Fix: delete the stale line from `go.work.sum` and rebuild — the workspace `use` directive re-resolves locally, no re-record needed.
 - **Sub-modules with external deps (bridge, examples) fail to build between pin-bump and tag-push, even in workspace mode** — when their `go.mod`s pin unpublished sibling versions (e.g. root vNEXT), loading their module graph (triggered by the external `oops` import) demands the unpublished `go.mod` from the VCS/proxy → `unknown revision`. Modules whose imports stay inside the workspace (agent, diagnose, diagnose/git, diagnose/postgres) keep building. Expected mid-release state; verify those two modules after the tags land (local `GOPRIVATE` direct fetch resolves instantly). Also: `go test ./...` from the repo root does NOT span module directories — use per-module invocations or explicit `./bridge/...` patterns.
 
-## API Surface (v0.10.0)
+## API Surface (current as of v0.10.2 — no API changes since v0.10.0)
 
 **Family adapters** (in `family.go` / `retry.go`, all single-source-of-truth via `familyData`):
 

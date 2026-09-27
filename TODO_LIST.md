@@ -4,46 +4,74 @@ Short- and mid-term actionable improvement tasks. Each item is bounded and
 traceable to its source. When an item ships, remove it here and record it in
 `CHANGELOG.md` under the version it shipped in.
 
-**Last updated:** 2026-09-18
+**Last updated:** 2026-09-27
 
 ---
 
 ## Active
 
-1. **Announce the Bridge Patterns guide** (source: ROADMAP theme 4) — the
-   classify→enrich→handle walkthrough shipped in v0.10.1
-   (`website/src/content/docs/guides/bridge.mdx`), but nothing has put it in
-   front of consumers who use `samber/oops`. Draft a public announcement (r/golang
-   post or a linkable short post) that leads with the three patterns and the
-   decision guide. Bounded: one draft, review, publish.
+1. **Announce the Bridge Patterns guide** (source: ROADMAP theme 4; carried
+   from TODO_LIST 2026-09-18) — the classify→enrich→handle walkthrough shipped
+   in v0.10.1 (`website/src/content/docs/guides/bridge.mdx`), but nothing has
+   put it in front of consumers who use `samber/oops`. Draft a public
+   announcement (r/golang post or a linkable short post) that leads with the
+   three patterns and the decision guide. Bounded: one draft, review, publish.
 
 2. **Retract the broken v0.6.0 tag family** (source: ROADMAP theme 3) — the
-   phantom-`replace` v0.6.x tags still resolve from the module proxy and can be
-   `go get`-ed by consumers. Add `retract` directives to `go.mod` (with reason
-   comments pointing at the replacement version), release, and verify
-   `go list -m -versions` shows them as retracted. Bounded: one go.mod edit +
-   release + verification.
+   phantom-`replace` v0.6.x tags still resolve from the module proxy and can
+   be `go get`-ed by consumers. Add `retract` directives to `go.mod` (with
+   reason comments pointing at the replacement version), release, and verify
+   `go list -m -versions` shows them as retracted. Verified still open
+   2026-09-27 (no `retract` in `go.mod`). Bounded: one go.mod edit + release +
+   verification.
 
----
+3. **Investigate why the Release workflow did not fire on the v0.10.2 tag
+   push** (source: docs-health audit 2026-09-27) — `release.yml` triggers on
+   `v[0-9]+.[0-9]+.[0-9]+*` tag pushes and ran for v0.10.1, but produced no
+   run for v0.10.2 (tag exists, CI ran on the same commit, proxy indexed).
+   The missing GitHub Release was created manually on 2026-09-27. Find the
+   trigger cause (push mechanics? workflow file at tag ref?) so the next
+   release cannot silently skip the gate. Bounded: one investigation + fix or
+   documented acceptance.
 
-## Design Decisions Resolved (2026-07-23)
+4. **Add website guard canaries to CI** (source: docs/status/2026-09-22 §f5–f8,
+   §f13) — the TS-7 re-bump class has broken `website-deploy` three times and
+   nothing structural guards it: (a) fail CI when `website/package.json`
+   typescript major ≠ 6; (b) run `pnpm install --frozen-lockfile` + `astro
+   check` for `website/**` changes; (c) decide the Dependabot security-update
+   auto-run for `/website` (disable it or fix its pnpm handling) and keep the
+   manual `nix develop -c pnpm audit` cadence until then. Bounded: one CI
+   workflow edit + one settings decision.
 
-All six design decisions from the "Design Decisions Needed" section have been resolved:
+5. **art-dupl: suppression/baseline + standing threshold policy** (source:
+   docs/status/2026-09-22 §f1–f2) — check whether art-dupl supports
+   exclude/baseline patterns and wire the accepted `strTrue`/`strFalse` clone
+   into it (AGENTS.md "do not fix again" is prose-only today); decide whether
+   `-t 1` or `-t 5` is the routine gate and record the policy in AGENTS.md.
+   Bounded: one capability check + one config/doc edit.
 
-1. **Per-error HTTP status override** → **SHIPPED.** `Error.WithHTTPStatus(code int)` + `HTTPStatuser` interface. Mirrors the `ExitCoder`/`WithExitCode` pattern exactly: per-error override of family-level default, 0 = use family default. `HTTPStatus(err)` and `HTTPHandler` both check the interface. Rationale: `WithExitCode` already set the precedent — per-error overrides of family defaults are an accepted pattern. `battle.not_found` = 404 is undeniable.
+6. **Lift diagnose-family coverage** (source: docs/status/2026-09-22 §f18–f19)
+   — `diagnose` core 83.9% → ≥90% (targeted tests on uncovered rule paths),
+   `diagnose/postgres` 80.3% → ≥85%. Bounded: two test additions.
 
-2. **`Classify(nil)` semantics** → **KEPT Rejection.** Nil = caller bug. Changing to Transient would make `HTTPStatus(nil)` → 503 (success becomes "service unavailable"). The fail-open principle applies to _unknown_ errors, not _nil_ errors — they are fundamentally different situations. Changing is also breaking.
+7. **Re-verify the standing claims battery** (source: docs/status/2026-09-22
+   §f15, §f20, §f38) — erraudit (0-findings claim), `go-structure-linter` CLI
+   (exit 0 with the flat preset), a full `buildflow --build-mode full` run,
+   and a `nix build` of `website/flake.nix`. These claims are asserted in
+   AGENTS.md/FEATURES.md but decay silently. Bounded: four command runs.
 
-3. **Constructor context ergonomics** → **WON'T FIX.** `WithContextMap(map[string]string{...})` already exists for multi-value context. Functional options would conflict with copy-on-write design. The chain complaint is cosmetic, not structural.
+8. **File the two upstream BuildFlow issues** (source: docs/status/2026-09-22
+   §f13–f14; verify-before-filing gate applies) — (a) `pnpm-audit` should
+   discover subdirectory lockfiles (this repo's skip exists only until then);
+   (b) branching-flow's phantom analyzer does not honor `IsIgnored` for
+   `pkg/phantom`. Bounded: two reproductions + two filings.
 
-4. **"Frozen" registry flag** → **WON'T FIX.** `atomic.Pointer` makes late registrations safe — no correctness issue to catch. Would break config-driven registration. Document the expected lifecycle instead of enforcing it.
+9. **Website chores** (source: docs/status/2026-09-22 §f30) — consider
+   `minimumReleaseAgeStrict` for pnpm in `website/pnpm-workspace.yaml`
+   (supply-chain freshness). (`bun.lock` gitignore already done — verified
+   2026-09-27, `website/.gitignore:22`.) Bounded: one config decision.
 
-5. **`RegisterClassificationType[T error]`** → **SHIPPED.** Two top-level functions: `RegisterClassificationType[T](family)` (DefaultRegistry) and `RegisterClassificationTypeFor[T](r, family)` (custom Registry). Go doesn't allow type parameters on methods, so the Registry-specific variant is a top-level function rather than a method. Non-breaking, pure sugar over `RegisterClassifier`.
-
-6. **json/v2 migration strategy** → **REVERTED to `encoding/json`.** The root module no longer imports `encoding/json/v2`. Only 2 call sites marshaled tiny structs — v1 produces identical output. The `GOEXPERIMENT=jsonv2` requirement was the #1 adoption barrier for a zero-dependency library. Removed from flake.nix, CI workflows, and AGENTS.md.
-
----
-
-## Completed
-
-Completed items are logged in `CHANGELOG.md` under the version they shipped in. Do not list them here.
+10. **Plan v0.11.0 scope** (source: docs/status/2026-09-18 §f40) — candidates
+    from the backlog: example-coverage gaps (`errorfamilytest`, `diagnose`),
+    coverage lifts, website canaries. Cut the CHANGELOG into a release plan.
+    Bounded: one planning pass.

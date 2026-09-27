@@ -59,7 +59,7 @@ and `go vet` all shipped in v0.8.0; the remaining gaps are tooling-level.
 
 **Raw ideas:**
 
-- Release automation script for coordinated multi-module tag cutting
+- Release automation script for coordinated multi-module tag cutting — reinforced 2026-09-27: the `Release` workflow silently did not fire on the v0.10.2 tag push (see TODO_LIST #3); an automation script with explicit trigger verification would end this class
 - Deprecation notes for broken tags (v0.6.0 family)
 - Pin-bump hygiene: submodules should bump root pins in lockstep on releases
 
@@ -82,8 +82,18 @@ use oops.
 
 **Raw ideas:**
 
-- ~~**Reference implementation for oops + bridge + error-family stack**~~ — **SHIPPED (2026-07-26):** `examples/cmd/bridge/` + `examples/checkout/`. Three patterns, 19 tests, pattern documentation in `cmd/bridge/README.md`. ~~Next: website guide page~~ — **guide page SHIPPED (v0.10.1):** `website/src/content/docs/guides/bridge.mdx`. Remaining: public announcement.
+- ~~**Reference implementation for oops + bridge + error-family stack**~~ — **SHIPPED (2026-07-26):** `examples/cmd/bridge/` + `examples/checkout/`. Three patterns, 19 tests, pattern documentation in `cmd/bridge/README.md`. ~~Next: website guide page~~ — **guide page SHIPPED (v0.10.1):** `website/src/content/docs/guides/bridge.mdx`. Remaining: public announcement (TODO_LIST #1).
 - More diagnostic submodules (`redis`, `docker`, `kubectl`)
 - Bridge packages for other error enrichment libraries beyond oops (only after oops bridge has proven consumers)
-- Integration guides for common frameworks (Echo, Gin, Chi, gRPC interceptors)
+- Integration guides for common frameworks (Echo, Gin, Chi, gRPC interceptors) — including a gRPC status-mapping guide (family → `codes.Internal`/`Unavailable`/`InvalidArgument`), a recurring consumer ask
+- End-to-end `HTTPHandler` middleware example (net/http or Chi) and example symmetry for the `New{Family}` constructor set
 - Benchmark suite comparing classification overhead across versions
+- Type `DiagnosticResult.Details` values (kills the stringly `"true"`/`"false"` constants at the root of the accepted `strTrue`/`strFalse` clone) — breaking protocol change, next major only
+
+## Open Questions
+
+Unresolved decisions that gate work elsewhere. They are not tasks — see TODO_LIST for the actionable fallout.
+
+1. **art-dupl threshold policy** — is `-t 1` the routine bar (needing a suppression/baseline story for accepted clones) or is `-t 1` reserved for occasional deep sweeps with `-t 5` as the normal gate? (Gates TODO_LIST #5.)
+2. **Fleet churn: fix at the root or per-repo canaries forever?** The json/v2 re-imports, TS-7 bumps, and go-directive drift originate in the machine-global `GOEXPERIMENT=jsonv2` export plus the orchestrator's migrator — outside this repo. Is a fleet-level fix planned, or is the per-repo canary defense the accepted permanent architecture? (Decides whether the website canaries in TODO_LIST #4 are scaffolding or permanent.)
+3. **Bridge & enrichment APIs: invest or freeze?** Bridge has zero external consumers (audited 2026-07-23; root cause: near-zero oops adoption ecosystem-wide); `LogError` ~3, `HTTPHandler` ~5, `errorfamilytest` ~3, `diagnose` ~3 external call sites. Grow adoption (announcements, examples, guides) or freeze the surface and invest in reliability/coverage? (Gates roughly a third of the discoverability backlog.)
