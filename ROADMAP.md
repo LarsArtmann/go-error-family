@@ -3,7 +3,7 @@
 Long-term direction and raw ideas not yet refined into actionable tasks.
 When an idea becomes bounded and actionable, it moves to `TODO_LIST.md`.
 
-**Last updated:** 2026-09-18
+**Last updated:** 2026-09-27
 
 ---
 
@@ -11,14 +11,16 @@ When an idea becomes bounded and actionable, it moves to `TODO_LIST.md`.
 
 go-error-family is a stable classification core with a growing ecosystem
 of opt-in modules (`diagnose`, `agent`, `bridge`). The taxonomy is proven across
-multiple consumers (DiscordSync, browser-history, SwettySwipperWeb). v0.10.1 is
-released (2026-09-15) with the `Orchestration` family (6th family), CI +
+multiple consumers (DiscordSync, browser-history, SwettySwipperWeb). v0.10.2 is
+released (2026-09-22) with the `Orchestration` family (6th family), CI +
 Release + Website pipelines, and all 7 module tags proxy-indexed. The focus
 now is: improving consumer discoverability of the higher-level boundary
 handlers (`HTTPHandler`, `LogError`, `diagnose`) — the pkg.go.dev example
 surface now covers all six families plus the boundary APIs (26 examples) —
-and keeping the supply-chain gates honest (pnpm-audit re-enabled;
-Dependabot's npm updater cannot drive the pnpm website lockfile).
+and keeping the supply-chain gates honest (the BuildFlow `pnpm-audit` step is
+skipped because it cannot see the `website/` subdirectory lockfile;
+Dependabot's npm updater cannot drive the pnpm website lockfile — the working
+check is a manual `pnpm audit` inside `website/`).
 
 ## Themes
 
@@ -71,12 +73,12 @@ external consumers despite being correct, tested (95.6%), and fuzzed.
 The bridge gap is demand and demonstration, not quality. The root cause is
 that `samber/oops` adoption is near-zero across the ecosystem, and consumers
 skip the enrichment layer entirely (classify→handle, not classify→enrich→
-handle). The reference implementation shipped (2026-07-26: `examples/cmd/bridge/`
-
-- `examples/checkout/`) demonstrates the full classify→enrich→handle flow with
-  three patterns (pass-through, AutoWrap, explicit Wrap) and documents when to use
-  each. The remaining gap is **demand and discoverability** — getting the pattern
-  in front of consumers who already use oops.
+handle). The reference implementation shipped (2026-07-26:
+`examples/cmd/bridge/` + `examples/checkout/`) demonstrates the full
+classify→enrich→handle flow with three patterns (pass-through, AutoWrap,
+explicit Wrap) and documents when to use each. The remaining gap is **demand
+and discoverability** — getting the pattern in front of consumers who already
+use oops.
 
 **Raw ideas:**
 

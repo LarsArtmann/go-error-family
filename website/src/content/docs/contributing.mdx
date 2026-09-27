@@ -51,7 +51,7 @@ go-error-family (classification) and samber/oops (enrichment) are complementary:
 - **Library code** imports go-error-family only — returns classified errors
 - **Application code** imports oops for enrichment and wraps via the `bridge/` package
 
-The four interfaces (`Coded`/`Classified`/`Contextual`/`Retryable`) are the sole public contract.
+The six interfaces (`Coded`/`Classified`/`Contextual`/`Retryable`/`ExitCoder`/`HTTPStatuser`) are the sole public contract.
 
 ## Pull Requests
 

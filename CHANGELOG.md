@@ -6,6 +6,17 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ## [Unreleased]
 
+### Changed
+
+- **Documentation: canonical references brought current with the six-family protocol (docs-health pass 2026-09-27)** — SKILL.md (the full API reference) had zero mentions of `Orchestration`: family table, severity order, HTTP mapping, audience mapping, and constructor lists now include the 6th family; `docs/DOMAIN_LANGUAGE.md` gained `Orchestration` in the Family/Audience definitions and the `HTTPStatuser` interface row; README's "four interfaces" claim corrected to the six-interface contract (with `HTTPStatuser`), and the architecture tree now lists `registry.go`, `stdlib.go`, `bridge/`, and the bridge/checkout examples; website `contributing.mdx` "four interfaces" and `quick-start.mdx` "Five Families" heading fixed (both stale since v0.8.0/v0.10.0).
+
+## [0.10.2] - 2026-09-22
+
+Release-engineering release: **no public API changes.** Completes the
+`exhaustruct` → `exhaustruct_v5` lint migration, re-aligns every module's
+`go` directive with its true dependency floor, and clears the website's
+TypeScript-7 recurrence plus 8 transitive vulnerabilities.
+
 ### Added
 
 - **Six godoc example functions for the under-adopted API surface** (pkg.go.dev discoverability) — `ExampleWrap` (the most-used constructor previously had no example), `ExampleHandleErrorWithContext` (the canonical entry point), `ExampleIsRetryable` (including the unknown-error fail-open default), `ExampleFamily_RetryPolicy` (advisory single-attempt vs Transient defaults), `ExampleLogError` (family→severity mapping: Transient→Warn, others→Error, with time-stripped deterministic output), and `ExampleHTTPHandler` (end-to-end: handler returns a classified error, response is a safe JSON body with per-error `WithHTTPStatus(404)` override). Root package now carries 26 runnable examples.
@@ -13,13 +24,25 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 ### Changed
 
 - **Lint: completed the `exhaustruct` → `exhaustruct_v5` migration** in `.golangci.yml` (deprecation-warning follow-up from v0.10.1) — the linter block and its os/exec/net exclusion list moved to the v5 key (`ignore-patterns`), and test files exclude `exhaustruct_v5` alongside the other structural linters. Verified 0 issues across all 7 modules on golangci-lint v2.13.2.
-- **Go directive normalized to `go 1.26.7` in all 7 modules + `go.work`** — automated dependency churn had regressed the root and `diagnose` modules to `go 1.26` and set `bridge` to `go 1.26.0`, splitting the uniform `go 1.26.7` floor that the deliberate toolchain bump (dprint adoption) established. All builds and tests re-verified after normalization.
+- **Go directives aligned with true dependency floors in all 7 modules** — `agent`, `diagnose/git`, and `diagnose/postgres` strip to `go 1.26` once `diagnose` stops carrying a 1.26.7 floor; `bridge` and `examples` settle at `go 1.26.0` because `golang.org/x/text v0.42.0` publishes a 1.26.0 floor that `go mod tidy` enforces (dep-forced patch). Self-requires bump to the coordinated release versions. This supersedes the earlier uniform-`1.26.7` normalization: the intended floor is now per-module, not repo-wide.
 - **`.buildflow.yml`: corrected the `pnpm-audit` skip rationale and documented the real failure mode** — the step runs `pnpm audit` at the repo root where no lockfile exists (it lives in `website/`), failing closed with `ERR_PNPM_AUDIT_NO_LOCKFILE`; a cached ✔ had been hiding that failure until a `BUILDFLOW_NO_RESULT_CACHE=1` run exposed it. The old rationale ("Dependabot covers it") overstated Dependabot: alerts detect website vulnerabilities, but Dependabot's automatic security-update jobs fail on the pnpm lockfile. The working remediation check is `nix develop -c pnpm audit` in `website/` (documented in AGENTS.md).
 
 ### Fixed
 
 - **Website: TypeScript 7 re-bump recurrence and stale lockfile (third occurrence of this class)** — `website/package.json` drifted to `typescript ^7.0.2` (against the documented 6.x policy) and `@astrojs/starlight ^0.42.1`/`astro ^7.3.2` while `pnpm-lock.yaml` stayed at 6.0.3/0.42.0, failing `pnpm install --frozen-lockfile` in `website-deploy` (manifest/lockfile specifier mismatch). Reverted `typescript` to `^6.0.0`, kept the in-range starlight/astro/html-validate bumps, regenerated the lockfile, and re-verified `astro check` (0 issues) + `astro build` (15 pages).
 - **Website: 8 transitive dependency vulnerabilities resolved** (6 high, 2 moderate) — `devalue < 5.9.1` (DoS), `fast-uri`, `js-yaml`, and `svgo` advisories across multiple major lines, all reachable through `astro`/`starlight`/`html-validate` whose latest releases don't yet pull patched transitives. `pnpm update --depth Infinity` bumped every transitive within its declared range (no overrides needed); `pnpm audit` is clean. This also removes the alert source that kept triggering the failing Dependabot update jobs.
+
+### Modules
+
+Coordinated multi-module release. Submodule `go.mod` files reference root **v0.10.2** and diagnose **v0.2.4**.
+
+- `github.com/larsartmann/go-error-family` → **v0.10.2** (no API changes; docs + CI + website fixes)
+- `github.com/larsartmann/go-error-family/diagnose` → **v0.2.4** (pin-only; go-directive floor alignment)
+- `github.com/larsartmann/go-error-family/agent` → **v0.2.4** (pin-only; go-directive floor alignment)
+- `github.com/larsartmann/go-error-family/bridge` → **v0.3.4** (pin-only; dep-forced `go 1.26.0` floor)
+- `github.com/larsartmann/go-error-family/diagnose/git` → **v0.5.4** (pin-only; go-directive floor alignment)
+- `github.com/larsartmann/go-error-family/diagnose/postgres` → **v0.5.4** (pin-only; go-directive floor alignment)
+- `github.com/larsartmann/go-error-family/examples` → **v0.3.2** (six new godoc examples; dep-forced `go 1.26.0` floor)
 
 ## [0.10.1] - 2026-09-15
 
