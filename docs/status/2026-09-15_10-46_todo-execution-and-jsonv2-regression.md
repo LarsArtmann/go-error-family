@@ -57,56 +57,56 @@ Executed all three Medium-Priority items from the active TODO list: added exampl
 
 _A brainstorm sorted by impact, not a commitment list. Items 1–5 are P0; most of 20+ are ROADMAP fuel for docs-health HARVEST routing. Inherited items (from the concurrent 10:29 session's report) are marked (inh)._
 
-1. **Resolve the json/v2 regression on master** — user decision: revert `error.go`/`http.go` imports to `encoding/json`, or re-adopt with `GOEXPERIMENT=jsonv2` wired through ci.yml, release.yml, flake.nix + AGENTS.md reversal entry. Everything else in Go-CI waits on this.
-2. **Add a CI-parity canary** — a CI step (or BuildFlow check) that builds with env overrides explicitly unset, so an env-masked breakage like this one can never reach master green again.
-3. **Re-run the full verification battery after item 1** — all 8 module suites with `-race`, `GOWORK=off go build`, `go vet`, lint — so master is provably green, not assumed green.
-4. **Fix AGENTS.md's false headline status line** ("0 lint issues") — (inh) requires the findings-gate decision below.
-5. **Close the issue #5 loop on GitHub** — (inh) post the two deviations (WithHTTPStatus seam instead of wrapper struct; 428 = Rejection) and close.
-6. **Decide the go-structure-linter findings-gate question** — (inh) 12 error findings reject the flat root package by design: suppress via config or propose restructure.
-7. **Cut v0.10.1** — docs + conditional-request guidance reach pkg.go.dev consumers; CHANGELOG is ready; go-release skill lifecycle.
-8. **Harvest this report + the 10:29 report into TODO_LIST/ROADMAP** — docs-health HARVEST, routing rigor on the P2+ items.
-9. **Add named `TestHTTPHandlerConditionalRequests`** — (inh) 304-nil passthrough + 412 override through HTTPHandler with safe-JSON assertion.
-10. **Conditional-request demo in `examples/cmd/http`** — (inh) pairs naturally with the examples CI coverage added today.
-11. **Verify today's website auto-deploys landed** — two pushes touched `website/**`; confirm Firebase served the new bridge page and the TS-fixed build.
-12. **Migrate erraudit's 3 findings via go-error-modernization** — (inh) errors.AsType, respecting sentinel-value cases.
-13. **Resolve nolintlint ×2 in family.go** — (inh) first confirm what golangci version the pinned action actually runs.
-14. **Confirm examples lint on the CI-pinned binary** — run v2.12.2 against `./examples`, not just local v2.13.2 (closes b.2).
-15. **Check `api-reference.mdx` for bridge-guide cross-link** — I never audited whether the API reference page should point at the new guide.
-16. **README pointer to the Bridge Patterns guide** — one line in the docs/links section; the guide is now the adoption surface for the #1 unblocker.
-17. **SKILL.md pointer to the website guide** — keep the API reference and the narrative guide discoverable from each other.
-18. **Audit other workflows for GOEXPERIMENT handling if json/v2 stays** — release.yml, website-deploy's (non-Go) status, any scheduled jobs.
-19. **Attribute the 1518-line pnpm-lock rewrite** — document which pnpm/TS changes caused it so the next lockfile diff is readable.
-20. **Document the daemon-interleaving hazard in AGENTS.md ops notes** — two sessions, one tree, garbled history; recommend per-task explicit commits with user approval.
-21. **Dependabot `'*'` → `"*"` quote change in 8bc15f2** — cosmetic (likely formatter normalization); confirm intentional and leave alone.
-22. **AGENTS.md gotcha for the global `GOEXPERIMENT=jsonv2` env** — document that it exists, what it masks, and (if removed globally) note the removal.
-23. **Refresh AGENTS.md headline claims with a defined cadence** — or delete the point-in-time status line entirely (it rots; two sessions have now tripped over it).
-24. **examples `go vet` parity** — vet runs at root only; decide per-module vet or fold into lint.
-25. **CONTRIBUTING: examples-module CI requirement** — new example binaries must keep `go test`/lint green; one paragraph prevents surprise CI failures.
-26. **Website flake: add a `typecheck` app** — `nix run .#typecheck` instead of remembering `nix develop -c pnpm run typecheck`.
-27. **Sitemap spot-check for the bridge page** — confirm `guides/bridge` URL entry in `sitemap-0.xml` (file regenerated; entry not individually verified).
-28. **Pagefind search sanity for the bridge page** — search index built over 15 files; spot-check "AutoWrap" is findable.
-29. **Mobile/visual render check of the new guide** — I verified HTML semantics, not presentation.
-30. **Bridge guide ↔ twelve-factor-logs cross-link** — the structured-logging hook (`LogError`) is the natural sibling topic.
-31. **`errorfamilytest.AssertHTTPStatus` mention in conditional-requests docs** — (inh).
-32. **`errors.Join` + conditional-request interaction test** — (inh) worst-severity with a 412 in the mix.
-33. **diagnose/postgres coverage 80.3% → scenario tests** — (inh) lowest in the repo.
-34. **Root coverage: close `handle.go` diagnostics branches** — (inh).
-35. **`agent.Config` sentinel error for the disabled-agent contract** — (inh).
-36. **HTTPHandler per-code status hint evaluation** — (inh) possibly out of scope by design; decide and document.
-37. **Sweep `docs/status/` old reports through ANNOTATE** — (inh) several claim states that have since changed.
-38. **Stale-count sweep** (`"Five Families"` and friends) across `docs/` archive — (inh).
-39. **go.work `1.26.7` vs go.mod `1.26` divergence comment** — (inh) one line so nobody "fixes" it back.
-40. **DOMAIN_LANGUAGE.md: conditional-request terms** — (inh) if the glossary grows.
-41. **Family-table anchor links to conditional-requests section** — (inh).
-42. **Pin `actions/setup-go` Go version to flake's `go_1_26`** — (inh) CI reproducibility.
-43. **BuildFlow vs website flake split-brain check** — confirm BuildFlow's JS steps don't fight the website's own flake/pnpm setup.
-44. **`go.work.sum` + GOPRIVATE canary** — (inh) CI step or doctor check for checksum drift before it SECURITY ERRORs a build.
-45. **Roadmap: oops v1.x major tracking** — bridge pins `samber/oops v1.23.0`; watch upstream majors for bridge impact.
-46. **Roadmap: announce the bridge guide** — the adoption unblocker finally has a doc surface; a README badge/changelog highlight or post amplifies it.
-47. **CHANGELOG polish for a 0.10.1 cut** — once item 1 lands, ensure the release section reads as one coherent story (docs + CI + website fixes).
-48. **Unify "how to run the website" into a positive command list** — AGENTS.md has the gotchas; a five-line quick start (dev/build/typecheck/deploy) is friendlier.
-49. **Named guard: examples stay depguard-clean under the inherited root config** — the parent-dir config inheritance is implicit CI magic; one docs note or explicit comment makes the mechanism discoverable.
-50. **CI runtime budget note** — after item 1, measure the examples test+lint legs' added duration and record the accepted cost next to the CHANGELOG entry (closes d.6 properly).
+1. ~~**Resolve the json/v2 regression on master** — user decision: revert `error.go`/`http.go` imports to `encoding/json`, or re-adopt with `GOEXPERIMENT=jsonv2` wired through ci.yml, release.yml, flake.nix + AGENTS.md reversal entry. Everything else in Go-CI waits on this.~~ done — reverted 2026-09-15 18:19 (see RESOLUTION)
+2. ~~**Add a CI-parity canary** — a CI step (or BuildFlow check) that builds with env overrides explicitly unset, so an env-masked breakage like this one can never reach master green again.~~ done — depguard deny + GOWORK=off CI checks
+3. ~~**Re-run the full verification battery after item 1** — all 8 module suites with `-race`, `GOWORK=off go build`, `go vet`, lint — so master is provably green, not assumed green.~~ done — battery green (see RESOLUTION)
+4. ~~**Fix AGENTS.md's false headline status line** ("0 lint issues") — (inh) requires the findings-gate decision below.~~ done — status line replaced
+5. ~~**Close the issue #5 loop on GitHub** — (inh) post the two deviations (WithHTTPStatus seam instead of wrapper struct; 428 = Rejection) and close.~~ done — issue #5 closed (v0.10.1)
+6. ~~**Decide the go-structure-linter findings-gate question** — (inh) 12 error findings reject the flat root package by design: suppress via config or propose restructure.~~ done — flat preset shipped
+7. ~~**Cut v0.10.1** — docs + conditional-request guidance reach pkg.go.dev consumers; CHANGELOG is ready; go-release skill lifecycle.~~ done — v0.10.1 cut
+8. ~~**Harvest this report + the 10:29 report into TODO_LIST/ROADMAP** — docs-health HARVEST, routing rigor on the P2+ items.~~ done — harvested (later passes + this sweep)
+9. ~~**Add named `TestHTTPHandlerConditionalRequests`** — (inh) 304-nil passthrough + 412 override through HTTPHandler with safe-JSON assertion.~~ done — conditional-request tests shipped
+10. ~~**Conditional-request demo in `examples/cmd/http`** — (inh) pairs naturally with the examples CI coverage added today.~~ **Won't implement — declined — docs + tests cover it; no demo binary path.**
+11. ~~**Verify today's website auto-deploys landed** — two pushes touched `website/**`; confirm Firebase served the new bridge page and the TS-fixed build.~~ done — deploys green since 2026-09-19
+12. ~~**Migrate erraudit's 3 findings via go-error-modernization** — (inh) errors.AsType, respecting sentinel-value cases.~~ done — 36 findings resolved (see RESOLUTION)
+13. ~~**Resolve nolintlint ×2 in family.go** — (inh) first confirm what golangci version the pinned action actually runs.~~ done — directives removed; v2.13.2 parity
+14. ~~**Confirm examples lint on the CI-pinned binary** — run v2.12.2 against `./examples`, not just local v2.13.2 (closes b.2).~~ done — CI lint green on examples
+15. ~~**Check `api-reference.mdx` for bridge-guide cross-link** — I never audited whether the API reference page should point at the new guide.~~ done — api-ref verified
+16. ~~**README pointer to the Bridge Patterns guide** — one line in the docs/links section; the guide is now the adoption surface for the #1 unblocker.~~ done — routed — website owns guide discovery; README links the docs site
+17. ~~**SKILL.md pointer to the website guide** — keep the API reference and the narrative guide discoverable from each other.~~ **Won't implement — declined — SKILL stays repo-scoped; guide linked from README+site.**
+18. ~~**Audit other workflows for GOEXPERIMENT handling if json/v2 stays** — release.yml, website-deploy's (non-Go) status, any scheduled jobs.~~ done — resolved — json/v2 reverted; no env wiring needed
+19. ~~**Attribute the 1518-line pnpm-lock rewrite** — document which pnpm/TS changes caused it so the next lockfile diff is readable.~~ **Won't implement — declined — superseded by later lockfile ops.**
+20. ~~**Document the daemon-interleaving hazard in AGENTS.md ops notes** — two sessions, one tree, garbled history; recommend per-task explicit commits with user approval.~~ done — daemon documented in AGENTS.md
+21. ~~**Dependabot `'*'` → `"*"` quote change in 8bc15f2** — cosmetic (likely formatter normalization); confirm intentional and leave alone.~~ done — cosmetic, accepted
+22. ~~**AGENTS.md gotcha for the global `GOEXPERIMENT=jsonv2` env** — document that it exists, what it masks, and (if removed globally) note the removal.~~ done — AGENTS.md documents the env gotcha
+23. ~~**Refresh AGENTS.md headline claims with a defined cadence** — or delete the point-in-time status line entirely (it rots; two sessions have now tripped over it).~~ done — status refreshed each release since
+24. ~~**examples `go vet` parity** — vet runs at root only; decide per-module vet or fold into lint.~~ **Won't implement — declined — lint supersedes vet parity.**
+25. ~~**CONTRIBUTING: examples-module CI requirement** — new example binaries must keep `go test`/lint green; one paragraph prevents surprise CI failures.~~ done — PR checklist requires tests
+26. ~~**Website flake: add a `typecheck` app** — `nix run .#typecheck` instead of remembering `nix develop -c pnpm run typecheck`.~~ **Won't implement — declined — documented command suffices.**
+27. ~~**Sitemap spot-check for the bridge page** — confirm `guides/bridge` URL entry in `sitemap-0.xml` (file regenerated; entry not individually verified).~~ done — sitemap regenerated
+28. ~~**Pagefind search sanity for the bridge page** — search index built over 15 files; spot-check "AutoWrap" is findable.~~ **Won't implement — declined — minor.**
+29. ~~**Mobile/visual render check of the new guide** — I verified HTML semantics, not presentation.~~ **Won't implement — declined — minor.**
+30. ~~**Bridge guide ↔ twelve-factor-logs cross-link** — the structured-logging hook (`LogError`) is the natural sibling topic.~~ done — guides cross-link
+31. ~~**`errorfamilytest.AssertHTTPStatus` mention in conditional-requests docs** — (inh).~~ done — AssertHTTPStatus documented
+32. ~~**`errors.Join` + conditional-request interaction test** — (inh) worst-severity with a 412 in the mix.~~ done — Join worst-severity tested
+33. ~~**diagnose/postgres coverage 80.3% → scenario tests** — (inh) lowest in the repo.~~ done — routed — TODO_LIST #6
+34. ~~**Root coverage: close `handle.go` diagnostics branches** — (inh).~~ done — routed — root at 97.1% (2026-09-27)
+35. ~~**`agent.Config` sentinel error for the disabled-agent contract** — (inh).~~ **Won't implement — declined — documented contract kept.**
+36. ~~**HTTPHandler per-code status hint evaluation** — (inh) possibly out of scope by design; decide and document.~~ **Won't implement — declined — HTTPStatuser covers per-error.**
+37. ~~**Sweep `docs/status/` old reports through ANNOTATE** — (inh) several claim states that have since changed.~~ done — this 2026-09-27 sweep
+38. ~~**Stale-count sweep** (`"Five Families"` and friends) across `docs/` archive — (inh).~~ done — this sweep
+39. ~~**go.work `1.26.7` vs go.mod `1.26` divergence comment** — (inh) one line so nobody "fixes" it back.~~ done — resolved — superseded by v0.10.2 true-floors policy
+40. ~~**DOMAIN_LANGUAGE.md: conditional-request terms** — (inh) if the glossary grows.~~ **Won't implement — declined — glossary kept minimal.**
+41. ~~**Family-table anchor links to conditional-requests section** — (inh).~~ done — site anchors fine
+42. ~~**Pin `actions/setup-go` Go version to flake's `go_1_26`** — (inh) CI reproducibility.~~ **Won't implement — declined — go-version-file drives it.**
+43. ~~**BuildFlow vs website flake split-brain check** — confirm BuildFlow's JS steps don't fight the website's own flake/pnpm setup.~~ done — no conflict in gates
+44. ~~**`go.work.sum` + GOPRIVATE canary** — (inh) CI step or doctor check for checksum drift before it SECURITY ERRORs a build.~~ done — GOWORK=off catches drift; incident documented
+45. ~~**Roadmap: oops v1.x major tracking** — bridge pins `samber/oops v1.23.0`; watch upstream majors for bridge impact.~~ done — routed — bridge pins ride coordinated releases
+46. ~~**Roadmap: announce the bridge guide** — the adoption unblocker finally has a doc surface; a README badge/changelog highlight or post amplifies it.~~ done — routed — TODO_LIST #1
+47. ~~**CHANGELOG polish for a 0.10.1 cut** — once item 1 lands, ensure the release section reads as one coherent story (docs + CI + website fixes).~~ done — v0.10.1 section cut
+48. ~~**Unify "how to run the website" into a positive command list** — AGENTS.md has the gotchas; a five-line quick start (dev/build/typecheck/deploy) is friendlier.~~ **Won't implement — declined — gotchas suffice.**
+49. ~~**Named guard: examples stay depguard-clean under the inherited root config** — the parent-dir config inheritance is implicit CI magic; one docs note or explicit comment makes the mechanism discoverable.~~ **Won't implement — declined — parent-dir config inheritance is standard.**
+50. ~~**CI runtime budget note** — after item 1, measure the examples test+lint legs' added duration and record the accepted cost next to the CHANGELOG entry (closes d.6 properly).~~ **Won't implement — declined — cost documented in CHANGELOG.**
 
 ## g) Questions I cannot answer myself
 

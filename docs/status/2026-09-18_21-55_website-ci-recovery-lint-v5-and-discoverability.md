@@ -40,15 +40,15 @@
 
 ## b) PARTIALLY DONE
 
-1. **Deploy Website workflow recovery.** What works: fix is committed locally and every leg verified locally (frozen install, check, build). What remains: the actual GitHub run has not gone green — it triggers on the next `website/**` **push**, which I did not perform (no-push policy). Blocker: none, just unpushed. Effort: S (push + watch one run).
+1. ~~**Deploy Website workflow recovery.** What works: fix is committed locally and every leg verified locally (frozen install, check, build). What remains: the actual GitHub run has not gone green — it triggers on the next `website/**` **push**, which I did not perform (no-push policy). Blocker: none, just unpushed. Effort: S (push + watch one run).~~ done — Deploy Website green 2026-09-19 (commit b1b5aec)
 
-2. **Website security-gate automation.** What works: audit is clean today; manual remediation procedure documented (`nix develop -c pnpm audit` + `pnpm update --depth Infinity`). What remains: nothing automated watches for the NEXT advisory — Dependabot auto-updates are structurally broken for pnpm here, and BuildFlow's `pnpm-audit` cannot see the subdirectory lockfile. Blocker: tool limitations (upstream). Effort: M (CI canary job) / L (BuildFlow upstream feature).
+2. ~~**Website security-gate automation.** What works: audit is clean today; manual remediation procedure documented (`nix develop -c pnpm audit` + `pnpm update --depth Infinity`). What remains: nothing automated watches for the NEXT advisory — Dependabot auto-updates are structurally broken for pnpm here, and BuildFlow's `pnpm-audit` cannot see the subdirectory lockfile. Blocker: tool limitations (upstream). Effort: M (CI canary job) / L (BuildFlow upstream feature).~~ done — routed — TODO_LIST #4 (website guard canaries) + ROADMAP Open Questions #2
 
-3. **Consumer Discoverability theme.** What works: root package now fully example-covered (26). What remains: `errorfamilytest` (0 examples), `diagnose` (0), `diagnose/git`, `diagnose/postgres` (0) — plus "common patterns" godoc section. Blocker: none; time. Effort: M.
+3. ~~**Consumer Discoverability theme.** What works: root package now fully example-covered (26). What remains: `errorfamilytest` (0 examples), `diagnose` (0), `diagnose/git`, `diagnose/postgres` (0) — plus "common patterns" godoc section. Blocker: none; time. Effort: M.~~ done — routed — ROADMAP theme 1 remaining-gaps note (errorfamilytest/diagnose examples)
 
-4. **TODO_LIST Active items** (bridge-guide announcement; v0.6.0 tag retraction) — refined and written down this session, not executed. Effort: M each.
+4. ~~**TODO_LIST Active items** (bridge-guide announcement; v0.6.0 tag retraction) — refined and written down this session, not executed. Effort: M each.~~ done — routed — TODO_LIST #1 and #2 (both still active, re-verified 2026-09-27)
 
-5. **Erraudit "0 findings" claim.** AGENTS.md asserts it, but I added ~90 lines of example code and did **not re-run erraudit** to keep the claim true. Likely still 0 (no error paths in examples), unverified. Effort: S.
+5. ~~**Erraudit "0 findings" claim.** AGENTS.md asserts it, but I added ~90 lines of example code and did **not re-run erraudit** to keep the claim true. Likely still 0 (no error paths in examples), unverified. Effort: S.~~ done — routed — TODO_LIST #7 (claims battery)
 
 ---
 

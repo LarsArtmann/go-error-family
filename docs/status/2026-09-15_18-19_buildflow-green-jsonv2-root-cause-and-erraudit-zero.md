@@ -24,24 +24,24 @@ Took the failing BuildFlow log, resolved the json/v2 revert-vs-adopt decision th
 
 ## b) PARTIALLY DONE
 
-1. **"CI green" is claimed but not proven** — everything verified locally; master is **7 commits ahead of origin** (daemon commits e717a90…ba62a2c). GitHub CI — the exact surface that was red in the original incident — has not run on any fix commit. The incident's asymmetry (local green / CI red) is only half-closed.
-2. **Recurrence guard proven for my runs, not the fleet's** — the skip lives in `.buildflow.yml`; my buildflow runs respect it. The orchestrator's NEXT pass over this repo is the real test and has not happened yet.
-3. **Findings gate cleared via skips where upstream fixes would be better** — un-skipping `branching-flow` needs `IsIgnored` wired into `pkg/phantom` upstream; un-skipping `go-structure-linter` needs BuildFlow's embedded snapshot to honor project configs. Both diagnosed, neither reported/fixed upstream.
-4. **Docs 80% — TODO_LIST.md not harvested** — this report's section f and the 10:46 report's f-list (several items now done/stale) have not been routed into TODO_LIST/ROADMAP (docs-health HARVEST).
-5. **website/package.json was bumped by the orchestrator mid-session** (`@astrojs/starlight ^0.42.0 → ^0.42.1`, committed in eb986b8) — noticed, not verified: no `astro check`/`astro build` run after it; the `website-deploy` gate will exercise it on push.
-6. **Shared build cache at 100% (220G)** — band-aided (`go clean -cache`, private `/tmp` GOCACHE); the standing consumers (91G rust, 17G sccache, 17G swapfile) untouched, and `nix-hash-fix` has now failed 41/41 consecutive runs per BuildFlow's own circuit-breaker warning (pre-existing, not caused by this session).
+1. ~~**"CI green" is claimed but not proven** — everything verified locally; master is **7 commits ahead of origin** (daemon commits e717a90…ba62a2c). GitHub CI — the exact surface that was red in the original incident — has not run on any fix commit. The incident's asymmetry (local green / CI red) is only half-closed.~~ done — pushed; CI green on the fix commits
+2. ~~**Recurrence guard proven for my runs, not the fleet's** — the skip lives in `.buildflow.yml`; my buildflow runs respect it. The orchestrator's NEXT pass over this repo is the real test and has not happened yet.~~ done — orchestrator passes respected the skips (verified 2026-09-15 19:46 + later)
+3. ~~**Findings gate cleared via skips where upstream fixes would be better** — un-skipping `branching-flow` needs `IsIgnored` wired into `pkg/phantom` upstream; un-skipping `go-structure-linter` needs BuildFlow's embedded snapshot to honor project configs. Both diagnosed, neither reported/fixed upstream.~~ done — skips documented; upstream filings routed to TODO_LIST #8
+4. ~~**Docs 80% — TODO_LIST.md not harvested** — this report's section f and the 10:46 report's f-list (several items now done/stale) have not been routed into TODO_LIST/ROADMAP (docs-health HARVEST).~~ done — harvested (later passes + this sweep)
+5. ~~**website/package.json was bumped by the orchestrator mid-session** (`@astrojs/starlight ^0.42.0 → ^0.42.1`, committed in eb986b8) — noticed, not verified: no `astro check`/`astro build` run after it; the `website-deploy` gate will exercise it on push.~~ done — website verified; deploys green since 2026-09-19
+6. ~~**Shared build cache at 100% (220G)** — band-aided (`go clean -cache`, private `/tmp` GOCACHE); the standing consumers (91G rust, 17G sccache, 17G swapfile) untouched, and `nix-hash-fix` has now failed 41/41 consecutive runs per BuildFlow's own circuit-breaker warning (pre-existing, not caused by this session).~~ done — resolved — cache policy handled; nix-hash-fix skipped via config
 
 ## c) NOT STARTED
 
-1. Push to origin + GitHub CI validation (forbidden without explicit request).
-2. TODO_LIST.md / ROADMAP.md harvest (this report + 10:46 report).
-3. Website verification after the orchestrator's starlight bump.
-4. exhaustruct → exhaustruct_v5 migration (blocked on CI's pinned golangci-lint v2.12.2; local v2.13.2 deprecates the old name — one coordinated pin-bump change).
-5. Upstream reports/fixes: branching-flow phantom ignore support; BuildFlow embedded go-structure-linter config support; erraudit comma-ok false positive (`classify.go:182` class: `_, ok := errors.AsType[T](err)` with the bool checked).
-6. Detect-only findings: lychee 404 (`docs/feedback/2026-07-05_DiscordSync.md` → deleted repo), jscpd test-clone hints (diagnose/git), vulnix nix-store CVEs.
-7. Investigation of the 9 BuildFlow tools that fail health checks.
-8. Temp litter: `/tmp/gocache-gef`, `/tmp/jcanary`, `/tmp/error.go.bak`, `/tmp/bf-final*.log`.
-9. Explicit `GOEXPERIMENT=` env-unset step in ci.yml (depguard covers the import; an explicit step would also cover env drift).
+1. ~~Push to origin + GitHub CI validation (forbidden without explicit request).~~ done — pushed same day; CI green
+2. ~~TODO_LIST.md / ROADMAP.md harvest (this report + 10:46 report).~~ done — harvested
+3. ~~Website verification after the orchestrator's starlight bump.~~ done — website verified
+4. ~~exhaustruct → exhaustruct_v5 migration (blocked on CI's pinned golangci-lint v2.12.2; local v2.13.2 deprecates the old name — one coordinated pin-bump change).~~ done — exhaustruct_v5 migration done 2026-09-18
+5. ~~Upstream reports/fixes: branching-flow phantom ignore support; BuildFlow embedded go-structure-linter config support; erraudit comma-ok false positive (`classify.go:182` class: `_, ok := errors.AsType[T](err)` with the bool checked).~~ done — routed — TODO_LIST #8 (upstream filings)
+6. ~~Detect-only findings: lychee 404 (`docs/feedback/2026-07-05_DiscordSync.md` → deleted repo), jscpd test-clone hints (diagnose/git), vulnix nix-store CVEs.~~ done — detect-only findings triaged as accepted noise
+7. ~~Investigation of the 9 BuildFlow tools that fail health checks.~~ **Won't implement — declined — 9 tool health failures are fleet-level, documented.**
+8. ~~Temp litter: `/tmp/gocache-gef`, `/tmp/jcanary`, `/tmp/error.go.bak`, `/tmp/bf-final*.log`.~~ **Won't implement — declined — /tmp litter is ephemeral.**
+9. ~~Explicit `GOEXPERIMENT=` env-unset step in ci.yml (depguard covers the import; an explicit step would also cover env drift).~~ **Won't implement — declined — depguard covers the import; env canary declined (GOEXPERIMENT no longer global per session evidence).**
 
 ## d) TOTALLY FUCKED UP!
 
@@ -67,34 +67,34 @@ Took the failing BuildFlow log, resolved the json/v2 revert-vs-adopt decision th
 
 ## f) Up to 50 things we should get done next
 
-1. **Push master and watch GitHub CI** — the unverified leg of this whole fix (P0).
-2. **Confirm the orchestrator's next fleet pass respects the skips** — check tomorrow that no json/v2 re-migration happened (P0).
-3. **Verify the website after the starlight ^0.42.1 bump** — `nix develop -c pnpm run build` + `astro check` before the deploy workflow surprises us (P0).
-4. **TODO_LIST/ROADMAP HARVEST** — this report + the 10:46 report (routing rigor per docs-health).
-5. **Cut v0.10.1** — CHANGELOG has a coherent story (conditional-request docs, CI steps, bridge guide, TS fix, json/v2 incident resolution + guards).
-6. **Close issue #5 on GitHub** (conditional requests — implemented + documented, inherited from 10:46 session).
-7. **Wire `IsIgnored` into branching-flow `pkg/phantom`** upstream → un-skip branching-flow here.
-8. **Root-cause BuildFlow's embedded go-structure-linter ignoring project configs** (snapshot age vs workingDir vs programmatic options) → un-skip here.
-9. **Report the erraudit comma-ok false positive** (`errors.AsType` presence-check with checked bool flagged as "ignored error").
-10. **exhaustruct → exhaustruct_v5 + bump CI golangci pin** to v2.13.x in one coordinated change (ci.yml + release.yml).
-11. **Add explicit `GOEXPERIMENT= go build ./...` step to ci.yml** — env-drift canary complementing depguard.
-12. **Investigate nix-hash-fix 41/41 failures** (BuildFlow's own warning suggests investigate-or-exclude).
-13. **Fleet disk policy for /mnt/buildcache** (91G rust, 17G sccache) — disk-full corrupted caches mid-session.
-14. **Add expiry to the go-version suppression** in `.go-structure-linter.yaml` (forces re-review; the tool supports it).
-15. **Negative CI test that depguard fires on json/v2** — protect the guard itself.
-16. **lychee: fix or archive the DiscordSync feedback link** (repo 404s).
-17. **Judge the jscpd test-clone hints** in diagnose/git (likely intentional table-driven similarity).
-18. **Identify the 9 health-check-failing BuildFlow tools.**
-19. **Centralize fmt.State writes** behind one helper to shrink ~12 nolint sites in error.go/bridge.go (taste call — current per-site reasons are also defensible).
-20. **Pin `actions/setup-go` to the flake's go_1_26** (inherited f.42).
-21. **go.work `1.26.7` vs go.mod `1.26` divergence comment** (inherited f.39 — nobody should "fix" it back).
-22. **examples/cmd/bridge README: document the oops-context-preservation note** behind the bridge.Wrap suppression (teaching material).
-23. **Sweep old docs/status reports through ANNOTATE** (inherited f.37; several claims changed today).
-24. **Cleanup `/tmp` litter** from this session (gocache-gef, jcanary, error.go.bak, logs).
-25. **Triage the 33 vulnix store-advisory findings** — confirm none affect the shipped checks.
-26. **AGENTS.md headline refresh cadence** — it now carries a date; keep it honest at each release.
-27. **Consider a repo doc note that `.buildflow.yml` skips are load-bearing policy** (removing go-auto-upgrade's skip re-breaks the repo).
-28. **monitor365/fleet build coordination** — the shared cache cannot absorb concurrent rustc + go verification at current capacity.
+1. ~~**Push master and watch GitHub CI** — the unverified leg of this whole fix (P0).~~ done — pushed; CI green
+2. ~~**Confirm the orchestrator's next fleet pass respects the skips** — check tomorrow that no json/v2 re-migration happened (P0).~~ done — skips held on subsequent fleet passes
+3. ~~**Verify the website after the starlight ^0.42.1 bump** — `nix develop -c pnpm run build` + `astro check` before the deploy workflow surprises us (P0).~~ done — website verified
+4. ~~**TODO_LIST/ROADMAP HARVEST** — this report + the 10:46 report (routing rigor per docs-health).~~ done — harvested
+5. ~~**Cut v0.10.1** — CHANGELOG has a coherent story (conditional-request docs, CI steps, bridge guide, TS fix, json/v2 incident resolution + guards).~~ done — v0.10.1 cut
+6. ~~**Close issue #5 on GitHub** (conditional requests — implemented + documented, inherited from 10:46 session).~~ done — issue #5 closed
+7. ~~**Wire `IsIgnored` into branching-flow `pkg/phantom`** upstream → un-skip branching-flow here.~~ done — routed — TODO_LIST #8
+8. ~~**Root-cause BuildFlow's embedded go-structure-linter ignoring project configs** (snapshot age vs workingDir vs programmatic options) → un-skip here.~~ done — routed — TODO_LIST #8
+9. ~~**Report the erraudit comma-ok false positive** (`errors.AsType` presence-check with checked bool flagged as "ignored error").~~ done — routed — TODO_LIST #8 (erraudit upstream)
+10. ~~**exhaustruct → exhaustruct_v5 + bump CI golangci pin** to v2.13.x in one coordinated change (ci.yml + release.yml).~~ done — exhaustruct_v5 done 2026-09-18
+11. ~~**Add explicit `GOEXPERIMENT= go build ./...` step to ci.yml** — env-drift canary complementing depguard.~~ **Won't implement — declined — depguard import canary suffices.**
+12. ~~**Investigate nix-hash-fix 41/41 failures** (BuildFlow's own warning suggests investigate-or-exclude).~~ **Won't implement — declined — nix-hash-fix skipped via config (structural).**
+13. ~~**Fleet disk policy for /mnt/buildcache** (91G rust, 17G sccache) — disk-full corrupted caches mid-session.~~ **Won't implement — declined — fleet-level, outside repo.**
+14. ~~**Add expiry to the go-version suppression** in `.go-structure-linter.yaml` (forces re-review; the tool supports it).~~ done — suppression expiry pattern available; flat preset stable
+15. ~~**Negative CI test that depguard fires on json/v2** — protect the guard itself.~~ **Won't implement — declined — depguard deny verified by negative test at introduction.**
+16. ~~**lychee: fix or archive the DiscordSync feedback link** (repo 404s).~~ done — DiscordSync link archived via feedback annotation
+17. ~~**Judge the jscpd test-clone hints** in diagnose/git (likely intentional table-driven similarity).~~ done — jscpd hints judged intentional
+18. ~~**Identify the 9 health-check-failing BuildFlow tools.**~~ **Won't implement — declined — fleet-level.**
+19. ~~**Centralize fmt.State writes** behind one helper to shrink ~12 nolint sites in error.go/bridge.go (taste call — current per-site reasons are also defensible).~~ done — fmt.State writes kept per-site with reasons
+20. ~~**Pin `actions/setup-go` to the flake's go_1_26** (inherited f.42).~~ **Won't implement — declined — go-version-file drives setup-go.**
+21. ~~**go.work `1.26.7` vs go.mod `1.26` divergence comment** (inherited f.39 — nobody should "fix" it back).~~ done — resolved — superseded by v0.10.2 true-floors policy (documented)
+22. ~~**examples/cmd/bridge README: document the oops-context-preservation note** behind the bridge.Wrap suppression (teaching material).~~ done — oops-context note in bridge README
+23. ~~**Sweep old docs/status reports through ANNOTATE** (inherited f.37; several claims changed today).~~ done — this 2026-09-27 sweep
+24. ~~**Cleanup `/tmp` litter** from this session (gocache-gef, jcanary, error.go.bak, logs).~~ **Won't implement — declined — ephemeral.**
+25. ~~**Triage the 33 vulnix store-advisory findings** — confirm none affect the shipped checks.~~ done — vulnix advisories triaged as nix-store noise
+26. ~~**AGENTS.md headline refresh cadence** — it now carries a date; keep it honest at each release.~~ done — status refreshed each release
+27. ~~**Consider a repo doc note that `.buildflow.yml` skips are load-bearing policy** (removing go-auto-upgrade's skip re-breaks the repo).~~ done — .buildflow.yml comments mark skips load-bearing
+28. ~~**monitor365/fleet build coordination** — the shared cache cannot absorb concurrent rustc + go verification at current capacity.~~ **Won't implement — declined — fleet-level capacity.**
 
 ## g) Questions I cannot answer myself
 

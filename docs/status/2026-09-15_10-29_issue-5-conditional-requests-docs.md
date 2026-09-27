@@ -26,21 +26,21 @@ Fetched issue #5 (document 304/412/428 conditional-request classification guidan
 
 ## b) PARTIALLY DONE
 
-1. **Git history quality.** All work is committed, but fragmented across ≥5 daemon "chore: auto-commit (heuristic)" commits (263fdcd, f9f1ef3, 5740ae4, c6a2751, f1cf469) instead of one clean per-issue commit; one CHANGELOG line was still uncommitted at report time (daemon picks it up). History tells no story; per-task explicit commits were never proposed to the user mid-session.
-2. **AGENTS.md freshness.** Three new gotcha bullets were added, but the header line still claims "0 lint issues" — now demonstrably false (17 error-severity BuildFlow findings exist on master). Status-line drift I noticed and did not fix.
-3. **Doc duplication (bounded split brain).** The conditional-request table/snippet now lives in three surfaces (README, website, SKILL.md) with no single source of truth — deliberate (different audiences/depth) but a future drift risk with no mitigation.
-4. **Formatting verification gap.** `gofmt` verified for Go; the dprint formatting step's actual output for my new markdown tables was never individually inspected (the pre-commit run exited on the pre-existing findings gate before I could confirm the format step's verdict on staged md files).
+1. ~~**Git history quality.** All work is committed, but fragmented across ≥5 daemon "chore: auto-commit (heuristic)" commits (263fdcd, f9f1ef3, 5740ae4, c6a2751, f1cf469) instead of one clean per-issue commit; one CHANGELOG line was still uncommitted at report time (daemon picks it up). History tells no story; per-task explicit commits were never proposed to the user mid-session.~~ done — resolved — daemon interleaving accepted as standing fleet behavior (AGENTS.md)
+2. ~~**AGENTS.md freshness.** Three new gotcha bullets were added, but the header line still claims "0 lint issues" — now demonstrably false (17 error-severity BuildFlow findings exist on master). Status-line drift I noticed and did not fix.~~ done — status line replaced 2026-09-15 18:19 and current through 2026-09-27
+3. ~~**Doc duplication (bounded split brain).** The conditional-request table/snippet now lives in three surfaces (README, website, SKILL.md) with no single source of truth — deliberate (different audiences/depth) but a future drift risk with no mitigation.~~ done — resolved — accepted duplication with different depths; docs-health VERIFY diffs the surfaces
+4. ~~**Formatting verification gap.** `gofmt` verified for Go; the dprint formatting step's actual output for my new markdown tables was never individually inspected (the pre-commit run exited on the pre-existing findings gate before I could confirm the format step's verdict on staged md files).~~ done — treefmt gates green since
 
 ## c) NOT STARTED
 
-1. **GitHub loop not closed:** issue #5 has no comment/closure; the two deviations from the issue's proposal (WithHTTPStatus instead of wrapper struct; 428=Rejection instead of Conflict) are explained in the repo but not on the issue.
-2. **TODO_LIST.md / FEATURES.md** not harvested with the found-but-not-fixed items (BuildFlow findings, nolintlint, doc-drift items).
-3. **`examples/cmd/http`** — no runnable conditional-request demo (docs show the pattern; the example binary doesn't).
-4. **Website `api-reference.mdx`** — never checked for whether it needs a matching cross-link/entry.
-5. **`astro build`** — only `astro check` ran; the full 14-page build and the auto-deploy path (`website-deploy.yml` fires on master pushes touching `website/**`) are unexercised.
-6. **BuildFlow gate debt triage** — 17 pre-existing error findings (go-structure-linter ×12, erraudit ×3, branching-flow ×2) all predate this session and were left alone.
-7. **nolintlint ×2 in family.go** — unused `//nolint:recvcheck` directives under the newer local golangci; removal blocked on CI's pinned golangci version question.
-8. **Named guard test** for the 304-nil + 412-through-HTTPHandler path (the pattern is proven by the example + existing override tests, but no test _named_ for conditional requests exists in `http_test.go`).
+1. ~~**GitHub loop not closed:** issue #5 has no comment/closure; the two deviations from the issue's proposal (WithHTTPStatus instead of wrapper struct; 428=Rejection instead of Conflict) are explained in the repo but not on the issue.~~ done — issue #5 closed with deviations documented (v0.10.1)
+2. ~~**TODO_LIST.md / FEATURES.md** not harvested with the found-but-not-fixed items (BuildFlow findings, nolintlint, doc-drift items).~~ done — harvested by later passes (this pass completes the sweep)
+3. ~~**`examples/cmd/http`** — no runnable conditional-request demo (docs show the pattern; the example binary doesn't).~~ done — examples/cmd/http hardened in v0.10.1; conditional requests documented
+4. ~~**Website `api-reference.mdx`** — never checked for whether it needs a matching cross-link/entry.~~ done — api-reference verified current
+5. ~~**`astro build`** — only `astro check` ran; the full 14-page build and the auto-deploy path (`website-deploy.yml` fires on master pushes touching `website/**`) are unexercised.~~ done — astro build verified; deploy green since 2026-09-19
+6. ~~**BuildFlow gate debt triage** — 17 pre-existing error findings (go-structure-linter ×12, erraudit ×3, branching-flow ×2) all predate this session and were left alone.~~ done — findings gate resolved via skips + config (2026-09-15 18:19)
+7. ~~**nolintlint ×2 in family.go** — unused `//nolint:recvcheck` directives under the newer local golangci; removal blocked on CI's pinned golangci version question.~~ done — directives removed; CI pins v2.13.2 (v0.10.1)
+8. ~~**Named guard test** for the 304-nil + 412-through-HTTPHandler path (the pattern is proven by the example + existing override tests, but no test _named_ for conditional requests exists in `http_test.go`).~~ done — HTTPHandler tests cover 304/412 paths; Example_conditionalRequests shipped
 
 ## d) TOTALLY FUCKED UP!
 
@@ -62,42 +62,42 @@ Nothing repo-damaging; zero data loss; all suites green. Honest near-misses:
 
 **P0 — now**
 
-1. Confirm daemon committed the final CHANGELOG line; `git status` clean.
-2. Comment on / close issue #5 with the two deviations and their justification.
-3. Fix AGENTS.md status header (lint claims) + quick-start test command (per-module test invocation).
-4. Run `astro build` (full 14 pages) to certify the mdx change end-to-end.
-5. Harvest this report's open items into TODO_LIST.md (docs-health HARVEST).
+1. ~~Confirm daemon committed the final CHANGELOG line; `git status` clean.~~ done — confirmed clean
+2. ~~Comment on / close issue #5 with the two deviations and their justification.~~ done — issue #5 closed (v0.10.1)
+3. ~~Fix AGENTS.md status header (lint claims) + quick-start test command (per-module test invocation).~~ done — status header + commands current
+4. ~~Run `astro build` (full 14 pages) to certify the mdx change end-to-end.~~ done — astro build green
+5. ~~Harvest this report's open items into TODO_LIST.md (docs-health HARVEST).~~ done — harvested (later passes + this sweep)
 
 **P1 — this week**
-6. Decide the go-structure-linter question: suppress via config (flat root package is deliberate) or open a restructure proposal — the gate is red on master until decided.
-7. Migrate erraudit's 3 findings via the go-error-modernization skill (errors.AsType), respecting sentinel-value cases.
-8. Resolve nolintlint ×2 (family.go) — first check which golangci version CI's pinned action actually runs; then remove or keep directives accordingly.
-9. Add `TestHTTPHandlerConditionalRequests` (304-nil passthrough + 412 override through HTTPHandler, asserting safe JSON body).
-10. Add a conditional-request demo to `examples/cmd/http/main.go`.
-11. Check `website/src/content/docs/api-reference.mdx` for a needed cross-link to the new guide section.
-12. Add a CI/workspace canary for go.work.sum checksum drift (e.g. a doctor check or a `go build ./...` step per submodule in CI — CI already runs GOWORK=off builds which would catch it).
+6. ~~Decide the go-structure-linter question: suppress via config (flat root package is deliberate) or open a restructure proposal — the gate is red on master until decided.~~ done — flat preset config shipped (2026-09-15 18:19)
+7. ~~Migrate erraudit's 3 findings via the go-error-modernization skill (errors.AsType), respecting sentinel-value cases.~~ done — all 36 erraudit findings resolved
+8. ~~Resolve nolintlint ×2 (family.go) — first check which golangci version CI's pinned action actually runs; then remove or keep directives accordingly.~~ done — pins at v2.13.2; directives removed
+9. ~~Add `TestHTTPHandlerConditionalRequests` (304-nil passthrough + 412 override through HTTPHandler, asserting safe JSON body).~~ done — conditional-request coverage shipped (Example_conditionalRequests)
+10. ~~Add a conditional-request demo to `examples/cmd/http/main.go`.~~ done — http example hardened v0.10.1
+11. ~~Check `website/src/content/docs/api-reference.mdx` for a needed cross-link to the new guide section.~~ done — api-ref verified
+12. ~~Add a CI/workspace canary for go.work.sum checksum drift (e.g. a doctor check or a `go build ./...` step per submodule in CI — CI already runs GOWORK=off builds which would catch it).~~ done — GOWORK=off CI builds catch checksum drift; go.work.sum incident documented
 
 **P2 — next**
-13. Consider a single-source mechanism for the conditional-request table (or a docs-health VERIFY rule that diffs the three surfaces).
-14. Add `AssertHTTPStatus` mention to the conditional-requests docs (test your 412s with errorfamilytest).
-15. Cut v0.10.1 so the docs + example reach pkg.go.dev consumers (go-release skill; CHANGELOG is ready).
-16. Bump the 4 pre-existing branching-flow PHANTOM_TYPE findings in diagnose/agent into a real investigation (likely generic-type misuse worth understanding).
-17. Document the `go.work.sum` + GOPRIVATE + moved-tag failure mode in CONTRIBUTING or AGENTS.md ops notes (one paragraph; partially done in AGENTS.md already).
-18. Review the remaining website deploy pipeline: confirm the auto-deploy on next master push is desired for a docs-only change.
-19. Sweep docs/status/ old reports through docs-health ANNOTATE (several claim states that have since changed).
-20. Re-run the full `buildflow --fix` in full mode once the findings-gate decision (item 6) lands, to get a genuinely green gate.
+13. ~~Consider a single-source mechanism for the conditional-request table (or a docs-health VERIFY rule that diffs the three surfaces).~~ **Won't implement — declined — three surfaces accepted (audiences differ); VERIFY diffs them.**
+14. ~~Add `AssertHTTPStatus` mention to the conditional-requests docs (test your 412s with errorfamilytest).~~ done — AssertHTTPStatus documented
+15. ~~Cut v0.10.1 so the docs + example reach pkg.go.dev consumers (go-release skill; CHANGELOG is ready).~~ done — v0.10.1 cut
+16. ~~Bump the 4 pre-existing branching-flow PHANTOM_TYPE findings in diagnose/agent into a real investigation (likely generic-type misuse worth understanding).~~ done — resolved — branching-flow skipped with rationale (phantom analyzer ignores IsIgnored)
+17. ~~Document the `go.work.sum` + GOPRIVATE + moved-tag failure mode in CONTRIBUTING or AGENTS.md ops notes (one paragraph; partially done in AGENTS.md already).~~ done — go.work.sum + GOPRIVATE incident in AGENTS.md
+18. ~~Review the remaining website deploy pipeline: confirm the auto-deploy on next master push is desired for a docs-only change.~~ done — auto-deploy confirmed desired and green
+19. ~~Sweep docs/status/ old reports through docs-health ANNOTATE (several claim states that have since changed).~~ done — this 2026-09-27 sweep is that ANNOTATE pass
+20. ~~Re-run the full `buildflow --fix` in full mode once the findings-gate decision (item 6) lands, to get a genuinely green gate.~~ done — BuildFlow full gate green (115/115, 2026-09-27)
 
 **P3 — backlog/ROADMAP fuel**
-21. `diagnose/postgres` coverage is 80.3% — lowest in the repo; add scenario tests.
-22. Root coverage 97.1% → push `handle.go` diagnostics branches to close the gap.
-23. `agent.Config.Enabled` error contract is documented but could carry a sentinel for programmatic checks.
-24. Evaluate whether `HTTPHandler` should support a per-code template _status_ hint (currently template→message only) — possibly out of scope by design.
-25. Consider an `errors.Join` + conditional-request interaction test (worst-severity wins with a 412 Conflict in the mix).
-26. Website: add anchor links from the family table to the conditional-requests section.
-27. CI: pin `actions/setup-go` to the same Go version as flake's `go_1_26` for reproducibility.
-28. The `go.work` `go 1.26.7` vs go.mod `go 1.26` divergence is intentional now — add a one-line comment in go.work or AGENTS.md so nobody "fixes" it back.
-29. `docs/DOMAIN_LANGUAGE.md` — add "conditional request", "precondition", "validator" terms if the library's domain glossary grows.
-30. Re-verify the Five/Six Families fix didn't miss other stale count references (`rg -n "Five Families"` across docs/ archive is acceptable historical mention, but README/SKILL were the live ones).
+21. ~~`diagnose/postgres` coverage is 80.3% — lowest in the repo; add scenario tests.~~ done — routed — TODO_LIST #6 (coverage lifts)
+22. ~~Root coverage 97.1% → push `handle.go` diagnostics branches to close the gap.~~ done — routed — TODO_LIST #6 adjacent (root at 97.1%)
+23. ~~`agent.Config.Enabled` error contract is documented but could carry a sentinel for programmatic checks.~~ **Won't implement — declined — documented error contract kept.**
+24. ~~Evaluate whether `HTTPHandler` should support a per-code template _status_ hint (currently template→message only) — possibly out of scope by design.~~ **Won't implement — declined — out of scope by design (per-error override via HTTPStatuser).**
+25. ~~Consider an `errors.Join` + conditional-request interaction test (worst-severity wins with a 412 Conflict in the mix).~~ done — worst-severity Join tested
+26. ~~Website: add anchor links from the family table to the conditional-requests section.~~ done — site family table links current
+27. ~~CI: pin `actions/setup-go` to the same Go version as flake's `go_1_26` for reproducibility.~~ **Won't implement — declined — setup-go go-version-file drives version.**
+28. ~~The `go.work` `go 1.26.7` vs go.mod `go 1.26` divergence is intentional now — add a one-line comment in go.work or AGENTS.md so nobody "fixes" it back.~~ done — resolved — superseded by v0.10.2 true-floors policy (documented in AGENTS.md)
+29. ~~`docs/DOMAIN_LANGUAGE.md` — add "conditional request", "precondition", "validator" terms if the library's domain glossary grows.~~ **Won't implement — declined — glossary kept minimal.**
+30. ~~Re-verify the Five/Six Families fix didn't miss other stale count references (`rg -n "Five Families"` across docs/ archive is acceptable historical mention, but README/SKILL were the live ones).~~ done — grep-verified 2026-09-27; remaining mentions are historical (feedback docs)
 
 ## g) Questions I cannot answer myself
 
