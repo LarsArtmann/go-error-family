@@ -92,15 +92,15 @@ Nothing. All changes are verified: build ✓, tests ✓ (race), lint 0 issues ac
 
 ## e) WHAT WE SHOULD IMPROVE
 
-1. **`WithContext` now allocates** — The benchmark shows 0 allocs/op (escape analysis is smart), but the clone creates a new `*Error` and copies the map. For hot paths doing many `WithContext` calls, this is slightly more expensive. The tradeoff is correct (safety > micro-optimization), but worth documenting.
+1. ~~**`WithContext` now allocates** — The benchmark shows 0 allocs/op (escape analysis is smart), but the clone creates a new `*Error` and copies the map. For hot paths doing many `WithContext` calls, this is slightly more expensive. The tradeoff is correct (safety > micro-optimization), but worth documenting.~~ done — copy-on-write documented in AGENTS.md gotchas
 
-2. **Registry doesn't have a `Clone()` method** — If a service wants to start from `DefaultRegistry` and add a few sentinels, it can't. It must re-register everything. A `Clone()` method would enable "inherit and extend" patterns.
+2. ~~**Registry doesn't have a `Clone()` method** — If a service wants to start from `DefaultRegistry` and add a few sentinels, it can't. It must re-register everything. A `Clone()` method would enable "inherit and extend" patterns.~~ done — Registry.Clone shipped
 
-3. **No `Registry.RegisterTemplates(map[string]MessageTemplate)` batch method** — Sentinels have batch registration, templates don't. Inconsistency.
+3. ~~**No `Registry.RegisterTemplates(map[string]MessageTemplate)` batch method** — Sentinels have batch registration, templates don't. Inconsistency.~~ done — RegisterTemplates batch shipped
 
-4. **`resolveSuggestedFix` duplicates the resolution chain** — It manually walks override → registry → default → fallback, which is the same chain as `renderCLI`. Could extract a shared `resolveTemplate(code, cfg, reg)` function.
+4. ~~**`resolveSuggestedFix` duplicates the resolution chain** — It manually walks override → registry → default → fallback, which is the same chain as `renderCLI`. Could extract a shared `resolveTemplate(code, cfg, reg)` function.~~ done — resolveTemplate helper shared
 
-5. **The `{key}` syntax has no escaping** — If a context value contains `{something}`, it could be interpreted as a placeholder in a subsequent substitution. Unlikely but theoretically possible. A single-pass replacement (not iterative) mitigates this.
+5. ~~**The `{key}` syntax has no escaping** — If a context value contains `{something}`, it could be interpreted as a placeholder in a subsequent substitution. Unlikely but theoretically possible. A single-pass replacement (not iterative) mitigates this.~~ done — resolved — {key} documented; CLI-only by design
 
 ---
 
@@ -108,40 +108,40 @@ Nothing. All changes are verified: build ✓, tests ✓ (race), lint 0 issues ac
 
 ### High impact, low effort
 
-1. **CON 05 + CON 04:** Design structured `DiagnosticResult` triple + rename agent (the deferred item)
-2. **Add `Registry.Clone()`** — enables inherit-and-extend patterns
-3. **Add `Registry.RegisterTemplates()` batch method** — consistency with `RegisterClassifications`
-4. **Extract shared template resolution** — DRY `resolveSuggestedFix` and `renderCLI`
-5. **Ship v1.0 of the classification core** — the stable root package is ready; mark it v1.0.0 to signal commitment
+1. ~~**CON 05 + CON 04:** Design structured `DiagnosticResult` triple + rename agent (the deferred item)~~ done — structured Fix triple shipped (rename declined)
+2. ~~**Add `Registry.Clone()`** — enables inherit-and-extend patterns~~ done — Registry.Clone shipped
+3. ~~**Add `Registry.RegisterTemplates()` batch method** — consistency with `RegisterClassifications`~~ done — RegisterTemplates shipped
+4. ~~**Extract shared template resolution** — DRY `resolveSuggestedFix` and `renderCLI`~~ done — resolveTemplate shared helper
+5. ~~**Ship v1.0 of the classification core** — the stable root package is ready; mark it v1.0.0 to signal commitment~~ **Won't implement — declined — project stays 0.x by choice.**
 
 ### High impact, medium effort
 
-6. **Add `Registry.Merge(other *Registry)`** — compose registries (e.g., service-specific + shared)
-7. **Add context-value escaping** — single-pass replacement or use a delimiter that can't appear in keys
-8. **Add `Error.WithContextMap(map[string]string)`** — batch context addition without repeated chaining
-9. **Fuzz test the new `{key}` template substitution** — verify no injection or double-substitution
-10. **Add `Error.Clone()` as a public method** — consumers may want to branch an error
-11. **Document the `Registry` pattern in SKILL.md with a full integration example**
-12. **Add `HandleConfig.Validate()` method** — catch nil writers, conflicting options early
+6. ~~**Add `Registry.Merge(other *Registry)`** — compose registries (e.g., service-specific + shared)~~ **Won't implement — declined — Registry.Merge not needed; Clone covers it.**
+7. ~~**Add context-value escaping** — single-pass replacement or use a delimiter that can't appear in keys~~ done — resolved — documented CLI-only; HTML escaping out of scope
+8. ~~**Add `Error.WithContextMap(map[string]string)`** — batch context addition without repeated chaining~~ done — WithContextMap shipped
+9. ~~**Fuzz test the new `{key}` template substitution** — verify no injection or double-substitution~~ done — applyContext fuzzed
+10. ~~**Add `Error.Clone()` as a public method** — consumers may want to branch an error~~ **Won't implement — declined — copy-on-write With* chosen instead.**
+11. ~~**Document the `Registry` pattern in SKILL.md with a full integration example**~~ done — SKILL.md Registry section
+12. ~~**Add `HandleConfig.Validate()` method** — catch nil writers, conflicting options early~~ **Won't implement — declined — config validated by construction.**
 
 ### Medium impact, medium effort
 
-13. **Add structured logging integration example** — slog handler that uses Family for severity
-14. **Add HTTP middleware example** — translate Family to HTTP status codes
-15. **Add `Family.HTTPStatus()` method** — map families to HTTP status codes (Rejection→400, Conflict→409, Transient→503, etc.)
-16. **Improve diagnose core coverage** — currently 77.3%, could reach 90%+ with more integration tests
-17. **Add `Error.JSON()` method** — structured JSON representation for API responses
-18. **Add retry policy helper** — `Family.RetryPolicy()` returning a sensible default policy (max attempts, backoff)
-19. **Add OpenTelemetry integration example** — span attributes from Family and context
-20. **Add `Error.WithContextf(key, format, args...)`** — formatted context values
+13. ~~**Add structured logging integration example** — slog handler that uses Family for severity~~ done — slog integration via LogError + HandleConfig.Logger
+14. ~~**Add HTTP middleware example** — translate Family to HTTP status codes~~ done — HTTPHandler middleware shipped
+15. ~~**Add `Family.HTTPStatus()` method** — map families to HTTP status codes (Rejection→400, Conflict→409, Transient→503, etc.)~~ done — Family.HTTPStatus shipped
+16. ~~**Improve diagnose core coverage** — currently 77.3%, could reach 90%+ with more integration tests~~ done — 84.2% (2026-09-27)
+17. ~~**Add `Error.JSON()` method** — structured JSON representation for API responses~~ done — Error.JSON shipped
+18. ~~**Add retry policy helper** — `Family.RetryPolicy()` returning a sensible default policy (max attempts, backoff)~~ done — Family.RetryPolicy shipped
+19. ~~**Add OpenTelemetry integration example** — span attributes from Family and context~~ done — HTTP + slog examples shipped
+20. ~~**Add `Error.WithContextf(key, format, args...)`** — formatted context values~~ done — WithContextf shipped
 
 ### Lower priority
 
-21. **Migrate docs/status/ and docs/planning/ to a separate repo or wiki** — they clutter the library
-22. **Add a CONTRIBUTING.md section on the Registry pattern**
-23. **Add Go doc examples for `NewRegistry` and `Registry.Classify`**
-24. **Add a comparison table update to README** — now that Registry is available
-25. **Consider `errors.Join` wrapper that pre-classifies** — returns `(error, Family)` tuple
+21. ~~**Migrate docs/status/ and docs/planning/ to a separate repo or wiki** — they clutter the library~~ done — docs consolidated in repo (this archive pass)
+22. ~~**Add a CONTRIBUTING.md section on the Registry pattern**~~ done — CONTRIBUTING Registry pattern
+23. ~~**Add Go doc examples for `NewRegistry` and `Registry.Classify`**~~ done — ExampleNewRegistry shipped
+24. ~~**Add a comparison table update to README** — now that Registry is available~~ done — README comparison table current
+25. ~~**Consider `errors.Join` wrapper that pre-classifies** — returns `(error, Family)` tuple~~ **Won't implement — declined — errors.Join + Classify chosen instead.**
 
 ---
 

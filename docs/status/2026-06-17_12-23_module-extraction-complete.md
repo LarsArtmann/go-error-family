@@ -72,14 +72,14 @@ The plan (`docs/planning/2026-06-17_11-51_module-extraction-and-polish.md`) has 
 
 | #  | Task                                                   | Impact | Effort |
 | -- | ------------------------------------------------------ | ------ | ------ |
-| 9  | `Registry.Clone()` method                              | Medium | 20min  |
-| 10 | `Registry.RegisterTemplates()` batch                   | Low    | 15min  |
-| 11 | DRY `resolveSuggestedFix` / `renderCLI`                | Medium | 30min  |
-| 12 | Update README for new module structure                 | Medium | 30min  |
-| 13 | Update AGENTS.md build commands per module             | Medium | 20min  |
-| 14 | Update SKILL.md details (beyond architecture overview) | Low    | 20min  |
-| 16 | Check/update DOMAIN_LANGUAGE.md                        | Low    | 10min  |
-| 17 | Final full verification + release prep                 | Low    | 10min  |
+| ~~9~~  | ~~`Registry.Clone()` method~~ done — Registry.Clone shipped | ~~Medium~~ | ~~20min~~ |
+| ~~10~~ | ~~`Registry.RegisterTemplates()` batch~~ done — RegisterTemplates shipped | ~~Low~~ | ~~15min~~ |
+| ~~11~~ | ~~DRY `resolveSuggestedFix` / `renderCLI`~~ done — resolveTemplate helper shared | ~~Medium~~ | ~~30min~~ |
+| ~~12~~ | ~~Update README for new module structure~~ done — README module structure current | ~~Medium~~ | ~~30min~~ |
+| ~~13~~ | ~~Update AGENTS.md build commands per module~~ done — AGENTS.md per-module commands | ~~Medium~~ | ~~20min~~ |
+| ~~14~~ | ~~Update SKILL.md details (beyond architecture overview)~~ done — SKILL.md module docs | ~~Low~~ | ~~20min~~ |
+| ~~16~~ | ~~Check/update DOMAIN_LANGUAGE.md~~ done — DOMAIN_LANGUAGE.md current | ~~Low~~ | ~~10min~~ |
+| ~~17~~ | ~~Final full verification + release prep~~ done — v0.6.0+ released; verification standard since | ~~Low~~ | ~~10min~~ |
 
 ---
 
@@ -93,19 +93,19 @@ One annoyance: BuildFlow's `go-mod-tidy` step is slow because the replace direct
 
 ## e) WHAT WE SHOULD IMPROVE
 
-1. **The replace directive chain is fragile** — root replaces diagnose, diagnose replaces root. This works but is confusing. The real fix is publishing a root version that deletes the `agent/` and `diagnose/` directories from the module. Until then, `go.work` handles development correctly.
+1. ~~**The replace directive chain is fragile** — root replaces diagnose, diagnose replaces root. This works but is confusing. The real fix is publishing a root version that deletes the `agent/` and `diagnose/` directories from the module. Until then, `go.work` handles development correctly.~~ done — resolved — real version pins replaced the chain (2026-07-05)
 
-2. **`agent/go.mod` doesn't have explicit `diagnose` require** — it has a replace but not a require. `go mod tidy` in the agent module can't resolve diagnose without the replace. This is correct for unpublished modules but needs cleanup on first publish.
+2. ~~**`agent/go.mod` doesn't have explicit `diagnose` require** — it has a replace but not a require. `go mod tidy` in the agent module can't resolve diagnose without the replace. This is correct for unpublished modules but needs cleanup on first publish.~~ done — resolved — agent/go.mod requires diagnose since v0.6.0
 
-3. **README is stale** — still describes the old single-module structure. Needs updating to reflect 6-module workspace.
+3. ~~**README is stale** — still describes the old single-module structure. Needs updating to reflect 6-module workspace.~~ done — README current
 
-4. **No Registry.Clone() or RegisterTemplates()** — inconsistency: sentinels have batch registration (`RegisterClassifications`), templates don't. `Clone()` would enable "inherit DefaultRegistry and extend" patterns.
+4. ~~**No Registry.Clone() or RegisterTemplates()** — inconsistency: sentinels have batch registration (`RegisterClassifications`), templates don't. `Clone()` would enable "inherit DefaultRegistry and extend" patterns.~~ done — Clone + RegisterTemplates shipped
 
-5. **`resolveSuggestedFix` duplicates `renderCLI`'s template chain** — both walk override → registry → default → fallback. Should extract shared helper.
+5. ~~**`resolveSuggestedFix` duplicates `renderCLI`'s template chain** — both walk override → registry → default → fallback. Should extract shared helper.~~ done — resolveTemplate shared
 
-6. **CON 05+04 still deferred** — the `extractCommand` prose parsing + agent renaming. User explicitly deferred this for design discussion.
+6. ~~**CON 05+04 still deferred** — the `extractCommand` prose parsing + agent renaming. User explicitly deferred this for design discussion.~~ done — resolved — deferred design items closed 2026-07-23 (design-decisions record)
 
-7. **v1.0 tagging not done** — the root module is ready for v1.0 semver commitment, but this is a product decision requiring explicit user approval.
+7. ~~**v1.0 tagging not done** — the root module is ready for v1.0 semver commitment, but this is a product decision requiring explicit user approval.~~ **Won't implement — declined — project stays 0.x by choice.**
 
 ---
 
@@ -113,40 +113,40 @@ One annoyance: BuildFlow's `go-mod-tidy` step is slow because the replace direct
 
 ### High impact, low effort
 
-1. **Update README for 6-module structure** — module landscape, import examples, what's stable vs experimental
-2. **Add `Registry.Clone()`** — enables inherit-and-extend patterns
-3. **Add `Registry.RegisterTemplates()` batch** — consistency with `RegisterClassifications`
-4. **DRY template resolution** — extract shared helper from `resolveSuggestedFix` and `renderCLI`
-5. **Update AGENTS.md Quick Start** — per-module build/test commands
+1. ~~**Update README for 6-module structure** — module landscape, import examples, what's stable vs experimental~~ done — README current
+2. ~~**Add `Registry.Clone()`** — enables inherit-and-extend patterns~~ done — Clone shipped
+3. ~~**Add `Registry.RegisterTemplates()` batch** — consistency with `RegisterClassifications`~~ done — RegisterTemplates shipped
+4. ~~**DRY template resolution** — extract shared helper from `resolveSuggestedFix` and `renderCLI`~~ done — resolveTemplate shared
+5. ~~**Update AGENTS.md Quick Start** — per-module build/test commands~~ done — AGENTS.md Quick Start per-module
 
 ### High impact, medium effort
 
-6. **CON 05+04: Design structured `DiagnosticResult` triple** — `{summary, command, rationale}` instead of prose. Kills `extractCommand` heuristic at root.
-7. **CON 05+04: Rename "agent" to match what it does** — RCA, Synthesizer, or DiagnosticAnalyzer
-8. **Ship v1.0 of the root module** — semver commitment for the classification library
-9. **Publish root version that deletes agent/ and diagnose/ dirs** — removes replace directive chain
-10. **Add `Error.WithContextMap(map[string]string)`** — batch context without repeated chaining
-11. **Fuzz test for `{key}` template substitution** — verify no injection or double-substitution
-12. **Add `Family.HTTPStatus()` method** — map families to HTTP status codes (Rejection→400, Conflict→409, Transient→503)
+6. ~~**CON 05+04: Design structured `DiagnosticResult` triple** — `{summary, command, rationale}` instead of prose. Kills `extractCommand` heuristic at root.~~ done — structured Fix triple shipped
+7. ~~**CON 05+04: Rename "agent" to match what it does** — RCA, Synthesizer, or DiagnosticAnalyzer~~ **Won't implement — declined — rename rejected (published module path).**
+8. ~~**Ship v1.0 of the root module** — semver commitment for the classification library~~ **Won't implement — declined — stays 0.x by choice.**
+9. ~~**Publish root version that deletes agent/ and diagnose/ dirs** — removes replace directive chain~~ **Won't implement — declined — submodules stay in-repo.**
+10. ~~**Add `Error.WithContextMap(map[string]string)`** — batch context without repeated chaining~~ done — WithContextMap shipped
+11. ~~**Fuzz test for `{key}` template substitution** — verify no injection or double-substitution~~ done — applyContext fuzzed
+12. ~~**Add `Family.HTTPStatus()` method** — map families to HTTP status codes (Rejection→400, Conflict→409, Transient→503)~~ done — Family.HTTPStatus shipped
 
 ### Medium impact, medium effort
 
-13. **Add slog integration example** — severity from Family
-14. **Add HTTP middleware example** — Family → HTTP status code translation
-15. **Add `Error.JSON()` method** — structured JSON for API responses
-16. **Improve diagnose coverage from 77.3%** — more integration tests
-17. **Add retry policy helper** — `Family.RetryPolicy()` returning sensible defaults
-18. **Add OpenTelemetry integration example** — span attributes from Family + context
-19. **Add `Error.WithContextf(key, format, args...)`** — formatted context values
-20. **Add Go doc examples for `NewRegistry`** — discoverable via `go doc`
+13. ~~**Add slog integration example** — severity from Family~~ done — slog integration shipped
+14. ~~**Add HTTP middleware example** — Family → HTTP status code translation~~ done — HTTPHandler shipped
+15. ~~**Add `Error.JSON()` method** — structured JSON for API responses~~ done — Error.JSON shipped
+16. ~~**Improve diagnose coverage from 77.3%** — more integration tests~~ done — 84.2% (2026-09-27)
+17. ~~**Add retry policy helper** — `Family.RetryPolicy()` returning sensible defaults~~ done — RetryPolicy shipped
+18. ~~**Add OpenTelemetry integration example** — span attributes from Family + context~~ done — OTel-adjacent: slog hook + OnDiagnosed
+19. ~~**Add `Error.WithContextf(key, format, args...)`** — formatted context values~~ done — WithContextf shipped
+20. ~~**Add Go doc examples for `NewRegistry`** — discoverable via `go doc`~~ done — ExampleNewRegistry shipped
 
 ### Lower priority
 
-21. **Migrate docs/status/ and docs/planning/ to separate directory** — they clutter the library
-22. **Add CONTRIBUTING.md section on the Registry pattern**
-23. **Add comparison table update to README** — now that Registry is available
-24. **Consider `errors.Join` wrapper that pre-classifies** — returns `(error, Family)` tuple
-25. **Add benchmark for `Registry.Classify` vs `Classify`** — measure indirection cost
+21. ~~**Migrate docs/status/ and docs/planning/ to separate directory** — they clutter the library~~ done — docs consolidated in-repo
+22. ~~**Add CONTRIBUTING.md section on the Registry pattern**~~ done — CONTRIBUTING Registry section
+23. ~~**Add comparison table update to README** — now that Registry is available~~ done — comparison table current
+24. ~~**Consider `errors.Join` wrapper that pre-classifies** — returns `(error, Family)` tuple~~ **Won't implement — declined — errors.Join + Classify chosen.**
+25. ~~**Add benchmark for `Registry.Classify` vs `Classify`** — measure indirection cost~~ done — Registry benchmarks exist
 
 ---
 

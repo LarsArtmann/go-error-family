@@ -73,16 +73,16 @@ All files are under 350 lines. The closest to the limit:
 
 ## c) NOT STARTED 🔲
 
-1. **TODO_LIST.md** — No project-level TODO list exists
-2. **FEATURES.md** — No feature inventory exists
-3. **ROADMAP.md** — No roadmap exists
-4. **diagnose coverage improvement** — Could add more mock-based tests for `FilesystemRule` and `NetworkRule`
-5. **agent coverage improvement** — 89.4%, could target 95%+
-6. **handle.go proactive split** — At 342 lines, it's 8 lines under the 350 limit. Could split now before it grows
-7. **Benchmark coverage** — `benchmark_test.go` and `diagnose/benchmark_test.go` have benchmarks but no coverage tracking
-8. **Fuzz test expansion** — Only `bridge/fuzz_test.go` has fuzz tests; root package fuzz tests not verified for completeness
-9. **Examples coverage** — All 3 example programs report 0% coverage (expected — they're `main` packages)
-10. **`.golangci.yml` indentation reformat** — Uncommitted whitespace change exists
+1. ~~**TODO_LIST.md** — No project-level TODO list exists~~ done — TODO_LIST.md exists
+2. ~~**FEATURES.md** — No feature inventory exists~~ done — FEATURES.md exists
+3. ~~**ROADMAP.md** — No roadmap exists~~ done — ROADMAP.md exists
+4. ~~**diagnose coverage improvement** — Could add more mock-based tests for `FilesystemRule` and `NetworkRule`~~ done — 84.2% (2026-09-27)
+5. ~~**agent coverage improvement** — 89.4%, could target 95%+~~ done — agent 100%
+6. ~~**handle.go proactive split** — At 342 lines, it's 8 lines under the 350 limit. Could split now before it grows~~ **Won't implement — declined — handle.go kept cohesive.**
+7. ~~**Benchmark coverage** — `benchmark_test.go` and `diagnose/benchmark_test.go` have benchmarks but no coverage tracking~~ done — benchmark tracking via BuildFlow
+8. ~~**Fuzz test expansion** — Only `bridge/fuzz_test.go` has fuzz tests; root package fuzz tests not verified for completeness~~ done — 16 fuzz targets
+9. ~~**Examples coverage** — All 3 example programs report 0% coverage (expected — they're `main` packages)~~ done — examples tested in CI
+10. ~~**`.golangci.yml` indentation reformat** — Uncommitted whitespace change exists~~ done — .golangci.yml formatted
 
 ---
 
@@ -98,24 +98,24 @@ All files are under 350 lines. The closest to the limit:
 
 ### High impact
 
-1. **Create `TODO_LIST.md`** — No structured task tracking exists. Every session starts from AGENTS.md memory, which is fine but not a substitute for a proper TODO list.
-2. **Create `FEATURES.md`** — AGENTS.md lists APIs but doesn't track feature status (DONE/PARTIAL/PLANNED).
-3. **Split `handle.go` (342 lines)** — Proactively split before it hits the 350-line limit. Natural boundaries: `HandleError`, `HandleErrorWithConfig`, `HandleErrorDetailedWithConfig`, template logic.
-4. **Improve `diagnose` coverage (59.8% → 80%+)** — Extract testable logic from `FilesystemRule.Run` and `NetworkRule.Run` into pure helper functions, then unit test the helpers.
-5. **Postgres test file at 337 lines** — Close to 350-line limit. Consider splitting `rules_postgres_test.go` into `mock_test.go` + `unit_test.go` + `integration_test.go` (following the git pattern).
+1. ~~**Create `TODO_LIST.md`** — No structured task tracking exists. Every session starts from AGENTS.md memory, which is fine but not a substitute for a proper TODO list.~~ done — created
+2. ~~**Create `FEATURES.md`** — AGENTS.md lists APIs but doesn't track feature status (DONE/PARTIAL/PLANNED).~~ done — created
+3. ~~**Split `handle.go` (342 lines)** — Proactively split before it hits the 350-line limit. Natural boundaries: `HandleError`, `HandleErrorWithConfig`, `HandleErrorDetailedWithConfig`, template logic.~~ **Won't implement — declined — kept cohesive.**
+4. ~~**Improve `diagnose` coverage (59.8% → 80%+)** — Extract testable logic from `FilesystemRule.Run` and `NetworkRule.Run` into pure helper functions, then unit test the helpers.~~ done — 84.2% (2026-09-27)
+5. ~~**Postgres test file at 337 lines** — Close to 350-line limit. Consider splitting `rules_postgres_test.go` into `mock_test.go` + `unit_test.go` + `integration_test.go` (following the git pattern).~~ done — postgres tests split
 
 ### Medium impact
 
-6. **Add `diagnose/postgres` mock helpers** — The postgres tests already have `pgAssertDetail`/`pgAssertStatus`, but mock setup is still manual. Consider a `newDefaultPgMock()` that pre-configures `pg_isready=true`, `brew=false`, `systemctl=false`, `service=false`.
-7. **Consistent test helper naming** — Git has `assertDetail`/`assertStatus`, postgres has `pgAssertDetail`/`pgAssertStatus`, diagnose has `assertDetail`. Consider a `testhelpers` package or consistent prefixing.
-8. **Benchmark coverage tracking** — Add `-bench` flags to CI to track performance regressions.
-9. **Fuzz corpus seeding** — Add seed corpora for the 5 fuzz functions in `bridge/fuzz_test.go`.
+6. ~~**Add `diagnose/postgres` mock helpers** — The postgres tests already have `pgAssertDetail`/`pgAssertStatus`, but mock setup is still manual. Consider a `newDefaultPgMock()` that pre-configures `pg_isready=true`, `brew=false`, `systemctl=false`, `service=false`.~~ done — newDefaultPgMock shipped
+7. ~~**Consistent test helper naming** — Git has `assertDetail`/`assertStatus`, postgres has `pgAssertDetail`/`pgAssertStatus`, diagnose has `assertDetail`. Consider a `testhelpers` package or consistent prefixing.~~ done — assert naming unified
+8. ~~**Benchmark coverage tracking** — Add `-bench` flags to CI to track performance regressions.~~ done — BuildFlow timings track regressions
+9. ~~**Fuzz corpus seeding** — Add seed corpora for the 5 fuzz functions in `bridge/fuzz_test.go`.~~ done — corpora seeded
 
 ### Low impact
 
-10. **Auto-format `.golangci.yml`** — The uncommitted indentation change is cosmetic but should be committed for consistency.
-11. **Remove `var _ = fmt.Sprintf` in git mock_test.go** — Blank identifier assignment to prevent unused import; consider if still needed.
-12. **Consolidate `diagnose/diagnose.go` + `diagnose/helpers.go` split** — The split was done for file size but `helpers.go` at 108 lines could arguably stay merged.
+10. ~~**Auto-format `.golangci.yml`** — The uncommitted indentation change is cosmetic but should be committed for consistency.~~ done — formatted
+11. ~~**Remove `var _ = fmt.Sprintf` in git mock_test.go** — Blank identifier assignment to prevent unused import; consider if still needed.~~ done — removed
+12. ~~**Consolidate `diagnose/diagnose.go` + `diagnose/helpers.go` split** — The split was done for file size but `helpers.go` at 108 lines could arguably stay merged.~~ **Won't implement — declined — helpers.go split kept (flat-module policy).**
 
 ---
 
@@ -123,37 +123,37 @@ All files are under 350 lines. The closest to the limit:
 
 ### Priority 1 — High Impact (Do First)
 
-1. **Create `TODO_LIST.md`** — Centralized task tracking
-2. **Create `FEATURES.md`** — Honest feature inventory with status
-3. **Split `handle.go` (342 → ~170+172)** — Proactive before it grows past 350
-4. **Improve `diagnose` coverage from 59.8% to 70%+** — Extract testable helpers from rules
-5. **Split `diagnose/postgres/rules_postgres_test.go` (337 lines)** — Before it exceeds limit
-6. **Commit `.golangci.yml` formatting fix** — Clean up uncommitted change
+1. ~~**Create `TODO_LIST.md`** — Centralized task tracking~~ done — created
+2. ~~**Create `FEATURES.md`** — Honest feature inventory with status~~ done — created
+3. ~~**Split `handle.go` (342 → ~170+172)** — Proactive before it grows past 350~~ **Won't implement — declined — kept cohesive.**
+4. ~~**Improve `diagnose` coverage from 59.8% to 70%+** — Extract testable helpers from rules~~ done — 84.2% (2026-09-27)
+5. ~~**Split `diagnose/postgres/rules_postgres_test.go` (337 lines)** — Before it exceeds limit~~ done — postgres split
+6. ~~**Commit `.golangci.yml` formatting fix** — Clean up uncommitted change~~ done — committed
 
 ### Priority 2 — Medium Impact
 
-7. **Create `ROADMAP.md`** — Long-term direction for v0.4.0+
-8. **Add `newDefaultPgMock()` helper** — Reduce postgres test boilerplate
-9. **Unify assert helper naming** — Consistent across packages
-10. **Add `diagnose/NetworkRule` unit tests** — Improve coverage via mock injection
-11. **Add `diagnose/FilesystemRule` unit tests** — Improve coverage via mock injection
-12. **Update `AGENTS.md`** — Reflect latest file split structure, coverage numbers, helper functions
-13. **Run `go mod tidy` on all modules** — Ensure clean dependency state
-14. **Add integration test CI config** — Document how to run full suite
-15. **Seed fuzz corpora** — Add initial seed inputs for fuzz functions
+7. ~~**Create `ROADMAP.md`** — Long-term direction for v0.4.0+~~ done — created
+8. ~~**Add `newDefaultPgMock()` helper** — Reduce postgres test boilerplate~~ done — shipped
+9. ~~**Unify assert helper naming** — Consistent across packages~~ done — unified
+10. ~~**Add `diagnose/NetworkRule` unit tests** — Improve coverage via mock injection~~ done — NetworkRule tested
+11. ~~**Add `diagnose/FilesystemRule` unit tests** — Improve coverage via mock injection~~ done — FilesystemRule tested
+12. ~~**Update `AGENTS.md`** — Reflect latest file split structure, coverage numbers, helper functions~~ done — AGENTS.md current
+13. ~~**Run `go mod tidy` on all modules** — Ensure clean dependency state~~ done — tidy runs in release process
+14. ~~**Add integration test CI config** — Document how to run full suite~~ done — integration CI via BuildFlow
+15. ~~**Seed fuzz corpora** — Add initial seed inputs for fuzz functions~~ done — corpora seeded
 
 ### Priority 3 — Nice to Have
 
-16. **Add `docs/DOMAIN_LANGUAGE.md` update** — Capture any new terms from recent work
-17. **Review `bridge/classify.go` (90 lines)** — Check if bridge classify logic can be simplified
-18. **Add `diagnose` benchmark tests** — Track performance of rule execution
-19. **Consider `testify` or custom assertion package** — For cross-package assert helper reuse
-20. **Add `Makefile` or `justfile` → `flake.nix` migration** — If any build scripts exist
-21. **Review `handle.go` for template extraction** — 342 lines suggests possible template helper extraction
-22. **Add error context propagation tests** — Verify context flows through all HandleError variants
-23. **Document the `familyStringCase` type alias pattern** — Useful for other table-driven tests
-24. **Consider `diagnose/mock.go` → `diagnose/internal/mocks/`** — Keep test infrastructure separate
-25. **Add `CHANGELOG.md`** — Track releases since v0.3.0
+16. ~~**Add `docs/DOMAIN_LANGUAGE.md` update** — Capture any new terms from recent work~~ done — DOMAIN_LANGUAGE.md current
+17. ~~**Review `bridge/classify.go` (90 lines)** — Check if bridge classify logic can be simplified~~ done — bridge/classify.go reviewed
+18. ~~**Add `diagnose` benchmark tests** — Track performance of rule execution~~ done — diagnose benchmarks
+19. ~~**Consider `testify` or custom assertion package** — For cross-package assert helper reuse~~ **Won't implement — declined — stdlib testing kept.**
+20. ~~**Add `Makefile` or `justfile` → `flake.nix` migration** — If any build scripts exist~~ **Won't implement — declined — flake.nix is the only task runner.**
+21. ~~**Review `handle.go` for template extraction** — 342 lines suggests possible template helper extraction~~ **Won't implement — declined — kept cohesive.**
+22. ~~**Add error context propagation tests** — Verify context flows through all HandleError variants~~ done — context propagation tested
+23. ~~**Document the `familyStringCase` type alias pattern** — Useful for other table-driven tests~~ done — documented in AGENTS.md
+24. ~~**Consider `diagnose/mock.go` → `diagnose/internal/mocks/`** — Keep test infrastructure separate~~ **Won't implement — declined — mock.go is a documented injection API.**
+25. ~~**Add `CHANGELOG.md`** — Track releases since v0.3.0~~ done — CHANGELOG.md exists
 
 ---
 
