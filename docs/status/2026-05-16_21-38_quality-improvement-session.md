@@ -53,25 +53,25 @@ Go library for structured error classification. Three packages: root (`errorfami
 
 ## C) NOT STARTED
 
-1. **AI provider integration** — `agent.deterministicAnalyze` is a scaffold. `buildPrompt` constructs a prompt string that goes nowhere. No LLM provider interface, no HTTP client, no streaming.
+1. ~~**AI provider integration** — `agent.deterministicAnalyze` is a scaffold. `buildPrompt` constructs a prompt string that goes nowhere. No LLM provider interface, no HTTP client, no streaming.~~ **Won't implement — declined — agent is analysis-only by design.**
 
-2. **CI/CD pipeline** — no GitHub Actions, no Makefile, no `flake.nix`. Tests run manually via `go test ./...`.
+2. ~~**CI/CD pipeline** — no GitHub Actions, no Makefile, no `flake.nix`. Tests run manually via `go test ./...`.~~ done — three workflows live
 
-3. **`HandleConfig.Verbose` field** — exists but unused after the diagnostics wiring was simplified. Was intended to append diagnostic details to output but was removed in favor of the cleaner `OnDiagnosed` callback pattern. Field should be either wired or removed.
+3. ~~**`HandleConfig.Verbose` field** — exists but unused after the diagnostics wiring was simplified. Was intended to append diagnostic details to output but was removed in favor of the cleaner `OnDiagnosed` callback pattern. Field should be either wired or removed.~~ done — Verbose/Diagnose flags removed from HandleConfig
 
-4. **Error code validation** — no validation that error codes follow the dot-separated lowercase convention (`db.timeout`, `file.not_found`). Users can pass any string.
+4. ~~**Error code validation** — no validation that error codes follow the dot-separated lowercase convention (`db.timeout`, `file.not_found`). Users can pass any string.~~ **Won't implement — declined — codes are consumer-defined strings by design.**
 
-5. **`RegisterClassification` with `errors.Is` chain walk** — the sentinel registry iterates all entries with `errors.Is` for every `Classify()` call. This is O(n) for n registered sentinels. Fine for small N, but should be documented or optimized if used heavily.
+5. ~~**`RegisterClassification` with `errors.Is` chain walk** — the sentinel registry iterates all entries with `errors.Is` for every `Classify()` call. This is O(n) for n registered sentinels. Fine for small N, but should be documented or optimized if used heavily.~~ done — atomic.Pointer snapshot; lock-free reads
 
-6. **`context.go: GatherSystemSnapshot`** — captures environment variables. The `isSecretKey` regex is reasonable but not audited against all common secret key patterns. Some env vars with "key" in the name (e.g., `API_KEY_V2`) are redacted, but patterns like `CONN_STRING` are not.
+6. ~~**`context.go: GatherSystemSnapshot`** — captures environment variables. The `isSecretKey` regex is reasonable but not audited against all common secret key patterns. Some env vars with "key" in the name (e.g., `API_KEY_V2`) are redacted, but patterns like `CONN_STRING` are not.~~ done — isSecretKey deleted with the SystemSnapshot cleanup
 
-7. **`DiagnosticRunner` interface in `handle.go`** — returns `any` instead of `[]*diagnose.DiagnosticResult`. This is intentionally loose coupling but makes the `OnDiagnosed` callback require type assertions. Should be `[]*diagnose.DiagnosticResult` or a defined result type.
+7. ~~**`DiagnosticRunner` interface in `handle.go`** — returns `any` instead of `[]*diagnose.DiagnosticResult`. This is intentionally loose coupling but makes the `OnDiagnosed` callback require type assertions. Should be `[]*diagnose.DiagnosticResult` or a defined result type.~~ done — typed DiagnosticFunc shipped
 
-8. **`FilesystemRule.Run` auto-fix closure captures loop variable** — the `AutoFix` closures capture `path` and `parent` by closure, which is fine, but the test file write check (`/tmp/.write_test_*`) could leave artifacts if the test process crashes between create and remove.
+8. ~~**`FilesystemRule.Run` auto-fix closure captures loop variable** — the `AutoFix` closures capture `path` and `parent` by closure, which is fine, but the test file write check (`/tmp/.write_test_*`) could leave artifacts if the test process crashes between create and remove.~~ **Won't implement — declined — ApplyFixes removed entirely.**
 
-9. **No benchmarks** — no `Benchmark*` functions in any test file. `Classify()`, `Is()`, `Error()` formatting would benefit from benchmarks.
+9. ~~**No benchmarks** — no `Benchmark*` functions in any test file. `Classify()`, `Is()`, `Error()` formatting would benefit from benchmarks.~~ done — benchmark_test.go suite
 
-10. **No fuzz tests** — `ParseFamily`, `errorCodeContains`, `hasContextSubstring` are good candidates for fuzz testing.
+10. ~~**No fuzz tests** — `ParseFamily`, `errorCodeContains`, `hasContextSubstring` are good candidates for fuzz testing.~~ done — 11 fuzz targets in root
 
 ---
 
@@ -107,31 +107,31 @@ Go library for structured error classification. Three packages: root (`errorfami
 
 | #  | Priority    | Task                                                                                | Impact                               |
 | -- | ----------- | ----------------------------------------------------------------------------------- | ------------------------------------ |
-| 1  | 🔴 Critical | Push the 3 commits to origin/master                                                 | Unblocking: current work is unpushed |
-| 2  | 🔴 Critical | Add CI pipeline (GitHub Actions: `go test`, `go vet`, `go build`)                   | Prevent regressions                  |
-| 3  | 🟠 High     | Tighten `DiagnosticRunner` interface: return `[]*DiagnosticResult` instead of `any` | Type safety                          |
-| 4  | 🟠 High     | Wire or remove `HandleConfig.Verbose` field                                         | Dead config smell                    |
-| 5  | 🟠 High     | Add `UnregisterClassification` / `ClearClassifications` for test isolation          | Registry accumulates forever         |
-| 6  | 🟠 High     | Add integration tests for `diagnose/` rules with mocked command execution           | Push diagnose coverage to 80%+       |
-| 7  | 🟠 High     | Split `handle.go` into `handle.go` + `render.go` + `template.go`                    | Single file doing too much           |
-| 8  | 🟡 Medium   | Add `Error.WithTimestamp(t time.Time)` for testing/replay                           | Testing, error replay                |
-| 9  | 🟡 Medium   | Add example tests (`func ExampleNewRejection()`) for godoc                          | Documentation                        |
-| 10 | 🟡 Medium   | Add error code validation (dot-separated lowercase) in constructors                 | Prevent invalid codes at creation    |
-| 11 | 🟡 Medium   | Make `codeToWhat`/`codeToFix` configurable via `HandleConfig`                       | Extensibility                        |
-| 12 | 🟡 Medium   | Add benchmarks for `Classify()`, `Is()`, `Error()`, `Format()`                      | Performance baseline                 |
-| 13 | 🟡 Medium   | Add fuzz tests for `ParseFamily`, `errorCodeContains`, `hasContextSubstring`        | Edge case discovery                  |
-| 14 | 🟡 Medium   | Extract diagnose matching helpers into testable, interface-driven package           | Reduce coupling                      |
-| 15 | 🟡 Medium   | Audit `isSecretKey` regex against comprehensive secret key patterns                 | Security: leaked env vars            |
-| 16 | 🟢 Low      | Add `WithContextE()` that returns `error` instead of `*Error`                       | Convenience                          |
-| 17 | 🟢 Low      | Add `GoString()` method to `Error` for `%#v` formatting                             | Debugging                            |
-| 18 | 🟢 Low      | Document O(n) behavior of `lookupRegistered` for large sentinel counts              | Performance documentation            |
-| 19 | 🟢 Low      | Add `RegisterClassificationFunc` for dynamic classification                         | Complex classification logic         |
-| 20 | 🟢 Low      | Add `errors.Join` support for multi-error classification                            | Go 1.20+ multi-errors                |
-| 21 | 🟢 Low      | Add `Family.MarshalText`/`UnmarshalText` for JSON/YAML                              | Configuration files                  |
-| 22 | 🟢 Low      | Add `Error.MarshalJSON` for structured logging                                      | Observability                        |
-| 23 | 🟢 Low      | Create `flake.nix` for reproducible builds                                          | Nix ecosystem                        |
-| 24 | 🟢 Low      | Add `CHANGELOG.md` entry for this session's changes                                 | Documentation                        |
-| 25 | 🟢 Low      | Consider `context.Context` propagation through error chain                          | Cancellation in error handling       |
+| ~~1~~  | ~~🔴 Critical~~ done — pushed long since | ~~Push the 3 commits to origin/master~~ | ~~Unblocking: current work is unpushed~~ |
+| ~~2~~  | ~~🔴 Critical~~ done — three workflows live | ~~Add CI pipeline (GitHub Actions: `go test`, `go vet`, `go build`)~~ | ~~Prevent regressions~~ |
+| ~~3~~  | ~~🟠 High~~ done — typed DiagnosticFunc | ~~Tighten `DiagnosticRunner` interface: return `[]*DiagnosticResult` instead of `any`~~ | ~~Type safety~~ |
+| ~~4~~  | ~~🟠 High~~ done — flag removed | ~~Wire or remove `HandleConfig.Verbose` field~~ | ~~Dead config smell~~ |
+| ~~5~~  | ~~🟠 High~~ done — UnregisterClassification/UnregisterTemplate exist | ~~Add `UnregisterClassification` / `ClearClassifications` for test isolation~~ | ~~Registry accumulates forever~~ |
+| ~~6~~  | ~~🟠 High~~ done — diagnose fully tested | ~~Add integration tests for `diagnose/` rules with mocked command execution~~ | ~~Push diagnose coverage to 80%+~~ |
+| ~~7~~  | ~~🟠 High~~ **Won't implement — declined — handle.go kept cohesive by the flat-structure policy.** | ~~Split `handle.go` into `handle.go` + `render.go` + `template.go`~~ | ~~Single file doing too much~~ |
+| ~~8~~  | ~~🟡 Medium~~ done — WithTimestamp shipped | ~~Add `Error.WithTimestamp(t time.Time)` for testing/replay~~ | ~~Testing, error replay~~ |
+| ~~9~~  | ~~🟡 Medium~~ done — 26 godoc examples | ~~Add example tests (`func ExampleNewRejection()`) for godoc~~ | ~~Documentation~~ |
+| ~~10~~ | ~~🟡 Medium~~ **Won't implement — declined — codes are consumer-defined by design.** | ~~Add error code validation (dot-separated lowercase) in constructors~~ | ~~Prevent invalid codes at creation~~ |
+| ~~11~~ | ~~🟡 Medium~~ done — template registry replaced codeToWhat/codeToFix | ~~Make `codeToWhat`/`codeToFix` configurable via `HandleConfig`~~ | ~~Extensibility~~ |
+| ~~12~~ | ~~🟡 Medium~~ done — benchmark suite | ~~Add benchmarks for `Classify()`, `Is()`, `Error()`, `Format()`~~ | ~~Performance baseline~~ |
+| ~~13~~ | ~~🟡 Medium~~ done — 11 fuzz targets | ~~Add fuzz tests for `ParseFamily`, `errorCodeContains`, `hasContextSubstring`~~ | ~~Edge case discovery~~ |
+| ~~14~~ | ~~🟡 Medium~~ done — diagnose helpers.go | ~~Extract diagnose matching helpers into testable, interface-driven package~~ | ~~Reduce coupling~~ |
+| ~~15~~ | ~~🟡 Medium~~ done — deleted with SystemSnapshot | ~~Audit `isSecretKey` regex against comprehensive secret key patterns~~ | ~~Security: leaked env vars~~ |
+| ~~16~~ | ~~🟢 Low~~ done — WithContextf shipped instead | ~~Add `WithContextE()` that returns `error` instead of `*Error`~~ | ~~Convenience~~ |
+| ~~17~~ | ~~🟢 Low~~ **Won't implement — declined — not adopted.** | ~~Add `GoString()` method to `Error` for `%#v` formatting~~ | ~~Debugging~~ |
+| ~~18~~ | ~~🟢 Low~~ done — AGENTS.md documents the atomic-snapshot design | ~~Document O(n) behavior of `lookupRegistered` for large sentinel counts~~ | ~~Performance documentation~~ |
+| ~~19~~ | ~~🟢 Low~~ done — RegisterClassifier shipped | ~~Add `RegisterClassificationFunc` for dynamic classification~~ | ~~Complex classification logic~~ |
+| ~~20~~ | ~~🟢 Low~~ done — worst-severity multi-error classification | ~~Add `errors.Join` support for multi-error classification~~ | ~~Go 1.20+ multi-errors~~ |
+| ~~21~~ | ~~🟢 Low~~ done — MarshalText/UnmarshalText on Family + Audience | ~~Add `Family.MarshalText`/`UnmarshalText` for JSON/YAML~~ | ~~Configuration files~~ |
+| ~~22~~ | ~~🟢 Low~~ done — Error.JSON() | ~~Add `Error.MarshalJSON` for structured logging~~ | ~~Observability~~ |
+| ~~23~~ | ~~🟢 Low~~ done — flake.nix in place | ~~Create `flake.nix` for reproducible builds~~ | ~~Nix ecosystem~~ |
+| ~~24~~ | ~~🟢 Low~~ done — CHANGELOG maintained | ~~Add `CHANGELOG.md` entry for this session's changes~~ | ~~Documentation~~ |
+| ~~25~~ | ~~🟢 Low~~ done — HandleErrorWithContext | ~~Consider `context.Context` propagation through error chain~~ | ~~Cancellation in error handling~~ |
 
 ---
 

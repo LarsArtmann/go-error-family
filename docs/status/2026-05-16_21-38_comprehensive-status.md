@@ -168,23 +168,23 @@ Build is clean. All 130 tests pass. No compile errors. No panics. `go vet` clean
 
 ### Architecture
 
-1. **Wire AI agent to a real provider** — The scaffold proves the design works. Time to integrate OpenAI/Anthropic/Crush SDK.
-2. **Add `Mark(err, sentinel)` function** — Identity stamping without global registry, inspired by cockroachdb/errors.
-3. **Extract CommandRunner interface** — Makes diagnostic rules unit-testable without PostgreSQL/Git on PATH.
+1. ~~**Wire AI agent to a real provider** — The scaffold proves the design works. Time to integrate OpenAI/Anthropic/Crush SDK.~~ **Won't implement — declined — agent is analysis-only by design.**
+2. ~~**Add `Mark(err, sentinel)` function** — Identity stamping without global registry, inspired by cockroachdb/errors.~~ **Won't implement — declined — Classify + RegisterClassification cover it; never adopted.**
+3. ~~**Extract CommandRunner interface** — Makes diagnostic rules unit-testable without PostgreSQL/Git on PATH.~~ done — CommandRunner interface shipped in diagnose
 
 ### Quality
 
-4. **Update CHANGELOG.md** — Currently a skeleton. Should reflect all 8 commits since initial release.
-5. **Add `.golangci.yml`** — Consistent linting with the rest of the ecosystem.
-6. **Add CI pipeline** — GitHub Actions for build + test + vet on push/PR.
-7. **Add `flake.nix`** — LarsArtmann ecosystem standard for build/test automation.
-8. **Increase diagnose coverage** — Integration tests for rules that shell out, or extract interfaces for mockability.
+4. ~~**Update CHANGELOG.md** — Currently a skeleton. Should reflect all 8 commits since initial release.~~ done — CHANGELOG maintained through v0.10.2
+5. ~~**Add `.golangci.yml`** — Consistent linting with the rest of the ecosystem.~~ done — .golangci.yml curated
+6. ~~**Add CI pipeline** — GitHub Actions for build + test + vet on push/PR.~~ done — ci.yml + release.yml + website-deploy.yml
+7. ~~**Add `flake.nix`** — LarsArtmann ecosystem standard for build/test automation.~~ done — flake.nix in place
+8. ~~**Increase diagnose coverage** — Integration tests for rules that shell out, or extract interfaces for mockability.~~ done — diagnose split into core/git/postgres, 78-91% covered
 
 ### Ecosystem
 
-9. **Tag `v0.1.0-alpha`** — Signals API stability expectations. Module is on GitHub but has no version.
-10. **Integrate with first consumer repo** — Proves the protocol works in practice.
-11. **Write ADR-001** — Document why 5 families, why int not string, why embed error in interfaces.
+9. ~~**Tag `v0.1.0-alpha`** — Signals API stability expectations. Module is on GitHub but has no version.~~ done — v0.1.x shipped; v0.10.2 latest
+10. ~~**Integrate with first consumer repo** — Proves the protocol works in practice.~~ done — 50+ consumers per the 2026-07-23 adoption audit
+11. ~~**Write ADR-001** — Document why 5 families, why int not string, why embed error in interfaces.~~ **Won't implement — declined — rationale lives in README + code comments.**
 
 ---
 
@@ -194,51 +194,51 @@ Build is clean. All 130 tests pass. No compile errors. No panics. `go vet` clean
 
 | # | Task                                                            | Effort | Impact                 |
 | - | --------------------------------------------------------------- | ------ | ---------------------- |
-| 1 | Update CHANGELOG.md with all changes since initial commit       | 30min  | Historical accuracy    |
-| 2 | Fix remaining gopls warnings (unused params) or document intent | 15min  | Zero-warning hygiene   |
-| 3 | Tag `v0.1.0-alpha`                                              | 5min   | API stability signal   |
-| 4 | Add GitHub Actions CI (build + test + vet)                      | 1h     | Automated quality gate |
-| 5 | Add `.golangci.yml`                                             | 30min  | Consistent linting     |
+| ~~1~~ | ~~Update CHANGELOG.md with all changes since initial commit~~ done — CHANGELOG maintained | ~~30min~~ | ~~Historical accuracy~~ |
+| ~~2~~ | ~~Fix remaining gopls warnings (unused params) or document intent~~ done — resolved long ago | ~~15min~~ | ~~Zero-warning hygiene~~ |
+| ~~3~~ | ~~Tag `v0.1.0-alpha`~~ done — v0.1.x shipped | ~~5min~~ | ~~API stability signal~~ |
+| ~~4~~ | ~~Add GitHub Actions CI (build + test + vet)~~ done — three workflows live | ~~1h~~ | ~~Automated quality gate~~ |
+| ~~5~~ | ~~Add `.golangci.yml`~~ done — curated config | ~~30min~~ | ~~Consistent linting~~ |
 
 ### High — Test Coverage
 
 | #  | Task                                                                            | Effort | Impact                                   |
 | -- | ------------------------------------------------------------------------------- | ------ | ---------------------------------------- |
-| 6  | Integration tests for GitRule (dirty repo, merge conflicts, unreachable remote) | 1h     | GitRule only tested for clean repo       |
-| 7  | Integration tests for PostgresRule (mock pg_isready, TCP server)                | 1h     | PostgresRule TCP path untested           |
-| 8  | Integration tests for NetworkRule (DNS resolution, TCP connect, timeout)        | 1h     | NetworkRule only tested for host parsing |
-| 9  | Extract CommandRunner/ConnectionTester interfaces for mockability               | 1h     | Enables unit tests without system tools  |
-| 10 | Test FilesystemRule auto-fix callback (mkdir in temp dir)                       | 30min  | AutoFix path never executed in tests     |
+| ~~6~~  | ~~Integration tests for GitRule (dirty repo, merge conflicts, unreachable remote)~~ done — GitRule temp-repo-tested | ~~1h~~ | ~~GitRule only tested for clean repo~~ |
+| ~~7~~  | ~~Integration tests for PostgresRule (mock pg_isready, TCP server)~~ done — PostgresRule mock-tested | ~~1h~~ | ~~PostgresRule TCP path untested~~ |
+| ~~8~~  | ~~Integration tests for NetworkRule (DNS resolution, TCP connect, timeout)~~ done — NetworkRule tested | ~~1h~~ | ~~NetworkRule only tested for host parsing~~ |
+| ~~9~~  | ~~Extract CommandRunner/ConnectionTester interfaces for mockability~~ done — CommandRunner shipped (ConnectionTester declined, subsumed by NetworkRule) | ~~1h~~ | ~~Enables unit tests without system tools~~ |
+| ~~10~~ | ~~Test FilesystemRule auto-fix callback (mkdir in temp dir)~~ done — FilesystemRule tested | ~~30min~~ | ~~AutoFix path never executed in tests~~ |
 
 ### High — Ecosystem Integration
 
 | #  | Task                                                          | Effort | Impact                |
 | -- | ------------------------------------------------------------- | ------ | --------------------- |
-| 11 | Migrate go-cqrs-lite to import go-error-family                | 2h     | First real consumer   |
-| 12 | Add go-error-family to projects-management-automation go.work | 15min  | Workspace integration |
-| 13 | Add ErrorCode()/ErrorContext() to go-finding FindingError     | 30min  | Second consumer       |
-| 14 | Add ErrorCode()/ErrorContext() to docs-organizer DocsError    | 30min  | Third consumer        |
+| ~~11~~ | ~~Migrate go-cqrs-lite to import go-error-family~~ **Won't implement — declined — library pivoted to standalone go-error-family.** | ~~2h~~ | ~~First real consumer~~ |
+| ~~12~~ | ~~Add go-error-family to projects-management-automation go.work~~ done — go.work in place | ~~15min~~ | ~~Workspace integration~~ |
+| ~~13~~ | ~~Add ErrorCode()/ErrorContext() to go-finding FindingError~~ **Won't implement — declined — out of scope.** | ~~30min~~ | ~~Second consumer~~ |
+| ~~14~~ | ~~Add ErrorCode()/ErrorContext() to docs-organizer DocsError~~ **Won't implement — declined — out of scope.** | ~~30min~~ | ~~Third consumer~~ |
 
 ### Medium — Feature Completeness
 
 | #  | Task                                                         | Effort | Impact                                |
 | -- | ------------------------------------------------------------ | ------ | ------------------------------------- |
-| 15 | Wire AI agent to real provider (OpenAI/Anthropic SDK)        | 3h     | Agent actually works                  |
-| 16 | Implement actual command execution in ApplyFixes (sandboxed) | 2h     | Autonomous mode is not a lie          |
-| 17 | Add `Mark(err, sentinel)` identity stamping                  | 30min  | Alternative to RegisterClassification |
-| 18 | Add default MessageTemplate overrides for common error codes | 1h     | Better out-of-box UX                  |
-| 19 | Add golangci.yml configuration                               | 30min  | Consistent linting                    |
-| 20 | Add flake.nix for build/test automation                      | 1h     | Ecosystem standard                    |
+| ~~15~~ | ~~Wire AI agent to real provider (OpenAI/Anthropic SDK)~~ **Won't implement — declined — analysis-only by design.** | ~~3h~~ | ~~Agent actually works~~ |
+| ~~16~~ | ~~Implement actual command execution in ApplyFixes (sandboxed)~~ **Won't implement — declined — ApplyFixes removed; agent is analysis-only.** | ~~2h~~ | ~~Autonomous mode is not a lie~~ |
+| ~~17~~ | ~~Add `Mark(err, sentinel)` identity stamping~~ **Won't implement — declined — never adopted.** | ~~30min~~ | ~~Alternative to RegisterClassification~~ |
+| ~~18~~ | ~~Add default MessageTemplate overrides for common error codes~~ done — HandleConfig.TemplateOverride | ~~1h~~ | ~~Better out-of-box UX~~ |
+| ~~19~~ | ~~Add golangci.yml configuration~~ done — curated config | ~~30min~~ | ~~Consistent linting~~ |
+| ~~20~~ | ~~Add flake.nix for build/test automation~~ done — flake.nix in place | ~~1h~~ | ~~Ecosystem standard~~ |
 
 ### Lower — Polish
 
 | #  | Task                                                   | Effort | Impact                     |
 | -- | ------------------------------------------------------ | ------ | -------------------------- |
-| 21 | Write ADR-001: Why Family int over string              | 30min  | Architecture documentation |
-| 22 | Write examples/ directory with runnable Go examples    | 1h     | GoDoc integration          |
-| 23 | Add IsPostgresRunning helper to consumer repos         | 15min  | Useful utility             |
-| 24 | Update README with v0.1. status and installation badge | 15min  | Professional appearance    |
-| 25 | Benchmark Classify() performance for hot-path usage    | 30min  | Performance baseline       |
+| ~~21~~ | ~~Write ADR-001: Why Family int over string~~ **Won't implement — declined — rationale lives in README + code comments.** | ~~30min~~ | ~~Architecture documentation~~ |
+| ~~22~~ | ~~Write examples/ directory with runnable Go examples~~ done — examples/ module with 5 demos | ~~1h~~ | ~~GoDoc integration~~ |
+| ~~23~~ | ~~Add IsPostgresRunning helper to consumer repos~~ done — IsPostgresRunning in diagnose/postgres | ~~15min~~ | ~~Useful utility~~ |
+| ~~24~~ | ~~Update README with v0.1. status and installation badge~~ done — README carries pkg.go.dev/GoReportCard/MIT badges | ~~15min~~ | ~~Professional appearance~~ |
+| ~~25~~ | ~~Benchmark Classify() performance for hot-path usage~~ done — Classify benchmarks in benchmark_test.go | ~~30min~~ | ~~Performance baseline~~ |
 
 ---
 

@@ -178,23 +178,23 @@ Build is clean. Tests pass. No compile errors. No panics.
 
 ### Architecture
 
-1. **Extract command execution behind interfaces in diagnose** — `CommandRunner` interface with a real and mock implementation. Makes rules testable without PostgreSQL/Git.
-2. **Wire HandleError to the diagnostic runner** — HandleConfig.DiagnosticRunner should actually run diagnostics and include findings in the output.
-3. **Add `Mark(err, sentinel)` function** — Inspired by cockroachdb/errors. Stamps identity onto errors without requiring RegisterClassification.
+1. ~~**Extract command execution behind interfaces in diagnose** — `CommandRunner` interface with a real and mock implementation. Makes rules testable without PostgreSQL/Git.~~ done — CommandRunner interface shipped in diagnose
+2. ~~**Wire HandleError to the diagnostic runner** — HandleConfig.DiagnosticRunner should actually run diagnostics and include findings in the output.~~ done — DiagnosticFunc wiring shipped
+3. ~~**Add `Mark(err, sentinel)` function** — Inspired by cockroachdb/errors. Stamps identity onto errors without requiring RegisterClassification.~~ **Won't implement — declined — Classify + RegisterClassification cover identity; never adopted.**
 
 ### Quality
 
-4. **Write diagnose package tests** — Use temp directories for FilesystemRule, mock connections for PostgresRule/NetworkRule, temp git repos for GitRule.
-5. **Write agent package tests** — Test involvement level logic, deterministic analysis, Config validation.
-6. **Fix all LSP hints/warnings** — Remove unused functions, use Fprintf instead of WriteString+Sprintf, simplify string operations.
-7. **Add .golangci.yml** — Match the ecosystem standard from go-cqrs-lite/auto-deduplicate.
-8. **Add HandleError tests** — Test the CLI boundary handler with various error types, templates, and families.
+4. ~~**Write diagnose package tests** — Use temp directories for FilesystemRule, mock connections for PostgresRule/NetworkRule, temp git repos for GitRule.~~ done — diagnose fully tested (mock runner, temp dirs)
+5. ~~**Write agent package tests** — Test involvement level logic, deterministic analysis, Config validation.~~ done — agent at 100% coverage
+6. ~~**Fix all LSP hints/warnings** — Remove unused functions, use Fprintf instead of WriteString+Sprintf, simplify string operations.~~ done — resolved long ago
+7. ~~**Add .golangci.yml** — Match the ecosystem standard from go-cqrs-lite/auto-deduplicate.~~ done — .golangci.yml curated since v0.2
+8. ~~**Add HandleError tests** — Test the CLI boundary handler with various error types, templates, and families.~~ done — handle.go fully tested
 
 ### Ecosystem
 
-9. **Push to GitHub and tag v0.1.0** — Makes it importable by other repos.
-10. **Add go-error-family to LIBRARY_GUIDE.md** — So AI assistants know to use it.
-11. **Write ADR for the Family design** — Formal record of why 5 families, why int not string, why embed error in interfaces.
+9. ~~**Push to GitHub and tag v0.1.0** — Makes it importable by other repos.~~ done — public on GitHub; v0.10.2 latest release
+10. ~~**Add go-error-family to LIBRARY_GUIDE.md** — So AI assistants know to use it.~~ **Won't implement — declined — superseded by README + SKILL.md.**
+11. ~~**Write ADR for the Family design** — Formal record of why 5 families, why int not string, why embed error in interfaces.~~ **Won't implement — declined — rationale lives in README Philosophy + family.go doc comments.**
 
 ---
 
@@ -204,56 +204,56 @@ Build is clean. Tests pass. No compile errors. No panics.
 
 | # | Task                                                                    | Effort | Impact                               |
 | - | ----------------------------------------------------------------------- | ------ | ------------------------------------ |
-| 1 | Write diagnose package tests (FilesystemRule with temp dirs)            | 2h     | Rules are currently untested         |
-| 2 | Fix all LSP hints/warnings (unused funcs, string hints)                 | 30min  | Code hygiene                         |
-| 3 | Write agent package tests (involvement levels, deterministic analysis)  | 1h     | Agent is untested                    |
-| 4 | Write HandleError tests (all families, templates, context substitution) | 1h     | CLI handler is untested              |
-| 5 | Wire HandleError to diagnostic runner                                   | 30min  | Two systems don't talk to each other |
+| ~~1~~ | ~~Write diagnose package tests (FilesystemRule with temp dirs)~~ done — diagnose fully tested | ~~2h~~ | ~~Rules are currently untested~~ |
+| ~~2~~ | ~~Fix all LSP hints/warnings (unused funcs, string hints)~~ done — resolved long ago | ~~30min~~ | ~~Code hygiene~~ |
+| ~~3~~ | ~~Write agent package tests (involvement levels, deterministic analysis)~~ done — agent at 100% coverage | ~~1h~~ | ~~Agent is untested~~ |
+| ~~4~~ | ~~Write HandleError tests (all families, templates, context substitution)~~ done — handle.go fully tested | ~~1h~~ | ~~CLI handler is untested~~ |
+| ~~5~~ | ~~Wire HandleError to diagnostic runner~~ done — DiagnosticFunc wiring shipped | ~~30min~~ | ~~Two systems don't talk to each other~~ |
 
 ### High — Testability
 
 | # | Task                                                        | Effort | Impact                       |
 | - | ----------------------------------------------------------- | ------ | ---------------------------- |
-| 6 | Extract CommandRunner interface for diagnose rules          | 1h     | Makes all rules mockable     |
-| 7 | Add ConnectionTester interface for PostgresRule/NetworkRule | 30min  | Makes network rules mockable |
-| 8 | Write PostgresRule integration test with mock server        | 1h     | Validates pg_isready logic   |
-| 9 | Write GitRule integration test with temp repos              | 1h     | Validates git status logic   |
+| ~~6~~ | ~~Extract CommandRunner interface for diagnose rules~~ done — CommandRunner interface shipped | ~~1h~~ | ~~Makes all rules mockable~~ |
+| ~~7~~ | ~~Add ConnectionTester interface for PostgresRule/NetworkRule~~ **Won't implement — declined — subsumed by NetworkRule dial checks.** | ~~30min~~ | ~~Makes network rules mockable~~ |
+| ~~8~~ | ~~Write PostgresRule integration test with mock server~~ done — PostgresRule mock-tested | ~~1h~~ | ~~Validates pg_isready logic~~ |
+| ~~9~~ | ~~Write GitRule integration test with temp repos~~ done — GitRule temp-repo-tested | ~~1h~~ | ~~Validates git status logic~~ |
 
 ### High — Ecosystem Integration
 
 | #  | Task                                                          | Effort | Impact                             |
 | -- | ------------------------------------------------------------- | ------ | ---------------------------------- |
-| 10 | Push repo to GitHub                                           | 15min  | Importable by consumers            |
-| 11 | Tag v0.1.0-alpha                                              | 5min   | Signals API stability expectations |
-| 12 | Add go-error-family to docs/LIBRARY_GUIDE.md                  | 30min  | Discoverability                    |
-| 13 | Add go-error-family to projects-management-automation go.work | 15min  | Workspace integration              |
+| ~~10~~ | ~~Push repo to GitHub~~ done — public on GitHub | ~~15min~~ | ~~Importable by consumers~~ |
+| ~~11~~ | ~~Tag v0.1.0-alpha~~ done — v0.1.0+ shipped; v0.10.2 latest | ~~5min~~ | ~~Signals API stability expectations~~ |
+| ~~12~~ | ~~Add go-error-family to docs/LIBRARY_GUIDE.md~~ **Won't implement — declined — superseded by README + SKILL.md.** | ~~30min~~ | ~~Discoverability~~ |
+| ~~13~~ | ~~Add go-error-family to projects-management-automation go.work~~ done — go.work in place | ~~15min~~ | ~~Workspace integration~~ |
 
 ### Medium — Feature Completeness
 
 | #  | Task                                                     | Effort | Impact                                    |
 | -- | -------------------------------------------------------- | ------ | ----------------------------------------- |
-| 14 | Add `Mark(err, sentinel)` function                       | 30min  | Identity stamping without global registry |
-| 15 | Add golangci.yml configuration                           | 30min  | Consistent linting                        |
-| 16 | Write ADR-001: Why Family int over string categories     | 30min  | Architecture documentation                |
-| 17 | Add Nix flake.nix for build/test automation              | 1h     | Ecosystem standard                        |
-| 18 | Add CI pipeline (GitHub Actions: build, test, vet, lint) | 1h     | Automated quality gates                   |
+| ~~14~~ | ~~Add `Mark(err, sentinel)` function~~ **Won't implement — declined — Classify + RegisterClassification cover it; never adopted.** | ~~30min~~ | ~~Identity stamping without global registry~~ |
+| ~~15~~ | ~~Add golangci.yml configuration~~ done — .golangci.yml curated | ~~30min~~ | ~~Consistent linting~~ |
+| ~~16~~ | ~~Write ADR-001: Why Family int over string categories~~ **Won't implement — declined — rationale lives in README + code comments.** | ~~30min~~ | ~~Architecture documentation~~ |
+| ~~17~~ | ~~Add Nix flake.nix for build/test automation~~ done — flake.nix in place | ~~1h~~ | ~~Ecosystem standard~~ |
+| ~~18~~ | ~~Add CI pipeline (GitHub Actions: build, test, vet, lint)~~ done — ci.yml + release.yml + website-deploy.yml | ~~1h~~ | ~~Automated quality gates~~ |
 
 ### Medium — First Consumer Migration
 
 | #  | Task                                                             | Effort | Impact                    |
 | -- | ---------------------------------------------------------------- | ------ | ------------------------- |
-| 19 | Migrate go-cqrs-lite: import go-error-family for Family/Classify | 2h     | Proves the protocol works |
-| 20 | Add interfaces to docs-organizer (Is, ErrorCode, ErrorContext)   | 30min  | Second consumer           |
-| 21 | Add interfaces to go-finding (ErrorCode, ErrorContext)           | 30min  | Third consumer            |
+| ~~19~~ | ~~Migrate go-cqrs-lite: import go-error-family for Family/Classify~~ **Won't implement — declined — the library pivoted to standalone go-error-family.** | ~~2h~~ | ~~Proves the protocol works~~ |
+| ~~20~~ | ~~Add interfaces to docs-organizer (Is, ErrorCode, ErrorContext)~~ **Won't implement — declined — out of scope for the error protocol.** | ~~30min~~ | ~~Second consumer~~ |
+| ~~21~~ | ~~Add interfaces to go-finding (ErrorCode, ErrorContext)~~ **Won't implement — declined — out of scope for the error protocol.** | ~~30min~~ | ~~Third consumer~~ |
 
 ### Lower — Polish
 
 | #  | Task                                                    | Effort | Impact               |
 | -- | ------------------------------------------------------- | ------ | -------------------- |
-| 22 | Wire AI agent to a real provider (Crush SDK or OpenAI)  | 3h     | Agent actually works |
-| 23 | Add message template overrides for common error codes   | 1h     | Better default UX    |
-| 24 | Add IsPostgresRunning standalone helper to go-cqrs-lite | 15min  | Useful utility       |
-| 25 | Write examples/ directory with runnable Go examples     | 1h     | GoDoc integration    |
+| ~~22~~ | ~~Wire AI agent to a real provider (Crush SDK or OpenAI)~~ **Won't implement — declined — agent is analysis-only by design.** | ~~3h~~ | ~~Agent actually works~~ |
+| ~~23~~ | ~~Add message template overrides for common error codes~~ done — HandleConfig.TemplateOverride | ~~1h~~ | ~~Better default UX~~ |
+| ~~24~~ | ~~Add IsPostgresRunning standalone helper to go-cqrs-lite~~ done — IsPostgresRunning in diagnose/postgres | ~~15min~~ | ~~Useful utility~~ |
+| ~~25~~ | ~~Write examples/ directory with runnable Go examples~~ done — examples/ module with 5 demos | ~~1h~~ | ~~GoDoc integration~~ |
 
 ---
 

@@ -62,10 +62,10 @@ Nothing was left half-finished in terms of the BuildFlow failures.
 
 ### Items noticed but not addressed this session:
 
-1. **`gitignore-upserter:repair`** was showing as `○` (not passing) in the BuildFlow output — never investigated
-2. **AGENTS.md not updated** with new patterns learned this session
-3. **release.yml `version: latest`** for golangci-lint-action — pinned the action SHA but left `version: latest` (3 occurrences), which is a separate supply-chain concern
-4. **golangci-lint "unknown linters" warning** — `//nolint:hierarchical-errors` triggers `[runner/nolint_filter] Found unknown linters in //nolint directives: hierarchical-errors`. Not silenced.
+1. ~~**`gitignore-upserter:repair`** was showing as `○` (not passing) in the BuildFlow output — never investigated~~ done — gitignore-upserter repaired by the 2026-07-26 session
+2. ~~**AGENTS.md not updated** with new patterns learned this session~~ done — AGENTS.md updated repeatedly since
+3. ~~**release.yml `version: latest`** for golangci-lint-action — pinned the action SHA but left `version: latest` (3 occurrences), which is a separate supply-chain concern~~ done — pinned v2.12.2 on 2026-07-26, v2.13.2 since 2026-09-15
+4. ~~**golangci-lint "unknown linters" warning** — `//nolint:hierarchical-errors` triggers `[runner/nolint_filter] Found unknown linters in //nolint directives: hierarchical-errors`. Not silenced.~~ done — the directives were removed 2026-07-26; warning gone
 
 ---
 
@@ -99,16 +99,16 @@ Nothing was left half-finished in terms of the BuildFlow failures.
 
 ### Process Improvements
 
-1. **Investigate the auto-commit hook** — it commits with AI-generated messages that don't match the actual changes. This is actively harmful to git history readability.
-2. **Investigate hierarchical-errors config** — 60 nolint directives is unacceptable noise. Check for config file support, or wrap the tool in a script that filters specific violation types.
-3. **Pin `version: latest` in release.yml** — 3 occurrences of `version: latest` for golangci-lint-action is a reproducibility and security concern.
-4. **Silence golangci-lint "unknown linters" warning** — either register `hierarchical-errors` and `legacyerrors` as known linter names in golangci-lint config, or use a different nolint syntax.
-5. **AGENTS.md update needed** — Document: flake.nix `...` requirement, hierarchical-errors nolint pattern, GitHub Actions SHA pinning policy.
+1. ~~**Investigate the auto-commit hook** — it commits with AI-generated messages that don't match the actual changes. This is actively harmful to git history readability.~~ done — resolved — the auto-commit daemon is documented standing fleet behavior in AGENTS.md
+2. ~~**Investigate hierarchical-errors config** — 60 nolint directives is unacceptable noise. Check for config file support, or wrap the tool in a script that filters specific violation types.~~ done — resolved — the linter was proven never-installed; all 52 directives removed 2026-07-26
+3. ~~**Pin `version: latest` in release.yml** — 3 occurrences of `version: latest` for golangci-lint-action is a reproducibility and security concern.~~ done — pinned v2.12.2 2026-07-26, v2.13.2 since 2026-09-15
+4. ~~**Silence golangci-lint "unknown linters" warning** — either register `hierarchical-errors` and `legacyerrors` as known linter names in golangci-lint config, or use a different nolint syntax.~~ done — directives removed; warning gone
+5. ~~**AGENTS.md update needed** — Document: flake.nix `...` requirement, hierarchical-errors nolint pattern, GitHub Actions SHA pinning policy.~~ done — AGENTS.md carries all three notes
 
 ### Code Quality
 
-6. The `//nolint:hierarchical-errors` comments on every `fmt.Fprintf` in `Format()` methods are a code smell — the tool fundamentally misunderstands `fmt.Formatter` patterns. Consider filing an issue or contributing a type-aware exemption.
-7. The `ignored` finding type has too many false positives for cleanup code (`_ = f.Close()`, `_ = conn.Close()`, `_ = recover()`). These are idiomatic Go.
+6. ~~The `//nolint:hierarchical-errors` comments on every `fmt.Fprintf` in `Format()` methods are a code smell — the tool fundamentally misunderstands `fmt.Formatter` patterns. Consider filing an issue or contributing a type-aware exemption.~~ **Won't implement — NOT-DO — the linter never existed as a tool; nothing to file upstream.**
+7. ~~The `ignored` finding type has too many false positives for cleanup code (`_ = f.Close()`, `_ = conn.Close()`, `_ = recover()`). These are idiomatic Go.~~ **Won't implement — NOT-DO — same nonexistent-linter root cause.**
 
 ---
 
@@ -116,31 +116,31 @@ Nothing was left half-finished in terms of the BuildFlow failures.
 
 | #  | Priority | Task                                                                                  |
 | -- | -------- | ------------------------------------------------------------------------------------- |
-| 1  | CRITICAL | Investigate and fix the auto-commit hook that generates misleading commit messages    |
-| 2  | CRITICAL | Run actual `buildflow` command to verify full pipeline passes                         |
-| 3  | CRITICAL | Fix `gitignore-upserter:repair` (was `○` in BuildFlow output)                         |
-| 4  | HIGH     | Pin `version: latest` → specific version in release.yml (3 occurrences)               |
-| 5  | HIGH     | Update AGENTS.md with flake.nix `...` fix, nolint patterns, SHA pinning policy        |
-| 6  | HIGH     | Investigate hierarchical-errors config file support to reduce nolint noise            |
-| 7  | HIGH     | Silence golangci-lint "unknown linters" warning for hierarchical-errors/legacyerrors  |
-| 8  | MEDIUM   | Consider squashing the 11 misleading auto-commits into meaningful commits             |
-| 9  | MEDIUM   | File issue/contribute to hierarchical-errors: fmt.Formatter false positives           |
-| 10 | MEDIUM   | File issue/contribute to hierarchical-errors: cleanup `_ = f.Close()` false positives |
-| 11 | MEDIUM   | Add `//nolint:hierarchical-errors` documentation to AGENTS.md lint section            |
-| 12 | MEDIUM   | Consider a `.hierarchical-errors.toml` or similar config if supported                 |
-| 13 | LOW      | Review whether `hierarchical-errors` `generic_return` finding type has value at all   |
-| 14 | LOW      | Consider excluding `ignored` finding type globally for diagnose package               |
-| 15 | LOW      | Review the 11 auto-commits for any unintended changes                                 |
+| ~~1~~  | ~~CRITICAL~~ done — resolved — documented standing fleet daemon in AGENTS.md | ~~Investigate and fix the auto-commit hook that generates misleading commit messages~~ |
+| ~~2~~  | ~~CRITICAL~~ done — later runs green (89/89 on 2026-09-15, 105/105 on 2026-09-18) | ~~Run actual `buildflow` command to verify full pipeline passes~~ |
+| ~~3~~  | ~~CRITICAL~~ done — repaired 2026-07-26 | ~~Fix `gitignore-upserter:repair` (was `○` in BuildFlow output)~~ |
+| ~~4~~  | ~~HIGH~~ done — v2.12.2 then v2.13.2 | ~~Pin `version: latest` → specific version in release.yml (3 occurrences)~~ |
+| ~~5~~  | ~~HIGH~~ done — AGENTS.md updated | ~~Update AGENTS.md with flake.nix `...` fix, nolint patterns, SHA pinning policy~~ |
+| ~~6~~  | ~~HIGH~~ **Won't implement — NOT-DO — linter proven nonexistent.** | ~~Investigate hierarchical-errors config file support to reduce nolint noise~~ |
+| ~~7~~  | ~~HIGH~~ done — directives removed 2026-07-26 | ~~Silence golangci-lint "unknown linters" warning for hierarchical-errors/legacyerrors~~ |
+| ~~8~~  | ~~MEDIUM~~ **Won't implement — won't implement — pushed history stays as-is; rewriting rejected.** | ~~Consider squashing the 11 misleading auto-commits into meaningful commits~~ |
+| ~~9~~  | ~~MEDIUM~~ **Won't implement — NOT-DO — nonexistent tool.** | ~~File issue/contribute to hierarchical-errors: fmt.Formatter false positives~~ |
+| ~~10~~ | ~~MEDIUM~~ **Won't implement — NOT-DO — nonexistent tool.** | ~~File issue/contribute to hierarchical-errors: cleanup `_ = f.Close()` false positives~~ |
+| ~~11~~ | ~~MEDIUM~~ **Won't implement — NOT-DO — directives removed instead; removal documented in AGENTS.md.** | ~~Add `//nolint:hierarchical-errors` documentation to AGENTS.md lint section~~ |
+| ~~12~~ | ~~MEDIUM~~ **Won't implement — NOT-DO — nonexistent tool.** | ~~Consider a `.hierarchical-errors.toml` or similar config if supported~~ |
+| ~~13~~ | ~~LOW~~ **Won't implement — NOT-DO — nonexistent tool.** | ~~Review whether `hierarchical-errors` `generic_return` finding type has value at all~~ |
+| ~~14~~ | ~~LOW~~ **Won't implement — NOT-DO — nonexistent tool.** | ~~Consider excluding `ignored` finding type globally for diagnose package~~ |
+| ~~15~~ | ~~LOW~~ done — mid-release daemon commits reviewed retroactively (2026-09-15 report f1) | ~~Review the 11 auto-commits for any unintended changes~~ |
 
 ---
 
 ## g) Questions I CANNOT Answer Myself
 
-1. **The auto-commit hook** — Is there a BuildFlow pre-commit hook configured that auto-commits changes? If so, can it be configured to generate accurate commit messages or disabled? I cannot find its configuration but it committed my work 11 times with wrong messages.
+1. ~~**The auto-commit hook** — Is there a BuildFlow pre-commit hook configured that auto-commits changes? If so, can it be configured to generate accurate commit messages or disabled? I cannot find its configuration but it committed my work 11 times with wrong messages.~~ done — answered — standing auto-commit daemon, documented in AGENTS.md
 
-2. **Should the 11 misleading auto-commits be squashed?** — The git history now contains 11 commits with AI-generated messages that don't describe the actual changes. Should these be squashed/rebased into a single accurate commit, or left as-is? (I will not do `git reset` per safety rules, but `git rebase -i` might be appropriate with your approval.)
+2. ~~**Should the 11 misleading auto-commits be squashed?** — The git history now contains 11 commits with AI-generated messages that don't describe the actual changes. Should these be squashed/rebased into a single accurate commit, or left as-is? (I will not do `git reset` per safety rules, but `git rebase -i` might be appropriate with your approval.)~~ done — answered — history left as-is; no rewrite
 
-3. **Is `version: latest` in release.yml intentional?** — The CI workflow pins `version: v2.12.2` but the release workflow uses `version: latest` for golangci-lint-action. Is this intentional (latest on release) or should both be pinned?
+3. ~~**Is `version: latest` in release.yml intentional?** — The CI workflow pins `version: v2.12.2` but the release workflow uses `version: latest` for golangci-lint-action. Is this intentional (latest on release) or should both be pinned?~~ done — answered — not intentional; pinned v2.12.2 on 2026-07-26, v2.13.2 since
 
 ---
 
