@@ -64,6 +64,7 @@ examples/             ← OWN MODULE: runnable examples (depends on root + diagn
 | `Transient`      | **Yes** | 75   | System      | All      | Reassuring    | Temporary infra failure (the only retryable one) |
 | `Corruption`     | No      | 65   | System      | Ops      | Urgent        | Source of truth damaged, unparseable data        |
 | `Infrastructure` | No      | 69   | System      | Ops      | Apologetic    | System cannot serve, nil deps, startup fail      |
+| `Orchestration`  | No      | 70   | Program     | Ops      | Apologetic    | Internal coordination failure — the program's own logic bug |
 
 Only `Transient` is retryable. Everything else is not. This is the core design decision.
 
@@ -76,11 +77,11 @@ family.IsValid() bool          // true if within defined range
 family.String() string         // "rejection", "transient", etc.
 
 // Ordering & multi-error (powers errors.Join worst-severity selection)
-family.Severity() int          // total order: Transient(1) < Rejection(2) < Conflict(3) < Infrastructure(4) < Corruption(5)
+family.Severity() int          // total order: Transient(1) < Rejection(2) < Conflict(3) < Infrastructure(4) < Orchestration(5) < Corruption(6)
 
 // Process & network boundaries
 family.ExitCode() int          // BSD sysexits.h code (see table above)
-family.HTTPStatus() int        // canonical family→HTTP (Rejection→400, Conflict→409, Transient→503, Corruption→500, Infrastructure→503)
+family.HTTPStatus() int        // canonical family→HTTP (Rejection→400, Conflict→409, Transient→503, Infrastructure→503, Orchestration→500, Corruption→500)
 family.RetryPolicy() RetryPolicy  // advisory: Transient→{3 attempts, 100ms–5s backoff}; others→{1 attempt}
 
 // Presentation metadata
@@ -102,7 +103,7 @@ type Audience int // AudienceUser, AudienceOps, AudienceAll
 type Tone string  // "instructional", "explanatory", "reassuring", "urgent", "apologetic"
 ```
 
-Audience mapping: Rejection/Conflict → User, Corruption/Infrastructure → Ops, Transient → All.
+Audience mapping: Rejection/Conflict → User, Corruption/Infrastructure/Orchestration → Ops, Transient → All.
 
 ---
 
@@ -209,9 +210,9 @@ errorfamily.WrapOnce(err, family, code, message) *Error  // idempotent: returns 
 errorfamily.WrapOncef(err, family, code, format, args...) *Error
 
 // Family shortcuts (New + Wrap + formatted Wrap for each)
-NewRejection / NewConflict / NewTransient / NewCorruption / NewInfrastructure
-WrapRejection / WrapConflict / WrapTransient / WrapCorruption / WrapInfrastructure
-WrapRejectionf / WrapConflictf / WrapTransientf / WrapCorruptionf / WrapInfrastructuref  // printf-style
+NewRejection / NewConflict / NewTransient / NewCorruption / NewInfrastructure / NewOrchestration
+WrapRejection / WrapConflict / WrapTransient / WrapCorruption / WrapInfrastructure / WrapOrchestration
+WrapRejectionf / WrapConflictf / WrapTransientf / WrapCorruptionf / WrapInfrastructuref / WrapOrchestrationf  // printf-style
 ```
 
 **When to use `New*` vs `Wrap*`:**

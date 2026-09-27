@@ -42,7 +42,7 @@ go-error-family **classifies**; [samber/oops](https://github.com/samber/oops) **
 - **Libraries** import go-error-family only — they know their domain contract (a 404 is a Rejection, a timeout is Transient) but must not presume the app's observability stack, so they never import oops.
 - **Applications** import oops for enrichment and, if they also need behavioral decisions, wrap library errors via the `bridge/` package.
 
-The four interfaces (`Coded`, `Classified`, `Contextual`, `Retryable`) are the sole public contract; the `Error` struct is a reference implementation, not a requirement.
+The six interfaces (`Coded`, `Classified`, `Contextual`, `Retryable`, `ExitCoder`, `HTTPStatuser`) are the sole public contract; the `Error` struct is a reference implementation, not a requirement.
 
 ## Quick Start
 
@@ -83,12 +83,12 @@ os.Exit(errorfamily.HandleError(err))
 // exit: 1
 ```
 
-See [examples/](examples/) for runnable CLI, HTTP, and custom diagnostic rule demos.
+See [examples/](examples/) for runnable CLI, HTTP, custom diagnostic rule, and oops-bridge demos.
 
 ## What It Gives You
 
 - **`Family`** — behavioral classification (Rejection, Conflict, Transient, Corruption, Infrastructure, Orchestration) that maps to retry decisions, exit codes, HTTP status codes, and user-facing tone
-- **Small interfaces** — `Coded`, `Classified`, `Contextual`, `Retryable`, `ExitCoder` — each error type implements what it needs; the `Error` struct is just a reference implementation
+- **Small interfaces** — `Coded`, `Classified`, `Contextual`, `Retryable`, `ExitCoder`, `HTTPStatuser` — each error type implements what it needs; the `Error` struct is just a reference implementation
 - **`Classify(err)`** — universal classification for any error (multi-error → interface → sentinels → classifiers → default)
 - **Multi-error support** — `errors.Join` + `Classify` picks the **worst** Family by severity, deterministically regardless of argument order
 - **`ExitCode(err)`** — BSD sysexits.h exit codes derived from Family (overridable per-error via `ExitCoder` interface)
@@ -560,10 +560,12 @@ Zero-allocation hot paths. Benchmarks on AMD Ryzen 9 7950X:
 ```
 go-error-family/
 ├── family.go               — Family enum + data-driven familyData
-├── interfaces.go           — Coded, Classified, Contextual, Retryable (each embeds error)
+├── interfaces.go           — Coded, Classified, Contextual, Retryable, ExitCoder, HTTPStatuser (each embeds error)
 ├── error.go                — Reference Error struct (Is, Unwrap, Format, WithContext, accessors)
 ├── classify.go             — Classify, Code, IsRetryable, ExitCode, Classifier, RegisterClassifier(s)
 ├── constructors.go         — New, Wrap, Newf, Wrapf + family-specific shortcuts (incl. Wrap{Family}f)
+├── registry.go             — injectable Registry (sentinels, classifiers, templates), Clone, DefaultRegistry
+├── stdlib.go               — RegisterStdlibDefaults (context/sql/os error taxonomy)
 ├── handle.go               — HandleError, HandleErrorWithContext, template system, TemplateForCode
 ├── http.go                 — HTTPStatus, HTTPHandler (classify→status-code net/http middleware)
 ├── log.go                  — LogError, LogErrorContext (structured slog logging)
@@ -577,10 +579,13 @@ go-error-family/
 │   └── postgres/           — submodule: PostgresRule
 ├── agent/
 │   └── agent.go            — DebugAgent interface, Config, AgentResult, FixStep
+├── bridge/                 — submodule: samber/oops integration (Wrap, AutoWrap, InferFamily)
 └── examples/
     ├── cmd/cli             — CLI boundary handler example
     ├── cmd/http            — HTTP middleware with status code mapping
-    └── cmd/custom_rule     — Writing your own DiagnosticRule
+    ├── cmd/custom_rule     — Writing your own DiagnosticRule
+    ├── cmd/bridge          — oops + bridge reference implementation (3 patterns)
+    └── checkout/           — library layer that imports only errorfamily
 ```
 
 ## When to Use / When Not To
