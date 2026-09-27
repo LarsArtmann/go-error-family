@@ -13,6 +13,10 @@ golangci-lint run ./...                        # lint (all modules)
 go build ./...                                 # build check
 ```
 
+## Docs Layout
+
+Historical snapshots live under `archived/`: every 2026-05 → 2026-09 report in `docs/status/archived/` carries inline `~~strikethrough~~ done at` resolutions, and `docs/planning/archived/` + `docs/feedback/archived/` hold the executed plans and annotated consumer feedback (2026-09-27 docs-health pass). New status reports go directly in `docs/status/`; when a report's items are fully dispositioned (done / routed to TODO_LIST or ROADMAP / won't-implement with a reason), strike them inline and `git mv` the file to `archived/`. Living docs own all current state — never point TODO_LIST/ROADMAP citations at archived files without the `archived/` path prefix.
+
 ## Architecture Decision: Libraries Classify, Applications Enrich
 
 **go-error-family (classification) and samber/oops (enrichment) are complementary, not competing.** The `bridge/` package is the seam where they meet.

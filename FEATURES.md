@@ -240,6 +240,6 @@ All packages at 80%+. Fuzz tests (16 total):
 ## Known Gaps
 
 - ~~**No per-error HTTP status override**~~ — **SHIPPED (v0.8.0).** `WithHTTPStatus(int)` + `HTTPStatuser` interface provide per-error overrides of family-level defaults. Mirrors `ExitCoder`/`WithExitCode` pattern exactly.
-- **`Classify(nil)` returns Rejection** — resolved design decision (2026-07-23). Kept as Rejection: nil = caller bug, and changing to Transient would make `HTTPStatus(nil)` return 503. Decision rationale recorded in `docs/status/2026-07-23_17-56_design-decisions-resolved-json-v2-revert.html`.
+- **`Classify(nil)` returns Rejection** — resolved design decision (2026-07-23). Kept as Rejection: nil = caller bug, and changing to Transient would make `HTTPStatus(nil)` return 503. Decision rationale recorded in `docs/status/archived/2026-07-23_17-56_design-decisions-resolved-json-v2-revert.html`.
 - **Constructor context ergonomics** — resolved design decision (2026-07-23). WON'T FIX: `WithContextMap(map[string]string{...})` already exists for multi-value context. Functional options would conflict with copy-on-write design. Same decision record as above.
 - **`encoding/json` (stdlib)** — the root module uses standard `encoding/json`. The v0.7.0 json/v2 experiment was reverted in v0.8.0; no `GOEXPERIMENT` required.

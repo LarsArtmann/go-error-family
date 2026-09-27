@@ -198,22 +198,22 @@ The 2 HTML dashboards (`2026-07-23_17-56_design-decisions-resolved.html`, `2026-
 | -- | ------------------------------------------------------------------------------------------ | ------ |
 | ~~38~~ | ~~Annotate `2026-07-23_17-56_design-decisions-resolved.html` with resolution appendix~~ done — HTML dashboards annotated 2026-09-27 | ~~🟡~~ |
 | ~~39~~ | ~~Annotate `2026-07-23_18-26_adoption-audit.html` with resolution appendix~~ done — HTML dashboards annotated 2026-09-27 | ~~🟡~~ |
-| 40 | Verify all 20 untouched `2026-07-*` files for new staleness                                | 🟢     |
-| 41 | Consider archiving very old status reports (2026-07-05 era) to reduce docs/status/ clutter | 🟢     |
+| ~~40~~ | ~~Verify all 20 untouched `2026-07-*` files for new staleness~~ done — this 2026-09-27 sweep verified all remaining 2026-* files | ~~🟢~~ |
+| ~~41~~ | ~~Consider archiving very old status reports (2026-07-05 era) to reduce docs/status/ clutter~~ done — archiving executed 2026-09-27 (docs/status/, docs/planning/, docs/feedback/ archived/) | ~~🟢~~ |
 
 ### Lower priority
 
 | #  | Task                                                                            | Impact |
 | -- | ------------------------------------------------------------------------------- | ------ |
-| 42 | Add `time.Duration` case to `contextValueToString` (flagged in 2026-07-16)      | 🟢     |
-| 43 | Add `fmt.Stringer` case to `contextValueToString` with panic recovery           | 🟢     |
-| 44 | Refactor `TestOrchestrationIntegration` to remove project-wide cyclop exclusion | 🟢     |
-| 45 | Add integration test: `HandleError` return value respects `WithExitCode`        | 🟢     |
-| 46 | Pin `actions/setup-node` in website-deploy.yml to specific version              | 🟢     |
-| 47 | Add `go vet ./...` to release.yml (in ci.yml but not release.yml)               | 🟢     |
-| 48 | Consider `SECURITY.md` for vulnerability reporting                              | 🟢     |
-| 49 | Consider `renovate.json` or Dependabot for automated dependency updates         | 🟢     |
-| 50 | Consider cleaning up `docs/planning/` — verify plans are still relevant         | 🟢     |
+| ~~42~~ | ~~Add `time.Duration` case to `contextValueToString` (flagged in 2026-07-16)~~ done — Duration case shipped | ~~🟢~~ |
+| ~~43~~ | ~~Add `fmt.Stringer` case to `contextValueToString` with panic recovery~~ done — Stringer case shipped | ~~🟢~~ |
+| ~~44~~ | ~~Refactor `TestOrchestrationIntegration` to remove project-wide cyclop exclusion~~ done — resolved — exclusions policy documented instead (AGENTS.md) | ~~🟢~~ |
+| ~~45~~ | ~~Add integration test: `HandleError` return value respects `WithExitCode`~~ done — exit-code override tested | ~~🟢~~ |
+| ~~46~~ | ~~Pin `actions/setup-node` in website-deploy.yml to specific version~~ **Won't implement — declined — pinned via action SHA; node version via setup.** | ~~🟢~~ |
+| ~~47~~ | ~~Add `go vet ./...` to release.yml (in ci.yml but not release.yml)~~ **Won't implement — declined — release runs CI-covered legs; vet stays in ci.yml.** | ~~🟢~~ |
+| ~~48~~ | ~~Consider `SECURITY.md` for vulnerability reporting~~ **Won't implement — declined — SECURITY.md not adopted (private-first distribution).** | ~~🟢~~ |
+| ~~49~~ | ~~Consider `renovate.json` or Dependabot for automated dependency updates~~ done — Dependabot configures go_modules for all modules | ~~🟢~~ |
+| ~~50~~ | ~~Consider cleaning up `docs/planning/` — verify plans are still relevant~~ done — plans verified and archived 2026-09-27 | ~~🟢~~ |
 
 ---
 
