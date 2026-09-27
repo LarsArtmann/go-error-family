@@ -629,6 +629,14 @@
             were added for the new APIs, and writeHTTPError double-classifies.
             Honest assessment below.
           </p>
+          <p style="border:1px solid #ccc; padding:8px; margin-top:8px; font-size:0.9em;">
+            <strong>RESOLVED 2026-09-27 (docs-health pass):</strong>
+            <s>the website is now a split brain</s> — fixed: GOEXPERIMENT references removed and v0.8.0 shipped;
+            <s>no fuzz tests or benchmarks were added</s> — added: FuzzWithHTTPStatus, FuzzRegisterClassificationType,
+            BenchmarkWithHTTPStatus, BenchmarkHTTPStatusOverride (shipped in v0.8.0);
+            <s>writeHTTPError double-classifies</s> — fixed in v0.9.0 (classifies once, honors HTTPStatuser).
+            All open items in this report are closed; v0.10.2 is the current release.
+          </p>
         </div>
 
         <nav class="toc">
