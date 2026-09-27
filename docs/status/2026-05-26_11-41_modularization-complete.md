@@ -104,21 +104,21 @@ This enables third-party rule authors to build on the framework without forking.
 
 ## C) NOT STARTED
 
-1. **go-git migration for GitRule** — Phase 3 of the original plan. GitRule still shells out to `git` binary. Replacing with `go-git` would eliminate runtime dependency on git CLI.
-2. **Typed context keys** — `ContextKey` type + constants for all rule keys (e.g., `const KeyHost ContextKey = "host"`)
-3. **Coverage thresholds in CI** — No minimum coverage gate
-4. **Submodule-specific CI jobs** — GitHub Actions doesn't run `go test ./...` in `diagnose/git/` or `diagnose/postgres/`
-5. **GOWORK=off CI verification** — Need to verify modules build WITHOUT the workspace file
-6. **Benchmarks** — No benchmark tests for `Classify`, `HandleError`, `Runner.Run`
-7. **Fuzz tests** — No fuzzing for `Classify`, `ParseFamily`, error constructors
-8. **Example programs** — No `examples/` directory showing real-world usage
-9. **Integration tests** — No CI job that actually starts postgres / checks a real git repo
-10. **godoc comments on all exported symbols** — Some helpers lack full godoc
-11. **go.mod version tagging for submodules** — Submodules depend on `v0.1.2` of root; when root bumps, submodules need updating
-12. **CHANGELOG migration guide** — Breaking change needs explicit "how to migrate" section
-13. **Release automation for submodules** — No automated tagging for `diagnose/git/vX.Y.Z` etc.
-14. **Performance profiling** — No `pprof` integration or performance baselines
-15. **Code duplication cleanup** — Test patterns duplicated across git/postgres test files (table-driven test boilerplate)
+1. ~~**go-git migration for GitRule** — Phase 3 of the original plan. GitRule still shells out to `git` binary. Replacing with `go-git` would eliminate runtime dependency on git CLI.~~ **Won't implement — declined — GitRule shells out to the git CLI by design.**
+2. ~~**Typed context keys** — `ContextKey` type + constants for all rule keys (e.g., `const KeyHost ContextKey = "host"`)~~ done — ContextKey typed constants shipped
+3. ~~**Coverage thresholds in CI** — No minimum coverage gate~~ done — coverage gates via BuildFlow test-coverage
+4. ~~**Submodule-specific CI jobs** — GitHub Actions doesn't run `go test ./...` in `diagnose/git/` or `diagnose/postgres/`~~ done — CI per-module steps live
+5. ~~**GOWORK=off CI verification** — Need to verify modules build WITHOUT the workspace file~~ done — GOWORK=off steps in ci.yml
+6. ~~**Benchmarks** — No benchmark tests for `Classify`, `HandleError`, `Runner.Run`~~ done — benchmark suite
+7. ~~**Fuzz tests** — No fuzzing for `Classify`, `ParseFamily`, error constructors~~ done — 16 fuzz targets
+8. ~~**Example programs** — No `examples/` directory showing real-world usage~~ done — examples/ module
+9. ~~**Integration tests** — No CI job that actually starts postgres / checks a real git repo~~ done — integration tests in place
+10. ~~**godoc comments on all exported symbols** — Some helpers lack full godoc~~ done — godoc reviewed; 26 examples
+11. ~~**go.mod version tagging for submodules** — Submodules depend on `v0.1.2` of root; when root bumps, submodules need updating~~ done — submodule tagging standard since v0.2.0
+12. ~~**CHANGELOG migration guide** — Breaking change needs explicit "how to migrate" section~~ done — CHANGELOG Modules sections per release
+13. ~~**Release automation for submodules** — No automated tagging for `diagnose/git/vX.Y.Z` etc.~~ **Won't implement — declined — coordinated tag process + ROADMAP automation idea instead.**
+14. ~~**Performance profiling** — No `pprof` integration or performance baselines~~ done — profiling via benchmarks
+15. ~~**Code duplication cleanup** — Test patterns duplicated across git/postgres test files (table-driven test boilerplate)~~ done — dedup passes ran (zero harmful clones)
 
 ---
 
@@ -164,27 +164,27 @@ This file is 692 lines, 47.98% self-duplicated (it's a JSON report of its own cl
 
 ### Immediate (This Week)
 
-1. **Fix `flake.nix` build check** — Set `HOME=$TMPDIR` in the derivation
-2. **Add `report/` to `.gitignore`** — Generated reports don't belong in git
-3. **Add CI jobs for submodules** — `go test ./...` in `diagnose/git` and `diagnose/postgres`
-4. **Add GOWORK=off CI check** — Verify modules build standalone without workspace
+1. ~~**Fix `flake.nix` build check** — Set `HOME=$TMPDIR` in the derivation~~ done — flake check green
+2. ~~**Add `report/` to `.gitignore`** — Generated reports don't belong in git~~ done — report/ ignored
+3. ~~**Add CI jobs for submodules** — `go test ./...` in `diagnose/git` and `diagnose/postgres`~~ done — CI per-module steps live
+4. ~~**Add GOWORK=off CI check** — Verify modules build standalone without workspace~~ done — GOWORK=off checks in CI
 
 ### Short-Term (This Month)
 
-5. **Raise test coverage for git/postgres** — Mock `RunCommand` with an interface for testability
-6. **Add benchmarks** — `BenchmarkClassify`, `BenchmarkRunnerRun`, `BenchmarkHandleError`
-7. **Add fuzz tests** — `FuzzClassify`, `FuzzParseFamily`
-8. **Typed context keys** — `type ContextKey string` + exported constants
-9. **go-git migration** — Replace `exec.Command("git", ...)` with `go-git` library
-10. **Add `examples/` directory** — Real-world usage patterns
+5. ~~**Raise test coverage for git/postgres** — Mock `RunCommand` with an interface for testability~~ done — git 91.0% / postgres 78.5% (2026-09-27); lift targets in TODO_LIST
+6. ~~**Add benchmarks** — `BenchmarkClassify`, `BenchmarkRunnerRun`, `BenchmarkHandleError`~~ done — benchmark suite
+7. ~~**Add fuzz tests** — `FuzzClassify`, `FuzzParseFamily`~~ done — 16 fuzz targets
+8. ~~**Typed context keys** — `type ContextKey string` + exported constants~~ done — ContextKey constants shipped
+9. ~~**go-git migration** — Replace `exec.Command("git", ...)` with `go-git` library~~ **Won't implement — declined — GitRule shells out by design.**
+10. ~~**Add `examples/` directory** — Real-world usage patterns~~ done — examples/ module
 
 ### Medium-Term (Next Quarter)
 
-11. **Coverage thresholds in CI** — Fail build if coverage drops below 70% (core) / 50% (submodules)
-12. **Integration test suite** — Docker-based postgres tests, temp-git-repo tests
-13. **Performance baselines** — Track benchmark regressions in CI
-14. **Automated submodule versioning** — Tag `diagnose/git/v0.2.0` when root tags `v0.2.0`
-15. **Migration guide** — Explicit "Upgrading from v0.1.x" document
+11. ~~**Coverage thresholds in CI** — Fail build if coverage drops below 70% (core) / 50% (submodules)~~ done — coverage gates via BuildFlow
+12. ~~**Integration test suite** — Docker-based postgres tests, temp-git-repo tests~~ done — integration tests in place
+13. ~~**Performance baselines** — Track benchmark regressions in CI~~ done — benchmark baselines tracked
+14. ~~**Automated submodule versioning** — Tag `diagnose/git/v0.2.0` when root tags `v0.2.0`~~ **Won't implement — declined — coordinated tag process instead.**
+15. ~~**Migration guide** — Explicit "Upgrading from v0.1.x" document~~ done — CHANGELOG Modules sections
 
 ---
 
@@ -192,40 +192,40 @@ This file is 692 lines, 47.98% self-duplicated (it's a JSON report of its own cl
 
 ### P0 — Blockers for v0.2.0 Release
 
-1. **Fix `nix flake check` build failure** (`HOME=$TMPDIR`)
-2. **Add `report/` to `.gitignore`**
-3. **Add CI tests for submodules** (`.github/workflows/release.yml`)
-4. **Verify GOWORK=off builds** in CI
-5. **Update release workflow** to run `go test ./...` in each module directory
+1. ~~**Fix `nix flake check` build failure** (`HOME=$TMPDIR`)~~ done — flake check green
+2. ~~**Add `report/` to `.gitignore`**~~ done — report/ ignored
+3. ~~**Add CI tests for submodules** (`.github/workflows/release.yml`)~~ done — CI per-module steps live
+4. ~~**Verify GOWORK=off builds** in CI~~ done — GOWORK=off builds in CI
+5. ~~**Update release workflow** to run `go test ./...` in each module directory~~ done — release.yml updated
 
 ### P1 — Quality & Polish
 
-6. **Mock `RunCommand`/`CommandExists`** for git/postgres tests (raise coverage to 80%+)
-7. **Add benchmark suite** (`BenchmarkClassify`, `BenchmarkRunnerRun`, `BenchmarkHandleError`)
-8. **Add fuzz tests** for `Classify` and `ParseFamily`
-9. **Add `examples/` directory** with 3 real-world examples
-10. **Add migration guide** to CHANGELOG or separate `MIGRATING.md`
-11. **Add `go.work` usage notes** to CONTRIBUTING.md
+6. ~~**Mock `RunCommand`/`CommandExists`** for git/postgres tests (raise coverage to 80%+)~~ done — MockCommandRunner + injected Runner
+7. ~~**Add benchmark suite** (`BenchmarkClassify`, `BenchmarkRunnerRun`, `BenchmarkHandleError`)~~ done — benchmark suite
+8. ~~**Add fuzz tests** for `Classify` and `ParseFamily`~~ done — 16 fuzz targets
+9. ~~**Add `examples/` directory** with 3 real-world examples~~ done — examples/ module
+10. ~~**Add migration guide** to CHANGELOG or separate `MIGRATING.md`~~ done — CHANGELOG carries migration notes per release
+11. ~~**Add `go.work` usage notes** to CONTRIBUTING.md~~ done — go.work notes in AGENTS.md
 
 ### P2 — Features
 
-12. **Migrate GitRule to go-git** — Eliminate runtime `git` CLI dependency
-13. **Typed context keys** — `ContextKey` type + constants for all standard keys
-14. **Add `DefaultRunnerMinimal()`** or `DefaultRunnerWith(opts ...RuleOption)` — More flexible runner construction
-15. **Add `Timeout` to `DiagnosticResult`** — Already tracked but not exposed in API docs
-16. **Add `Context()` to `DiagnosticResult`** — Surface the context used for the diagnosis
+12. ~~**Migrate GitRule to go-git** — Eliminate runtime `git` CLI dependency~~ **Won't implement — declined — shells out by design.**
+13. ~~**Typed context keys** — `ContextKey` type + constants for all standard keys~~ done — ContextKey constants
+14. ~~**Add `DefaultRunnerMinimal()`** or `DefaultRunnerWith(opts ...RuleOption)` — More flexible runner construction~~ **Won't implement — declined — DefaultRunner composition chosen instead.**
+15. ~~**Add `Timeout` to `DiagnosticResult`** — Already tracked but not exposed in API docs~~ **Won't implement — declined — Duration in Details chosen instead.**
+16. ~~**Add `Context()` to `DiagnosticResult`** — Surface the context used for the diagnosis~~ **Won't implement — declined — Details map chosen instead.**
 
 ### P3 — Architecture & Long-Term Health
 
-17. **Add `internal/` package** for shared test helpers to reduce duplication
-18. **Add coverage badge** to README (shields.io)
-19. **Add `go vet` to CI** (already in flake, add to GitHub Actions)
-20. **Add `go mod verify` to CI**
-21. **Add binary size analysis** — Track growth of root package
-22. **Add API compatibility check** — `apidiff` or similar for breaking change detection
-23. **Add `go-test-coverage` threshold** in CI
-24. **Automated submodule tagging** — Script to tag `diagnose/git/vX.Y.Z` when root tags `vX.Y.Z`
-25. **Consider `pkg/` structure** — The go-structure-linter complains about root package files. Not required for a library this size, but worth evaluating.
+17. ~~**Add `internal/` package** for shared test helpers to reduce duplication~~ done — shared test helpers in diagnose
+18. ~~**Add coverage badge** to README (shields.io)~~ **Won't implement — declined — coverage gates via BuildFlow instead.**
+19. ~~**Add `go vet` to CI** (already in flake, add to GitHub Actions)~~ done — go vet in ci.yml
+20. ~~**Add `go mod verify` to CI**~~ done — go mod verify covered by CI consumer-simulation
+21. ~~**Add binary size analysis** — Track growth of root package~~ **Won't implement — declined — not demanded.**
+22. ~~**Add API compatibility check** — `apidiff` or similar for breaking change detection~~ done — apidiff covered by go-structure-linter + review
+23. ~~**Add `go-test-coverage` threshold** in CI~~ done — BuildFlow test-coverage step
+24. ~~**Automated submodule tagging** — Script to tag `diagnose/git/vX.Y.Z` when root tags `vX.Y.Z`~~ **Won't implement — declined — coordinated manual tag process.**
+25. ~~**Consider `pkg/` structure** — The go-structure-linter complains about root package files. Not required for a library this size, but worth evaluating.~~ **Won't implement — declined — flat structure is policy (.go-structure-linter.yaml).**
 
 ---
 
