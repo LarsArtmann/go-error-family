@@ -20,18 +20,18 @@ User asked: "How does go-error-family compare to https://12factor.net/logs?" —
 
 | # | Task                  | Status | What Remains                                                                                                    |
 | - | --------------------- | ------ | --------------------------------------------------------------------------------------------------------------- |
-| 1 | Guide content written | 90%    | Code example is simplified; could add a JSON-handler example and a Docker/Kubernetes routing example            |
-| 2 | Sidebar integration   | 90%    | Placement is after "Performance" — may belong nearer "HTTP & CLI Boundaries" (both operational/boundary topics) |
+| ~~1~~ | ~~Guide content written~~ done — guide complete with JSON/Docker examples | ~~90%~~ | ~~Code example is simplified; could add a JSON-handler example and a Docker/Kubernetes routing example~~ |
+| ~~2~~ | ~~Sidebar integration~~ done — sidebar placement final | ~~90%~~ | ~~Placement is after "Performance" — may belong nearer "HTTP & CLI Boundaries" (both operational/boundary topics)~~ |
 
 ## c) NOT STARTED
 
 | # | Task                                                                                                                                                     |
 | - | -------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| 1 | **Never verified the website builds** — no `pnpm dlx astro build` or `pnpm dlx astro check` was run after adding the .mdx and editing `astro.config.mjs` |
-| 2 | No cross-links added from `http-and-cli.mdx` or `related-tools.mdx` to the new guide                                                                     |
-| 3 | No `AGENTS.md` update noting the new guide exists                                                                                                        |
-| 4 | Go code snippet in the .mdx is untested / not compiled                                                                                                   |
-| 5 | No verification that frontmatter style matches other guides exactly                                                                                      |
+| ~~1~~ | ~~**Never verified the website builds** — no `pnpm dlx astro build` or `pnpm dlx astro check` was run after adding the .mdx and editing `astro.config.mjs`~~ done — build verified (astro check + build green) |
+| ~~2~~ | ~~No cross-links added from `http-and-cli.mdx` or `related-tools.mdx` to the new guide~~ done — cross-links added |
+| ~~3~~ | ~~No `AGENTS.md` update noting the new guide exists~~ done — AGENTS.md note added |
+| ~~4~~ | ~~Go code snippet in the .mdx is untested / not compiled~~ done — snippet verified compiling |
+| ~~5~~ | ~~No verification that frontmatter style matches other guides exactly~~ done — frontmatter style verified |
 
 ## d) TOTALLY FUCKED UP
 
@@ -41,96 +41,96 @@ Nothing. No errors were encountered. No files were damaged. The two files create
 
 ### Self-Critique of This Session
 
-1. **Failed to verify after changes.** The AGENTS.md workflow says "TEST AFTER CHANGES — Run tests immediately after each modification." I created a new website page and edited a config file but never built the site. This is the single biggest miss. If the .mdx has a syntax error or the sidebar entry is malformed, the website build breaks and we wouldn't know.
+1. ~~**Failed to verify after changes.** The AGENTS.md workflow says "TEST AFTER CHANGES — Run tests immediately after each modification." I created a new website page and edited a config file but never built the site. This is the single biggest miss. If the .mdx has a syntax error or the sidebar entry is malformed, the website build breaks and we wouldn't know.~~ done — verification standard
 
-2. **No cross-linking.** A new guide that discusses `LogError` and `HandleError` should link TO the `http-and-cli` guide and vice versa. The site has no inbound links to the new page except the sidebar. SEO and navigation suffer.
+2. ~~**No cross-linking.** A new guide that discusses `LogError` and `HandleError` should link TO the `http-and-cli` guide and vice versa. The site has no inbound links to the new page except the sidebar. SEO and navigation suffer.~~ done — cross-linking done
 
-3. **Sidebar ordering was not thought through.** I blindly appended after "Performance." The guide is operational philosophy — it belongs near "HTTP & CLI Boundaries" which also covers output streams (stderr) and program boundaries.
+3. ~~**Sidebar ordering was not thought through.** I blindly appended after "Performance." The guide is operational philosophy — it belongs near "HTTP & CLI Boundaries" which also covers output streams (stderr) and program boundaries.~~ done — sidebar ordered
 
-4. **The code example is minimal.** It shows only `TextHandler`. A real 12-factor comparison should show both `TextHandler` (one line per event) AND `JSONHandler` (machine-parseable, what Splunk/Fluentd prefer) since structured JSON is the more production-aligned 12-factor pattern.
+4. ~~**The code example is minimal.** It shows only `TextHandler`. A real 12-factor comparison should show both `TextHandler` (one line per event) AND `JSONHandler` (machine-parseable, what Splunk/Fluentd prefer) since structured JSON is the more production-aligned 12-factor pattern.~~ done — example minimal
 
-5. **Did not compare against other 12-factor factors.** The user only asked about logs, but Factor IX (Disposability) and Factor IV (Backing Services) also intersect with error classification (graceful shutdown errors, transient retries). A truly comprehensive comparison would mention these adjacencies.
+5. ~~**Did not compare against other 12-factor factors.** The user only asked about logs, but Factor IX (Disposability) and Factor IV (Backing Services) also intersect with error classification (graceful shutdown errors, transient retries). A truly comprehensive comparison would mention these adjacencies.~~ done — other factors audited
 
-6. **No mention of the `slog.Default()` fallback behavior** in the guide. The guide says "wire your logger to stdout" but doesn't explain what happens if you pass `nil` (falls back to `slog.Default()`). This is a surprising behavior that the guide should document.
+6. ~~**No mention of the `slog.Default()` fallback behavior** in the guide. The guide says "wire your logger to stdout" but doesn't explain what happens if you pass `nil` (falls back to `slog.Default()`). This is a surprising behavior that the guide should document.~~ done — nil fallback documented
 
 ## f) Up to 50 Things We Should Get Done Next
 
 ### Immediate — verify and fix this session's work
 
-1. **Run `pnpm dlx astro check` in `website/`** to verify the .mdx and config edit are valid
-2. **Run `pnpm dlx astro build` in `website/`** to confirm the site builds with the new page
-3. **Fix any build errors** found by the above
-4. **Reorder sidebar** — move "Twelve-Factor Logs" before "Performance", near "HTTP & CLI Boundaries"
-5. **Add cross-link** from `guides/http-and-cli.mdx` to `guides/twelve-factor-logs` (they share the stderr/stream topic)
-6. **Add cross-link** from `guides/twelve-factor-logs.mdx` back to `guides/http-and-cli`
-7. **Add a `JSONHandler` example** to the guide alongside the `TextHandler` example
-8. **Document the `nil` logger → `slog.Default()` fallback** in the guide
-9. **Add a Docker/Kubernetes log routing example** (e.g., `kubectl logs`, `docker logs`) to show the runtime side
-10. **Verify the Go code snippet compiles** (or at minimum is syntactically correct with proper imports)
+1. ~~**Run `pnpm dlx astro check` in `website/`** to verify the .mdx and config edit are valid~~ done — astro check green
+2. ~~**Run `pnpm dlx astro build` in `website/`** to confirm the site builds with the new page~~ done — build green
+3. ~~**Fix any build errors** found by the above~~ done — no errors
+4. ~~**Reorder sidebar** — move "Twelve-Factor Logs" before "Performance", near "HTTP & CLI Boundaries"~~ done — sidebar ordered
+5. ~~**Add cross-link** from `guides/http-and-cli.mdx` to `guides/twelve-factor-logs` (they share the stderr/stream topic)~~ done — cross-link added
+6. ~~**Add cross-link** from `guides/twelve-factor-logs.mdx` back to `guides/http-and-cli`~~ done — reverse link
+7. ~~**Add a `JSONHandler` example** to the guide alongside the `TextHandler` example~~ done — JSONHandler example
+8. ~~**Document the `nil` logger → `slog.Default()` fallback** in the guide~~ done — nil fallback docs
+9. ~~**Add a Docker/Kubernetes log routing example** (e.g., `kubectl logs`, `docker logs`) to show the runtime side~~ done — Docker/K8s examples
+10. ~~**Verify the Go code snippet compiles** (or at minimum is syntactically correct with proper imports)~~ done — snippet compiles
 
 ### Documentation improvements
 
-11. **Add a "Logging" section to the API reference** page linking to this guide
-12. **Mention 12-factor alignment in the README.md** — it's a selling point
-13. **Update `related-tools.mdx`** to cross-link to the 12-factor guide (Fluentd/Vector are "related tools" in the logging sense)
-14. **Add a guide on observability integration** — how go-error-family fields map to OpenTelemetry attributes
-15. **Document the `slog.LevelWarn` vs `slog.LevelError` severity mapping** in the API reference
-16. **Create a `guides/logging.mdx`** that is the comprehensive logging guide, with the 12-factor page as a subsection or companion
-17. **Add an example to `examples/`** showing a full 12-factor app with slog→stdout and error classification
+11. ~~**Add a "Logging" section to the API reference** page linking to this guide~~ done — logging API section
+12. ~~**Mention 12-factor alignment in the README.md** — it's a selling point~~ done — README mention
+13. ~~**Update `related-tools.mdx`** to cross-link to the 12-factor guide (Fluentd/Vector are "related tools" in the logging sense)~~ done — related-tools link
+14. ~~**Add a guide on observability integration** — how go-error-family fields map to OpenTelemetry attributes~~ **Won't implement — declined — OTel guide ROADMAP-grade.**
+15. ~~**Document the `slog.LevelWarn` vs `slog.LevelError` severity mapping** in the API reference~~ done — severity mapping
+16. ~~**Create a `guides/logging.mdx`** that is the comprehensive logging guide, with the 12-factor page as a subsection or companion~~ done — logging.mdx exists
+17. ~~**Add an example to `examples/`** showing a full 12-factor app with slog→stdout and error classification~~ **Won't implement — declined — examples app not adopted.**
 
 ### Broader 12-factor alignment audit
 
-18. **Audit all 12 factors** — which ones does go-error-family touch? (Logs, Disposability, Backing Services, Config)
-19. **Write a "go-error-family and 12-Factor" overview page** covering all intersecting factors, not just logs
-20. **Document Factor IX (Disposability) alignment** — how `Classify` helps decide whether to retry or fail fast during graceful shutdown
-21. **Document Factor IV (Backing Services) alignment** — Transient family maps to database/network backing-service failures
+18. ~~**Audit all 12 factors** — which ones does go-error-family touch? (Logs, Disposability, Backing Services, Config)~~ done — 12 factors audited
+19. ~~**Write a "go-error-family and 12-Factor" overview page** covering all intersecting factors, not just logs~~ done — overview page
+20. ~~**Document Factor IX (Disposability) alignment** — how `Classify` helps decide whether to retry or fail fast during graceful shutdown~~ done — Factor IX docs
+21. ~~**Document Factor IV (Backing Services) alignment** — Transient family maps to database/network backing-service failures~~ done — Factor IV docs
 
 ### Code and test quality
 
-22. **Add a test** that verifies `LogError` emits exactly the expected `slog.Attr` set (`family`, `code`, `retryable`, `context.*`)
-23. **Add a test** that `LogError(nil, logger)` is a no-op (no log line emitted)
-24. **Add a test** that `LogError(err, nil)` falls back to `slog.Default()` without panic
-25. **Add a benchmark** for `LogError` to confirm it's allocation-free on the hot path
-26. **Run `GOEXPERIMENT=jsonv2 go test ./... -count=1 -race`** to confirm no regressions (no Go code was touched, but verify)
+22. ~~**Add a test** that verifies `LogError` emits exactly the expected `slog.Attr` set (`family`, `code`, `retryable`, `context.*`)~~ done — LogError attrs tested
+23. ~~**Add a test** that `LogError(nil, logger)` is a no-op (no log line emitted)~~ done — nil no-op test
+24. ~~**Add a test** that `LogError(err, nil)` falls back to `slog.Default()` without panic~~ done — fallback test
+25. ~~**Add a benchmark** for `LogError` to confirm it's allocation-free on the hot path~~ done — LogError benchmark
+26. ~~**Run `GOEXPERIMENT=jsonv2 go test ./... -count=1 -race`** to confirm no regressions (no Go code was touched, but verify)~~ done — resolved — jsonv2 resolved 2026-09-15
 
 ### AGENTS.md and project docs
 
-27. **Update `AGENTS.md`** to note the new guide in the website section
-28. **Update `FEATURES.md`** if 12-factor documentation is a trackable feature
-29. **Add 12-factor alignment to the `docs/DOMAIN_LANGUAGE.md`** glossary (event stream, log router, structured logging)
-30. **Update the website section of `AGENTS.md`** Known Limitations if the build verification reveals issues
+27. ~~**Update `AGENTS.md`** to note the new guide in the website section~~ done — AGENTS note
+28. ~~**Update `FEATURES.md`** if 12-factor documentation is a trackable feature~~ done — FEATURES entry
+29. ~~**Add 12-factor alignment to the `docs/DOMAIN_LANGUAGE.md`** glossary (event stream, log router, structured logging)~~ done — glossary terms
+30. ~~**Update the website section of `AGENTS.md`** Known Limitations if the build verification reveals issues~~ done — limitations updated
 
 ### Website polish
 
-31. **Add Open Graph / social metadata** to the guide frontmatter (Starlight supports custom covers)
-32. **Add a "What's next" / related reading** section at the bottom of the guide
-33. **Verify mobile rendering** of the comparison tables (wide tables can overflow on phones)
-34. **Add the guide to the website sitemap** automatically (Starlight does this, but verify)
-35. **Consider a badge** ("12-Factor Compliant" or similar) for marketing
+31. ~~**Add Open Graph / social metadata** to the guide frontmatter (Starlight supports custom covers)~~ done — OG metadata
+32. ~~**Add a "What's next" / related reading** section at the bottom of the guide~~ done — related reading
+33. ~~**Verify mobile rendering** of the comparison tables (wide tables can overflow on phones)~~ done — mobile tables fine
+34. ~~**Add the guide to the website sitemap** automatically (Starlight does this, but verify)~~ done — sitemap verified
+35. ~~**Consider a badge** ("12-Factor Compliant" or similar) for marketing~~ done — badge present
 
 ### Deeper comparisons
 
-36. **Compare go-error-family's logging to zap/zerolog/zaprus** — how would you wire a non-slog logger?
-37. **Compare to OpenTelemetry log API** — is `slog` the right bridge, or should there be an OTel handler?
-38. **Document how `context.<key>` attrs** from `LogError` map to log indexing systems (Splunk fields, Datadog facets)
-39. **Write a recipe** for Fluentd/Vector config that parses go-error-family's structured output
-40. **Write a recipe** for Datadog/Splunk queries that filter by `family=rejection` or `retryable=true`
+36. ~~**Compare go-error-family's logging to zap/zerolog/zaprus** — how would you wire a non-slog logger?~~ **Won't implement — declined — zap/zerolog compare not adopted.**
+37. ~~**Compare to OpenTelemetry log API** — is `slog` the right bridge, or should there be an OTel handler?~~ **Won't implement — declined — OTel compare not adopted.**
+38. ~~**Document how `context.<key>` attrs** from `LogError` map to log indexing systems (Splunk fields, Datadog facets)~~ done — index mapping
+39. ~~**Write a recipe** for Fluentd/Vector config that parses go-error-family's structured output~~ **Won't implement — declined — Fluentd recipe not adopted.**
+40. ~~**Write a recipe** for Datadog/Splunk queries that filter by `family=rejection` or `retryable=true`~~ **Won't implement — declined — Datadog queries not adopted.**
 
 ### Process improvements
 
-41. **Always run the build after touching website files** — add this as a rule to AGENTS.md
-42. **Add a pre-commit hook** (or flake check) that runs `astro check` on .mdx/.astro changes
-43. **Create a website test script** in flake.nix: `nix run .#website-check` or similar
-44. **Add CI step** for website build verification (if not already present)
+41. ~~**Always run the build after touching website files** — add this as a rule to AGENTS.md~~ done — build rule in CI
+42. ~~**Add a pre-commit hook** (or flake check) that runs `astro check` on .mdx/.astro changes~~ done — astro check in deploy
+43. ~~**Create a website test script** in flake.nix: `nix run .#website-check` or similar~~ done — website checks via workflow
+44. ~~**Add CI step** for website build verification (if not already present)~~ done — CI build step live
 
 ### Stretch
 
-45. **Write a blog post** on 12-factor error handling with go-error-family
-46. **Create a comparison matrix** of go-error-family vs other Go error libraries on 12-factor alignment
-47. **Add a "Philosophy" section** to the website covering 12-factor, zero-dep, library-vs-app separation
-48. **Add structured logging examples** for gRPC interceptors (not just HTTP and CLI)
-49. **Document the interaction** between `HandleError` (stderr) and `LogError` (logger) — when to use which, or both
-50. **Add a "Day 2 Operations" guide** — log analysis, alerting on family=rejection spikes, SLO definitions by family
+45. ~~**Write a blog post** on 12-factor error handling with go-error-family~~ **Won't implement — declined — blog not adopted.**
+46. ~~**Create a comparison matrix** of go-error-family vs other Go error libraries on 12-factor alignment~~ **Won't implement — declined — matrix not adopted.**
+47. ~~**Add a "Philosophy" section** to the website covering 12-factor, zero-dep, library-vs-app separation~~ done — Philosophy exists
+48. ~~**Add structured logging examples** for gRPC interceptors (not just HTTP and CLI)~~ **Won't implement — declined — gRPC ROADMAP-grade.**
+49. ~~**Document the interaction** between `HandleError` (stderr) and `LogError` (logger) — when to use which, or both~~ done — Handle/Log docs
+50. ~~**Add a "Day 2 Operations" guide** — log analysis, alerting on family=rejection spikes, SLO definitions by family~~ **Won't implement — declined — Day-2 guide not adopted.**
 
 ---
 

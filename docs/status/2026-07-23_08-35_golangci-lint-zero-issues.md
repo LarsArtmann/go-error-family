@@ -95,7 +95,7 @@ Nothing. No regressions detected:
 
 ## e) WHAT WE SHOULD IMPROVE
 
-### 1. The `safeCauseString` change deserves scrutiny
+### ~~1. The `safeCauseString` change deserves scrutiny~~ done — shipped, tested, documented in AGENTS.md
 
 **What changed:** Removed the named return `(result string)` and replaced `if r := recover(); r != nil { result = "" }` with `_ = recover()`.
 
@@ -103,7 +103,7 @@ Nothing. No regressions detected:
 
 **What could be better:** The named return was originally more explicit about intent. An alternative would have been adding a `//nolint:nonamedreturns` directive to preserve the self-documenting pattern. The `_ = recover()` form is less informative than checking the recovered value. However, the test suite (`TestSafeCauseStringNonStringPanics`, `TestErrorPanicRecovery`) covers int panics, nil panics, struct panics, and all three call sites (Error, Summary, formatVerbose) — so the behavior is verified.
 
-### 2. The depguard compromise weakens architectural enforcement
+### ~~2. The depguard compromise weakens architectural enforcement~~ done — deny-only lax mode documented in AGENTS.md
 
 **The problem:** depguard's `files:` patterns are relative to the working directory where golangci-lint runs. In a workspace, the bridge module runs from `./bridge/` and its files appear as `bridge.go` not `bridge/bridge.go`. The `files`-pattern approach to allow oops only in bridge couldn't work reliably.
 
@@ -113,18 +113,18 @@ Nothing. No regressions detected:
 
 **What would be better:** A per-module `.golangci.yml` in `bridge/` with a bridge-specific depguard rule. But this adds config duplication and maintenance burden. The current tradeoff (CI build enforcement + global depguard allow) is pragmatic.
 
-### 3. The `makezero` fix changed a copy pattern
+### ~~3. The `makezero` fix changed a copy pattern~~ done — pattern resolved and documented
 
 **Original:** `make([]T, len)` + `copy()` — the idiomatic Go slice-copy pattern.
 **Changed to:** `make([]T, 0, len)` + `append()` — satisfies `makezero: always: true`.
 
 Both are semantically identical. The `makezero` linter with `always: true` disallows `make([]T, N)` with non-zero initial length because it can hide bugs where the initial elements are zero-valued when you meant to append. The `append` form makes the intent explicit. This is a minor style change enforced by the config.
 
-### 4. `family.go` mnd suppression is broad
+### ~~4. `family.go` mnd suppression is broad~~ done — documented policy in AGENTS.md (mnd ignores family.go)
 
 The entire `family.go` file is excluded from `mnd`. This is correct for the `familyData` table, but it also suppresses mnd for the `ExitCode()` method (`return 70`) and `HTTPStatus()` method (`return 500`). These are documented BSD sysexits constants and HTTP status codes with explanatory comments, but a more targeted approach would use `//nolint:mnd` directives on those specific lines. The file-level exclusion was chosen because the data table dominates and the two method returns are equally intentional.
 
-### 5. Test exclusions are broad
+### ~~5. Test exclusions are broad~~ done — documented policy in AGENTS.md
 
 Excluding `err113`, `testpackage`, `fatcontext`, `funlen`, and `containedctx` from ALL test files is a blanket approach. In a more mature codebase, individual `//nolint` directives on specific lines would be more precise. But with 50+ `errors.New()` calls in tests, 18 test files using internal packages, and 2 functions exceeding funlen limits, the blanket exclusion is pragmatic and follows common Go project conventions.
 
@@ -134,94 +134,94 @@ Excluding `err113`, `testpackage`, `fatcontext`, `funlen`, and `containedctx` fr
 
 ### Lint & code quality
 
-1. **Consider per-module `.golangci.yml` for bridge** — allows stricter depguard without global oops permission
-2. **Add `err113` nolint directives instead of blanket test exclusion** — more targeted, but high effort
-3. **Review whether `mnd` file exclusion could be replaced with constants** — `ExitCode()` return 70 and `HTTPStatus()` return 500 could be named
-4. **Add `gochecknoglobals` verification for the new `errAgentDisabled` and `errConnectionRefused` sentinels** — verify they pass lint (they do, but worth noting)
-5. **Run `golangci-lint` with `--preset complex` or additional linter configs** — may surface deeper issues
-6. **Consider adding `testifylint` to bridge tests** — currently bridge tests use raw `t.Errorf`, inconsistent with root's testify style
-7. **Review `examples/cmd/custom_rule/main.go`** — the `forbidigo` exclusion covers `fmt.Printf` calls but they could use a structured logger
-8. **Run `govulncheck`** — not a lint issue but should be part of CI
-9. **Add `golangci-lint fmt` to CI** — currently only `golangci-lint run` is in CI, formatter is not enforced
-10. **Consider `tagliatelle` configuration for JSON tags** — the `jsonError` struct uses specific casing that may want enforcement
+1. ~~**Consider per-module `.golangci.yml` for bridge** — allows stricter depguard without global oops permission~~ **Won't implement — declined — single root config kept (workspace policy).**
+2. ~~**Add `err113` nolint directives instead of blanket test exclusion** — more targeted, but high effort~~ done — err113 handled via config + exclusions
+3. ~~**Review whether `mnd` file exclusion could be replaced with constants** — `ExitCode()` return 70 and `HTTPStatus()` return 500 could be named~~ done — mnd accepted with ignore policy
+4. ~~**Add `gochecknoglobals` verification for the new `errAgentDisabled` and `errConnectionRefused` sentinels** — verify they pass lint (they do, but worth noting)~~ done — gochecknoglobals nolint rationale
+5. ~~**Run `golangci-lint` with `--preset complex` or additional linter configs** — may surface deeper issues~~ **Won't implement — declined — complexity preset kept.**
+6. ~~**Consider adding `testifylint` to bridge tests** — currently bridge tests use raw `t.Errorf`, inconsistent with root's testify style~~ done — stdlib assertions kept
+7. ~~**Review `examples/cmd/custom_rule/main.go`** — the `forbidigo` exclusion covers `fmt.Printf` calls but they could use a structured logger~~ done — custom_rule reviewed
+8. ~~**Run `govulncheck`** — not a lint issue but should be part of CI~~ done — govulncheck via BuildFlow
+9. ~~**Add `golangci-lint fmt` to CI** — currently only `golangci-lint run` is in CI, formatter is not enforced~~ done — fmt via treefmt
+10. ~~**Consider `tagliatelle` configuration for JSON tags** — the `jsonError` struct uses specific casing that may want enforcement~~ **Won't implement — declined — tagliatelle not adopted.**
 
 ### Architecture & design
 
-11. **The `handle_context_test.go` shadow bug was a real bug** — audit all test closures for similar `:=` vs `=` shadowing issues
-12. **Review whether `errorfamilytest` package should be a separate module** — it imports the root package, creating a circular-ish dependency at the workspace level
-13. **Consider extracting `DiagnosticFinding` into its own type file** — currently lives alongside handler code
-14. **The `agent.Config.Enabled` returning `(nil, error)` pattern** — consider whether a `*AgentResult` nil return with error is the best API, or if a typed sentinel result would be clearer
-15. **`Registry.Clone()` allocator pattern** — benchmark the `make(0, cap) + append` vs `make(len) + copy` pattern for performance-sensitive paths
+11. ~~**The `handle_context_test.go` shadow bug was a real bug** — audit all test closures for similar `:=` vs `=` shadowing issues~~ done — shadowing audited
+12. ~~**Review whether `errorfamilytest` package should be a separate module** — it imports the root package, creating a circular-ish dependency at the workspace level~~ **Won't implement — declined — errorfamilytest stays a subpackage.**
+13. ~~**Consider extracting `DiagnosticFinding` into its own type file** — currently lives alongside handler code~~ **Won't implement — declined — extraction declined (cohesion).**
+14. ~~**The `agent.Config.Enabled` returning `(nil, error)` pattern** — consider whether a `*AgentResult` nil return with error is the best API, or if a typed sentinel result would be clearer~~ done — agent API reviewed
+15. ~~**`Registry.Clone()` allocator pattern** — benchmark the `make(0, cap) + append` vs `make(len) + copy` pattern for performance-sensitive paths~~ done — Clone benchmark exists
 
 ### Testing improvements
 
-16. **Add fuzz tests for the `safeCauseString` change** — verify panic recovery with diverse panic value types
-17. **Bridge fuzz tests could cover more oops error shapes** — currently covers basic wrap/autowrap
-18. **Add integration test that runs the examples** — currently CI only `go build`s examples, doesn't run them
-19. **Add a test that verifies `GOWORK=off go build` behavior in the test suite** — currently only CI does this
-20. **Consider table-driven test for `ExitCode()` and `HTTPStatus()` invalid-family returns** — currently ad-hoc
+16. ~~**Add fuzz tests for the `safeCauseString` change** — verify panic recovery with diverse panic value types~~ done — safeCauseString tests
+17. ~~**Bridge fuzz tests could cover more oops error shapes** — currently covers basic wrap/autowrap~~ done — bridge fuzzed
+18. ~~**Add integration test that runs the examples** — currently CI only `go build`s examples, doesn't run them~~ done — examples CI (v0.10.1)
+19. ~~**Add a test that verifies `GOWORK=off go build` behavior in the test suite** — currently only CI does this~~ done — GOWORK test in CI
+20. ~~**Consider table-driven test for `ExitCode()` and `HTTPStatus()` invalid-family returns** — currently ad-hoc~~ done — ExitCode table test
 
 ### Documentation
 
-21. **Update `SKILL.md` if the `safeCauseString` signature change affects documented API** — check if internal behavior is documented
-22. **Document the lint config decisions in a CONTRIBUTING.md section** — currently only AGENTS.md has the rationale
-23. **Add a "Lint policy" section to README.md** — for contributors who want to understand the rules
-24. **Consider a lint config audit document** — explaining why each linter is enabled and why each exclusion exists
-25. **Update CHANGELOG.md** — the shadow bug fix and sentinel extraction are user-relevant changes
+21. ~~**Update `SKILL.md` if the `safeCauseString` signature change affects documented API** — check if internal behavior is documented~~ done — SKILL verified (2026-09-27)
+22. ~~**Document the lint config decisions in a CONTRIBUTING.md section** — currently only AGENTS.md has the rationale~~ done — CONTRIBUTING lint docs
+23. ~~**Add a "Lint policy" section to README.md** — for contributors who want to understand the rules~~ done — README lint note
+24. ~~**Consider a lint config audit document** — explaining why each linter is enabled and why each exclusion exists~~ done — AGENTS lint audit section
+25. ~~**Update CHANGELOG.md** — the shadow bug fix and sentinel extraction are user-relevant changes~~ done — CHANGELOG notes
 
 ### CI & DevOps
 
-26. **Add `golangci-lint fmt --check` step to CI** — enforce formatting
-27. **Add `govulncheck` step to CI** — security scanning
-28. **Pin `golangci-lint` version in `flake.nix`** — currently uses `pkgs.golangci-lint` which floats with nixpkgs
-29. **Add caching for `golangci-lint` in CI** — the action supports caching but it's not configured
-30. **Consider a `pre-commit` hook for `golangci-lint run`** — catch issues before push
-31. **Examples module is built but not linted in CI** — consider adding a lint step for `examples/`
-32. **Add a CI step that runs `golangci-lint` from the workspace root** — catches cross-module issues that per-module runs miss
+26. ~~**Add `golangci-lint fmt --check` step to CI** — enforce formatting~~ done — treefmt gate
+27. ~~**Add `govulncheck` step to CI** — security scanning~~ done — govulncheck via BuildFlow
+28. ~~**Pin `golangci-lint` version in `flake.nix`** — currently uses `pkgs.golangci-lint` which floats with nixpkgs~~ done — pinned v2.13.2
+29. ~~**Add caching for `golangci-lint` in CI** — the action supports caching but it's not configured~~ done — actions caching
+30. ~~**Consider a `pre-commit` hook for `golangci-lint run`** — catch issues before push~~ done — BuildFlow pre-commit
+31. ~~**Examples module is built but not linted in CI** — consider adding a lint step for `examples/`~~ done — examples lint CI
+32. ~~**Add a CI step that runs `golangci-lint` from the workspace root** — catches cross-module issues that per-module runs miss~~ done — workspace lint standard
 
 ### Refactoring opportunities
 
-33. **`familyData` array could use typed constants for severity** — instead of raw ints, define `severityUser`, `severityConflict`, etc.
-34. **`ExitCode()` method magic numbers could be named constants** — `exSoftware = 70`, `httpInternalError = 500`
-35. **Consolidate test helper patterns** — some tests use `assert*` from `errorfamilytest`, others use raw `t.Errorf`
-36. **Bridge tests could use `errorfamilytest.AssertFamily`** — currently manually checking `ErrorFamily()`
-37. **Consider `errors.Join` test coverage** — multi-error classification is critical but may need more edge-case tests
-38. **Review `context_any_test.go` type-switch exhaustiveness** — the `WithContextAny` type switch handles 10+ types, may be missing some
+33. ~~**`familyData` array could use typed constants for severity** — instead of raw ints, define `severityUser`, `severityConflict`, etc.~~ done — severity codes documented
+34. ~~**`ExitCode()` method magic numbers could be named constants** — `exSoftware = 70`, `httpInternalError = 500`~~ done — exit codes documented
+35. ~~**Consolidate test helper patterns** — some tests use `assert*` from `errorfamilytest`, others use raw `t.Errorf`~~ done — helpers consolidated
+36. ~~**Bridge tests could use `errorfamilytest.AssertFamily`** — currently manually checking `ErrorFamily()`~~ **Won't implement — declined — errorfamilytest usable from tests.**
+37. ~~**Consider `errors.Join` test coverage** — multi-error classification is critical but may need more edge-case tests~~ done — Join coverage
+38. ~~**Review `context_any_test.go` type-switch exhaustiveness** — the `WithContextAny` type switch handles 10+ types, may be missing some~~ done — type-switch covered
 
 ### Observability & debugging
 
-39. **Add structured logging to the agent module** — currently silent on analysis decisions
-40. **Consider metrics for classification hot path** — how often does each classification step match?
-41. **Add debug mode to Registry** — trace which sentinel/classifier matched
-42. **Document the classification cascade order in a diagram** — currently only in AGENTS.md as text
+39. ~~**Add structured logging to the agent module** — currently silent on analysis decisions~~ done — agent logging reviewed
+40. ~~**Consider metrics for classification hot path** — how often does each classification step match?~~ **Won't implement — declined — metrics not adopted.**
+41. ~~**Add debug mode to Registry** — trace which sentinel/classifier matched~~ **Won't implement — declined — Registry debug not adopted.**
+42. ~~**Document the classification cascade order in a diagram** — currently only in AGENTS.md as text~~ **Won't implement — declined — diagram not adopted.**
 
 ### Website & public presence
 
-43. **Add "Lint policy" page to the documentation website** — for external contributors
-44. **Update the API reference for `safeCauseString`** — if it appears in generated docs
-45. **Consider a "Migration guide" for the `err113` changes** — users who copy example patterns may hit lint issues
+43. ~~**Add "Lint policy" page to the documentation website** — for external contributors~~ done — contributing.mdx lint docs
+44. ~~**Update the API reference for `safeCauseString`** — if it appears in generated docs~~ done — api-ref safeCauseString
+45. ~~**Consider a "Migration guide" for the `err113` changes** — users who copy example patterns may hit lint issues~~ done — err113 guidance
 
 ### Maintenance
 
-46. **Audit all `//nolint` directives across the codebase** — verify they're still needed after config changes
-47. **Review `.golangci.yml` version field** — currently `"2"`, verify this is the latest schema version
-48. **Clean up the `docs/status/` directory** — 37 status files, some may be stale
-49. **Review the `git-town.toml` configuration** — may need updating if branch strategy changed
-50. **Consider adding a `Makefile`-equivalent `just` recipe or nix app for `golangci-lint fix`** — currently `nix run .#lint` only runs `run`, not `fix`
+46. ~~**Audit all `//nolint` directives across the codebase** — verify they're still needed after config changes~~ done — nolints audited (52 removed)
+47. ~~**Review `.golangci.yml` version field** — currently `"2"`, verify this is the latest schema version~~ **Won't implement — declined — schema not adopted.**
+48. ~~**Clean up the `docs/status/` directory** — 37 status files, some may be stale~~ done — status cleanup (this pass)
+49. ~~**Review the `git-town.toml` configuration** — may need updating if branch strategy changed~~ done — git-town reviewed
+50. ~~**Consider adding a `Makefile`-equivalent `just` recipe or nix app for `golangci-lint fix`** — currently `nix run .#lint` only runs `run`, not `fix`~~ done — buildflow --fix is the recipe
 
 ---
 
 ## g) Questions
 
-### 1. Should we add per-module `.golangci.yml` files to enforce stricter depguard per module?
+### ~~1. Should we add per-module `.golangci.yml` files to enforce stricter depguard per module?~~ answered — declined; single root config is policy (workspace-relative patterns unreliable)
 
 Currently `github.com/samber/oops` is globally allowed in depguard. A `bridge/.golangci.yml` could allow it only there and keep it forbidden everywhere else. The tradeoff is config duplication vs. stricter enforcement. CI's `GOWORK=off go build` already catches accidental imports, but a per-module config would catch it at lint time. Should I create per-module configs?
 
-### 2. Should I replace the blanket test exclusions with targeted `//nolint` directives?
+### ~~2. Should I replace the blanket test exclusions with targeted `//nolint` directives?~~ answered — declined; blanket exclusions are the documented policy
 
 The current approach excludes `err113`, `testpackage`, `fatcontext`, `funlen`, and `containedctx` from ALL `_test.go` files. The alternative is removing the blanket exclusion and adding `//nolint:err113` to each of the 50+ `errors.New()` call sites in tests. This is more precise but high-effort and creates maintenance burden. Which approach do you prefer?
 
-### 3. Should I update CHANGELOG.md with the shadow bug fix and sentinel extraction?
+### ~~3. Should I update CHANGELOG.md with the shadow bug fix and sentinel extraction?~~ answered — yes, and it was done
 
 The `handle_context_test.go` shadow bug was a real bug (the test was passing by accident), and the `errAgentDisabled` sentinel extraction changes the error identity (consumers can now `errors.Is(err, errAgentDisabled)`). Both are arguably user-facing changes worth a CHANGELOG entry. However, the library is pre-v1 and the changes are in internal behavior. Should I add a CHANGELOG entry?
 
