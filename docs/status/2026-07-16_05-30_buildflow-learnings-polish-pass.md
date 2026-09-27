@@ -86,23 +86,23 @@ All 13 modified + 4 new files are uncommitted. The prior session committed `fa60
 
 ## c) NOT STARTED
 
-### Fuzz tests for new APIs
+### ~~Fuzz tests for new APIs~~ done — WrapOnce/WithExitCode/WithHTTPStatus/contextValueToString fuzz targets shipped
 
 No fuzz tests exist for `WrapOnce`, `WithExitCode`, `WithContextAny`, `contextValueToString`, or `safeCauseString`. The existing fuzz suite covers `Classify`, `ParseFamily`, and error formatting, but the new APIs are fuzz-blind.
 
-### TODO_LIST.md update
+### ~~TODO_LIST.md update~~ done — updated repeatedly since
 
 Not checked or updated. May have stale entries or missing entries for the new APIs.
 
-### ROADMAP.md update
+### ~~ROADMAP.md update~~ done — updated through 2026-09-27
 
 Not checked or updated.
 
-### docs/DOMAIN_LANGUAGE.md update
+### ~~docs/DOMAIN_LANGUAGE.md update~~ done — ExitCoder/HTTPStatuser glossary rows added (2026-09-27 pass)
 
 Not checked. `ExitCoder` may warrant a glossary entry if the file covers the consumer interfaces.
 
-### Website rebuild/deploy
+### ~~Website rebuild/deploy~~ done — site rebuilt and deployed; website-deploy green since 2026-09-19
 
 The `website/src/content/docs/api-reference.mdx` was updated but the Astro site hasn't been rebuilt or deployed. The live site at `errorfamily.lars.software` still shows the old API reference.
 
@@ -128,24 +128,24 @@ All code compiles, all tests pass, lint is clean, race detector is clean. No bug
 
 ### Process improvements
 
-1. **Run `git diff --cached` before starting work** — would have caught the README badge deletion immediately.
-2. **Verify lint passes before committing** — the prior session committed code with known lint warnings.
-3. **Don't leave monolithic test files** — `buildflow_learnings_test.go` should have been split from the start. Naming tests after the inspiration source ("buildflow_learnings") instead of the feature ("wraponce", "exitcode") is an anti-pattern.
-4. **Update docs in the same commit as the code** — the prior session committed code without updating CHANGELOG, SKILL.md, README.md, FEATURES.md, or the website. This creates a window where the code and docs disagree.
+1. ~~**Run `git diff --cached` before starting work** — would have caught the README badge deletion immediately.~~ done — git diff first is standard
+2. ~~**Verify lint passes before committing** — the prior session committed code with known lint warnings.~~ done — lint before commit standard
+3. ~~**Don't leave monolithic test files** — `buildflow_learnings_test.go` should have been split from the start. Naming tests after the inspiration source ("buildflow_learnings") instead of the feature ("wraponce", "exitcode") is an anti-pattern.~~ done — no monolithic tests
+4. ~~**Update docs in the same commit as the code** — the prior session committed code without updating CHANGELOG, SKILL.md, README.md, FEATURES.md, or the website. This creates a window where the code and docs disagree.~~ done — docs ship with code
 
 ### Code improvements
 
-5. **`contextValueToString` doesn't handle `[]byte`** — common in Go (raw JSON, file contents). Currently falls through to `fmt.Sprint` which produces `[65 66 67]` instead of "ABC". Should add a `[]byte` case that uses `string(val)`.
-6. **`contextValueToString` doesn't handle `error` type** — an error value in context would render via `fmt.Sprint` which calls `Error()`. This is correct but could panic (the very thing `safeCauseString` guards against). Should wrap in recovery or document the risk.
-7. **`contextValueToString` doesn't handle `time.Time`** — would render as `2006-01-02 15:04:05.999999999 -0700 MST` via `fmt.Sprint`. Should use RFC3339 for consistency with the rest of the library.
-8. **`WrapOnce` uses `errors.AsType[*Error]` but doesn't walk the full chain** — `errors.AsType` does walk the chain (it's the generic version of `errors.As`), so this is actually correct. But the doc comment could be clearer about this.
-9. **`safeCauseString` has no test for `Error()` method that panics with a non-string value** — the recover catches `any`, but we only tested string panics.
-10. **`ExitCode(err)` package function doesn't have a benchmark for the `errors.AsType[ExitCoder]` path** — only the family-default path is benchmarked (`BenchmarkExitCode` exists but `BenchmarkExitCodeOverride` was added this session and tests the override path, so this is actually covered).
+5. ~~**`contextValueToString` doesn't handle `[]byte`** — common in Go (raw JSON, file contents). Currently falls through to `fmt.Sprint` which produces `[65 66 67]` instead of "ABC". Should add a `[]byte` case that uses `string(val)`.~~ done — []byte case handled
+6. ~~**`contextValueToString` doesn't handle `error` type** — an error value in context would render via `fmt.Sprint` which calls `Error()`. This is correct but could panic (the very thing `safeCauseString` guards against). Should wrap in recovery or document the risk.~~ done — error case handled
+7. ~~**`contextValueToString` doesn't handle `time.Time`** — would render as `2006-01-02 15:04:05.999999999 -0700 MST` via `fmt.Sprint`. Should use RFC3339 for consistency with the rest of the library.~~ done — time.Time case handled
+8. ~~**`WrapOnce` uses `errors.AsType[*Error]` but doesn't walk the full chain** — `errors.AsType` does walk the chain (it's the generic version of `errors.As`), so this is actually correct. But the doc comment could be clearer about this.~~ done — doc comment added
+9. ~~**`safeCauseString` has no test for `Error()` method that panics with a non-string value** — the recover catches `any`, but we only tested string panics.~~ done — panic test added
+10. ~~**`ExitCode(err)` package function doesn't have a benchmark for the `errors.AsType[ExitCoder]` path** — only the family-default path is benchmarked (`BenchmarkExitCode` exists but `BenchmarkExitCodeOverride` was added this session and tests the override path, so this is actually covered).~~ done — benchmark note added
 
 ### Architecture improvements
 
-11. **The bridge package's `ClassifiedError` should document why it doesn't implement `ExitCoder`** — the decision was made (YAGNI) but not documented in code. A comment on `ClassifiedError` would prevent future contributors from adding it without understanding the tradeoff.
-12. **No integration test exists for the full ExitCoder flow** — unit tests verify each piece (interface, override, handler) but no test runs `NewTransient(...).WithExitCode(42)` through `HandleError` and checks that `os.Exit` would receive 42. The `TestHandleErrorDetailedRespectsExitCoder` test is close but only checks `HandleResult.ExitCode`, not the actual `HandleError` return value.
+11. ~~**The bridge package's `ClassifiedError` should document why it doesn't implement `ExitCoder`** — the decision was made (YAGNI) but not documented in code. A comment on `ClassifiedError` would prevent future contributors from adding it without understanding the tradeoff.~~ done — bridge comment added
+12. ~~**No integration test exists for the full ExitCoder flow** — unit tests verify each piece (interface, override, handler) but no test runs `NewTransient(...).WithExitCode(42)` through `HandleError` and checks that `os.Exit` would receive 42. The `TestHandleErrorDetailedRespectsExitCoder` test is close but only checks `HandleResult.ExitCode`, not the actual `HandleError` return value.~~ done — integration test added
 
 ---
 
@@ -153,80 +153,80 @@ All code compiles, all tests pass, lint is clean, race detector is clean. No bug
 
 ### Immediate (blocking release)
 
-1. **Commit all changes** from this session (13 modified + 4 new files)
-2. **Delete or update the stale status report** (`docs/status/2026-07-16_04-32_buildflow-learnings-integration.md`) — it describes an incomplete state
-3. **Add `[]byte` case to `contextValueToString`** — common Go type, currently renders badly
-4. **Add `time.Time` case to `contextValueToString`** — should use RFC3339
-5. **Add `error` case to `contextValueToString`** with safeCauseString — defense in depth
+1. ~~**Commit all changes** from this session (13 modified + 4 new files)~~ done — committed
+2. ~~**Delete or update the stale status report** (`docs/status/2026-07-16_04-32_buildflow-learnings-integration.md`) — it describes an incomplete state~~ done — report superseded by later passes
+3. ~~**Add `[]byte` case to `contextValueToString`** — common Go type, currently renders badly~~ done — []byte case
+4. ~~**Add `time.Time` case to `contextValueToString`** — should use RFC3339~~ done — time.Time case
+5. ~~**Add `error` case to `contextValueToString`** with safeCauseString — defense in depth~~ done — error case
 
 ### Testing
 
-6. **Add fuzz test for `WrapOnce`** — fuzz the error input, verify idempotency holds
-7. **Add fuzz test for `contextValueToString`** — fuzz with random `any` values, verify no panic
-8. **Add fuzz test for `WithExitCode` chain** — fuzz exit codes, verify copy-on-write isolation
-9. **Add integration test: `HandleError` return value respects `WithExitCode`** — end-to-end CLI path
-10. **Add test: `safeCauseString` with non-string panic value** — e.g., `panic(42)` or `panic(nil)`
-11. **Add test: `contextValueToString` with `[]byte`** (after adding the case)
-12. **Add test: `contextValueToString` with `time.Time`** (after adding the case)
-13. **Add test: `contextValueToString` with negative numbers** — verify `-42` renders correctly
-14. **Add test: `WrapOncef` with existing `*Error` in wrapped chain** — `fmt.Errorf("wrap: %w", classifiedErr)` then `WrapOncef`
-15. **Add benchmark: `contextValueToString` for each type** — type switch vs `fmt.Sprint` comparison
+6. ~~**Add fuzz test for `WrapOnce`** — fuzz the error input, verify idempotency holds~~ done — fuzz WrapOnce
+7. ~~**Add fuzz test for `contextValueToString`** — fuzz with random `any` values, verify no panic~~ done — fuzz context
+8. ~~**Add fuzz test for `WithExitCode` chain** — fuzz exit codes, verify copy-on-write isolation~~ done — fuzz exit codes
+9. ~~**Add integration test: `HandleError` return value respects `WithExitCode`** — end-to-end CLI path~~ done — integration test
+10. ~~**Add test: `safeCauseString` with non-string panic value** — e.g., `panic(42)` or `panic(nil)`~~ done — panic test
+11. ~~**Add test: `contextValueToString` with `[]byte`** (after adding the case)~~ done — []byte test
+12. ~~**Add test: `contextValueToString` with `time.Time`** (after adding the case)~~ done — Time test
+13. ~~**Add test: `contextValueToString` with negative numbers** — verify `-42` renders correctly~~ done — negatives
+14. ~~**Add test: `WrapOncef` with existing `*Error` in wrapped chain** — `fmt.Errorf("wrap: %w", classifiedErr)` then `WrapOncef`~~ done — WrapOncef test
+15. ~~**Add benchmark: `contextValueToString` for each type** — type switch vs `fmt.Sprint` comparison~~ done — benchmark
 
 ### Documentation
 
-16. **Update `TODO_LIST.md`** — add entries for fuzz tests, contextValueToString edge cases
-17. **Check `ROADMAP.md`** — may need updating with the new API direction
-18. **Check `docs/DOMAIN_LANGUAGE.md`** — add `ExitCoder` to the glossary if interfaces are documented there
-19. **Add comment on bridge `ClassifiedError`** documenting why it doesn't implement `ExitCoder`
-20. **Rebuild and deploy website** — `api-reference.mdx` was updated but the live site is stale
-21. **Verify the website `api-reference.mdx` renders correctly** in Astro/Starlight
-22. **Add a "What's New in v0.8.0" section to the website** if the pattern exists
+16. ~~**Update `TODO_LIST.md`** — add entries for fuzz tests, contextValueToString edge cases~~ done — TODO_LIST current
+17. ~~**Check `ROADMAP.md`** — may need updating with the new API direction~~ done — ROADMAP current
+18. ~~**Check `docs/DOMAIN_LANGUAGE.md`** — add `ExitCoder` to the glossary if interfaces are documented there~~ done — glossary current
+19. ~~**Add comment on bridge `ClassifiedError`** documenting why it doesn't implement `ExitCoder`~~ done — bridge comment
+20. ~~**Rebuild and deploy website** — `api-reference.mdx` was updated but the live site is stale~~ done — website rebuilt
+21. ~~**Verify the website `api-reference.mdx` renders correctly** in Astro/Starlight~~ done — rendering verified
+22. ~~**Add a "What's New in v0.8.0" section to the website** if the pattern exists~~ done — What's New via changelog
 
 ### Code quality
 
-23. **Run `nix flake check`** — the AGENTS.md says to check flake.nix first; we only ran go commands
-24. **Run `nix run .#lint`** — verify the nix-based lint passes (may catch issues golangci-lint CLI misses)
-25. **Run `nix run .#test`** — verify the nix-based test runner passes
-26. **Verify `GOEXPERIMENT=jsonv2` is set in all CI paths** — the new code doesn't use json/v2 directly but the module does
-27. **Check if `examples/` module needs updating** — it has its own go.mod; new APIs may warrant example additions
-28. **Add `WrapOnce` usage to `examples/cmd/`** if a suitable example exists
+23. ~~**Run `nix flake check`** — the AGENTS.md says to check flake.nix first; we only ran go commands~~ done — flake check green
+24. ~~**Run `nix run .#lint`** — verify the nix-based lint passes (may catch issues golangci-lint CLI misses)~~ done — lint green
+25. ~~**Run `nix run .#test`** — verify the nix-based test runner passes~~ done — tests green
+26. ~~**Verify `GOEXPERIMENT=jsonv2` is set in all CI paths** — the new code doesn't use json/v2 directly but the module does~~ done — resolved — GOEXPERIMENT saga closed (depguard canary)
+27. ~~**Check if `examples/` module needs updating** — it has its own go.mod; new APIs may warrant example additions~~ done — examples updated
+28. ~~**Add `WrapOnce` usage to `examples/cmd/`** if a suitable example exists~~ done — WrapOnce example
 
 ### API completeness
 
-29. **Consider `WrapOnce` family-specific variants** (`WrapOnceRejection`, etc.) — currently only the generic `WrapOnce`/`WrapOncef` exist; the `Wrap*` family has 5 variants each for `New` and `Wrap`
-30. **Consider `WithContextAnyMap(map[string]any)`** — bulk typed-context attachment
-31. **Consider `ExitCode` validation** — should negative exit codes be allowed? Currently any `int` is accepted
-32. **Consider `WithExitCodef`** — probably unnecessary (exit codes are ints, not strings), but document why
-33. **Review whether `ExitCoder` should be in the bridge** — the decision was "no" but could be revisited if consumers request it
+29. ~~**Consider `WrapOnce` family-specific variants** (`WrapOnceRejection`, etc.) — currently only the generic `WrapOnce`/`WrapOncef` exist; the `Wrap*` family has 5 variants each for `New` and `Wrap`~~ done — family variants
+30. ~~**Consider `WithContextAnyMap(map[string]any)`** — bulk typed-context attachment~~ **Won't implement — declined — ContextAnyMap not adopted.**
+31. ~~**Consider `ExitCode` validation** — should negative exit codes be allowed? Currently any `int` is accepted~~ done — exit validation tested
+32. ~~**Consider `WithExitCodef`** — probably unnecessary (exit codes are ints, not strings), but document why~~ done — WithExitCode shipped
+33. ~~**Review whether `ExitCoder` should be in the bridge** — the decision was "no" but could be revisited if consumers request it~~ done — bridge reviewed
 
 ### Architecture review
 
-34. **Audit all `With*` methods for consistent copy-on-write** — `WithExitCode` was added; verify the pattern is identical to `WithContext`, `WithCause`, `WithTimestamp`
-35. **Verify `clone()` copies ALL fields** — `exitCode` was added; if another field is added later, `clone()` must be updated. Consider a table-driven clone test.
-36. **Review `resolveExitCode` naming** — it's in `handle.go` but could arguably live in `classify.go` next to `ExitCode()`. Consider consolidation.
-37. **Check if `ExitCoder` should participate in `Classify`** — currently it doesn't (only `Classified` and `Retryable` influence classification). Should an ExitCoder with code 0 classify differently? Probably not, but document why.
-38. **Consider whether `JSON()` should have an option to include exit code** — some consumers run CLI tools behind HTTP APIs and might want it. Currently documented as excluded.
+34. ~~**Audit all `With*` methods for consistent copy-on-write** — `WithExitCode` was added; verify the pattern is identical to `WithContext`, `WithCause`, `WithTimestamp`~~ done — copy-on-write audited
+35. ~~**Verify `clone()` copies ALL fields** — `exitCode` was added; if another field is added later, `clone()` must be updated. Consider a table-driven clone test.~~ done — clone tested
+36. ~~**Review `resolveExitCode` naming** — it's in `handle.go` but could arguably live in `classify.go` next to `ExitCode()`. Consider consolidation.~~ done — naming settled
+37. ~~**Check if `ExitCoder` should participate in `Classify`** — currently it doesn't (only `Classified` and `Retryable` influence classification). Should an ExitCoder with code 0 classify differently? Probably not, but document why.~~ done — Classify role documented
+38. ~~**Consider whether `JSON()` should have an option to include exit code** — some consumers run CLI tools behind HTTP APIs and might want it. Currently documented as excluded.~~ **Won't implement — declined — JSON option declined; Error.JSON() ships.**
 
 ### Security and robustness
 
-39. **Audit `contextValueToString` for all types that could panic** — `fmt.Sprint` on a nil pointer would panic. Add a `recover` guard or test for this.
-40. **Verify `safeCauseString` doesn't swallow stack traces** — the `recover()` catches the panic but doesn't log it. In production, a silently swallowed panic could hide a real bug. Consider a `log.Debug` or at minimum document the tradeoff.
-41. **Check for integer overflow in `ExitCode`** — exit codes are OS-level and typically 0-255. Currently any `int` is accepted. Should we validate?
+39. ~~**Audit `contextValueToString` for all types that could panic** — `fmt.Sprint` on a nil pointer would panic. Add a `recover` guard or test for this.~~ done — panic audit done
+40. ~~**Verify `safeCauseString` doesn't swallow stack traces** — the `recover()` catches the panic but doesn't log it. In production, a silently swallowed panic could hide a real bug. Consider a `log.Debug` or at minimum document the tradeoff.~~ **Won't implement — declined — stack traces are oops territory (bridge).**
+41. ~~**Check for integer overflow in `ExitCode`** — exit codes are OS-level and typically 0-255. Currently any `int` is accepted. Should we validate?~~ done — overflow tested
 
 ### CI/CD
 
-42. **Verify CI pipeline handles the new test files** — the 4 new test files should be automatically picked up by `go test ./...`
-43. **Check if golangci-lint cache needs clearing** — new files may not be linted if cache is stale
-44. **Verify the examples build step in CI** — `examples/` is a separate module; new APIs don't affect it but verify
+42. ~~**Verify CI pipeline handles the new test files** — the 4 new test files should be automatically picked up by `go test ./...`~~ done — CI files pinned
+43. ~~**Check if golangci-lint cache needs clearing** — new files may not be linted if cache is stale~~ done — lint cache fine
+44. ~~**Verify the examples build step in CI** — `examples/` is a separate module; new APIs don't affect it but verify~~ done — examples CI since v0.10.1
 
 ### Cleanup
 
-45. **Remove the `docs/status/2026-07-16_04-32_buildflow-learnings-integration.md` if it's superseded** — or mark it as superseded by this report
-46. **Review all `//nolint` directives** — none were added this session, but verify the existing ones still apply
-47. **Check for any `TODO` or `FIXME` comments introduced** — none were added, but verify
-48. **Verify `git mv` was used for the test file split** — actually, the old file was `trash`ed and new files were `write`n. This means git sees it as delete+create, not a rename. The commit will lose rename detection. Not critical but suboptimal.
-49. **Stage all changes properly** — currently there's a mix of staged (deletion of old test file) and unstaged changes. Need a clean `git add -A` before committing.
-50. **Write a proper commit message** following the project's commit conventions for the polish layer
+45. ~~**Remove the `docs/status/2026-07-16_04-32_buildflow-learnings-integration.md` if it's superseded** — or mark it as superseded by this report~~ done — superseded report handled (banner)
+46. ~~**Review all `//nolint` directives** — none were added this session, but verify the existing ones still apply~~ done — nolint reviewed
+47. ~~**Check for any `TODO` or `FIXME` comments introduced** — none were added, but verify~~ done — TODO scan done (this pass)
+48. ~~**Verify `git mv` was used for the test file split** — actually, the old file was `trash`ed and new files were `write`n. This means git sees it as delete+create, not a rename. The commit will lose rename detection. Not critical but suboptimal.~~ done — renames detected
+49. ~~**Stage all changes properly** — currently there's a mix of staged (deletion of old test file) and unstaged changes. Need a clean `git add -A` before committing.~~ done — staging clean
+50. ~~**Write a proper commit message** following the project's commit conventions for the polish layer~~ done — commit messages documented
 
 ---
 

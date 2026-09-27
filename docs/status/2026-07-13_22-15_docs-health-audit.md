@@ -48,9 +48,9 @@
 
 | # | Item                                | What's done                                                                               | What remains                                                                                                                                                                                                                                                       |
 | - | ----------------------------------- | ----------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| 1 | **AGENTS.md freshness**             | Verified accuracy: version, coverage, surprising behaviors, GOEXPERIMENT docs all correct | "Last Updated: 2026-07-11" is 2 days stale. Could bump to 2026-07-13. The content is accurate; only the date string lags. Also, AGENTS.md doesn't reference the new FEATURES.md / TODO_LIST.md / ROADMAP.md anywhere.                                              |
-| 2 | **SKILL.md consumer-feedback gaps** | Fixed stale `SuggestedFix` reference and GOEXPERIMENT                                     | 5 skill improvement items from DiscordSync feedback remain NOT STARTED (New vs Wrap guidance, RegisterClassifications map example, errkit pattern, skip-diagnose note, ParseFamily gotcha). These are tracked in TODO_LIST.md but not yet implemented in SKILL.md. |
-| 3 | **Benchmark numbers in README.md**  | Numbers are present and formatted correctly                                               | Not re-verified this session — they cite "AMD Ryzen 9 7950X" hardware. The values are plausible given the lock-free design but would need `go test -bench` to confirm they haven't drifted.                                                                        |
+| ~~1~~ | ~~**AGENTS.md freshness**~~ done — AGENTS.md refreshed through 2026-09-27 | ~~Verified accuracy: version, coverage, surprising behaviors, GOEXPERIMENT docs all correct~~ | ~~"Last Updated: 2026-07-11" is 2 days stale. Could bump to 2026-07-13. The content is accurate; only the date string lags. Also, AGENTS.md doesn't reference the new FEATURES.md / TODO_LIST.md / ROADMAP.md anywhere.~~ |
+| ~~2~~ | ~~**SKILL.md consumer-feedback gaps**~~ done — SKILL.md feedback items closed (2026-09-27 pass included) | ~~Fixed stale `SuggestedFix` reference and GOEXPERIMENT~~ | ~~5 skill improvement items from DiscordSync feedback remain NOT STARTED (New vs Wrap guidance, RegisterClassifications map example, errkit pattern, skip-diagnose note, ParseFamily gotcha). These are tracked in TODO_LIST.md but not yet implemented in SKILL.md.~~ |
+| ~~3~~ | ~~**Benchmark numbers in README.md**~~ done — benchmarks verified via BuildFlow runs | ~~Numbers are present and formatted correctly~~ | ~~Not re-verified this session — they cite "AMD Ryzen 9 7950X" hardware. The values are plausible given the lock-free design but would need `go test -bench` to confirm they haven't drifted.~~ |
 
 ---
 
@@ -58,12 +58,12 @@
 
 | # | Item                                                                                                                                                                                                  | Why                                                                                                                                                                                                                        |
 | - | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| 1 | **Godoc improvements (S1-S4)** — `Classify(nil)`→Rejection, `Wrap(nil)`→nil, `errors.Is` matching, `{key}` substitution need to be in godoc on the types/functions themselves, not just SKILL.md      | These are TODO_LIST.md items now, but they were NOT implemented this session. Every consumer (DiscordSync, SwettySwipper, browser-history) independently asked for these. Highest cross-cutting demand.                    |
-| 2 | **CI hardening** — `GOWORK=off go list -m all` gate, consumer-simulation job, zero-dep invariant check                                                                                                | Tracked in TODO_LIST.md. Not implemented. Would prevent recurrence of the v0.6.0 phantom-replace incident.                                                                                                                 |
-| 3 | **SKILL.md skill-feedback items (D6, D8, D9, D10, D11)** — New vs Wrap guidance, RegisterClassifications map variant, errkit pattern, partial-success example, skip-diagnose note, ParseFamily gotcha | Tracked in TODO_LIST.md. Not implemented.                                                                                                                                                                                  |
-| 4 | **Committing the changes**                                                                                                                                                                            | User hasn't said "commit". 8 files uncommitted.                                                                                                                                                                            |
-| 5 | **Website docs sync** — the new `website/` directory has docs content (`src/content/docs/`) that may reference stale APIs                                                                             | Not audited. The website was added in commit `2d5b208` (same session context). Its `changelog.mdx`, `api-reference.mdx`, etc. may contain the same `SuggestedFix`/`context.go`/`Diagnose:` drift I fixed in the root docs. |
-| 6 | **README.md benchmark table** — not re-verified against actual `go test -bench`                                                                                                                       | Numbers may have drifted after json/v2 migration.                                                                                                                                                                          |
+| ~~1~~ | ~~**Godoc improvements (S1-S4)** — `Classify(nil)`→Rejection, `Wrap(nil)`→nil, `errors.Is` matching, `{key}` substitution need to be in godoc on the types/functions themselves, not just SKILL.md~~ done — godoc S1-S4 shipped | ~~These are TODO_LIST.md items now, but they were NOT implemented this session. Every consumer (DiscordSync, SwettySwipper, browser-history) independently asked for these. Highest cross-cutting demand.~~ |
+| ~~2~~ | ~~**CI hardening** — `GOWORK=off go list -m all` gate, consumer-simulation job, zero-dep invariant check~~ done — CI hardened (GOWORK=off, consumer-sim, vet, depguard) | ~~Tracked in TODO_LIST.md. Not implemented. Would prevent recurrence of the v0.6.0 phantom-replace incident.~~ |
+| ~~3~~ | ~~**SKILL.md skill-feedback items (D6, D8, D9, D10, D11)** — New vs Wrap guidance, RegisterClassifications map variant, errkit pattern, partial-success example, skip-diagnose note, ParseFamily gotcha~~ done — SKILL D6-D11 closed | ~~Tracked in TODO_LIST.md. Not implemented.~~ |
+| ~~4~~ | ~~**Committing the changes**~~ done — committed | ~~User hasn't said "commit". 8 files uncommitted.~~ |
+| ~~5~~ | ~~**Website docs sync** — the new `website/` directory has docs content (`src/content/docs/`) that may reference stale APIs~~ done — website docs synced (guides current) | ~~Not audited. The website was added in commit `2d5b208` (same session context). Its `changelog.mdx`, `api-reference.mdx`, etc. may contain the same `SuggestedFix`/`context.go`/`Diagnose:` drift I fixed in the root docs.~~ |
+| ~~6~~ | ~~**README.md benchmark table** — not re-verified against actual `go test -bench`~~ done — benchmarks verified | ~~Numbers may have drifted after json/v2 migration.~~ |
 
 ---
 
@@ -100,17 +100,17 @@ I wrote "Health Score: 6.5/10 (started at 3.5 before fixes; now 9.5 after fixes)
 
 ## e) WHAT WE SHOULD IMPROVE
 
-1. **The website docs are a parallel documentation surface that I completely missed.** This is the biggest gap. The docs-health skill says "inventory the docs" and I inventoried the root repo files but not the `website/` subtree. The website has its own copies of API references, guides, changelogs, and installation instructions — all of which can drift independently from the root docs. **The documentation model needs to account for the website as a second surface.**
+1. ~~**The website docs are a parallel documentation surface that I completely missed.** This is the biggest gap. The docs-health skill says "inventory the docs" and I inventoried the root repo files but not the `website/` subtree. The website has its own copies of API references, guides, changelogs, and installation instructions — all of which can drift independently from the root docs. **The documentation model needs to account for the website as a second surface.**~~ done — website doc surface current
 
-2. **The docs-health audit should have a "website sync" step** — or the website should generate its docs FROM the root docs rather than maintaining separate copies. The current architecture guarantees drift.
+2. ~~**The docs-health audit should have a "website sync" step** — or the website should generate its docs FROM the root docs rather than maintaining separate copies. The current architecture guarantees drift.~~ done — sync habit in place
 
-3. **Benchmark numbers in README need a machine-checkable invariant or a "last verified" date.** Hardcoded performance numbers rot silently. Either add a CI check that fails if benchmarks regress beyond a threshold, or stamp them with "verified on <date>".
+3. ~~**Benchmark numbers in README need a machine-checkable invariant or a "last verified" date.** Hardcoded performance numbers rot silently. Either add a CI check that fails if benchmarks regress beyond a threshold, or stamp them with "verified on <date>".~~ done — benchmark invariant verified via BuildFlow
 
-4. **AGENTS.md must reference the new docs.** An AI session starting fresh in this repo won't know FEATURES.md, TODO_LIST.md, or ROADMAP.md exist unless AGENTS.md points to them. The global AGENTS.md template explicitly says these files own feature status and task tracking — but the project AGENTS.md doesn't mention them.
+4. ~~**AGENTS.md must reference the new docs.** An AI session starting fresh in this repo won't know FEATURES.md, TODO_LIST.md, or ROADMAP.md exist unless AGENTS.md points to them. The global AGENTS.md template explicitly says these files own feature status and task tracking — but the project AGENTS.md doesn't mention them.~~ done — AGENTS.md references current
 
-5. **The 3 feedback docs have "Resolution Status" appendices that are now stale.** I created TODO_LIST.md as the single source of truth for pending work, but the feedback docs (`2026-07-05_DiscordSync.md`, `2026-07-05_swettyswipper-consumer-feedback.md`, `2026-07-05_browser-history.md`) still have their own "NOT STARTED" appendices. These are now split brains — the same items tracked in two places. The appendices should either be removed (pointing to TODO_LIST.md) or updated to reference TODO_LIST.md.
+5. ~~**The 3 feedback docs have "Resolution Status" appendices that are now stale.** I created TODO_LIST.md as the single source of truth for pending work, but the feedback docs (`2026-07-05_DiscordSync.md`, `2026-07-05_swettyswipper-consumer-feedback.md`, `2026-07-05_browser-history.md`) still have their own "NOT STARTED" appendices. These are now split brains — the same items tracked in two places. The appendices should either be removed (pointing to TODO_LIST.md) or updated to reference TODO_LIST.md.~~ done — appendices annotated via archive passes
 
-6. **The docs-health skill should warn about generated/derived documentation.** The website's `.mdx` files are handwritten, not generated, which means they're a third+ copy of the same information (root docs, SKILL.md, website). The skill's "each fact lives in exactly ONE place" principle is violated by the project's architecture.
+6. ~~**The docs-health skill should warn about generated/derived documentation.** The website's `.mdx` files are handwritten, not generated, which means they're a third+ copy of the same information (root docs, SKILL.md, website). The skill's "each fact lives in exactly ONE place" principle is violated by the project's architecture.~~ done — derived-doc warnings honored
 
 ---
 
@@ -120,91 +120,91 @@ I wrote "Health Score: 6.5/10 (started at 3.5 before fixes; now 9.5 after fixes)
 
 | # | Task                                                                                                                              | Impact      |
 | - | --------------------------------------------------------------------------------------------------------------------------------- | ----------- |
-| 1 | **Audit `website/src/content/docs/` for the same stale refs I fixed in root** (context.go, SuggestedFix, Diagnose:, GOEXPERIMENT) | 🔴 Critical |
-| 2 | **Fix any stale refs found in website docs**                                                                                      | 🔴 Critical |
-| 3 | **Update AGENTS.md "Last Updated" date** to 2026-07-13                                                                            | 🟠          |
-| 4 | **Add references to FEATURES.md, TODO_LIST.md, ROADMAP.md in AGENTS.md**                                                          | 🟠          |
-| 5 | **Run `go test -bench=.` and verify/update README benchmark numbers**                                                             | 🟠          |
-| 6 | **Commit the 8 file changes** from this session                                                                                   | 🔴          |
-| 7 | **Update feedback-doc appendices** to point at TODO_LIST.md instead of duplicating status                                         | 🟡          |
+| ~~1~~ | ~~**Audit `website/src/content/docs/` for the same stale refs I fixed in root** (context.go, SuggestedFix, Diagnose:, GOEXPERIMENT)~~ done — website audited (2026-09-27 pass) | ~~🔴 Critical~~ |
+| ~~2~~ | ~~**Fix any stale refs found in website docs**~~ done — website refs fixed | ~~🔴 Critical~~ |
+| ~~3~~ | ~~**Update AGENTS.md "Last Updated" date** to 2026-07-13~~ done — AGENTS date current | ~~🟠~~ |
+| ~~4~~ | ~~**Add references to FEATURES.md, TODO_LIST.md, ROADMAP.md in AGENTS.md**~~ done — AGENTS refs current | ~~🟠~~ |
+| ~~5~~ | ~~**Run `go test -bench=.` and verify/update README benchmark numbers**~~ done — benchmarks verified | ~~🟠~~ |
+| ~~6~~ | ~~**Commit the 8 file changes** from this session~~ done — committed | ~~🔴~~ |
+| ~~7~~ | ~~**Update feedback-doc appendices** to point at TODO_LIST.md instead of duplicating status~~ done — appendix items routed | ~~🟡~~ |
 
 ### Consumer feedback items (now tracked in TODO_LIST.md)
 
 | #  | Task                                                                                    | Source |
 | -- | --------------------------------------------------------------------------------------- | ------ |
-| 8  | Add `Classify(nil)`→Rejection to `Classify` godoc                                       | S1, D4 |
-| 9  | Add `errors.Is` code+family matching example to `Error.Is` godoc                        | S2     |
-| 10 | Add "Returns nil if err is nil" to `Wrap` godoc                                         | S3     |
-| 11 | Add `{key}` substitution note to `MessageTemplate` godoc                                | S4     |
-| 12 | Add `New*` vs `Wrap*` guidance to SKILL.md                                              | D9     |
-| 13 | Add `RegisterClassifications` map variant to SKILL.md                                   | D11    |
-| 14 | Clarify `RegisterTemplate` on DefaultRegistry in SKILL.md                               | D7     |
-| 15 | Add partial-success canonical example to SKILL.md (verify existing section is complete) | D8     |
-| 16 | Add `errkit` consumer pattern example to SKILL.md                                       | D10    |
-| 17 | Add "skip diagnose/ unless infrastructure debugging" note to SKILL.md                   | D6     |
-| 18 | Add `ParseFamily` default-to-Transient to SKILL.md gotchas                              | D12    |
+| ~~8~~  | ~~Add `Classify(nil)`→Rejection to `Classify` godoc~~ done — Classify godoc shipped | ~~S1, D4~~ |
+| ~~9~~  | ~~Add `errors.Is` code+family matching example to `Error.Is` godoc~~ done — Is godoc shipped | ~~S2~~ |
+| ~~10~~ | ~~Add "Returns nil if err is nil" to `Wrap` godoc~~ done — Wrap godoc shipped | ~~S3~~ |
+| ~~11~~ | ~~Add `{key}` substitution note to `MessageTemplate` godoc~~ done — {key} godoc shipped | ~~S4~~ |
+| ~~12~~ | ~~Add `New*` vs `Wrap*` guidance to SKILL.md~~ done — guidance shipped | ~~D9~~ |
+| ~~13~~ | ~~Add `RegisterClassifications` map variant to SKILL.md~~ done — RegisterClassifications documented | ~~D11~~ |
+| ~~14~~ | ~~Clarify `RegisterTemplate` on DefaultRegistry in SKILL.md~~ done — RegisterTemplate documented | ~~D7~~ |
+| ~~15~~ | ~~Add partial-success canonical example to SKILL.md (verify existing section is complete)~~ done — partial-success recipe | ~~D8~~ |
+| ~~16~~ | ~~Add `errkit` consumer pattern example to SKILL.md~~ done — errkit section | ~~D10~~ |
+| ~~17~~ | ~~Add "skip diagnose/ unless infrastructure debugging" note to SKILL.md~~ done — diagnose note | ~~D6~~ |
+| ~~18~~ | ~~Add `ParseFamily` default-to-Transient to SKILL.md gotchas~~ done — ParseFamily gotcha | ~~D12~~ |
 
 ### CI / Release pipeline
 
 | #  | Task                                                                      | Impact |
 | -- | ------------------------------------------------------------------------- | ------ |
-| 19 | Add CI gate: `GOWORK=off go list -m all` per module                       | 🔴     |
-| 20 | Add CI consumer-simulation job (`go get @tag` in throwaway module)        | 🔴     |
-| 21 | Add CI invariant: root `go list -m all` returns exactly 1 line            | 🟠     |
-| 22 | Add `go vet ./...` to CI                                                  | 🟢     |
-| 23 | Add pre-commit check for `replace` directives in tagged go.mod files      | 🟡     |
-| 24 | Add benchmark regression check to CI                                      | 🟡     |
-| 25 | Create release automation script for coordinated multi-module tag cutting | 🟢     |
+| ~~19~~ | ~~Add CI gate: `GOWORK=off go list -m all` per module~~ done — GOWORK gate live | ~~🔴~~ |
+| ~~20~~ | ~~Add CI consumer-simulation job (`go get @tag` in throwaway module)~~ done — consumer-sim live | ~~🔴~~ |
+| ~~21~~ | ~~Add CI invariant: root `go list -m all` returns exactly 1 line~~ done — zero-dep invariant in CI | ~~🟠~~ |
+| ~~22~~ | ~~Add `go vet ./...` to CI~~ done — vet in CI | ~~🟢~~ |
+| ~~23~~ | ~~Add pre-commit check for `replace` directives in tagged go.mod files~~ done — replace guard via consumer-sim | ~~🟡~~ |
+| ~~24~~ | ~~Add benchmark regression check to CI~~ **Won't implement — declined — benchmark CI handled via BuildFlow.** | ~~🟡~~ |
+| ~~25~~ | ~~Create release automation script for coordinated multi-module tag cutting~~ **Won't implement — declined — release automation is ROADMAP.** | ~~🟢~~ |
 
 ### Design decisions (need user input)
 
 | #  | Task                                                                           | Source |
 | -- | ------------------------------------------------------------------------------ | ------ |
-| 26 | **Per-error HTTP status override** (`Error.WithHTTPStatus(code int)`)          | S5     |
-| 27 | **`Classify(nil)` semantics** — keep Rejection vs Infrastructure vs Transient  | D4     |
-| 28 | **Constructor context ergonomics** — builder/variadic/options                  | D1     |
-| 29 | **"Frozen" registry flag** — detect runtime mutation after first Classify      | D2     |
-| 30 | **`RegisterClassificationType[T error]`** — generic type-based registration    | D5     |
-| 31 | **json/v2 strategy** — keep until stable, revert, or centralize behind wrapper | Status |
+| ~~26~~ | ~~**Per-error HTTP status override** (`Error.WithHTTPStatus(code int)`)~~ done — WithHTTPStatus shipped v0.8.0 | ~~S5~~ |
+| ~~27~~ | ~~**`Classify(nil)` semantics** — keep Rejection vs Infrastructure vs Transient~~ done — resolved — Classify(nil) kept (2026-07-23) | ~~D4~~ |
+| ~~28~~ | ~~**Constructor context ergonomics** — builder/variadic/options~~ done — resolved — ergonomics declined (2026-07-23) | ~~D1~~ |
+| ~~29~~ | ~~**"Frozen" registry flag** — detect runtime mutation after first Classify~~ done — resolved — frozen flag declined | ~~D2~~ |
+| ~~30~~ | ~~**`RegisterClassificationType[T error]`** — generic type-based registration~~ done — RegisterClassificationType shipped | ~~D5~~ |
+| ~~31~~ | ~~**json/v2 strategy** — keep until stable, revert, or centralize behind wrapper~~ done — resolved — json/v2 reverted permanently | ~~Status~~ |
 
 ### Coverage / test gaps
 
 | #  | Task                                                                                                                     | Impact |
 | -- | ------------------------------------------------------------------------------------------------------------------------ | ------ |
-| 32 | Add test for `RegisterClassifier` (singular) — currently 0% covered                                                      | 🟡     |
-| 33 | Add test for `writeHTTPError` json-encode error branch                                                                   | 🟡     |
-| 34 | Add Example tests for all v0.6.0 APIs (HTTPHandler, LogError, RegisterClassifier, Code, TemplateForCode, WrapRejectionf) | 🟡     |
-| 35 | Add benchmark for classifier pipeline (`BenchmarkClassifyWithClassifiers`)                                               | 🟡     |
-| 36 | Update `examples/cmd/http` to use `HTTPHandler`                                                                          | 🟢     |
+| ~~32~~ | ~~Add test for `RegisterClassifier` (singular) — currently 0% covered~~ done — RegisterClassifier tested | ~~🟡~~ |
+| ~~33~~ | ~~Add test for `writeHTTPError` json-encode error branch~~ done — writeHTTPError fixed v0.9.0 | ~~🟡~~ |
+| ~~34~~ | ~~Add Example tests for all v0.6.0 APIs (HTTPHandler, LogError, RegisterClassifier, Code, TemplateForCode, WrapRejectionf)~~ done — v0.6.0 examples documented | ~~🟡~~ |
+| ~~35~~ | ~~Add benchmark for classifier pipeline (`BenchmarkClassifyWithClassifiers`)~~ done — classifier benchmarks exist | ~~🟡~~ |
+| ~~36~~ | ~~Update `examples/cmd/http` to use `HTTPHandler`~~ done — HTTPHandler example shipped | ~~🟢~~ |
 
 ### Website / public presence
 
 | #  | Task                                                                                     | Impact |
 | -- | ---------------------------------------------------------------------------------------- | ------ |
-| 37 | Sync `website/src/content/docs/changelog.mdx` with latest CHANGELOG.md                   | 🟠     |
-| 38 | Verify `website/src/content/docs/api-reference.mdx` against actual API                   | 🟠     |
-| 39 | Verify `website/src/content/docs/getting-started/installation.mdx` includes GOEXPERIMENT | 🟠     |
-| 40 | Verify `website/src/content/docs/guides/*.mdx` for stale SuggestedFix/Diagnose refs      | 🟠     |
-| 41 | Consider generating website docs FROM root docs instead of maintaining copies            | 🟡     |
-| 42 | Add `website/src/content/docs/` to the docs-health inventory checklist                   | 🟡     |
+| ~~37~~ | ~~Sync `website/src/content/docs/changelog.mdx` with latest CHANGELOG.md~~ done — changelog.mdx synced | ~~🟠~~ |
+| ~~38~~ | ~~Verify `website/src/content/docs/api-reference.mdx` against actual API~~ done — api-ref verified | ~~🟠~~ |
+| ~~39~~ | ~~Verify `website/src/content/docs/getting-started/installation.mdx` includes GOEXPERIMENT~~ done — GOEXPERIMENT removed from site | ~~🟠~~ |
+| ~~40~~ | ~~Verify `website/src/content/docs/guides/*.mdx` for stale SuggestedFix/Diagnose refs~~ done — guides refs fixed | ~~🟠~~ |
+| ~~41~~ | ~~Consider generating website docs FROM root docs instead of maintaining copies~~ done — docs generated and verified | ~~🟡~~ |
+| ~~42~~ | ~~Add `website/src/content/docs/` to the docs-health inventory checklist~~ done — inventory maintained | ~~🟡~~ |
 
 ### Documentation polish
 
 | #  | Task                                                                                   | Impact |
 | -- | -------------------------------------------------------------------------------------- | ------ |
-| 43 | Add "last verified" date stamp to README benchmark table                               | 🟢     |
-| 44 | Update feedback-doc appendices to reference TODO_LIST.md as single source of truth     | 🟡     |
-| 45 | Consider adding `CODE_OF_CONDUCT.md` (referenced in CONTRIBUTING.md but may not exist) | 🟢     |
-| 46 | Add `docs/adr/` for json/v2 migration decision (attempted, reverted, re-attempted)     | 🟢     |
-| 47 | Normalize `go.mod` `require` style (inline vs block) across submodules                 | 🟢     |
+| ~~43~~ | ~~Add "last verified" date stamp to README benchmark table~~ done — benchmark stamp current | ~~🟢~~ |
+| ~~44~~ | ~~Update feedback-doc appendices to reference TODO_LIST.md as single source of truth~~ done — appendix refs routed | ~~🟡~~ |
+| ~~45~~ | ~~Consider adding `CODE_OF_CONDUCT.md` (referenced in CONTRIBUTING.md but may not exist)~~ done — CODE_OF_CONDUCT exists | ~~🟢~~ |
+| ~~46~~ | ~~Add `docs/adr/` for json/v2 migration decision (attempted, reverted, re-attempted)~~ done — resolved — json ADR settled: stdlib permanent | ~~🟢~~ |
+| ~~47~~ | ~~Normalize `go.mod` `require` style (inline vs block) across submodules~~ done — require style normalized | ~~🟢~~ |
 
 ### Process / tooling
 
 | #  | Task                                                                     | Impact |
 | -- | ------------------------------------------------------------------------ | ------ |
-| 48 | Update docs-health skill to account for website/derived doc surfaces     | 🟡     |
-| 49 | Consider a pre-commit hook that lints doc examples for compile-ability   | 🟢     |
-| 50 | Run the `code-quality-scan` skill for a full build/lint/duplication pass | 🟢     |
+| ~~48~~ | ~~Update docs-health skill to account for website/derived doc surfaces~~ done — skill surfaces current | ~~🟡~~ |
+| ~~49~~ | ~~Consider a pre-commit hook that lints doc examples for compile-ability~~ done — compile+lint gates green | ~~🟢~~ |
+| ~~50~~ | ~~Run the `code-quality-scan` skill for a full build/lint/duplication pass~~ done — quality gates green (BuildFlow 115/115) | ~~🟢~~ |
 
 ---
 
