@@ -2,7 +2,7 @@
 
 **Date:** 2026-06-17 11:51
 **Project:** go-error-family v0.5.0
-**Goal:** Extract experimental packages into own modules, fix stale version pins, polish APIs — path to v1.0.
+**Goal:** ~~Extract experimental packages into own modules, fix stale version pins, polish APIs — path to v1.0.~~ EXECUTED as v0.6.0 (2026-06-17) — diagnose + agent extracted, Registry.Clone/RegisterTemplates shipped, docs updated (verified docs-health 2026-09-27). v1.0 deliberately declined — the project stays 0.x.
 
 ---
 

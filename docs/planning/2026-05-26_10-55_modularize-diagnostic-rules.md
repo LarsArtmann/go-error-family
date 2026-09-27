@@ -1,7 +1,7 @@
 # Decision: Modularize Diagnostic Rules + Typed Context Keys
 
 **Date:** 2026-05-26
-**Status:** Proposed — awaiting approval
+**Status:** ~~Proposed — awaiting approval~~ APPROVED AND EXECUTED as v0.2.0 (2026-05-26) — diagnose/git + diagnose/postgres submodules, typed ContextKeys, go.work all shipped
 **Decision-makers:** Lars
 
 ---
@@ -166,13 +166,13 @@ var filesystemSpec = ruleSpec{
 
 ## Open Questions
 
-1. **go-git vs shell-out?** `go-git` is pure Go and testable, but adds a non-trivial dependency tree. Is the tradeoff worth it for a diagnostic rule that runs once per error?
+1. ~~**go-git vs shell-out?** `go-git` is pure Go and testable, but adds a non-trivial dependency tree. Is the tradeoff worth it for a diagnostic rule that runs once per error?~~ done — decided — go-git tradeoff resolved: shell-out kept
 
-2. **PostgresRule extraction?** Should we extract PostgresRule too (even without a pure-Go replacement), or leave it in the core diagnose package since it has no new dependencies?
+2. ~~**PostgresRule extraction?** Should we extract PostgresRule too (even without a pure-Go replacement), or leave it in the core diagnose package since it has no new dependencies?~~ done — decided — yes, PostgresRule also extracted (v0.2.0)
 
-3. **Version bump?** v0.2.0 (semver minor) or v1.0.0 (if we consider the API stable enough)?
+3. ~~**Version bump?** v0.2.0 (semver minor) or v1.0.0 (if we consider the API stable enough)?~~ done — decided — v0.2.0 tagged 2026-05-26
 
-4. **go.work vs replace directives?** `go.work` is the modern approach for local multi-module development. But it requires consumers to also use workspaces. `replace` directives in go.mod are more explicit but leak into published modules.
+4. ~~**go.work vs replace directives?** `go.work` is the modern approach for local multi-module development. But it requires consumers to also use workspaces. `replace` directives in go.mod are more explicit but leak into published modules.~~ done — decided — go.work adopted
 
 ---
 

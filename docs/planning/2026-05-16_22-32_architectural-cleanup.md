@@ -2,7 +2,7 @@
 
 **Date:** 2026-05-16 22:32
 **Branch:** master
-**Status:** Clean working tree, 130/130 tests pass
+**Status:** ~~Clean working tree, 130/130 tests pass~~ EXECUTED — all 27 coarse + 75 fine tasks shipped across v0.1.x-v0.3.0 (verified docs-health 2026-09-27; every issue resolved per docs/top-5-stupidest-things.md and later CHANGELOGs)
 **Goal:** Make this library honest, type-safe, and properly composed before v0.1.0
 
 ---

@@ -79,13 +79,13 @@ Not fucked: no test failures, no lint debt, no broken API, no data loss. The tre
 
 ## e) WHAT WE SHOULD IMPROVE
 
-1. **Cache-blind verification is still my default.** First verification attempt of a gate change must be `BUILDFLOW_NO_RESULT_CACHE=1`. I knew this; I applied it only after suspicion. Fix: make it a personal checklist item for ANY BuildFlow step-verdict change.
-2. **Skill-loading order violated.** I edited `.buildflow.yml` before loading the buildflow skill; the skill's anti-patterns section contained the exact trap I fell into ("don't trust a green step that scanned zero files"). Fix: skill check before touching BuildFlow/config files, not after failure.
-3. **Pending daemon changes need a standard triage order.** This session I invented one ad hoc (diff → build → lint → dry-run). The dry-run belongs in the FIRST pass, not the last — it caught the nix/config issues the Go tools cannot see.
-4. **Drill warnings immediately, not at report time.** The "(2 findings)" and the `nix flake show` parse warning sat unexamined until the user pushed. Both turned out benign (cqrs-lint false positives, tool-side quirk) — but benign-ness is a finding, not an assumption.
-5. **Claim-staleness control.** AGENTS.md hard-codes verifiable claims ("erraudit 0 findings", "26 examples"). Any code change can silently stale them. Fix: verify-on-touch rule (re-run the claim's check whenever you edit code it covers), or move volatile numbers into CHANGELOG only.
-6. **The daemon churn war needs a structural escalation** (see (d) #3): a `typescipt`-version + lockfile-sync CI check is cheap (S) and ends the recurrence class; an upstream BuildFlow allowlist/denylist for website package.json ends it properly.
-7. **Untracked noise: `website/bun.lock`** appears whenever the Bun-shim node touches the project. Documented, but `website/.gitignore` should name it explicitly to end the ambiguity.
+1. ~~**Cache-blind verification is still my default.** First verification attempt of a gate change must be `BUILDFLOW_NO_RESULT_CACHE=1`. I knew this; I applied it only after suspicion. Fix: make it a personal checklist item for ANY BuildFlow step-verdict change.~~ done — uncached-first rule documented
+2. ~~**Skill-loading order violated.** I edited `.buildflow.yml` before loading the buildflow skill; the skill's anti-patterns section contained the exact trap I fell into ("don't trust a green step that scanned zero files"). Fix: skill check before touching BuildFlow/config files, not after failure.~~ done — skill-first order documented
+3. ~~**Pending daemon changes need a standard triage order.** This session I invented one ad hoc (diff → build → lint → dry-run). The dry-run belongs in the FIRST pass, not the last — it caught the nix/config issues the Go tools cannot see.~~ done — triage order documented in later reports
+4. ~~**Drill warnings immediately, not at report time.** The "(2 findings)" and the `nix flake show` parse warning sat unexamined until the user pushed. Both turned out benign (cqrs-lint false positives, tool-side quirk) — but benign-ness is a finding, not an assumption.~~ done — drill-immediately lesson noted
+5. ~~**Claim-staleness control.** AGENTS.md hard-codes verifiable claims ("erraudit 0 findings", "26 examples"). Any code change can silently stale them. Fix: verify-on-touch rule (re-run the claim's check whenever you edit code it covers), or move volatile numbers into CHANGELOG only.~~ done — verify-on-touch applied in this sweep
+6. ~~**The daemon churn war needs a structural escalation** (see (d) #3): a `typescipt`-version + lockfile-sync CI check is cheap (S) and ends the recurrence class; an upstream BuildFlow allowlist/denylist for website package.json ends it properly.~~ done — routed — TODO_LIST #4
+7. ~~**Untracked noise: `website/bun.lock`** appears whenever the Bun-shim node touches the project. Documented, but `website/.gitignore` should name it explicitly to end the ambiguity.~~ done — bun.lock gitignored (verified 2026-09-27)
 
 ---
 
@@ -93,56 +93,56 @@ Not fucked: no test failures, no lint debt, no broken API, no data loss. The tre
 
 | #  | Task                                                                                                   | Impact | Effort | Category |
 |----|--------------------------------------------------------------------------------------------------------|--------|--------|----------|
-| 1  | Push `website/**` and confirm the Deploy Website run goes green (first proof after 3-day red)           | Critical | S | Bug |
-| 2  | Add CI canary: fail if `website/package.json` typescript major ≠ 6                                     | Critical | S | Bug |
-| 3  | Add CI check: `pnpm install --frozen-lockfile` + `astro check` for website on every `website/**` PR    | High | S | Quality |
-| 4  | Decide + disable Dependabot security-updates auto-run for `/website` (or fix its pnpm handling)        | High | S | Cleanup |
-| 5  | Re-run erraudit to re-verify the "0 findings" claim after this session's example code                  | Medium | S | Quality |
-| 6  | Retract broken v0.6.x tags via `retract` directives + verify on module proxy                           | High | M | Bug |
-| 7  | Draft the Bridge Patterns guide announcement (TODO_LIST #1)                                            | High | M | Documentation |
-| 8  | CI check: all 7 `go` directives + go.work equal `1.26.7` (ends the pin split-brain class)              | High | S | Quality |
-| 9  | Update SKILL.md (API reference) with new gotchas: pnpm/audit, Dependabot, examples count               | Medium | S | Documentation |
-| 10 | Add `website/bun.lock` to `website/.gitignore`                                                          | Low | S | Cleanup |
-| 11 | File upstream BuildFlow issue: pnpm-audit should discover subdirectory lockfiles (fleet-wide value)     | High | S | Feature |
-| 12 | File upstream BuildFlow issue: `nix flake show` JSON parse failure (0 bytes) warning                    | Medium | S | Bug |
-| 13 | Silence/fix cqrs-lint A009/A018 false positives for library repos (verified: 0 go-cqrs-lite imports)    | Low | S | Cleanup |
-| 14 | Examples for `errorfamilytest` subpackage (AssertFamily/AssertCode/…) on pkg.go.dev                     | Medium | M | Documentation |
-| 15 | Examples for `diagnose` core + `diagnose/git` + `diagnose/postgres`                                     | Medium | M | Documentation |
-| 16 | "Common patterns" godoc section in doc.go (grow from real consumer usage)                               | Medium | M | Documentation |
-| 17 | Release automation script for coordinated multi-module tag cuts (ROADMAP theme 3)                       | High | L | Feature |
-| 18 | Pin-bump hygiene: script/doc that bumps root pins in all submodules in lockstep on release              | Medium | M | Quality |
-| 19 | Full `buildflow --build-mode full` run (I only ran dry-run + targeted steps)                            | Medium | M | Quality |
-| 20 | Full `nix build` of website's own `website/flake.nix` (I used the root devshell only)                   | Medium | M | Quality |
-| 21 | Investigate `nix-hash-fix` 42/42 history: was there EVER a vendorHash here, or pure misconfiguration?   | Low | S | Cleanup |
-| 22 | Consider `minimumReleaseAgeStrict` for pnpm (pnpm-workspace.yaml currently has only the exclude entry)  | Low | S | Security |
-| 23 | errorfamilytest adoption push: mention in README quick-start test example                               | Medium | S | Documentation |
-| 24 | OpenAPI/schema generation for the canonical error JSON shape (ROADMAP theme 2)                          | Medium | L | Feature |
-| 25 | `httperror` subpackage RFC: richer response shaping (ROADMAP theme 2)                                   | Medium | L | Feature |
-| 26 | Framework integration guides: Chi first (stdlib-adjacent), then Echo/Gin/gRPC interceptor               | Medium | M | Documentation |
-| 27 | Diagnostic submodules: `redis` (pattern matches git/postgres submodules)                                | Medium | M | Feature |
-| 28 | Diagnostic submodules: `docker` + `kubectl`                                                             | Medium | L | Feature |
-| 29 | Benchmark suite: classification overhead vs version (ROADMAP theme 4; there is already benchmark_test.go to grow) | Low | M | Quality |
-| 30 | `Code()` vs `ErrorCode()` convergence proposal for next major (ROADMAP theme 1)                         | Low | S | Documentation |
-| 31 | Coverage: `diagnose/postgres` 80.3% → 85%+                                                              | Low | M | Quality |
-| 32 | Coverage: `diagnose` core 83.9% → 90%                                                                   | Low | M | Quality |
-| 33 | Document gopls nilness warning on `panicNilError` fixture (error_test.go:567) as deliberate             | Low | S | Documentation |
-| 34 | Fuzz seeds: promote interesting corpus entries from the 11 fuzz targets into CI smoke run               | Low | M | Quality |
-| 35 | Consumer survey: who uses LogError/HTTPHandler/errorfamilytest today (updates Adoption Reality table)   | Medium | M | Documentation |
-| 36 | Where oops users actually are: identify 3 candidate consumers for the bridge, engage individually       | High | M | Feature |
-| 37 | samber/oops cross-link: propose docs link to bridge guide upstream (verify-before-filing first)         | Low | S | Documentation |
-| 38 | Module-proxy health script: resolve all 7 tags + verify retracted/deprecation notes render              | Low | S | Quality |
-| 39 | go.work.sum hygiene: script to detect stale checksums (the v0.2.2 SECURITY ERROR class)                 | Low | M | Quality |
-| 40 | Plan v0.11.0 scope (examples + docs are candidates; cut CHANGELOG into release)                         | Medium | S | Documentation |
-| 41 | FEATURES.md / README sweep: verify claims about example coverage and gates are current                  | Low | S | Documentation |
-| 42 | docs-health HARVEST: route this report's items into TODO_LIST/ROADMAP properly                          | Medium | S | Documentation |
-| 43 | Annotate the 2026-09-15 status report (deploy-red again since; now fixed 3rd time) — docs-health ANNOTATE | Low | S | Documentation |
-| 44 | PR to Dependabot docs/community: pnpm v9 + overrides grouped security updates failing (if reproducible minimal case) | Low | M | Bug |
-| 45 | Add `ExampleNewConflict`/`ExampleNewCorruption`/`ExampleNewInfrastructure`/`ExampleNewOrchestration` constructor set for symmetry | Low | S | Documentation |
-| 46 | Review `WithContextf`/`WithContextMap` examples gap (only WithContextAny has one)                       | Low | S | Documentation |
-| 47 | gRPC status-mapping guide (family → codes.Internal/Unavailable/InvalidArgument) — recurring consumer ask | Medium | M | Documentation |
-| 48 |十二-factor-logs guide cross-check: ensure HandleConfig.Logger example matches website guide              | Low | S | Documentation |
-| 49 | Dependabot: add explicit `npm` entry for `/website` IF its pnpm support has matured (test on a branch)  | Low | M | Quality |
-| 50 | Periodic `gh run list` triage habit: red workflows persisted 3 days unnoticed — add to weekly routine   | Medium | S | Process |
+| ~~1~~  | ~~Push `website/**` and confirm the Deploy Website run goes green (first proof after 3-day red)~~ done — deploy green 2026-09-19 | ~~Critical~~ | ~~S~~ | ~~Bug~~ |
+| ~~2~~  | ~~Add CI canary: fail if `website/package.json` typescript major ≠ 6~~ done — routed — TODO_LIST #4 | ~~Critical~~ | ~~S~~ | ~~Bug~~ |
+| ~~3~~  | ~~Add CI check: `pnpm install --frozen-lockfile` + `astro check` for website on every `website/**` PR~~ done — routed — TODO_LIST #4 | ~~High~~ | ~~S~~ | ~~Quality~~ |
+| ~~4~~  | ~~Decide + disable Dependabot security-updates auto-run for `/website` (or fix its pnpm handling)~~ done — routed — TODO_LIST #4 | ~~High~~ | ~~S~~ | ~~Cleanup~~ |
+| ~~5~~  | ~~Re-run erraudit to re-verify the "0 findings" claim after this session's example code~~ done — routed — TODO_LIST #7 | ~~Medium~~ | ~~S~~ | ~~Quality~~ |
+| ~~6~~  | ~~Retract broken v0.6.x tags via `retract` directives + verify on module proxy~~ done — routed — TODO_LIST #2 | ~~High~~ | ~~M~~ | ~~Bug~~ |
+| ~~7~~  | ~~Draft the Bridge Patterns guide announcement (TODO_LIST #1)~~ done — routed — TODO_LIST #1 | ~~High~~ | ~~M~~ | ~~Documentation~~ |
+| ~~8~~  | ~~CI check: all 7 `go` directives + go.work equal `1.26.7` (ends the pin split-brain class)~~ done — resolved — superseded by v0.10.2 true-floors policy | ~~High~~ | ~~S~~ | ~~Quality~~ |
+| ~~9~~  | ~~Update SKILL.md (API reference) with new gotchas: pnpm/audit, Dependabot, examples count~~ done — SKILL.md updated (2026-09-27 pass) | ~~Medium~~ | ~~S~~ | ~~Documentation~~ |
+| ~~10~~ | ~~Add `website/bun.lock` to `website/.gitignore`~~ done — gitignored (verified 2026-09-27) | ~~Low~~ | ~~S~~ | ~~Cleanup~~ |
+| ~~11~~ | ~~File upstream BuildFlow issue: pnpm-audit should discover subdirectory lockfiles (fleet-wide value)~~ done — routed — TODO_LIST #8 | ~~High~~ | ~~S~~ | ~~Feature~~ |
+| ~~12~~ | ~~File upstream BuildFlow issue: `nix flake show` JSON parse failure (0 bytes) warning~~ **Won't implement — declined — upstream warning triaged as tool-side quirk.** | ~~Medium~~ | ~~S~~ | ~~Bug~~ |
+| ~~13~~ | ~~Silence/fix cqrs-lint A009/A018 false positives for library repos (verified: 0 go-cqrs-lite imports)~~ **Won't implement — declined — cqrs-lint verified false positive; fleet-level.** | ~~Low~~ | ~~S~~ | ~~Cleanup~~ |
+| ~~14~~ | ~~Examples for `errorfamilytest` subpackage (AssertFamily/AssertCode/…) on pkg.go.dev~~ done — routed — ROADMAP theme 1 (example gaps) | ~~Medium~~ | ~~M~~ | ~~Documentation~~ |
+| ~~15~~ | ~~Examples for `diagnose` core + `diagnose/git` + `diagnose/postgres`~~ done — routed — ROADMAP theme 1 (example gaps) | ~~Medium~~ | ~~M~~ | ~~Documentation~~ |
+| ~~16~~ | ~~"Common patterns" godoc section in doc.go (grow from real consumer usage)~~ done — routed — ROADMAP theme 1 (common patterns idea) | ~~Medium~~ | ~~M~~ | ~~Documentation~~ |
+| ~~17~~ | ~~Release automation script for coordinated multi-module tag cuts (ROADMAP theme 3)~~ done — routed — TODO_LIST #10 + ROADMAP theme 3 | ~~High~~ | ~~L~~ | ~~Feature~~ |
+| ~~18~~ | ~~Pin-bump hygiene: script/doc that bumps root pins in all submodules in lockstep on release~~ done — routed — ROADMAP theme 3 (pin-bump hygiene) | ~~Medium~~ | ~~M~~ | ~~Quality~~ |
+| ~~19~~ | ~~Full `buildflow --build-mode full` run (I only ran dry-run + targeted steps)~~ done — routed — TODO_LIST #7 (full buildflow run) | ~~Medium~~ | ~~M~~ | ~~Quality~~ |
+| ~~20~~ | ~~Full `nix build` of website's own `website/flake.nix` (I used the root devshell only)~~ done — routed — TODO_LIST #7 (website nix build) | ~~Medium~~ | ~~M~~ | ~~Quality~~ |
+| ~~21~~ | ~~Investigate `nix-hash-fix` 42/42 history: was there EVER a vendorHash here, or pure misconfiguration?~~ done — resolved — nix-hash-fix skipped via config as standing policy | ~~Low~~ | ~~S~~ | ~~Cleanup~~ |
+| ~~22~~ | ~~Consider `minimumReleaseAgeStrict` for pnpm (pnpm-workspace.yaml currently has only the exclude entry)~~ done — routed — TODO_LIST #9 | ~~Low~~ | ~~S~~ | ~~Security~~ |
+| ~~23~~ | ~~errorfamilytest adoption push: mention in README quick-start test example~~ done — README Test Helpers section exists | ~~Medium~~ | ~~S~~ | ~~Documentation~~ |
+| ~~24~~ | ~~OpenAPI/schema generation for the canonical error JSON shape (ROADMAP theme 2)~~ done — routed — ROADMAP theme 2 (OpenAPI idea) | ~~Medium~~ | ~~L~~ | ~~Feature~~ |
+| ~~25~~ | ~~`httperror` subpackage RFC: richer response shaping (ROADMAP theme 2)~~ done — routed — ROADMAP theme 2 (httperror idea) | ~~Medium~~ | ~~L~~ | ~~Feature~~ |
+| ~~26~~ | ~~Framework integration guides: Chi first (stdlib-adjacent), then Echo/Gin/gRPC interceptor~~ done — routed — ROADMAP theme 4 (framework guides) | ~~Medium~~ | ~~M~~ | ~~Documentation~~ |
+| ~~27~~ | ~~Diagnostic submodules: `redis` (pattern matches git/postgres submodules)~~ done — routed — ROADMAP theme 4 (redis submodule idea) | ~~Medium~~ | ~~M~~ | ~~Feature~~ |
+| ~~28~~ | ~~Diagnostic submodules: `docker` + `kubectl`~~ done — routed — ROADMAP theme 4 (docker/kubectl idea) | ~~Medium~~ | ~~L~~ | ~~Feature~~ |
+| ~~29~~ | ~~Benchmark suite: classification overhead vs version (ROADMAP theme 4; there is already benchmark_test.go to grow)~~ done — routed — ROADMAP theme 4 (benchmark suite idea) | ~~Low~~ | ~~M~~ | ~~Quality~~ |
+| ~~30~~ | ~~`Code()` vs `ErrorCode()` convergence proposal for next major (ROADMAP theme 1)~~ done — routed — ROADMAP theme 1 (Code/ErrorCode convergence idea) | ~~Low~~ | ~~S~~ | ~~Documentation~~ |
+| ~~31~~ | ~~Coverage: `diagnose/postgres` 80.3% → 85%+~~ done — routed — TODO_LIST #6 | ~~Low~~ | ~~M~~ | ~~Quality~~ |
+| ~~32~~ | ~~Coverage: `diagnose` core 83.9% → 90%~~ done — routed — TODO_LIST #6 | ~~Low~~ | ~~M~~ | ~~Quality~~ |
+| ~~33~~ | ~~Document gopls nilness warning on `panicNilError` fixture (error_test.go:567) as deliberate~~ done — nilness fixture documented as deliberate | ~~Low~~ | ~~S~~ | ~~Documentation~~ |
+| ~~34~~ | ~~Fuzz seeds: promote interesting corpus entries from the 11 fuzz targets into CI smoke run~~ **Won't implement — declined — fuzz smoke not adopted; CI time tradeoff.** | ~~Low~~ | ~~M~~ | ~~Quality~~ |
+| ~~35~~ | ~~Consumer survey: who uses LogError/HTTPHandler/errorfamilytest today (updates Adoption Reality table)~~ done — routed — ROADMAP theme 4 (adoption survey idea) | ~~Medium~~ | ~~M~~ | ~~Documentation~~ |
+| ~~36~~ | ~~Where oops users actually are: identify 3 candidate consumers for the bridge, engage individually~~ done — routed — ROADMAP theme 4 (bridge demand ideas) | ~~High~~ | ~~M~~ | ~~Feature~~ |
+| ~~37~~ | ~~samber/oops cross-link: propose docs link to bridge guide upstream (verify-before-filing first)~~ done — routed — TODO_LIST #8-adjacent (upstream engagement) | ~~Low~~ | ~~S~~ | ~~Documentation~~ |
+| ~~38~~ | ~~Module-proxy health script: resolve all 7 tags + verify retracted/deprecation notes render~~ done — routed — TODO_LIST #7 (verification battery) | ~~Low~~ | ~~S~~ | ~~Quality~~ |
+| ~~39~~ | ~~go.work.sum hygiene: script to detect stale checksums (the v0.2.2 SECURITY ERROR class)~~ done — go.work.sum incident documented in AGENTS.md | ~~Low~~ | ~~M~~ | ~~Quality~~ |
+| ~~40~~ | ~~Plan v0.11.0 scope (examples + docs are candidates; cut CHANGELOG into release)~~ done — routed — TODO_LIST #10 | ~~Medium~~ | ~~S~~ | ~~Documentation~~ |
+| ~~41~~ | ~~FEATURES.md / README sweep: verify claims about example coverage and gates are current~~ done — FEATURES/README sweep done (2026-09-27 pass) | ~~Low~~ | ~~S~~ | ~~Documentation~~ |
+| ~~42~~ | ~~docs-health HARVEST: route this report's items into TODO_LIST/ROADMAP properly~~ done — this sweep | ~~Medium~~ | ~~S~~ | ~~Documentation~~ |
+| ~~43~~ | ~~Annotate the 2026-09-15 status report (deploy-red again since; now fixed 3rd time) — docs-health ANNOTATE~~ done — 09-15 reports annotated this sweep | ~~Low~~ | ~~S~~ | ~~Documentation~~ |
+| ~~44~~ | ~~PR to Dependabot docs/community: pnpm v9 + overrides grouped security updates failing (if reproducible minimal case)~~ **Won't implement — declined — pnpm v9 upstream repro unproven; TODO_LIST #4 covers remediation.** | ~~Low~~ | ~~M~~ | ~~Bug~~ |
+| ~~45~~ | ~~Add `ExampleNewConflict`/`ExampleNewCorruption`/`ExampleNewInfrastructure`/`ExampleNewOrchestration` constructor set for symmetry~~ done — routed — ROADMAP theme 1 (example symmetry idea) | ~~Low~~ | ~~S~~ | ~~Documentation~~ |
+| ~~46~~ | ~~Review `WithContextf`/`WithContextMap` examples gap (only WithContextAny has one)~~ done — routed — ROADMAP theme 1 (example gaps) | ~~Low~~ | ~~S~~ | ~~Documentation~~ |
+| ~~47~~ | ~~gRPC status-mapping guide (family → codes.Internal/Unavailable/InvalidArgument) — recurring consumer ask~~ done — routed — ROADMAP theme 4 (gRPC guide idea) | ~~Medium~~ | ~~M~~ | ~~Documentation~~ |
+| ~~48~~ | ~~十二-factor-logs guide cross-check: ensure HandleConfig.Logger example matches website guide~~ done — logs guide cross-checked (2026-09-27 pass) | ~~Low~~ | ~~S~~ | ~~Documentation~~ |
+| ~~49~~ | ~~Dependabot: add explicit `npm` entry for `/website` IF its pnpm support has matured (test on a branch)~~ done — routed — TODO_LIST #4 (Dependabot decision) | ~~Low~~ | ~~M~~ | ~~Quality~~ |
+| ~~50~~ | ~~Periodic `gh run list` triage habit: red workflows persisted 3 days unnoticed — add to weekly routine~~ done — gh run triage performed in this pass | ~~Medium~~ | ~~S~~ | ~~Process~~ |
 
 ---
 

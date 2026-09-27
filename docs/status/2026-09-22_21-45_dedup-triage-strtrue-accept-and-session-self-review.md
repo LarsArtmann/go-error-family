@@ -22,19 +22,19 @@
 
 ## b) PARTIALLY DONE
 
-1. **The dedup loop ("iterate to zero harmful clones").**
-   - Works: 0 harmful clones — the only reported group has a defensible, documented reason to exist.
-   - Open: the acceptance lives only as prose in `AGENTS.md`. Nothing machine-readable stops art-dupl from re-reporting this exact clone on every future `-t 1` run. Whether art-dupl supports exclude patterns/baselines was NOT investigated (out of session scope per instruction).
-   - Blocker: unknown tool capability. Effort to close: S (if suppression exists).
-2. **Session documentation.** Complete when this file is written — but the (f) section below is explicitly NOT harvested into `TODO_LIST.md`/`ROADMAP.md` yet, because you instructed "THEN WAIT FOR INSTRUCTIONS". HARVEST (docs-health) is queued behind your go-ahead.
+1. ~~**The dedup loop ("iterate to zero harmful clones").**~~ done — resolved — acceptance prose documented; suppression routed to TODO_LIST #5
+   ~~- Works: 0 harmful clones — the only reported group has a defensible, documented reason to exist.~~
+   ~~- Open: the acceptance lives only as prose in `AGENTS.md`. Nothing machine-readable stops art-dupl from re-reporting this exact clone on every future `-t 1` run. Whether art-dupl supports exclude patterns/baselines was NOT investigated (out of session scope per instruction).~~
+   ~~- Blocker: unknown tool capability. Effort to close: S (if suppression exists).~~
+2. ~~**Session documentation.** Complete when this file is written — but the (f) section below is explicitly NOT harvested into `TODO_LIST.md`/`ROADMAP.md` yet, because you instructed "THEN WAIT FOR INSTRUCTIONS". HARVEST (docs-health) is queued behind your go-ahead.~~ done — HARVEST executed 2026-09-27 (this pass)
 
 ---
 
 ## c) NOT STARTED
 
-1. **art-dupl suppression/baseline mechanism** — planned, zero work done. Waiting on: a tool-capability check plus your standing-policy answer (see g) Q1).
-2. **HARVEST of this report's (f) section** into `TODO_LIST.md` (TODO_LIST-grade items) and `ROADMAP.md` (brainstorm fuel) — deliberately deferred per your instruction to wait. `TODO_LIST.md` currently still has exactly 2 active items (Bridge guide announcement; v0.6.x tag retraction), unchanged since 2026-09-18.
-3. **Carried from the 2026-09-18 report (c), NOT re-verified this session, priority presumed unchanged:** Bridge Patterns guide announcement (TODO_LIST #1); broken v0.6.x tag retraction (TODO_LIST #2); coordinated multi-module release automation script; structural CI canaries against daemon churn (typescript≠6, lockfile drift, go-directive uniformity).
+1. ~~**art-dupl suppression/baseline mechanism** — planned, zero work done. Waiting on: a tool-capability check plus your standing-policy answer (see g) Q1).~~ done — routed — TODO_LIST #5 (art-dupl suppression + threshold policy)
+2. ~~**HARVEST of this report's (f) section** into `TODO_LIST.md` (TODO_LIST-grade items) and `ROADMAP.md` (brainstorm fuel) — deliberately deferred per your instruction to wait. `TODO_LIST.md` currently still has exactly 2 active items (Bridge guide announcement; v0.6.x tag retraction), unchanged since 2026-09-18.~~ done — HARVEST executed 2026-09-27 (this pass)
+3. ~~**Carried from the 2026-09-18 report (c), NOT re-verified this session, priority presumed unchanged:** Bridge Patterns guide announcement (TODO_LIST #1); broken v0.6.x tag retraction (TODO_LIST #2); coordinated multi-module release automation script; structural CI canaries against daemon churn (typescript≠6, lockfile drift, go-directive uniformity).~~ done — routed — items 3/11/12/16 carried into TODO_LIST #3/#4/#6/#10 and ROADMAP
 
 ---
 
@@ -66,44 +66,44 @@ You asked for up to 50. I'm delivering 38 grounded items and stopping there — 
 
 | #  | Task                                                                                                          | Impact   | Effort | Category      | Src |
 |----|---------------------------------------------------------------------------------------------------------------|----------|--------|---------------|-----|
-| 1  | Check whether art-dupl supports exclude/baseline; wire the accepted `strTrue`/`strFalse` clones into it        | High     | S      | Cleanup       | S   |
-| 2  | Decide the standing art-dupl threshold policy (`-t 1` deep sweeps vs default 5) and record it in AGENTS.md     | Medium   | S      | Documentation | S   |
-| 3  | ROADMAP: type `DiagnosticResult.Details` values (kills the stringly `"true"`/`"false"` constants at the root)  | Low      | L      | Feature       | S   |
-| 4  | Verify the next `website/**` push turns Deploy Website green (still unproven after the 2026-09-18 local fix)   | Critical | S      | Bug           | R   |
-| 5  | CI canary: fail if `website/package.json` typescript major ≠ 6                                                 | Critical | S      | Bug           | R   |
-| 6  | CI check: `pnpm install --frozen-lockfile` + `astro check` on every `website/**` PR                            | High     | S      | Quality       | R   |
-| 7  | Decide + disable Dependabot security-updates auto-run for `/website` (or fix its pnpm handling)                | High     | S      | Cleanup       | R   |
-| 8  | Schedule a recurring manual `nix develop -c pnpm audit` in `website/` (only working remediation until #7)      | High     | S      | Security      | A   |
-| 9  | Retract broken v0.6.x tags: `retract` directives + release + `go list -m -versions` verification (TODO #2)     | High     | M      | Bug           | R   |
-| 10 | Announce the Bridge Patterns guide publicly (TODO #1)                                                          | High     | M      | Documentation | R   |
-| 11 | Release automation script for coordinated multi-module tag cuts                                                | High     | L      | Feature       | R   |
-| 12 | CI check: all 7 `go` directives + go.work equal `1.26.7` (ends the pin-drift class)                            | High     | S      | Quality       | R   |
-| 13 | File upstream BuildFlow: pnpm-audit should discover subdirectory lockfiles                                     | High     | S      | Feature       | R   |
-| 14 | File upstream structure-linter: `IsIgnored` not honored by `pkg/phantom` (branching-flow skip depends on it)   | Medium   | S      | Bug           | A   |
-| 15 | Run `go-structure-linter` CLI directly to re-confirm exit 0 (BuildFlow's embedded snapshot ignores project config) | Medium | S      | Quality       | A   |
-| 16 | Verify next CI run's `GOWORK=off` build still guards the no-json/v2 policy (canary check, not assumed)         | Critical | S      | Quality       | A   |
-| 17 | Root-cause the orchestrator `jsonv1tov2` migrator firing on json/v1 repos (fix outside this repo ends the skips) | High    | M/L    | Cleanup       | A   |
-| 18 | Lift `diagnose` core coverage 83.9% → ≥90% (targeted tests on uncovered rule paths)                            | Medium   | M      | Quality       | A   |
-| 19 | Lift `diagnose/postgres` coverage 80.3% → ≥85%                                                                 | Medium   | M      | Quality       | A   |
-| 20 | Re-run erraudit to re-verify the "0 findings" claim                                                            | Medium   | S      | Quality       | R   |
-| 21 | Update SKILL.md (API reference) to v0.10.1 state; parity-check AGENTS.md's "API Surface (v0.10.0)" header      | Medium   | S      | Documentation | S   |
-| 22 | Adoption: end-to-end `HTTPHandler` middleware example (net/http or Chi)                                        | Medium   | M      | Documentation | A   |
-| 23 | Adoption: `errorfamilytest` examples surfaced on pkg.go.dev                                                    | Medium   | M      | Documentation | R   |
-| 24 | Adoption: `diagnose` core + git + postgres examples                                                            | Medium   | M      | Documentation | R   |
-| 25 | Adoption: mention `errorfamilytest` in README's test quick-start                                               | Medium   | S      | Documentation | R   |
-| 26 | `doc.go` "Common patterns" section grown from real consumer usage                                              | Medium   | M      | Documentation | R   |
-| 27 | Decide: bridge + consumer-facing enrichment APIs — invest in adoption or freeze (gated by g) Q3)               | High     | S      | Decision      | A   |
-| 28 | Website content parity: mirror the conditional-requests guidance (README §) on the site if missing             | Low      | M      | Documentation | A   |
-| 29 | Add `website/bun.lock` to `website/.gitignore`                                                                 | Low      | S      | Cleanup       | R   |
-| 30 | Consider `minimumReleaseAgeStrict` for pnpm in `website/pnpm-workspace.yaml`                                   | Low      | S      | Security      | R   |
-| 31 | Diagnostic submodule: `redis` (matches git/postgres pattern)                                                   | Medium   | M      | Feature       | R   |
-| 32 | Diagnostic submodules: `docker` + `kubectl`                                                                    | Medium   | L      | Feature       | R   |
-| 33 | OpenAPI/schema generation for the canonical error JSON shape                                                   | Medium   | L      | Feature       | R   |
-| 34 | `httperror` subpackage RFC: richer response shaping                                                            | Medium   | L      | Feature       | R   |
-| 35 | Framework integration guides: Chi first, then Echo/Gin/gRPC interceptor                                        | Medium   | M      | Documentation | R   |
-| 36 | Benchmark suite: classification overhead tracked across versions (grow existing `benchmark_test.go`)           | Low      | M      | Quality       | R   |
-| 37 | Pin-bump hygiene: lockstep script/doc for submodule `go.mod` pins during releases                              | Medium   | M      | Quality       | R   |
-| 38 | Full verification runs: `buildflow --build-mode full` and `nix build` of `website/flake.nix` (dry-run only so far) | Medium | M      | Quality       | R   |
+| ~~1~~  | ~~Check whether art-dupl supports exclude/baseline; wire the accepted `strTrue`/`strFalse` clones into it~~ done — routed — TODO_LIST #5 | ~~High~~ | ~~S~~ | ~~Cleanup~~ | ~~S~~ |
+| ~~2~~  | ~~Decide the standing art-dupl threshold policy (`-t 1` deep sweeps vs default 5) and record it in AGENTS.md~~ done — routed — TODO_LIST #5 | ~~Medium~~ | ~~S~~ | ~~Documentation~~ | ~~S~~ |
+| ~~3~~  | ~~ROADMAP: type `DiagnosticResult.Details` values (kills the stringly `"true"`/`"false"` constants at the root)~~ done — routed — ROADMAP theme 4 (typed Details idea) | ~~Low~~ | ~~L~~ | ~~Feature~~ | ~~S~~ |
+| ~~4~~  | ~~Verify the next `website/**` push turns Deploy Website green (still unproven after the 2026-09-18 local fix)~~ done — deploy green 2026-09-19 | ~~Critical~~ | ~~S~~ | ~~Bug~~ | ~~R~~ |
+| ~~5~~  | ~~CI canary: fail if `website/package.json` typescript major ≠ 6~~ done — routed — TODO_LIST #4 | ~~Critical~~ | ~~S~~ | ~~Bug~~ | ~~R~~ |
+| ~~6~~  | ~~CI check: `pnpm install --frozen-lockfile` + `astro check` on every `website/**` PR~~ done — routed — TODO_LIST #4 | ~~High~~ | ~~S~~ | ~~Quality~~ | ~~R~~ |
+| ~~7~~  | ~~Decide + disable Dependabot security-updates auto-run for `/website` (or fix its pnpm handling)~~ done — routed — TODO_LIST #4 | ~~High~~ | ~~S~~ | ~~Cleanup~~ | ~~R~~ |
+| ~~8~~  | ~~Schedule a recurring manual `nix develop -c pnpm audit` in `website/` (only working remediation until #7)~~ done — routed — TODO_LIST #4 | ~~High~~ | ~~S~~ | ~~Security~~ | ~~A~~ |
+| ~~9~~  | ~~Retract broken v0.6.x tags: `retract` directives + release + `go list -m -versions` verification (TODO #2)~~ done — routed — TODO_LIST #2 | ~~High~~ | ~~M~~ | ~~Bug~~ | ~~R~~ |
+| ~~10~~ | ~~Announce the Bridge Patterns guide publicly (TODO #1)~~ done — routed — TODO_LIST #1 | ~~High~~ | ~~M~~ | ~~Documentation~~ | ~~R~~ |
+| ~~11~~ | ~~Release automation script for coordinated multi-module tag cuts~~ done — routed — TODO_LIST #3 + ROADMAP theme 3 | ~~High~~ | ~~L~~ | ~~Feature~~ | ~~R~~ |
+| ~~12~~ | ~~CI check: all 7 `go` directives + go.work equal `1.26.7` (ends the pin-drift class)~~ done — resolved — superseded by v0.10.2 true-floors policy; canary would assert documented floors | ~~High~~ | ~~S~~ | ~~Quality~~ | ~~R~~ |
+| ~~13~~ | ~~File upstream BuildFlow: pnpm-audit should discover subdirectory lockfiles~~ done — routed — TODO_LIST #8 | ~~High~~ | ~~S~~ | ~~Feature~~ | ~~R~~ |
+| ~~14~~ | ~~File upstream structure-linter: `IsIgnored` not honored by `pkg/phantom` (branching-flow skip depends on it)~~ done — routed — TODO_LIST #8 | ~~Medium~~ | ~~S~~ | ~~Bug~~ | ~~A~~ |
+| ~~15~~ | ~~Run `go-structure-linter` CLI directly to re-confirm exit 0 (BuildFlow's embedded snapshot ignores project config)~~ done — routed — TODO_LIST #7 | ~~Medium~~ | ~~S~~ | ~~Quality~~ | ~~A~~ |
+| ~~16~~ | ~~Verify next CI run's `GOWORK=off` build still guards the no-json/v2 policy (canary check, not assumed)~~ done — CI green on aefb86a incl. GOWORK=off (verified 2026-09-27) | ~~Critical~~ | ~~S~~ | ~~Quality~~ | ~~A~~ |
+| ~~17~~ | ~~Root-cause the orchestrator `jsonv1tov2` migrator firing on json/v1 repos (fix outside this repo ends the skips)~~ done — routed — ROADMAP Open Questions #2 | ~~High~~ | ~~M/L~~ | ~~Cleanup~~ | ~~A~~ |
+| ~~18~~ | ~~Lift `diagnose` core coverage 83.9% → ≥90% (targeted tests on uncovered rule paths)~~ done — routed — TODO_LIST #6 | ~~Medium~~ | ~~M~~ | ~~Quality~~ | ~~A~~ |
+| ~~19~~ | ~~Lift `diagnose/postgres` coverage 80.3% → ≥85%~~ done — routed — TODO_LIST #6 | ~~Medium~~ | ~~M~~ | ~~Quality~~ | ~~A~~ |
+| ~~20~~ | ~~Re-run erraudit to re-verify the "0 findings" claim~~ done — routed — TODO_LIST #7 | ~~Medium~~ | ~~S~~ | ~~Quality~~ | ~~R~~ |
+| ~~21~~ | ~~Update SKILL.md (API reference) to v0.10.1 state; parity-check AGENTS.md's "API Surface (v0.10.0)" header~~ done — SKILL.md Orchestration added 2026-09-27; AGENTS header updated | ~~Medium~~ | ~~S~~ | ~~Documentation~~ | ~~S~~ |
+| ~~22~~ | ~~Adoption: end-to-end `HTTPHandler` middleware example (net/http or Chi)~~ done — routed — ROADMAP theme 1/4 (middleware example idea) | ~~Medium~~ | ~~M~~ | ~~Documentation~~ | ~~A~~ |
+| ~~23~~ | ~~Adoption: `errorfamilytest` examples surfaced on pkg.go.dev~~ done — routed — ROADMAP theme 1 (example gaps) | ~~Medium~~ | ~~M~~ | ~~Documentation~~ | ~~R~~ |
+| ~~24~~ | ~~Adoption: `diagnose` core + git + postgres examples~~ done — routed — ROADMAP theme 1 (example gaps) | ~~Medium~~ | ~~M~~ | ~~Documentation~~ | ~~R~~ |
+| ~~25~~ | ~~Adoption: mention `errorfamilytest` in README's test quick-start~~ done — README Test Helpers section exists | ~~Medium~~ | ~~S~~ | ~~Documentation~~ | ~~R~~ |
+| ~~26~~ | ~~`doc.go` "Common patterns" section grown from real consumer usage~~ done — routed — ROADMAP theme 1 (common patterns idea) | ~~Medium~~ | ~~M~~ | ~~Documentation~~ | ~~R~~ |
+| ~~27~~ | ~~Decide: bridge + consumer-facing enrichment APIs — invest in adoption or freeze (gated by g) Q3)~~ done — routed — ROADMAP Open Questions #3 | ~~High~~ | ~~S~~ | ~~Decision~~ | ~~A~~ |
+| ~~28~~ | ~~Website content parity: mirror the conditional-requests guidance (README §) on the site if missing~~ done — site conditional-requests guidance shipped in v0.10.1 | ~~Low~~ | ~~M~~ | ~~Documentation~~ | ~~A~~ |
+| ~~29~~ | ~~Add `website/bun.lock` to `website/.gitignore`~~ done — gitignored (verified 2026-09-27) | ~~Low~~ | ~~S~~ | ~~Cleanup~~ | ~~R~~ |
+| ~~30~~ | ~~Consider `minimumReleaseAgeStrict` for pnpm in `website/pnpm-workspace.yaml`~~ done — routed — TODO_LIST #9 | ~~Low~~ | ~~S~~ | ~~Security~~ | ~~R~~ |
+| ~~31~~ | ~~Diagnostic submodule: `redis` (matches git/postgres pattern)~~ done — routed — ROADMAP theme 4 (redis idea) | ~~Medium~~ | ~~M~~ | ~~Feature~~ | ~~R~~ |
+| ~~32~~ | ~~Diagnostic submodules: `docker` + `kubectl`~~ done — routed — ROADMAP theme 4 (docker/kubectl idea) | ~~Medium~~ | ~~L~~ | ~~Feature~~ | ~~R~~ |
+| ~~33~~ | ~~OpenAPI/schema generation for the canonical error JSON shape~~ done — routed — ROADMAP theme 2 (OpenAPI idea) | ~~Medium~~ | ~~L~~ | ~~Feature~~ | ~~R~~ |
+| ~~34~~ | ~~`httperror` subpackage RFC: richer response shaping~~ done — routed — ROADMAP theme 2 (httperror idea) | ~~Medium~~ | ~~L~~ | ~~Feature~~ | ~~R~~ |
+| ~~35~~ | ~~Framework integration guides: Chi first, then Echo/Gin/gRPC interceptor~~ done — routed — ROADMAP theme 4 (framework guides) | ~~Medium~~ | ~~M~~ | ~~Documentation~~ | ~~R~~ |
+| ~~36~~ | ~~Benchmark suite: classification overhead tracked across versions (grow existing `benchmark_test.go`)~~ done — routed — ROADMAP theme 4 (benchmark suite idea) | ~~Low~~ | ~~M~~ | ~~Quality~~ | ~~R~~ |
+| ~~37~~ | ~~Pin-bump hygiene: lockstep script/doc for submodule `go.mod` pins during releases~~ done — routed — ROADMAP theme 3 (pin-bump hygiene) | ~~Medium~~ | ~~M~~ | ~~Quality~~ | ~~R~~ |
+| ~~38~~ | ~~Full verification runs: `buildflow --build-mode full` and `nix build` of `website/flake.nix` (dry-run only so far)~~ done — routed — TODO_LIST #7 | ~~Medium~~ | ~~M~~ | ~~Quality~~ | ~~R~~ |
 
 **HARVEST handoff:** items 1–3 and 21 are TODO_LIST-grade; most [R] items are already harvest fuel from 2026-09-18 (check them off there if done); 3, 24, 31–34 are ROADMAP fuel. Per your instruction, HARVEST has NOT run — say the word.
 
@@ -111,11 +111,11 @@ You asked for up to 50. I'm delivering 38 grounded items and stopping there — 
 
 ## g) Questions I cannot figure out myself
 
-**Q1 — art-dupl standing policy.** You ran `-t 1` by hand; the skill's default is 5. At `-t 1`, trivial 2-statement const blocks (like today's) will always surface. Do you want `-t 1` as the routine bar (and thus a suppression/baseline story, f#1), or `-t 1` reserved for occasional deep sweeps with `-t 5` as the normal gate? I can't infer your intent from the repo — nothing records a threshold policy.
+~~**Q1 — art-dupl standing policy.**~~ routed to ROADMAP Open Questions #1 (2026-09-27 harvest). Original:  You ran `-t 1` by hand; the skill's default is 5. At `-t 1`, trivial 2-statement const blocks (like today's) will always surface. Do you want `-t 1` as the routine bar (and thus a suppression/baseline story, f#1), or `-t 1` reserved for occasional deep sweeps with `-t 5` as the normal gate? I can't infer your intent from the repo — nothing records a threshold policy.
 
-**Q2 — fleet churn: root or per-repo forever?** The json/v2 re-imports, TS7 bumps, and go-directive drift all originate from the machine-global `GOEXPERIMENT=jsonv2` export plus the orchestrator's migrator — outside this repo. Is fixing the root (orchestrator config / BuildFlow migrator) actually planned, or is the per-repo canary defense the accepted permanent architecture? This decides whether f#5/#12/#17 are temporary scaffolding or permanent infrastructure.
+~~**Q2 — fleet churn: root or per-repo forever?**~~ routed to ROADMAP Open Questions #2 (2026-09-27 harvest). Original:  The json/v2 re-imports, TS7 bumps, and go-directive drift all originate from the machine-global `GOEXPERIMENT=jsonv2` export plus the orchestrator's migrator — outside this repo. Is fixing the root (orchestrator config / BuildFlow migrator) actually planned, or is the per-repo canary defense the accepted permanent architecture? This decides whether f#5/#12/#17 are temporary scaffolding or permanent infrastructure.
 
-**Q3 — bridge & enrichment APIs: invest or freeze?** Bridge has ZERO external consumers (audited 2026-07-23, root cause: near-zero oops adoption ecosystem-wide); `LogError` ~3, `HTTPHandler` ~5, `errorfamilytest` ~3, `diagnose` ~3 external call sites. Should we spend effort growing adoption (announcements, examples, guides — f#10, #22–#26, #35), or freeze that surface and put the hours into reliability/coverage (f#16, #18–#20)? This gates roughly a third of the list.
+~~**Q3 — bridge & enrichment APIs: invest or freeze?**~~ routed to ROADMAP Open Questions #3 (2026-09-27 harvest). Original:  Bridge has ZERO external consumers (audited 2026-07-23, root cause: near-zero oops adoption ecosystem-wide); `LogError` ~3, `HTTPHandler` ~5, `errorfamilytest` ~3, `diagnose` ~3 external call sites. Should we spend effort growing adoption (announcements, examples, guides — f#10, #22–#26, #35), or freeze that surface and put the hours into reliability/coverage (f#16, #18–#20)? This gates roughly a third of the list.
 
 ---
 

@@ -4,7 +4,7 @@
 **North Star:** Make go-error-family a **superb classification protocol**. Per the architecture decision: **adopt both** — _library layer classifies_ (go-error-family), _application layer enriches_ (samber/oops), _bridge composes_. Prioritization lens: **superb architecture only** — version numbers and adoption metrics are explicitly out of scope.
 
 **Repository:** `/home/lars/projects/go-error-family` (Go workspace, 6 modules: root, agent, bridge, diagnose, diagnose/git, diagnose/postgres)
-**Baseline:** clean tree, all tests pass, root coverage 98.4%, 0 lint issues.
+**Baseline:** ~~clean tree, all tests pass, root coverage 98.4%, 0 lint issues.~~ EXECUTED — engine-core, protocol, and adapter tiers shipped across v0.6.0-v0.10.2 (severity-ordered multi-error, atomic registry, Fix struct, HTTPStatus, RetryPolicy, Error.JSON, stdlib taxonomy, bridge seam). Decision-gated items 71-78 dispositioned in the table below (docs-health 2026-09-27).
 
 ---
 
@@ -181,14 +181,14 @@ Sorted by impact desc, effort asc. 78 tasks. Each is a single verifiable unit.
 
 | #  | Task                                                   | Why gated                                   |
 | -- | ------------------------------------------------------ | ------------------------------------------- |
-| 71 | Rename `agent` package → RCA/Synthesizer               | User deferred for design discussion         |
-| 72 | Tag root module v1.0                                   | "Ignore version numbers"                    |
-| 73 | Publish root version deleting agent/diagnose dirs      | Depends on publish strategy                 |
-| 74 | Remove replace-directive chain                         | Depends on #73                              |
-| 75 | `errors.Join` pre-classifying wrapper `(error,Family)` | YAGNI — recommend SKIP unless concrete need |
-| 76 | i18n hook for familyData messages                      | No current consumer need                    |
-| 77 | Shorter import alias (`errfam`)                        | Cosmetic, breaking                          |
-| 78 | Re-evaluate Go 1.26 → lower requirement                | User: ignore version constraints            |
+| ~~71~~ | ~~Rename `agent` package → RCA/Synthesizer~~ done — resolved — rename rejected (published module path) | ~~User deferred for design discussion~~ |
+| ~~72~~ | ~~Tag root module v1.0~~ **Won't implement — declined — stays 0.x by choice.** | ~~"Ignore version numbers"~~ |
+| ~~73~~ | ~~Publish root version deleting agent/diagnose dirs~~ **Won't implement — declined — submodules stay in-repo.** | ~~Depends on publish strategy~~ |
+| ~~74~~ | ~~Remove replace-directive chain~~ done — resolved — replace chain removed 2026-07-05 (real pins) | ~~Depends on #73~~ |
+| ~~75~~ | ~~`errors.Join` pre-classifying wrapper `(error,Family)`~~ **Won't implement — declined — errors.Join + Classify chosen instead.** | ~~YAGNI — recommend SKIP unless concrete need~~ |
+| ~~76~~ | ~~i18n hook for familyData messages~~ **Won't implement — declined — i18n never demanded.** | ~~No current consumer need~~ |
+| ~~77~~ | ~~Shorter import alias (`errfam`)~~ **Won't implement — declined — errorfamily alias not adopted.** | ~~Cosmetic, breaking~~ |
+| ~~78~~ | ~~Re-evaluate Go 1.26 → lower requirement~~ done — resolved — Go floor is toolchain/dependency-driven (v0.10.2 true floors) | ~~User: ignore version constraints~~ |
 
 ---
 
