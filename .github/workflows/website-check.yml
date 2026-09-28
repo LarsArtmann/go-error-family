@@ -1,0 +1,62 @@
+name: Website Check
+
+on:
+  push:
+    branches: [master]
+    paths:
+      - "website/**"
+      - ".github/workflows/website-check.yml"
+  pull_request:
+    paths:
+      - "website/**"
+      - ".github/workflows/website-check.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: website-check-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: ./website
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+
+      - name: Canary - typescript must stay on major 6
+        run: |
+          ts="$(jq -r '.devDependencies.typescript // .dependencies.typescript // "missing"' package.json)"
+          major="$(printf '%s' "$ts" | sed -E 's/^[^0-9]*([0-9]+).*$/\1/')"
+          echo "typescript constraint: $ts (major: $major)"
+          if [ "$major" != "6" ]; then
+            echo "::error::website typescript must stay on major 6. astro check needs the programmatic API that the TS 7+ native compiler drops (tracked upstream at withastro/roadmap#1321). Found: $ts. If Astro officially supports TS 7, update this canary and AGENTS.md together."
+            exit 1
+          fi
+
+      - name: Enable pnpm via corepack
+        run: |
+          mkdir -p "$HOME/.local/bin"
+          corepack enable --install-directory "$HOME/.local/bin"
+          corepack prepare pnpm@11.20.0 --activate
+          echo "$HOME/.local/bin" >> "$GITHUB_PATH"
+
+      - name: Set up Node.js
+        uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
+        with:
+          node-version-file: "website/.node-version"
+          cache: pnpm
+          cache-dependency-path: website/pnpm-lock.yaml
+
+      - name: Install dependencies (frozen lockfile catches manifest/lockfile drift)
+        run: pnpm install --frozen-lockfile
+
+      - name: Astro check
+        run: pnpm exec astro check
+
+      - name: Astro build (catches missing build scripts, e.g. unapproved esbuild postinstall)
+        run: pnpm run build
