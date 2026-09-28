@@ -217,7 +217,7 @@ Separate Go module so root stays zero-dependency.
 
 ---
 
-## Test Coverage (verified 2026-09-27, live `go test -cover` run)
+## Test Coverage (verified 2026-09-28, live `go test -race -cover` run)
 
 | Package              | Coverage |
 | -------------------- | -------- |
@@ -225,11 +225,11 @@ Separate Go module so root stays zero-dependency.
 | `errorfamilytest`    | 96.3%    |
 | `agent`              | 100.0%   |
 | `bridge`             | 94.4%    |
-| `diagnose` (core)    | 84.2%    |
-| `diagnose/git`       | 91.0%    |
-| `diagnose/postgres`  | 78.5%    |
+| `diagnose` (core)    | 97.4%    |
+| `diagnose/git`       | 98.7%    |
+| `diagnose/postgres`  | 89.2%    |
 
-All packages at 80%+. Fuzz tests (16 total):
+All packages at 80%+; the diagnose family fully recovered from the v0.10.1 erraudit dips (84.2/91.0/78.5 on 2026-09-27) via error-branch tests on the run paths. Fuzz tests (16 total):
 
 **Root** (11): `FuzzParseFamily`, `FuzzParseFamilyRoundTrip`, `FuzzClassify`, `FuzzClassifyPlainError`, `FuzzErrorFormatting`, `FuzzApplyContext`, `FuzzWrapOnce`, `FuzzContextValueToString`, `FuzzWithExitCode`, `FuzzWithHTTPStatus`, `FuzzRegisterClassificationType`.
 
