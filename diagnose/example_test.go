@@ -20,13 +20,18 @@ func (r *webhookTimeoutRule) Name() string { return "webhook-timeout" }
 
 func (r *webhookTimeoutRule) Applicable(err error) bool { return r.Spec.Matches(err) }
 
-func (r *webhookTimeoutRule) Run(ctx context.Context, err error) (*diagnose.DiagnosticResult, error) {
+func (r *webhookTimeoutRule) Run(
+	ctx context.Context,
+	err error,
+) (*diagnose.DiagnosticResult, error) {
 	result := &diagnose.DiagnosticResult{
 		Status:     diagnose.StatusDegraded,
 		Summary:    "Webhook endpoint slower than the client timeout",
 		Confidence: diagnose.ConfidenceLikely,
-		Details:    map[string]string{"endpoint": diagnose.ContextValue(err, string(diagnose.KeyURL))},
-		Context:    diagnose.ErrorContext(err),
+		Details: map[string]string{
+			"endpoint": diagnose.ContextValue(err, string(diagnose.KeyURL)),
+		},
+		Context: diagnose.ErrorContext(err),
 	}
 	diagnose.SetFix(result, "Raise the client timeout", "app config: webhooks.timeout = 10s")
 	return result, nil
@@ -53,7 +58,13 @@ func ExampleRuleSpec() {
 		fmt.Println(result.RuleName, result.Status, result.Details["endpoint"])
 		fmt.Println(result.Fix.Command)
 	}
-	fmt.Println(diagnose.ResolveContextKey(err, []string{string(diagnose.KeyURL), string(diagnose.KeyEndpoint)}, "unknown"))
+	fmt.Println(
+		diagnose.ResolveContextKey(
+			err,
+			[]string{string(diagnose.KeyURL), string(diagnose.KeyEndpoint)},
+			"unknown",
+		),
+	)
 
 	// Output:
 	// true

@@ -41,7 +41,10 @@ func ExampleNewInfrastructure() {
 }
 
 func ExampleNewOrchestration() {
-	err := NewOrchestration("workflow.double_transition", "state machine applied the same transition twice")
+	err := NewOrchestration(
+		"workflow.double_transition",
+		"state machine applied the same transition twice",
+	)
 	fmt.Println(err, Classify(err).HTTPStatus(), Classify(err).ExitCode())
 	// Output: [orchestration:workflow.double_transition] state machine applied the same transition twice 500 70
 }

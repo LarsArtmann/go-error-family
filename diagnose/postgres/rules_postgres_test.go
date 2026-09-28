@@ -354,7 +354,10 @@ func TestPostgresRuleMockPgIsreadyRunError(t *testing.T) {
 		t.Fatalf("Run() error: %v", runErr)
 	}
 	if result.Details["pg_isready_error"] == "" {
-		t.Errorf("Details[pg_isready_error] = %q, want the run error", result.Details["pg_isready_error"])
+		t.Errorf(
+			"Details[pg_isready_error] = %q, want the run error",
+			result.Details["pg_isready_error"],
+		)
 	}
 	if result.Status != diagnose.StatusFailed {
 		t.Errorf("Status = %v, want failed (exec error, no response)", result.Status)

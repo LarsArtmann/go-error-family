@@ -26,7 +26,13 @@ func TestRunCommandSuccess(t *testing.T) {
 }
 
 func TestRunCommandNonZeroExit(t *testing.T) {
-	stdout, exitCode, err := RunCommand(context.Background(), 5*time.Second, "sh", "-c", "echo out; exit 3")
+	stdout, exitCode, err := RunCommand(
+		context.Background(),
+		5*time.Second,
+		"sh",
+		"-c",
+		"echo out; exit 3",
+	)
 	if err != nil {
 		t.Fatalf("RunCommand() error: %v (exit error must surface as exitCode, not err)", err)
 	}
@@ -58,7 +64,10 @@ func TestRunCommandMissingBinary(t *testing.T) {
 func TestRunCommandTimeout(t *testing.T) {
 	_, exitCode, err := RunCommand(context.Background(), 50*time.Millisecond, "sleep", "2")
 	if err != nil {
-		t.Fatalf("RunCommand() error = %v, want nil (signal-kill surfaces as ExitError with code -1)", err)
+		t.Fatalf(
+			"RunCommand() error = %v, want nil (signal-kill surfaces as ExitError with code -1)",
+			err,
+		)
 	}
 	if exitCode != -1 {
 		t.Errorf("exitCode = %d, want -1 on timeout kill", exitCode)
