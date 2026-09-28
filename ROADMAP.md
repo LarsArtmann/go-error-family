@@ -59,8 +59,8 @@ and `go vet` all shipped in v0.8.0; the remaining gaps are tooling-level.
 
 **Raw ideas:**
 
-- Release automation script for coordinated multi-module tag cutting — reinforced 2026-09-27: the `Release` workflow silently did not fire on the v0.10.2 tag push (see TODO_LIST #3); an automation script with explicit trigger verification would end this class
-- Deprecation notes for broken tags (v0.6.0 family)
+- Release automation script for coordinated multi-module tag cutting — reinforced 2026-09-27: the `Release` workflow silently did not fire on the v0.10.2 tag push (root-caused 2026-09-28: dropped tag-ref push webhook on a combined branch+tag push; `workflow_dispatch` fallback + runbook in place — `docs/status/2026-09-28_02-10_release-yml-no-fire-root-cause-v0.10.2.md`); an automation script with explicit trigger verification would end this class
+- ~~Deprecation notes for broken tags (v0.6.0 family)~~ — **SHIPPED (v0.10.3, 2026-09-28)**: `retract [v0.5.0, v0.6.0]` in root go.mod; `diagnose/v0.1.0` and `agent/v0.1.0` retracted by the v0.2.5 releases. Full audit found exactly 5 broken tags of 60+; v0.6.1 verified clean and left available. Retraction verified via `go list -m -retracted` against the origin.
 - Pin-bump hygiene: submodules should bump root pins in lockstep on releases
 
 ### 4. Ecosystem Growth
