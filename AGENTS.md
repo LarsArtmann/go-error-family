@@ -2,7 +2,7 @@
 
 Structured error protocol library. Library only — no `main`, no build system, no external deps. Full API reference: `SKILL.md`.
 
-**Status:** v0.10.2 released (2026-09-22): master CI green on the release commit, all 7 module tags pushed and proxy-indexed (v0.10.2 verified on `proxy.golang.org`), pkg.go.dev serving v0.10.2. Known gap: the `Release` workflow did NOT fire on the v0.10.2 tag push (no GitHub Release exists — remediated manually with `gh release create v0.10.2 --generate-notes` on 2026-09-27; investigate if it recurs). Deploy Website green since 2026-09-19 (TS 7 re-bump + lockfile drift fixed 2026-09-18, third occurrence of that class). Local: all tests pass with `-race` across root + all submodules, golangci-lint v2.13.2 = 0 issues in all 7 modules, erraudit 0 findings
+**Status:** v0.10.2 released (2026-09-22): master CI green on the release commit, all 7 module tags pushed and proxy-indexed (v0.10.2 verified on `proxy.golang.org`), pkg.go.dev serving v0.10.2. The v0.10.2 release.yml no-fire is ROOT-CAUSED (2026-09-28, `docs/status/2026-09-28_02-10_release-yml-no-fire-root-cause-v0.10.2.md`): the tag push webhook was never delivered — GitHub's combined branch+tag push can silently drop the tag event. Mitigated: `workflow_dispatch` fallback in release.yml + release runbook below. Deploy Website green since 2026-09-19. Local: all tests pass with `-race` across root + all submodules, golangci-lint v2.13.2 = 0 issues in all 7 modules, erraudit 0 findings
 **Workspace modules:** root (zero-dep), `agent`, `bridge` (oops integration), `diagnose`, `diagnose/git`, `diagnose/postgres`, `examples`, `website`
 
 ## Quick Start
@@ -12,6 +12,12 @@ go test ./... -count=1 -timeout 120s -race   # all tests
 golangci-lint run ./...                        # lint (all modules)
 go build ./...                                 # build check
 ```
+
+## Release Runbook
+
+1. **Push tags SEPARATELY from the branch** (`git push origin master && git push origin vX.Y.Z`). A combined push can silently drop the tag webhook (v0.10.2 incident) and release.yml never fires.
+2. **Verify the Release run starts within ~2 min of the tag push** (`gh run list --workflow=release.yml`). If missing, dispatch it manually: `gh workflow run release.yml -f tag=vX.Y.Z` (workflow_dispatch fallback, added 2026-09-28).
+3. Sub-module tags go up before the root tag; verify proxy indexing with `go list -m -versions` before announcing.
 
 ## Docs Layout
 
