@@ -6,9 +6,12 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ## [Unreleased]
 
-Planned vehicle: **v0.11.0 — discoverability release** (scope frozen 2026-09-28,
-TODO_LIST #8). No public API changes; the Go diff is examples, docs, and the
-release-pipeline guard. Cut after the gRPC guide lands on the website.
+## [0.11.0] - 2026-09-29
+
+Discoverability release: **no public API changes.** Constructor-example
+symmetry, first `errorfamilytest` examples, an executable `RuleSpec` example
+for `diagnose`, the gRPC status-mapping guide, and the release-engineering
+guards (website canary, art-dupl baseline, release dispatch fallback).
 
 ### Added
 
@@ -16,6 +19,7 @@ release-pipeline guard. Cut after the gRPC guide lands on the website.
 - **`errorfamilytest` gains its first godoc examples** — one per assertion helper (`AssertFamily`, `AssertCode`, `AssertRetryable`, `AssertContext`, `AssertContextMissing`, `AssertExitCode`, `AssertHTTPStatus`), showing the exact call shape on pkg.go.dev.
 - **`diagnose` gains an executable `RuleSpec` example** — the data-driven rule pattern end-to-end: spec matching (`ContextKeys` + `ContextSubstr`), a custom rule type, `Runner` registration, structured `Fix`, and `ResolveContextKey` lookup.
 - **Website: gRPC status-mapping guide** — the six families mapped to gRPC status codes with an interceptor pattern, mirroring the HTTP guide.
+- **Bridge patterns announcement** — [Discussion #12](https://github.com/LarsArtmann/go-error-family/discussions/12) (Announcements): classify-vs-enrich positioning, the three bridge patterns, the one-sentence decision guide; cross-linked from README.
 
 ### Changed
 
@@ -33,6 +37,10 @@ release-pipeline guard. Cut after the gRPC guide lands on the website.
 - **`website-check.yml`: website guard canary** — fails on typescript major ≠ 6, frozen-lockfile drift, `astro check`, or `astro build` on every `website/**` push/PR; ends the three-time deploy-breaker class structurally.
 - **`.art-dupl-baseline.json` (threshold 1)** — records the three accepted clone groups; `art-dupl check -t 1 .` reports only new clones. Routine gate is the default `-t 5`; deep sweeps run `-t 1` against the baseline (resolves ROADMAP OQ1 as a recorded default).
 - **Website: `minimumReleaseAgeStrict: true`** — the pnpm 11 one-day release cooldown now fails loudly instead of silently falling back to a too-fresh version; frozen installs verify the lockfile against supply-chain policies (492 entries, clean).
+
+### Modules
+
+- `go-error-family` -> **v0.11.0**, `diagnose` -> **v0.2.6**. `agent` (v0.2.5), `bridge` (v0.3.4), `diagnose/git` (v0.5.4), `diagnose/postgres` (v0.5.4), and `examples` (v0.3.2) have no Go changes in this release and stay put; their root-version pins ride the post-release Dependabot PRs.
 
 ## [0.10.3] - 2026-09-28
 

@@ -42,6 +42,8 @@ go-error-family **classifies**; [samber/oops](https://github.com/samber/oops) **
 - **Libraries** import go-error-family only — they know their domain contract (a 404 is a Rejection, a timeout is Transient) but must not presume the app's observability stack, so they never import oops.
 - **Applications** import oops for enrichment and, if they also need behavioral decisions, wrap library errors via the `bridge/` package.
 
+Running the two together: three patterns (pass through, `AutoWrap`, explicit `Wrap`) in the [bridge guide](https://errorfamily.lars.software/guides/bridge/), announced in [discussion #12](https://github.com/LarsArtmann/go-error-family/discussions/12).
+
 The six interfaces (`Coded`, `Classified`, `Contextual`, `Retryable`, `ExitCoder`, `HTTPStatuser`) are the sole public contract; the `Error` struct is a reference implementation, not a requirement.
 
 ## Quick Start

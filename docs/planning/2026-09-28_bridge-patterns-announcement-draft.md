@@ -72,4 +72,4 @@ welcome — especially from anyone running the two together in anger.
 - [x] "19 tests" verified in the audit table (examples/cmd/bridge)
 - [x] Links all real: repo tree, guide URL (deployed domain), oops repo
 - [x] "six families ... zero dependencies" matches v0.10.3 reality
-- [ ] **USER GATE:** review + choose channel (GitHub Discussion here vs r/golang), then publish + cross-link from README/related-tools
+- [x] **PUBLISHED 2026-09-28** as [GitHub Discussion #12](https://github.com/LarsArtmann/go-error-family/discussions/12) (Announcements category, repo Discussions enabled for this). r/golang adaptation deferred until there is an adoption signal. Cross-linked from README ("Complementary, not competing" section).
