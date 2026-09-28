@@ -1,0 +1,103 @@
+---
+title: gRPC Boundaries
+description: Mapping error families to gRPC status codes with a unary interceptor.
+---
+
+go-error-family does not import `google.golang.org/grpc` — the classification
+core stays zero-dependency. Instead, map the family to a gRPC status code at
+your server boundary. The mapping below follows [Google's official HTTP ↔ gRPC
+code mapping](https://grpc.io/docs/guides/status-codes/), so a service that
+serves both HTTP and gRPC stays consistent.
+
+## Family → gRPC Status Mapping
+
+| Family          | Canonical HTTP | gRPC code                 | Rationale                                                                                                                             |
+| --------------- | -------------- | ------------------------- | ------------------------------------------------------------------------------------------------------------------------------------- |
+| `Rejection`     | 400            | `codes.InvalidArgument`   | Client sent incomplete or invalid input; retrying unchanged will fail again.                                                          |
+| `Conflict`      | 409            | `codes.Aborted`           | The asserted state no longer holds (Google maps 409 → ABORTED). If you set `WithHTTPStatus(412)`, use `codes.FailedPrecondition` instead. |
+| `Transient`     | 503            | `codes.Unavailable`       | The only family gRPC clients may retry automatically (service-config retry policies retry `UNAVAILABLE`).                              |
+| `Infrastructure`| 503            | `codes.Unavailable`       | Also `UNAVAILABLE`, but the family's retry policy is single-attempt — gate client retries on the error's code, not the gRPC status alone. |
+| `Corruption`    | 500            | `codes.Internal`          | Stored data is damaged; never retryable, needs a human.                                                                               |
+| `Orchestration` | 500            | `codes.Internal`          | The program's own coordination logic failed; never retryable, report the bug.                                                         |
+| (unknown)       | —              | `codes.Unknown`           | `Classify` fail-opens to `Transient`; treat unclassified transport errors as `Unknown` unless you want the retry behavior.              |
+
+Per-error HTTP overrides (`WithHTTPStatus`) do **not** change the gRPC mapping —
+the interceptor maps from the family. If a specific error needs a different gRPC
+code (for example a not-found `Rejection` as `codes.NotFound`), switch on the
+error code before falling back to the family default.
+
+## Unary Interceptor
+
+```go
+package grpcboundary
+
+import (
+	"context"
+
+	errorfamily "github.com/larsartmann/go-error-family"
+	"google.golang.org/grpc"
+	"google.golang.org/grpc/codes"
+	"google.golang.org/grpc/status"
+)
+
+func UnaryErrorInterceptor() grpc.UnaryServerInterceptor {
+	return func(
+		ctx context.Context,
+		req any,
+		info *grpc.UnaryServerInfo,
+		handler grpc.UnaryHandler,
+	) (any, error) {
+		resp, err := handler(ctx, req)
+		if err == nil {
+			return resp, nil
+		}
+		return resp, toStatus(err)
+	}
+}
+
+func toStatus(err error) error {
+	family := errorfamily.Classify(err)
+	st := status.New(familyToCode(family), errorfamily.Code(err))
+	return st.Err()
+}
+
+func familyToCode(family errorfamily.Family) codes.Code {
+	switch family {
+	case errorfamily.Rejection:
+		return codes.InvalidArgument
+	case errorfamily.Conflict:
+		return codes.Aborted
+	case errorfamily.Transient, errorfamily.Infrastructure:
+		return codes.Unavailable
+	case errorfamily.Corruption, errorfamily.Orchestration:
+		return codes.Internal
+	default:
+		return codes.Unknown
+	}
+}
+```
+
+Two deliberate choices, mirroring the HTTP boundary:
+
+- **The status message is the error code, never `err.Error()`** — internal
+  details (paths, hosts, SQL fragments) must not leak across the wire.
+- **Classification happens once**, at the boundary. Domain code keeps
+  returning classified errors; the interceptor is the only place that knows
+  about gRPC.
+
+## Retry Guidance
+
+- `codes.Unavailable` is the code gRPC service-config retry policies act on.
+  A `Transient` classification means "retry is safe" (default policy: 3
+  attempts); `Infrastructure` maps to the same code but its retry policy is a
+  single attempt — inspect the error code in the status message when your
+  client needs to tell them apart.
+- `codes.Internal`, `codes.InvalidArgument`, and `codes.Aborted` must not be
+  retried without changing the request or resolving the conflict first.
+- `errors.Is` still works client-side if both ends use the library: match on
+  code + family to recover typed decisions from a `status` error.
+
+## See Also
+
+- [HTTP & CLI Boundaries](/guides/http-and-cli/) — the HTTP/CLI mapping, `HTTPHandler` middleware, and template resolution
+- [Classification](/guides/classification/) — how `Classify` reaches a family decision

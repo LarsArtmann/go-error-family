@@ -62,6 +62,7 @@ export default defineConfig({
 						{ label: "Custom Error Types", slug: "guides/error-types" },
 						{ label: "Bridge Patterns", slug: "guides/bridge" },
 						{ label: "HTTP & CLI Boundaries", slug: "guides/http-and-cli" },
+						{ label: "gRPC Boundaries", slug: "guides/grpc" },
 						{ label: "Diagnostics", slug: "guides/diagnostics" },
 						{ label: "Performance", slug: "guides/benchmarks" },
 						{ label: "Twelve-Factor Logs", slug: "guides/twelve-factor-logs" },
