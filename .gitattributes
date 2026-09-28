@@ -7,3 +7,4 @@ reports/** linguist-generated
 * text=auto eol=lf
 # Binary files should not be diffed or merged
 *.woff2 binary
+*.png binary
