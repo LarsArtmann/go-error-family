@@ -17,7 +17,9 @@ skip_steps:
   # deploy pipeline. With no root lockfile the step fails closed with
   # ERR_PNPM_AUDIT_NO_LOCKFILE (verified 2026-09-18 with
   # BUILDFLOW_NO_RESULT_CACHE=1 — the cached ✔ hid the failure). Skipped until
-  # BuildFlow's pnpm-audit supports subdirectory lockfiles (upstream candidate).
+  # BuildFlow's pnpm-audit supports subdirectory lockfiles — tracked upstream:
+  # https://github.com/LarsArtmann/BuildFlow/issues/19 (incl. the trigger/execution
+  # glob mismatch: lockfilePatterns matches **/pnpm-lock.yaml, detector runs at root).
   # Dependabot ALERTS still detect website vulnerabilities, but Dependabot's
   # automatic security-update jobs fail on this repo (npm updater vs pnpm v9
   # lockfile + overrides — every job since 2026-09-15 errored out), so the
@@ -40,6 +42,9 @@ skip_steps:
   # not a bug workaround. (The analyzer's old ignore-directive gap in
   # pkg/phantom is fixed upstream as of v0.6.x — IsIgnored is now honored —
   # so per-field ignores are available if the policy ever narrows.)
+  # Upstream: https://github.com/LarsArtmann/BuildFlow/issues/23 — the phantom
+  # analyzer parses `phantom` ignore directives (core ENUM) but never consults
+  # IsIgnored, so directives are silently dropped.
   - branching-flow
   # nix-hash-fix repairs vendorHash FOD mismatches, but this flake has no
   # vendorHash (plain go build via pkgs.go_1_26; no vendor/ directory), so
