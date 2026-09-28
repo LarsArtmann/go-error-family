@@ -10,6 +10,38 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 - **Documentation: canonical references brought current with the six-family protocol (docs-health pass 2026-09-27)** — SKILL.md (the full API reference) had zero mentions of `Orchestration`: family table, severity order, HTTP mapping, audience mapping, and constructor lists now include the 6th family; `docs/DOMAIN_LANGUAGE.md` gained `Orchestration` in the Family/Audience definitions and the `HTTPStatuser` interface row; README's "four interfaces" claim corrected to the six-interface contract (with `HTTPStatuser`), and the architecture tree now lists `registry.go`, `stdlib.go`, `bridge/`, and the bridge/checkout examples; website `contributing.mdx` "four interfaces" and `quick-start.mdx` "Five Families" heading fixed (both stale since v0.8.0/v0.10.0).
 
+## [0.10.3] - 2026-09-28
+
+Consumer-protection release: **no public API changes.** Retracts every
+broken pre-extraction tag family so consumers can no longer resolve them
+to broken module graphs from the module proxy.
+
+### Deprecated
+
+- **Retracted the broken root tags `v0.5.0`, `v0.5.1`, and `v0.6.0`** — all three shipped
+  local-directory `replace` directives (`./agent`, `./diagnose`) that break every consumer
+  building from the module proxy (directory replaces cannot resolve outside this workspace);
+  `v0.6.0` additionally pinned a phantom `v0.0.0-00010101…` pseudo-version. `v0.6.1` is
+  clean (zero requires, pre-extraction subpackage layout) and stays available. The retract
+  block in the root `go.mod` now carries the reason, so `go` tooling refuses quiet upgrades
+  and reports the retraction. Superseded by v0.10.3.
+
+### Fixed
+
+- **`diagnose/v0.1.0` retracted (diagnose v0.2.5)** — its `go.mod` carried a local-directory
+  replace (`=> ..`), equally unusable from the proxy. `agent/v0.1.0` retracted in agent
+  v0.2.5 (replaces `=> ..` and `=> ../diagnose`). These are the only two submodule tags
+  with replace directives; every other submodule tag audited clean (module path + zero
+  replaces across all 60+ tags).
+- **Release scope note:** only the three affected modules release here (`diagnose` v0.2.5,
+  `agent` v0.2.5, root v0.10.3). `bridge`, `diagnose/git`, `diagnose/postgres`, and
+  `examples` have no broken tags and no go.mod changes, so they stay at v0.3.4 / v0.5.4 /
+  v0.5.4 / v0.3.2 — a coordinated 7-module bump would only widen the documented
+  pin-bump-to-tag-push breakage window for the externally-dependent modules.
+- **CHANGELOG correction (0.10.2):** the Modules section claimed submodule `go.mod` files
+  reference root v0.10.2; they actually pin root **v0.10.1** (the new root version cannot
+  exist when the submodule tags are cut). Root pins ride the post-release Dependabot PRs.
+
 ## [0.10.2] - 2026-09-22
 
 Release-engineering release: **no public API changes.** Completes the
@@ -34,7 +66,7 @@ TypeScript-7 recurrence plus 8 transitive vulnerabilities.
 
 ### Modules
 
-Coordinated multi-module release. Submodule `go.mod` files reference root **v0.10.2** and diagnose **v0.2.4**.
+Coordinated multi-module release. Submodule `go.mod` files pin sibling versions (diagnose **v0.2.4**, bridge **v0.3.4**); the root pin stays at **v0.10.1** until the post-release Dependabot pass (the new root version cannot be referenced before it exists).
 
 - `github.com/larsartmann/go-error-family` → **v0.10.2** (no API changes; docs + CI + website fixes)
 - `github.com/larsartmann/go-error-family/diagnose` → **v0.2.4** (pin-only; go-directive floor alignment)
