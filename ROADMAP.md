@@ -94,6 +94,6 @@ use oops.
 
 Unresolved decisions that gate work elsewhere. They are not tasks — see TODO_LIST for the actionable fallout.
 
-1. **art-dupl threshold policy** — is `-t 1` the routine bar (needing a suppression/baseline story for accepted clones) or is `-t 1` reserved for occasional deep sweeps with `-t 5` as the normal gate? (Gates TODO_LIST #5.)
+1. ~~**art-dupl threshold policy**~~ — **RESOLVED (2026-09-28, recorded default):** routine gate `-t 5`; occasional deep sweeps `-t 1` against the committed `.art-dupl-baseline.json` (3 accepted clone groups). Policy lives in AGENTS.md "Lint Configuration"; wired via `art-dupl check -t 1 .` reporting only new clones.
 2. **Fleet churn: fix at the root or per-repo canaries forever?** The json/v2 re-imports, TS-7 bumps, and go-directive drift originate in the machine-global `GOEXPERIMENT=jsonv2` export plus the orchestrator's migrator — outside this repo. Is a fleet-level fix planned, or is the per-repo canary defense the accepted permanent architecture? (Decides whether the website canaries in TODO_LIST #4 are scaffolding or permanent.)
 3. **Bridge & enrichment APIs: invest or freeze?** Bridge has zero external consumers (audited 2026-07-23; root cause: near-zero oops adoption ecosystem-wide); `LogError` ~3, `HTTPHandler` ~5, `errorfamilytest` ~3, `diagnose` ~3 external call sites. Grow adoption (announcements, examples, guides) or freeze the surface and invest in reliability/coverage? (Gates roughly a third of the discoverability backlog.)
