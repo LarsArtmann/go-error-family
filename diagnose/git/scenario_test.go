@@ -2,6 +2,8 @@ package git
 
 import (
 	"context"
+	"errors"
+	"os"
 	"strings"
 	"testing"
 
@@ -197,5 +199,89 @@ func TestGitRuleMockCallsCommandRunner(t *testing.T) {
 	}
 	if !hasExists {
 		t.Error("Expected Exists() call, not found")
+	}
+}
+
+func TestGitRuleMockGitRemoteNonZeroExit(t *testing.T) {
+	tmpDir := t.TempDir()
+	initGitRepo(t, tmpDir)
+
+	mr := newMockRunner()
+	mr.ExistsMap["git"] = true
+	mr.Set("git -C "+tmpDir+" status --porcelain", "", 0)
+	mr.Set("git -C "+tmpDir+" remote", "fatal: not a git repository", 128)
+
+	r := &GitRule{Runner: mr}
+	err := errorfamily.NewTransient("git.error", "msg").WithContext("repo", tmpDir)
+
+	result, runErr := r.Run(context.Background(), err)
+	if runErr != nil {
+		t.Fatalf("Run() error: %v", runErr)
+	}
+	diagnose.AssertStatus(t, result, diagnose.StatusUnknown)
+	if !strings.Contains(result.Summary, "git remote failed") {
+		t.Errorf("Summary = %q, want it to mention the git remote failure", result.Summary)
+	}
+}
+
+func TestGitRuleMockGitRemoteRunError(t *testing.T) {
+	tmpDir := t.TempDir()
+	initGitRepo(t, tmpDir)
+
+	mr := newMockRunner()
+	mr.ExistsMap["git"] = true
+	mr.Set("git -C "+tmpDir+" status --porcelain", "", 0)
+	mr.Responses["git -C "+tmpDir+" remote"] = diagnose.MockResponse{
+		Err: errors.New("fork/exec git: resource temporarily unavailable"),
+	}
+
+	r := &GitRule{Runner: mr}
+	err := errorfamily.NewTransient("git.error", "msg").WithContext("repo", tmpDir)
+
+	result, runErr := r.Run(context.Background(), err)
+	if runErr != nil {
+		t.Fatalf("Run() error: %v", runErr)
+	}
+	diagnose.AssertStatus(t, result, diagnose.StatusUnknown)
+	if !strings.Contains(result.Summary, "git remote failed") {
+		t.Errorf("Summary = %q, want it to mention the git remote failure", result.Summary)
+	}
+}
+
+func TestGitRuleMockLsRemoteRunError(t *testing.T) {
+	tmpDir := t.TempDir()
+	initGitRepo(t, tmpDir)
+
+	mr := newMockRunner()
+	mr.ExistsMap["git"] = true
+	mr.Set("git -C "+tmpDir+" status --porcelain", "", 0)
+	mr.Set("git -C "+tmpDir+" remote", "origin", 0)
+	mr.Responses["git -C "+tmpDir+" ls-remote --heads origin"] = diagnose.MockResponse{
+		Err: errors.New("signal: killed"),
+	}
+
+	r := &GitRule{Runner: mr}
+	err := errorfamily.NewTransient("git.error", "msg").WithContext("repo", tmpDir)
+
+	result, runErr := r.Run(context.Background(), err)
+	if runErr != nil {
+		t.Fatalf("Run() error: %v", runErr)
+	}
+	diagnose.AssertStatus(t, result, diagnose.StatusUnknown)
+	if !strings.Contains(result.Summary, "git ls-remote failed") {
+		t.Errorf("Summary = %q, want it to mention the ls-remote failure", result.Summary)
+	}
+}
+
+func TestGitRuleResolveRepoPathFallsBackToCwd(t *testing.T) {
+	r := &GitRule{}
+	err := errorfamily.NewTransient("git.error", "msg")
+	got := r.resolveRepoPath(err)
+	want, cwdErr := os.Getwd()
+	if cwdErr != nil {
+		t.Skipf("os.Getwd failed: %v", cwdErr)
+	}
+	if got != want {
+		t.Errorf("resolveRepoPath() = %q, want cwd %q", got, want)
 	}
 }
