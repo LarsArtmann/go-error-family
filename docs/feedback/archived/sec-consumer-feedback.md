@@ -1,5 +1,14 @@
 # go-error-family — SDK Feedback from SEC
 
+> **RESOLVED & ARCHIVED (2026-09-28).** Every item below shipped by v0.10.1 and was
+> re-verified against v0.10.3: `Code(err)` (PP1/IDEA1), README decision tree (PP2),
+> `TemplateForCode` (PP3), `Family.HTTPStatus()` rationale docs + Corruption→500 (PP4),
+> `IsRetryable` (PP5), `HTTPHandler`/`HTTPStatus` (IDEA2), `LogError`/`LogErrorContext`
+> (IDEA3), `errorfamilytest` assertion helpers (IDEA4). Adoption counts in AGENTS.md
+> show the boundary APIs remain under-adopted — that is now an adoption problem, not an
+> API gap. Kept as the canonical consumer-feedback record.
+
+
 **Consumer:** [SEC](https://github.com/larsartmann/sec) — dice-based game (CQRS + HTMX)
 **Date:** 2026-07-05
 **Version used:** v0.5.1
