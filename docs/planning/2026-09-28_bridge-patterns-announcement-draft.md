@@ -72,4 +72,4 @@ welcome — especially from anyone running the two together in anger.
 - [x] "19 tests" verified in the audit table (examples/cmd/bridge)
 - [x] Links all real: repo tree, guide URL (deployed domain), oops repo
 - [x] "six families ... zero dependencies" matches v0.10.3 reality
-- [x] **PUBLISHED 2026-09-28** as [GitHub Discussion #12](https://github.com/LarsArtmann/go-error-family/discussions/12) (Announcements category, repo Discussions enabled for this). r/golang adaptation deferred until there is an adoption signal. Cross-linked from README ("Complementary, not competing" section).
+- [x] **PUBLISHED 2026-09-28, WITHDRAWN 2026-09-29** — went live as GitHub Discussion #12 (Announcements; repo Discussions enabled for it), then was deleted on reflection: a link-post in an otherwise empty Discussions tab serves no purpose as a "Discussion" (no audience, no replies, content already lives in the guide/README). Discussions disabled again. The text above is the canonical draft; adapt for a channel with real audience (r/golang candidate) when announcing.

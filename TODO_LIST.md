@@ -10,12 +10,17 @@ traceable to its source. When an item ships, remove it here and record it in
 
 ## Active
 
-None. The 2026-09-27/28 batch shipped in full (v0.11.0, 2026-09-29):
+1. **Announce the Bridge Patterns guide** (source: ROADMAP theme 4) —
+   REOPENED 2026-09-29: the GitHub Discussion venue was tried and withdrawn
+   (a link-post in an otherwise empty Discussions tab serves no purpose;
+   Discussions disabled again). The draft
+   (`docs/planning/2026-09-28_bridge-patterns-announcement-draft.md`) is
+   voice-checker-clean and self-reviewed; pick a channel with real audience
+   (r/golang candidate) before publishing. Bounded: one channel decision +
+   one publish.
 
-1. ~~Announce the Bridge Patterns guide~~ — **DONE 2026-09-28:**
-   [Discussion #12](https://github.com/LarsArtmann/go-error-family/discussions/12)
-   (Announcements; repo Discussions enabled for it), cross-linked from README.
-   r/golang adaptation deferred until adoption signal.
+The 2026-09-27/28 batch otherwise shipped in full (v0.11.0, 2026-09-29):
+
 2. ~~Website guard canaries in CI~~ — **DONE 2026-09-28:** `website-check.yml`
    (TS-major==6, frozen-lockfile install, `astro check`+`build`); Dependabot
    decision recorded in AGENTS.md (security updates stay enabled; red jobs are

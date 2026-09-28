@@ -19,7 +19,6 @@ guards (website canary, art-dupl baseline, release dispatch fallback).
 - **`errorfamilytest` gains its first godoc examples** — one per assertion helper (`AssertFamily`, `AssertCode`, `AssertRetryable`, `AssertContext`, `AssertContextMissing`, `AssertExitCode`, `AssertHTTPStatus`), showing the exact call shape on pkg.go.dev.
 - **`diagnose` gains an executable `RuleSpec` example** — the data-driven rule pattern end-to-end: spec matching (`ContextKeys` + `ContextSubstr`), a custom rule type, `Runner` registration, structured `Fix`, and `ResolveContextKey` lookup.
 - **Website: gRPC status-mapping guide** — the six families mapped to gRPC status codes with an interceptor pattern, mirroring the HTTP guide.
-- **Bridge patterns announcement** — [Discussion #12](https://github.com/LarsArtmann/go-error-family/discussions/12) (Announcements): classify-vs-enrich positioning, the three bridge patterns, the one-sentence decision guide; cross-linked from README.
 
 ### Changed
 
