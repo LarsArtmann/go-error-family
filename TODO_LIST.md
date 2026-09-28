@@ -61,7 +61,7 @@ traceable to its source. When an item ships, remove it here and record it in
    gRPC guide (`website/src/content/docs/guides/grpc.mdx` + sidebar) and
    verify `astro check`/`astro build`; (b) sync the website changelog; (c)
    finalize the CHANGELOG section with the release date; (d) workspace tests
-   + lint green (all 7 modules, `-race`); (e) follow the AGENTS release
-   runbook (separate tag pushes, ~2 min Release-run check, dispatch fallback
-   ready); (f) curate the GitHub Release notes (v0.10.2 style). Bounded:
-   one guide + one coordinated release.
+   - lint green (all 7 modules, `-race`); (e) follow the AGENTS release
+     runbook (separate tag pushes, ~2 min Release-run check, dispatch fallback
+     ready); (f) curate the GitHub Release notes (v0.10.2 style). Bounded:
+     one guide + one coordinated release.
