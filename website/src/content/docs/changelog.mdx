@@ -5,6 +5,38 @@ description: All notable changes to go-error-family.
 
 ## [Unreleased]
 
+## [0.11.0] — 2026-09-29
+
+Discoverability release: **no public API changes.**
+
+### Added
+
+- **Root godoc example symmetry complete** — every `New{Family}` constructor has a runnable example (30 examples total on pkg.go.dev).
+- **First godoc examples for `errorfamilytest`** — one per assertion helper (`AssertFamily`, `AssertCode`, `AssertRetryable`, `AssertContext`, `AssertContextMissing`, `AssertExitCode`, `AssertHTTPStatus`).
+- **Executable `RuleSpec` example for `diagnose`** — the data-driven rule pattern end-to-end: spec matching, `Runner` registration, structured `Fix`.
+- **gRPC status-mapping guide** — the six families mapped to gRPC status codes with an interceptor pattern.
+- **Bridge patterns announcement** ([Discussion #12](https://github.com/LarsArtmann/go-error-family/discussions/12)) — classify-vs-enrich positioning, the three bridge patterns, the decision guide.
+
+### Changed
+
+- **Canonical references brought current with the six-family protocol** — SKILL.md, `DOMAIN_LANGUAGE.md`, README, and the website quick-start/contributing pages now reflect `Orchestration` and the six-interface contract.
+
+### Fixed
+
+- **erraudit suppression for the deliberate silent recovery in `safeCauseString`** (new Sep-22 erraudit rule); battery re-verified 0 findings across all 7 modules.
+- **`.gitattributes`: `*.png binary`** — prevents diff/merge corruption for website OG images.
+
+### Release engineering
+
+- **`release.yml` `workflow_dispatch` fallback** with explicit `tag_name` — recovers from swallowed tag-push webhooks (the v0.10.2 incident class).
+- **`website-check.yml` guard canary** — fails on TypeScript major ≠ 6, lockfile drift, `astro check`, or `astro build` on every `website/**` change.
+- **`.art-dupl-baseline.json`** (threshold 1) — routine gate `-t 5`; deep sweeps `-t 1` against the committed baseline of 3 accepted clone groups.
+- **`minimumReleaseAgeStrict: true`** — the pnpm 11 supply-chain cooldown now fails loudly instead of silently.
+
+### Modules
+
+- `go-error-family` -> **v0.11.0**, `diagnose` -> **v0.2.6**; all other modules unchanged.
+
 ## [0.10.3] — 2026-09-28
 
 Consumer-protection release: **no public API changes.** Retracts every
