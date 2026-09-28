@@ -6,9 +6,33 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ## [Unreleased]
 
+Planned vehicle: **v0.11.0 — discoverability release** (scope frozen 2026-09-28,
+TODO_LIST #8). No public API changes; the Go diff is examples, docs, and the
+release-pipeline guard. Cut after the gRPC guide lands on the website.
+
+### Added
+
+- **Root godoc examples: family-constructor symmetry complete** — `ExampleNewConflict`, `ExampleNewCorruption`, `ExampleNewInfrastructure`, `ExampleNewOrchestration` join `ExampleNewTransient`; each shows the family's canonical HTTP status and one behavioral field (retryability / severity / exit code). Root package now carries 30 runnable examples.
+- **`errorfamilytest` gains its first godoc examples** — one per assertion helper (`AssertFamily`, `AssertCode`, `AssertRetryable`, `AssertContext`, `AssertContextMissing`, `AssertExitCode`, `AssertHTTPStatus`), showing the exact call shape on pkg.go.dev.
+- **`diagnose` gains an executable `RuleSpec` example** — the data-driven rule pattern end-to-end: spec matching (`ContextKeys` + `ContextSubstr`), a custom rule type, `Runner` registration, structured `Fix`, and `ResolveContextKey` lookup.
+- **Website: gRPC status-mapping guide** — the six families mapped to gRPC status codes with an interceptor pattern, mirroring the HTTP guide.
+
 ### Changed
 
 - **Documentation: canonical references brought current with the six-family protocol (docs-health pass 2026-09-27)** — SKILL.md (the full API reference) had zero mentions of `Orchestration`: family table, severity order, HTTP mapping, audience mapping, and constructor lists now include the 6th family; `docs/DOMAIN_LANGUAGE.md` gained `Orchestration` in the Family/Audience definitions and the `HTTPStatuser` interface row; README's "four interfaces" claim corrected to the six-interface contract (with `HTTPStatuser`), and the architecture tree now lists `registry.go`, `stdlib.go`, `bridge/`, and the bridge/checkout examples; website `contributing.mdx` "four interfaces" and `quick-start.mdx` "Five Families" heading fixed (both stale since v0.8.0/v0.10.0).
+- **README: test-helper and diagnostic-rules sections name the new example coverage** (`AssertContextMissing`/`AssertHTTPStatus`, `RuleSpec` example).
+
+### Fixed
+
+- **erraudit regression in `safeCauseString`** — the Sep 22 erraudit binary added a blank-identifier-on-`recover` rule after the 2026-09-15 zero-findings verification; the deliberate silent recovery now carries the documented `//nolint:legacyerrors` suppression with its rationale. Battery re-run confirms 0 findings across all 7 modules (2026-09-28).
+- **`.gitattributes`: `*.png binary`** — structure-linter advisory; prevents diff/merge corruption for website OG images.
+
+### Release engineering
+
+- **`release.yml`: `workflow_dispatch` fallback + explicit `tag_name`** — a swallowed tag-push webhook (the v0.10.2 incident: the tag ref never produced a push event, so the release silently skipped) can now be re-run from the Actions UI; the runbook in AGENTS.md mandates separate tag/branch pushes and a ~2 min trigger check.
+- **`website-check.yml`: website guard canary** — fails on typescript major ≠ 6, frozen-lockfile drift, `astro check`, or `astro build` on every `website/**` push/PR; ends the three-time deploy-breaker class structurally.
+- **`.art-dupl-baseline.json` (threshold 1)** — records the three accepted clone groups; `art-dupl check -t 1 .` reports only new clones. Routine gate is the default `-t 5`; deep sweeps run `-t 1` against the baseline (resolves ROADMAP OQ1 as a recorded default).
+- **Website: `minimumReleaseAgeStrict: true`** — the pnpm 11 one-day release cooldown now fails loudly instead of silently falling back to a too-fresh version; frozen installs verify the lockfile against supply-chain policies (492 entries, clean).
 
 ## [0.10.3] - 2026-09-28
 

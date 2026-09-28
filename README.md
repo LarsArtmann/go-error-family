@@ -103,9 +103,9 @@ See [examples/](examples/) for runnable CLI, HTTP, custom diagnostic rule, and o
 - **`RegisterStdlibDefaults(reg)`** — pre-registered classifications for common stdlib errors (context/sql/os) with documented rationale
 - **`TemplateForCode(code)`** — look up a registered message template without the full CLI pipeline (for HTTP/gRPC boundaries)
 - **`LogError(err, logger)`** — structured `log/slog` logging with family/code/retryable/context fields
-- **`errorfamilytest`** — test assertion helpers (`AssertFamily`, `AssertCode`, `AssertRetryable`, `AssertContext`, `AssertExitCode`)
+- **`errorfamilytest`** — test assertion helpers (`AssertFamily`, `AssertCode`, `AssertRetryable`, `AssertContext`, `AssertContextMissing`, `AssertExitCode`, `AssertHTTPStatus`), each with a godoc example
 - **`HandleError(err)`** — CLI boundary handler with structured messages (What / Why / Fix / WayOut)
-- **Diagnostic rules** — deterministic checks (PostgreSQL, filesystem, network, git) that auto-discover why an error occurred and emit structured `Fix{Summary, Command}`
+- **Diagnostic rules** — deterministic checks (PostgreSQL, filesystem, network, git) that auto-discover why an error occurred and emit structured `Fix{Summary, Command}`; the `RuleSpec` data-driven pattern has a runnable godoc example
 - **`WrapOnce(err, family, code, msg)`** — idempotent wrap that prevents double-wrapping at API boundaries
 - **`WithExitCode(code)` / `WithContextAny(key, value)`** — per-error exit code override and type-safe context attachment
 
@@ -424,7 +424,8 @@ if err := run(); err != nil {
 ## Test Helpers
 
 The `errorfamilytest` subpackage mirrors `net/http/httptest` — it keeps
-`testing` out of the production package:
+`testing` out of the production package. Every helper has a runnable-shaped
+godoc example on pkg.go.dev (`ExampleAssertFamily` and friends):
 
 ```go
 import "github.com/larsartmann/go-error-family/errorfamilytest"

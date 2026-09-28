@@ -55,8 +55,15 @@ traceable to its source. When an item ships, remove it here and record it in
    `minimumReleaseAgeStrict` for pnpm in `website/pnpm-workspace.yaml`
    (supply-chain freshness). (`bun.lock` gitignore already done — verified
    2026-09-27, `website/.gitignore:22`.) Bounded: one config decision.
+   DONE 2026-09-28 (`minimumReleaseAgeStrict: true`, install + check green).
 
-8. **Plan v0.11.0 scope** (source: docs/status/archived/2026-09-18 §f40) — candidates
-    from the backlog: example-coverage gaps (`errorfamilytest`, `diagnose`),
-    coverage lifts, website canaries. Cut the CHANGELOG into a release plan.
-    Bounded: one planning pass.
+8. **Cut v0.11.0** (scope frozen 2026-09-28, see CHANGELOG `[Unreleased]`) —
+   discoverability release: constructor examples + errorfamilytest/diagnose
+   examples + gRPC guide + release-engineering guards. Checklist: (a) land the
+   gRPC guide (`website/src/content/docs/guides/grpc.mdx` + sidebar) and
+   verify `astro check`/`astro build`; (b) sync the website changelog; (c)
+   finalize the CHANGELOG section with the release date; (d) workspace tests
+   + lint green (all 7 modules, `-race`); (e) follow the AGENTS release
+   runbook (separate tag pushes, ~2 min Release-run check, dispatch fallback
+   ready); (f) curate the GitHub Release notes (v0.10.2 style). Bounded:
+   one guide + one coordinated release.
