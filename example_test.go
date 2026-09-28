@@ -20,6 +20,32 @@ func ExampleNewTransient() {
 	// Output: [transient:db.timeout] query took too long
 }
 
+func ExampleNewConflict() {
+	err := NewConflict("game.already_finished", "move after game over").
+		WithContext("game_id", "g-42")
+	fmt.Println(err, Classify(err).HTTPStatus(), Classify(err).IsRetryable())
+	// Output: [conflict:game.already_finished] move after game over 409 false
+}
+
+func ExampleNewCorruption() {
+	err := NewCorruption("state.checksum_mismatch", "stored game state failed checksum")
+	fmt.Println(err, Classify(err).HTTPStatus(), Classify(err).Severity())
+	// Output: [corruption:state.checksum_mismatch] stored game state failed checksum 500 6
+}
+
+func ExampleNewInfrastructure() {
+	err := NewInfrastructure("fs.readonly", "filesystem mounted read-only").
+		WithContext("path", "/var/lib/app")
+	fmt.Println(err, Classify(err).HTTPStatus(), Classify(err).IsRetryable())
+	// Output: [infrastructure:fs.readonly] filesystem mounted read-only 503 false
+}
+
+func ExampleNewOrchestration() {
+	err := NewOrchestration("workflow.double_transition", "state machine applied the same transition twice")
+	fmt.Println(err, Classify(err).HTTPStatus(), Classify(err).ExitCode())
+	// Output: [orchestration:workflow.double_transition] state machine applied the same transition twice 500 70
+}
+
 func ExampleClassify() {
 	err := NewRejection("file.not_found", "config missing")
 	family := Classify(err)
