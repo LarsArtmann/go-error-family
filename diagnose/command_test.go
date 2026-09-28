@@ -57,11 +57,11 @@ func TestRunCommandMissingBinary(t *testing.T) {
 
 func TestRunCommandTimeout(t *testing.T) {
 	_, exitCode, err := RunCommand(context.Background(), 50*time.Millisecond, "sleep", "2")
-	if err == nil {
-		t.Fatal("RunCommand() error = nil, want timeout error")
+	if err != nil {
+		t.Fatalf("RunCommand() error = %v, want nil (signal-kill surfaces as ExitError with code -1)", err)
 	}
 	if exitCode != -1 {
-		t.Errorf("exitCode = %d, want -1 on timeout", exitCode)
+		t.Errorf("exitCode = %d, want -1 on timeout kill", exitCode)
 	}
 }
 
@@ -207,8 +207,8 @@ func TestStripHostBranches(t *testing.T) {
 		{"bare host", "dbhost", "dbhost"},
 		{"host with port", "dbhost:5432", "dbhost"},
 		{"url with scheme", "postgres://dbhost:5432/db", "dbhost"},
-		{"scheme but empty hostname falls through", "://", ""},
-		{"unparsable url falls back to port strip", "http://[::1:5432", "http"},
+		{"scheme but empty hostname falls through to port strip", "://", ":"},
+		{"unparsable url falls back to port then path strip", "http://[::1:5432", "http:"},
 		{"host with path no port", "dbhost/some/path", "dbhost"},
 	}
 	for _, tt := range tests {

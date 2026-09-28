@@ -2,6 +2,7 @@ package postgres
 
 import (
 	"context"
+	"errors"
 	"strings"
 	"testing"
 
@@ -335,4 +336,67 @@ func TestIsPostgresRunning(t *testing.T) {
 func TestIsPostgresRunningDefaults(t *testing.T) {
 	running := IsPostgresRunning(context.Background(), "localhost", "5432")
 	_ = running
+}
+
+func TestPostgresRuleMockPgIsreadyRunError(t *testing.T) {
+	mr := newPgMockRunner()
+	mr.ExistsMap["pg_isready"] = true
+	mr.Responses["pg_isready -h localhost -p 5432"] = diagnose.MockResponse{
+		ExitCode: -1,
+		Err:      errors.New("fork/exec pg_isready: permission denied"),
+	}
+
+	r := &PostgresRule{Runner: mr}
+	err := errorfamily.NewTransient("db.timeout", "msg")
+
+	result, runErr := r.Run(context.Background(), err)
+	if runErr != nil {
+		t.Fatalf("Run() error: %v", runErr)
+	}
+	if result.Details["pg_isready_error"] == "" {
+		t.Errorf("Details[pg_isready_error] = %q, want the run error", result.Details["pg_isready_error"])
+	}
+	if result.Status != diagnose.StatusFailed {
+		t.Errorf("Status = %v, want failed (exec error, no response)", result.Status)
+	}
+	if !strings.Contains(result.Summary, "NOT responding") {
+		t.Errorf("Summary = %q, want NOT responding", result.Summary)
+	}
+}
+
+func TestPostgresRuleMockNoPgIsreadyTCPRefused(t *testing.T) {
+	mr := newPgMockRunner()
+	mr.ExistsMap["pg_isready"] = false
+
+	r := &PostgresRule{Runner: mr}
+	err := errorfamily.NewTransient("db.timeout", "msg").
+		WithContext("host", "127.0.0.1").
+		WithContext("port", "1")
+
+	result, runErr := r.Run(context.Background(), err)
+	if runErr != nil {
+		t.Fatalf("Run() error: %v", runErr)
+	}
+	diagnose.AssertStatus(t, result, diagnose.StatusFailed)
+	if !strings.Contains(result.Summary, "Cannot connect to 127.0.0.1:1") {
+		t.Errorf("Summary = %q, want Cannot connect message", result.Summary)
+	}
+	diagnose.AssertDetail(t, result, "pg_isready", "not available")
+	if result.Details["tcp_error"] == "" {
+		t.Error("Details[tcp_error] is empty, want the dial error")
+	}
+	if result.Confidence != diagnose.ConfidenceVeryHigh {
+		t.Errorf("Confidence = %v, want ConfidenceVeryHigh", result.Confidence)
+	}
+}
+
+func TestIsPostgresRunningClosedPort(t *testing.T) {
+	if (diagnose.DefaultCommandRunner{}).Exists("pg_isready") {
+		t.Log("pg_isready present: exercising the exit-code path")
+	} else {
+		t.Log("pg_isready absent: exercising the TCP dial path")
+	}
+	if IsPostgresRunning(context.Background(), "127.0.0.1", "1") {
+		t.Error("IsPostgresRunning on closed port 1 = true, want false")
+	}
 }
