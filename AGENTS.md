@@ -2,7 +2,7 @@
 
 Structured error protocol library. Library only — no `main`, no build system, no external deps. Full API reference: `SKILL.md`.
 
-**Status:** v0.10.3 released (2026-09-28; retracts the proxy-broken v0.5.x/v0.6.0 root tags + diagnose/agent v0.1.0). All 7 modules proxy-indexed; retraction propagation verified through the default module proxy (2026-09-28: `go list -m` serves the retract rationale, `@versions` tops out at v0.10.3). CI + Release + Deploy Website green, tests pass with `-race`, golangci-lint v2.13.2 = 0 issues in all 7 modules, erraudit 0 findings (re-verified 2026-09-28 battery). Release-era narratives: `docs/history/agents-archive.md`.
+**Status:** v0.11.0 released (2026-09-29, discoverability release with diagnose v0.2.6; prior: v0.10.3 retracted the proxy-broken v0.5.x/v0.6.0 root tags + diagnose/agent v0.1.0). All 7 modules proxy-indexed; retraction propagation verified through the default module proxy (2026-09-28: `go list -m` serves the retract rationale, `@versions` tops out at v0.10.3). CI + Release + Deploy Website green, tests pass with `-race`, golangci-lint v2.13.2 = 0 issues in all 7 modules, erraudit 0 findings (re-verified 2026-09-29 battery). Release-era narratives: `docs/history/agents-archive.md`.
 **Workspace modules:** root (zero-dep), `agent`, `bridge` (oops integration), `diagnose`, `diagnose/git`, `diagnose/postgres`, `examples`, `website`
 
 ## Quick Start
