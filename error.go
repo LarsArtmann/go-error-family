@@ -333,7 +333,7 @@ func (e *Error) HTTPStatus() int { return e.httpStatus }
 // fmt.Sprintf callers, returning an empty string instead.
 func safeCauseString(cause error) string {
 	defer func() {
-		_ = recover()
+		_ = recover() //nolint:legacyerrors // the panic value is not an error; deliberate silent recovery so a misbehaving cause cannot crash the process
 	}()
 
 	return cause.Error()
