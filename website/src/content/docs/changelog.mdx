@@ -5,6 +5,59 @@ description: All notable changes to go-error-family.
 
 ## [Unreleased]
 
+## [0.10.3] — 2026-09-28
+
+Consumer-protection release: **no public API changes.** Retracts every
+broken pre-extraction tag family.
+
+### Deprecated
+
+- **Root tags `v0.5.0`, `v0.5.1`, `v0.6.0` retracted** — they shipped local-directory `replace` directives that break every consumer building from the module proxy (`v0.6.0` also pinned a phantom pseudo-version). `v0.6.1` is clean and stays available.
+- **`diagnose/v0.1.0` and `agent/v0.1.0` retracted** (diagnose v0.2.5, agent v0.2.5) — same local-dir replace class. All 60+ tags audited; these five were the only broken ones.
+
+### Modules
+
+- `go-error-family` -> **v0.10.3**, `diagnose` -> **v0.2.5**, `agent` -> **v0.2.5**. `bridge` (v0.3.4), `diagnose/git` (v0.5.4), `diagnose/postgres` (v0.5.4), `examples` (v0.3.2) unaffected — no broken tags, no changes.
+
+## [0.10.2] — 2026-09-22
+
+Release-engineering release: **no public API changes.**
+
+### Added
+
+- **Six godoc examples for the under-adopted API surface** (`ExampleWrap`, `ExampleHandleErrorWithContext`, `ExampleIsRetryable`, `ExampleFamily_RetryPolicy`, `ExampleLogError`, `ExampleHTTPHandler`) — 26 runnable examples on pkg.go.dev.
+
+### Changed
+
+- **`exhaustruct` -> `exhaustruct_v5` lint migration completed**; Go directives aligned with true per-module dependency floors (bridge/examples dep-forced to `go 1.26.0`).
+
+### Fixed
+
+- **Website: TypeScript 7 re-bump recurrence** (third occurrence of the class) reverted to `^6.0.0`; **8 transitive dependency vulnerabilities resolved**; `pnpm audit` clean.
+
+### Modules
+
+- `go-error-family` -> **v0.10.2**, `diagnose` -> **v0.2.4**, `agent` -> **v0.2.4**, `bridge` -> **v0.3.4**, `diagnose/git` -> **v0.5.4**, `diagnose/postgres` -> **v0.5.4**, `examples` -> **v0.3.2**
+
+## [0.10.1] — 2026-09-15
+
+Documentation, CI-reliability, and error-handling-hardening release. **No
+public API changes.**
+
+### Added
+
+- **Conditional-request classification guidance** (RFC 9110 §13): 304 = success path (never classify), 412 = `Conflict` + `WithHTTPStatus(412)`, 428/416 = `Rejection` with overrides — resolves #5.
+- **Website: Bridge Patterns guide** — classify->enrich->handle with the three patterns and the decision guide.
+- **CI lint version parity** (golangci-lint v2.13.2 everywhere), depguard deny rule for `encoding/json/v2`, `.buildflow.yml`.
+
+### Fixed
+
+- **All 36 erraudit findings resolved** — `diagnose/git` and `diagnose/postgres` run errors surface as `StatusUnknown`; `errors.As` -> `errors.AsType` migration.
+
+### Modules
+
+- `go-error-family` -> **v0.10.1**, `diagnose` -> **v0.2.3**, `agent` -> **v0.2.3**, `bridge` -> **v0.3.3**, `diagnose/git` -> **v0.5.3**, `diagnose/postgres` -> **v0.5.3**, `examples` -> **v0.3.1**
+
 ## [0.10.0] — 2026-07-26
 
 Adds the `Orchestration` family — the 6th behavioral family — for internal
