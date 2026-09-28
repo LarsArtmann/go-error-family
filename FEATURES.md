@@ -3,7 +3,7 @@
 Honest inventory of what exists, what works, and what doesn't. Every claim is
 verifiable against the code — citations point at the source.
 
-**Last verified:** 2026-09-27 against v0.10.2 (live `go test -cover` run across all modules)
+**Last verified:** 2026-09-28 against v0.10.3 (live `go test -race -cover` run across all modules)
 
 ---
 
@@ -192,7 +192,7 @@ Analysis-only debug agent. Separate Go module (depends on root + diagnose).
 
 Connects go-error-family with `samber/oops`. Separate Go module (depends on both).
 
-The code is correct, tested (95.6%), and fuzzed. Has **zero external consumers** (adoption audit 2026-07-23), but now has a **reference implementation** (`examples/cmd/bridge/` + `examples/checkout/`) demonstrating the full classify→enrich→handle flow with three patterns. See `examples/cmd/bridge/README.md` for the pattern documentation and decision guide.
+The code is correct, tested (94.4% on 2026-09-28), and fuzzed. Has **zero external consumers** (adoption audit 2026-07-23), but now has a **reference implementation** (`examples/cmd/bridge/` + `examples/checkout/`) demonstrating the full classify→enrich→handle flow with three patterns. See `examples/cmd/bridge/README.md` for the pattern documentation and decision guide.
 
 | Feature                                                                                         | Status           | Evidence             |
 | ----------------------------------------------------------------------------------------------- | ---------------- | -------------------- |

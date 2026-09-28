@@ -270,3 +270,30 @@ flowchart TD
 ---
 
 *Plan written 2026-09-28 01:50 CEST. Execute top-down; re-baseline this file (strike + annotate) after each tier completes, per the docs-health loop.*
+
+---
+
+## Execution Record (2026-09-28 — plan executed end-to-end)
+
+| Task | Outcome |
+| ---- | ------- |
+| M01 | ✅ done pre-session (push `e1d46ff`, CI + Deploy green) |
+| M02 | ✅ root-caused: the v0.10.2 tag-ref push webhook was never delivered (no PushEvent in the API, workflow byte-identical at both tags) — GitHub's combined branch+tag push can silently drop the tag event. Mitigations: `workflow_dispatch` fallback in release.yml (tested live on v0.10.3), release runbook in AGENTS.md, findings note `docs/status/2026-09-28_02-10_release-yml-no-fire-root-cause-v0.10.2.md` |
+| M03 | ✅ curated v0.10.2 notes (v0.10.1 style) published; G4 recommendation recorded: keep 0.x releases marked FULL (prerelease flag = literal alpha/beta/rc only) |
+| M04 | ✅ full tag audit (60+ tags) found 5 broken tags, not just the v0.6.x pair the TODO assumed: root v0.5.0/v0.5.1/v0.6.0 + `diagnose/v0.1.0` + `agent/v0.1.0` (v0.6.1 verified clean, NOT retracted). Retraction shipped as coordinated **v0.10.3** (3 affected modules only — deviation documented: bridge/git/postgres/examples have no broken tags, releasing them would only widen the mid-release breakage window). Verified via `go list -m -retracted` against origin: all 5 return the rationale, @latest resolves v0.10.3. Curated GH Release + website changelog synced (which was missing 0.10.1+0.10.2 entirely — added) |
+| M05 | ✅ `website-check.yml` canary (TS major==6, frozen install, astro check+build); Dependabot decision verified against GitHub docs (no per-directory toggle exists; open-pull-requests-limit: 0 does NOT disable security updates) → leave enabled, treat red security jobs as the alert signal; CI+canary+deploy all green on the canary's first run |
+| M06 | ✅ exceeded targets: diagnose core 84.2→**97.4** (target 88), git 91.0→**98.7** (target 95), postgres 78.5→**89.2** (target 83); all `-race` verified; FEATURES/AGENTS tables updated |
+| M07 | ✅ battery re-run 2026-09-28: erraudit 0 findings after **one real fix** (Sep-22 erraudit binary added a blank-identifier-on-recover rule post-dating the Sep-15 zero claim → documented suppression on `safeCauseString`); structure-linter exit 0 (+`*.png binary` advisory applied); `buildflow --build-mode full` no-cache: 1 failure (treefmt format check — golines wanted the new long lines wrapped; `nix fmt` applied, now green); website `nix run .#build` green (15 pages; note: the flake exposes `apps.build`, not `packages.default` — the old "nix build" claim needed that correction) |
+| M08 | ✅ drafted (`docs/planning/2026-09-28_bridge-patterns-announcement-draft.md`), self-reviewed against guide content; **publish = user gate** |
+| M09 | ✅ art-dupl has `baseline`/`check` subcommands; `.art-dupl-baseline.json` committed (3 accepted groups at `-t 1`, check exits 0); policy recorded: routine `-t 5`, deep sweeps `-t 1` against baseline (OQ1 default) |
+| M10 | ✅ source-verified both: (a) pnpm-audit — issue #19 already tracked it; added the trigger/execution evidence as a comment (`lockfilePatterns` glob `**/pnpm-lock.yaml` vs rootDir detector); (b) phantom `IsIgnored` unwired — filed [BuildFlow#23](https://github.com/LarsArtmann/BuildFlow/issues/23); both linked from `.buildflow.yml` |
+| M11 | ✅ scope frozen in CHANGELOG `[Unreleased]` (discoverability release); release checklist in TODO_LIST #8 |
+| M12 | ✅ `minimumReleaseAgeStrict: true` applied (docs-verified: pnpm 11 already defaults the 1-day cooldown; strict = fail-loud); frozen install passes supply-chain policy check (492 entries) |
+| M13 | ✅ AGENTS.md 39,865 → **18,020 bytes** (55% cut); every rule kept, narratives archived verbatim in `docs/history/agents-archive.md`; all internal citations verified |
+| M14 | ✅ SEC feedback archived with verified-resolution banner; `go.work` floor-vs-toolchain comment; `best-of-both-worlds.html` confirmed correctly archived (zero dangling refs); peripheral-surface audit recorded (`docs/status/2026-09-28_03-00_m14-peripheral-surface-audit.md`) |
+| M15 | ✅ `errorfamilytest/example_test.go` (7 helper examples) + `diagnose/example_test.go` (executable `ExampleRuleSpec` with Runner + ResolveContextKey); both modules lint-clean |
+| M16 | ✅ `website/src/content/docs/guides/grpc.mdx` (family→gRPC table per Google's HTTP↔gRPC mapping + interceptor + retry guidance); sidebar-linked; astro check 0 issues, build 16 pages |
+| M17 | ✅ constructor symmetry: `ExampleNewConflict/Corruption/Infrastructure/Orchestration` (root at 30 examples); deviation: no second HTTPHandler middleware example — `ExampleHTTPHandler` (v0.10.2) already demonstrates it end-to-end; README test-helper/diagnostic sections updated |
+| M18 | ✅ 6 superseded Dependabot PRs (#6–#11) closed with rationale (v0.10.3 supersedes the 0.10.2 bumps; Dependabot re-files); CSP + uptime-monitor decision records: both formally DECLINED with reasoning + revisit triggers (`docs/status/2026-09-28_03-30_decision-records-csp-uptime.md`) |
+
+**Deliberate deviations from the plan (all documented above):** M04 scope narrowed to the 3 affected modules; M07 corrected two stale claims (erraudit-zero needed a code fix; website nix build needed `apps.build`); M17 skipped a redundant middleware example; M10(a) became an issue comment instead of a duplicate filing.

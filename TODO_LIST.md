@@ -10,12 +10,10 @@ traceable to its source. When an item ships, remove it here and record it in
 
 ## Active
 
-1. **Announce the Bridge Patterns guide** (source: ROADMAP theme 4; carried
-   from TODO_LIST 2026-09-18) — the classify→enrich→handle walkthrough shipped
-   in v0.10.1 (`website/src/content/docs/guides/bridge.mdx`), but nothing has
-   put it in front of consumers who use `samber/oops`. Draft a public
-   announcement (r/golang post or a linkable short post) that leads with the
-   three patterns and the decision guide. Bounded: one draft, review, publish.
+1. **Announce the Bridge Patterns guide** (source: ROADMAP theme 4) —
+   DRAFTED 2026-09-28 (`docs/planning/2026-09-28_bridge-patterns-announcement-draft.md`,
+   self-reviewed against the guide). Remaining: user review, channel pick
+   (GitHub Discussion vs r/golang), publish, cross-link from README/related-tools.
 
 2. **Add website guard canaries to CI** (source: docs/status/archived/2026-09-22 §f5–f8,
    §f13) — the TS-7 re-bump class has broken `website-deploy` three times and
