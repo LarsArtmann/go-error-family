@@ -59,6 +59,16 @@ Everything else, scheduled AFTER the tiers above (they are real, but none of the
 | G3 | ROADMAP OQ3: bridge/enrichment — invest or freeze | M08 proceeds; items 31-37 pace follows the answer |
 | G4 | 0.x GitHub releases: full vs prerelease marking | M03 recommendation |
 
+### Gate resolutions (recorded as they land)
+
+- **G4 (resolved 2026-09-28, recommendation): keep 0.x releases marked FULL.** Prerelease
+  flag should reflect literal `alpha`/`beta`/`rc` suffixes only (current release.yml
+  behavior — now suffix-based on the resolved tag, not `github.ref_name`). Rationale: 0.x is
+  this project's stability contract with 50+ production consumers; marking every 0.x
+  "Pre-release" would hide releases from Latest-filtering consumers and understate real
+  stability guarantees. Semver 0.x caveat is already documented in the README. Revisit only
+  if a consumer survey says otherwise.
+
 ---
 
 ## Step 3 — Comprehensive Plan: medium tasks (30–100 min each)
