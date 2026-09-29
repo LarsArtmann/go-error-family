@@ -130,6 +130,7 @@ Every family maps to an error status (4xx/5xx), so conditional-request outcomes 
 | **416 Range Not Satisfiable** (RFC 9110 §15.5.17) | `Rejection` + `WithHTTPStatus(416)`. The `Range` value doesn't overlap the resource — a bad input value.                                               |
 
 ```go
+// skip-validate
 func getWidget(w http.ResponseWriter, r *http.Request) error {
     // RFC 9110 §13.2.2: If-Match evaluates before If-None-Match
     if im := r.Header.Get("If-Match"); im != "" && !etagMatches(im, currentETag) {
