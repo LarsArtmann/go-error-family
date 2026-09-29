@@ -38,27 +38,27 @@
 
 ## b) PARTIALLY DONE
 
-| # | Item                           | What's done                                                                                                                           | What remains                                                                                                                                                                                                                       |
-| - | ------------------------------ | ------------------------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| ~~1~~ | ~~**Website docs audit**~~ done — website residuals checked | ~~Fixed 4 website files (diagnostics.mdx, error-types.mdx, api-reference.mdx, changelog.mdx). All 11 .mdx files were read by sub-agent.~~ | ~~Did NOT fix `changelog.mdx` to match root `CHANGELOG.md` line-for-line (website version is a summary, not a mirror — may be intentional but wasn't verified). Website `contributing.mdx` not checked for CODE_OF_CONDUCT.md ghost.~~ |
-| ~~2~~ | ~~**Living doc consistency**~~ done — FEATURES/AGENTS updated | ~~CHANGELOG, TODO_LIST, SKILL.md, DOMAIN_LANGUAGE, CONTRIBUTING all updated~~ | ~~FEATURES.md NOT updated with this session's changes (time.Duration, contextValueToString refactor, new tests). AGENTS.md NOT updated — still references `//nolint:cyclop` which I removed.~~ |
-| ~~3~~ | ~~**Quality gate**~~ done — lint at 0 issues (08-35 session) | ~~Tests pass, treefmt passes, go vet passes, go build passes~~ | ~~`nix flake check` lint stage FAILS with 96 pre-existing issues (err113: 50, varnamelen: 12, testpackage: 10, mnd: 14, etc.). These are from prior v0.8.0 work, NOT from this session's changes.~~ |
-| ~~4~~ | ~~**CI consumer-simulation job**~~ done — consumer-sim live in CI | ~~Job written and committed~~ | ~~NOT tested locally — the YAML heredoc was originally wrong (caught and fixed), but the actual `go mod init` + replace + build sequence was never executed locally to verify it works.~~ |
+| #     | Item                                                              | What's done                                                                                                                               | What remains                                                                                                                                                                                                                           |
+| ----- | ----------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| ~~1~~ | ~~**Website docs audit**~~ done — website residuals checked       | ~~Fixed 4 website files (diagnostics.mdx, error-types.mdx, api-reference.mdx, changelog.mdx). All 11 .mdx files were read by sub-agent.~~ | ~~Did NOT fix `changelog.mdx` to match root `CHANGELOG.md` line-for-line (website version is a summary, not a mirror — may be intentional but wasn't verified). Website `contributing.mdx` not checked for CODE_OF_CONDUCT.md ghost.~~ |
+| ~~2~~ | ~~**Living doc consistency**~~ done — FEATURES/AGENTS updated     | ~~CHANGELOG, TODO_LIST, SKILL.md, DOMAIN_LANGUAGE, CONTRIBUTING all updated~~                                                             | ~~FEATURES.md NOT updated with this session's changes (time.Duration, contextValueToString refactor, new tests). AGENTS.md NOT updated — still references `//nolint:cyclop` which I removed.~~                                         |
+| ~~3~~ | ~~**Quality gate**~~ done — lint at 0 issues (08-35 session)      | ~~Tests pass, treefmt passes, go vet passes, go build passes~~                                                                            | ~~`nix flake check` lint stage FAILS with 96 pre-existing issues (err113: 50, varnamelen: 12, testpackage: 10, mnd: 14, etc.). These are from prior v0.8.0 work, NOT from this session's changes.~~                                    |
+| ~~4~~ | ~~**CI consumer-simulation job**~~ done — consumer-sim live in CI | ~~Job written and committed~~                                                                                                             | ~~NOT tested locally — the YAML heredoc was originally wrong (caught and fixed), but the actual `go mod init` + replace + build sequence was never executed locally to verify it works.~~                                              |
 
 ---
 
 ## c) NOT STARTED
 
-| # | Item                                                                                                                                               | Why                                                                                                                                                                                                                   |
-| - | -------------------------------------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| ~~1~~ | ~~**Update FEATURES.md** with this session's changes (time.Duration, refactored contextValueToString, new tests, CI improvements)~~ done — FEATURES.md updated | ~~Forgot. FEATURES is the feature inventory and should reflect current state.~~ |
-| ~~2~~ | ~~**Update AGENTS.md** — remove `//nolint:cyclop` reference, update contextValueToString description to mention scalarToString split + time.Duration~~ done — AGENTS.md updated | ~~Forgot. AGENTS.md is the AI context file and now has stale info.~~ |
-| ~~3~~ | ~~**Verify website `contributing.mdx`** for CODE_OF_CONDUCT.md ghost reference~~ done — contributing.mdx fixed (2026-09-27: six interfaces) | ~~Only checked root CONTRIBUTING.md. Website copy may have the same dead link.~~ |
-| ~~4~~ | ~~**Add explicit `time.Duration` test case** in error_test.go~~ done — Duration test added | ~~Added the Duration case to the type switch but no dedicated test asserts `5s` renders correctly. FuzzContextValueToString would catch it eventually but no explicit assertion exists.~~ |
-| ~~5~~ | ~~**Verify CONTRIBUTING.md architecture tree renders correctly**~~ done — tree alignment verified | ~~Changed `interfaces.go` to `│   interfaces.go` — the box-drawing character may not align with the rest of the ASCII tree which uses spaces.~~ |
-| ~~6~~ | ~~**Cross-check website changelog.mdx vs root CHANGELOG.md**~~ done — changelogs cross-checked | ~~Both have `[Unreleased]` now but content differs. Website is a summary; root is detailed. Didn't verify they tell the same story.~~ |
-| ~~7~~ | ~~**Update prior status report** (`2026-07-23_06-49`) questions~~ done — prior reports annotated (archive passes) | ~~That report asked Q1 (commit now?), Q2 (tag v0.8.0?), Q3 (Compose exists?). This session answered Q3 (yes, it exists, CHANGELOG updated) and partially Q1 (auto-committed). The report wasn't annotated with answers.~~ |
-| ~~8~~ | ~~**Rebuild and deploy website**~~ done — website rebuilt and deployed | ~~Website docs are fixed in source but the live site (`errorfamily.lars.software`) is still stale. Needs `nix run .#deploy` from `website/`.~~ |
+| #     | Item                                                                                                                                                                            | Why                                                                                                                                                                                                                       |
+| ----- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| ~~1~~ | ~~**Update FEATURES.md** with this session's changes (time.Duration, refactored contextValueToString, new tests, CI improvements)~~ done — FEATURES.md updated                  | ~~Forgot. FEATURES is the feature inventory and should reflect current state.~~                                                                                                                                           |
+| ~~2~~ | ~~**Update AGENTS.md** — remove `//nolint:cyclop` reference, update contextValueToString description to mention scalarToString split + time.Duration~~ done — AGENTS.md updated | ~~Forgot. AGENTS.md is the AI context file and now has stale info.~~                                                                                                                                                      |
+| ~~3~~ | ~~**Verify website `contributing.mdx`** for CODE_OF_CONDUCT.md ghost reference~~ done — contributing.mdx fixed (2026-09-27: six interfaces)                                     | ~~Only checked root CONTRIBUTING.md. Website copy may have the same dead link.~~                                                                                                                                          |
+| ~~4~~ | ~~**Add explicit `time.Duration` test case** in error_test.go~~ done — Duration test added                                                                                      | ~~Added the Duration case to the type switch but no dedicated test asserts `5s` renders correctly. FuzzContextValueToString would catch it eventually but no explicit assertion exists.~~                                 |
+| ~~5~~ | ~~**Verify CONTRIBUTING.md architecture tree renders correctly**~~ done — tree alignment verified                                                                               | ~~Changed `interfaces.go` to `│   interfaces.go` — the box-drawing character may not align with the rest of the ASCII tree which uses spaces.~~                                                                           |
+| ~~6~~ | ~~**Cross-check website changelog.mdx vs root CHANGELOG.md**~~ done — changelogs cross-checked                                                                                  | ~~Both have `[Unreleased]` now but content differs. Website is a summary; root is detailed. Didn't verify they tell the same story.~~                                                                                     |
+| ~~7~~ | ~~**Update prior status report** (`2026-07-23_06-49`) questions~~ done — prior reports annotated (archive passes)                                                               | ~~That report asked Q1 (commit now?), Q2 (tag v0.8.0?), Q3 (Compose exists?). This session answered Q3 (yes, it exists, CHANGELOG updated) and partially Q1 (auto-committed). The report wasn't annotated with answers.~~ |
+| ~~8~~ | ~~**Rebuild and deploy website**~~ done — website rebuilt and deployed                                                                                                          | ~~Website docs are fixed in source but the live site (`errorfamily.lars.software`) is still stale. Needs `nix run .#deploy` from `website/`.~~                                                                            |
 
 ---
 
@@ -123,94 +123,94 @@ When writing this report, I ran `git status` expecting to see my uncommitted cha
 
 ### Immediate (gaps from this session)
 
-| # | Task                                                                                                            | Impact |
-| - | --------------------------------------------------------------------------------------------------------------- | ------ |
-| ~~1~~ | ~~**Update AGENTS.md** — remove `//nolint:cyclop` reference, update contextValueToString description~~ done — AGENTS.md updated | ~~Medium~~ |
-| ~~2~~ | ~~**Update FEATURES.md** — add time.Duration case, contextValueToString split, new tests~~ done — FEATURES.md updated | ~~Medium~~ |
-| ~~3~~ | ~~**Clean CHANGELOG [Unreleased]** — remove internal refactor/test entries, keep only user-facing changes~~ done — CHANGELOG clean | ~~Medium~~ |
-| ~~4~~ | ~~**Verify CONTRIBUTING.md architecture tree** renders correctly (box-drawing alignment)~~ done — tree verified | ~~Low~~ |
-| ~~5~~ | ~~**Check website `contributing.mdx`** for CODE_OF_CONDUCT.md ghost~~ done — contributing.mdx fixed | ~~Low~~ |
-| ~~6~~ | ~~**Add explicit time.Duration test** in error_test.go~~ done — Duration test | ~~Low~~ |
-| ~~7~~ | ~~**Test consumer-simulation CI job locally** — run the exact shell commands~~ done — consumer-sim live | ~~Medium~~ |
-| ~~8~~ | ~~**Annotate prior status report** (2026-07-23_06-49) with answers to Q1-Q3~~ done — prior reports annotated | ~~Low~~ |
+| #     | Task                                                                                                                                         | Impact     |
+| ----- | -------------------------------------------------------------------------------------------------------------------------------------------- | ---------- |
+| ~~1~~ | ~~**Update AGENTS.md** — remove `//nolint:cyclop` reference, update contextValueToString description~~ done — AGENTS.md updated              | ~~Medium~~ |
+| ~~2~~ | ~~**Update FEATURES.md** — add time.Duration case, contextValueToString split, new tests~~ done — FEATURES.md updated                        | ~~Medium~~ |
+| ~~3~~ | ~~**Clean CHANGELOG [Unreleased]** — remove internal refactor/test entries, keep only user-facing changes~~ done — CHANGELOG clean           | ~~Medium~~ |
+| ~~4~~ | ~~**Verify CONTRIBUTING.md architecture tree** renders correctly (box-drawing alignment)~~ done — tree verified                              | ~~Low~~    |
+| ~~5~~ | ~~**Check website `contributing.mdx`** for CODE_OF_CONDUCT.md ghost~~ done — contributing.mdx fixed                                          | ~~Low~~    |
+| ~~6~~ | ~~**Add explicit time.Duration test** in error_test.go~~ done — Duration test                                                                | ~~Low~~    |
+| ~~7~~ | ~~**Test consumer-simulation CI job locally** — run the exact shell commands~~ done — consumer-sim live                                      | ~~Medium~~ |
+| ~~8~~ | ~~**Annotate prior status report** (2026-07-23_06-49) with answers to Q1-Q3~~ done — prior reports annotated                                 | ~~Low~~    |
 | ~~9~~ | ~~**Fix the auto-commit** — consider amending `e9c7219` message to cover all changes, or leave as-is and document~~ done — daemon documented | ~~Design~~ |
 
 ### From TODO_LIST.md (genuinely open work)
 
-| #  | Task                                                      | Impact |
-| -- | --------------------------------------------------------- | ------ |
+| #      | Task                                                                                 | Impact   |
+| ------ | ------------------------------------------------------------------------------------ | -------- |
 | ~~10~~ | ~~Rebuild and deploy website (docs fixed, site still stale)~~ done — website rebuilt | ~~High~~ |
-| ~~11~~ | ~~Set up CI/CD for website deploys~~ done — website CI live | ~~Low~~ |
-| ~~12~~ | ~~Apply ACME TXT DNS record (needs Namecheap API key)~~ done — ACME TXT applied | ~~Low~~ |
+| ~~11~~ | ~~Set up CI/CD for website deploys~~ done — website CI live                          | ~~Low~~  |
+| ~~12~~ | ~~Apply ACME TXT DNS record (needs Namecheap API key)~~ done — ACME TXT applied      | ~~Low~~  |
 
 ### Design decisions (need user input)
 
-| #  | Task                                                      | Impact   |
-| -- | --------------------------------------------------------- | -------- |
-| ~~13~~ | ~~**v0.8.0 release** — tag or wait?~~ done — v0.8.0 tagged | ~~Critical~~ |
-| ~~14~~ | ~~Per-error HTTP status override (`WithHTTPStatus`)~~ done — WithHTTPStatus shipped | ~~Design~~ |
-| ~~15~~ | ~~`Classify(nil)` semantics (keep Rejection vs change)~~ done — resolved — Classify(nil) kept | ~~Design~~ |
-| ~~16~~ | ~~Constructor context ergonomics (builder/variadic/options)~~ done — resolved — ergonomics declined | ~~Design~~ |
-| ~~17~~ | ~~"Frozen" registry flag~~ done — resolved — frozen flag declined | ~~Design~~ |
-| ~~18~~ | ~~`RegisterClassificationType[T error]` generic~~ done — RegisterClassificationType shipped | ~~Design~~ |
-| ~~19~~ | ~~json/v2 migration strategy~~ done — resolved — json/v2 reverted permanently | ~~Design~~ |
+| #      | Task                                                                                                | Impact       |
+| ------ | --------------------------------------------------------------------------------------------------- | ------------ |
+| ~~13~~ | ~~**v0.8.0 release** — tag or wait?~~ done — v0.8.0 tagged                                          | ~~Critical~~ |
+| ~~14~~ | ~~Per-error HTTP status override (`WithHTTPStatus`)~~ done — WithHTTPStatus shipped                 | ~~Design~~   |
+| ~~15~~ | ~~`Classify(nil)` semantics (keep Rejection vs change)~~ done — resolved — Classify(nil) kept       | ~~Design~~   |
+| ~~16~~ | ~~Constructor context ergonomics (builder/variadic/options)~~ done — resolved — ergonomics declined | ~~Design~~   |
+| ~~17~~ | ~~"Frozen" registry flag~~ done — resolved — frozen flag declined                                   | ~~Design~~   |
+| ~~18~~ | ~~`RegisterClassificationType[T error]` generic~~ done — RegisterClassificationType shipped         | ~~Design~~   |
+| ~~19~~ | ~~json/v2 migration strategy~~ done — resolved — json/v2 reverted permanently                       | ~~Design~~   |
 
 ### Pre-existing lint debt (96 issues from v0.8.0 code, not this session)
 
-| #  | Task                                                                                                     | Impact |
-| -- | -------------------------------------------------------------------------------------------------------- | ------ |
-| ~~20~~ | ~~Fix 50 `err113` issues — "do not define dynamic errors, use wrapped static errors"~~ done — err113 handled | ~~Medium~~ |
-| ~~21~~ | ~~Fix 14 `mnd` issues — magic numbers in test code~~ done — mnd policy documented | ~~Low~~ |
-| ~~22~~ | ~~Fix 12 `varnamelen` issues — short variable names (`f`, `r`, `c`, `w`, `h`, `tp`)~~ done — varnamelen names | ~~Low~~ |
-| ~~23~~ | ~~Fix 10 `testpackage` issues — tests should be in `errorfamily_test` not `errorfamily`~~ done — testpackage exclusions | ~~Medium~~ |
-| ~~24~~ | ~~Fix `containedctx`, `depguard`, `fatcontext`, `funlen`, `makezero`, `nonamedreturns`, `testableexamples`~~ done — containedctx etc. exclusions | ~~Low~~ |
+| #      | Task                                                                                                                                             | Impact     |
+| ------ | ------------------------------------------------------------------------------------------------------------------------------------------------ | ---------- |
+| ~~20~~ | ~~Fix 50 `err113` issues — "do not define dynamic errors, use wrapped static errors"~~ done — err113 handled                                     | ~~Medium~~ |
+| ~~21~~ | ~~Fix 14 `mnd` issues — magic numbers in test code~~ done — mnd policy documented                                                                | ~~Low~~    |
+| ~~22~~ | ~~Fix 12 `varnamelen` issues — short variable names (`f`, `r`, `c`, `w`, `h`, `tp`)~~ done — varnamelen names                                    | ~~Low~~    |
+| ~~23~~ | ~~Fix 10 `testpackage` issues — tests should be in `errorfamily_test` not `errorfamily`~~ done — testpackage exclusions                          | ~~Medium~~ |
+| ~~24~~ | ~~Fix `containedctx`, `depguard`, `fatcontext`, `funlen`, `makezero`, `nonamedreturns`, `testableexamples`~~ done — containedctx etc. exclusions | ~~Low~~    |
 
 ### Documentation polish
 
-| #  | Task                                                                        | Impact |
-| -- | --------------------------------------------------------------------------- | ------ |
+| #      | Task                                                                                                       | Impact  |
+| ------ | ---------------------------------------------------------------------------------------------------------- | ------- |
 | ~~25~~ | ~~Cross-verify website changelog.mdx vs root CHANGELOG.md tell the same story~~ done — changelogs verified | ~~Low~~ |
-| ~~26~~ | ~~Add "last verified" date to README benchmark table~~ done — benchmark stamped | ~~Low~~ |
-| ~~27~~ | ~~Verify CHANGELOG `{{.key}}` → `{key}` note in v0.1.0 entry is accurate~~ done — {key} note | ~~Low~~ |
+| ~~26~~ | ~~Add "last verified" date to README benchmark table~~ done — benchmark stamped                            | ~~Low~~ |
+| ~~27~~ | ~~Verify CHANGELOG `{{.key}}` → `{key}` note in v0.1.0 entry is accurate~~ done — {key} note               | ~~Low~~ |
 
 ### Testing
 
-| #  | Task                                                                                | Impact |
-| -- | ----------------------------------------------------------------------------------- | ------ |
-| ~~28~~ | ~~Run extended fuzz sessions (`-fuzztime=30s`) for all 14 fuzz functions~~ done — extended fuzz | ~~Low~~ |
+| #      | Task                                                                                                                      | Impact  |
+| ------ | ------------------------------------------------------------------------------------------------------------------------- | ------- |
+| ~~28~~ | ~~Run extended fuzz sessions (`-fuzztime=30s`) for all 14 fuzz functions~~ done — extended fuzz                           | ~~Low~~ |
 | ~~29~~ | ~~Add benchmark: `contextValueToString` per type (now that scalarToString exists)~~ done — contextValueToString benchmark | ~~Low~~ |
-| ~~30~~ | ~~Add `fmt.Stringer` case to `contextValueToString` with panic recovery~~ done — Stringer case | ~~Low~~ |
-| ~~31~~ | ~~Add integration test: `HandleError` return value respects `WithExitCode` end-to-end~~ done — HandleError exit test | ~~Low~~ |
+| ~~30~~ | ~~Add `fmt.Stringer` case to `contextValueToString` with panic recovery~~ done — Stringer case                            | ~~Low~~ |
+| ~~31~~ | ~~Add integration test: `HandleError` return value respects `WithExitCode` end-to-end~~ done — HandleError exit test      | ~~Low~~ |
 
 ### CI / Release
 
-| #  | Task                                                                      | Impact |
-| -- | ------------------------------------------------------------------------- | ------ |
-| ~~32~~ | ~~Add pre-commit check for `replace` directives in tagged go.mod files~~ done — replace check | ~~Medium~~ |
-| ~~33~~ | ~~Create release automation script for coordinated multi-module tag cutting~~ **Won't implement — declined — ROADMAP automation idea.** | ~~Low~~ |
-| ~~34~~ | ~~Add benchmark regression check to CI~~ **Won't implement — declined — benchmark CI via BuildFlow.** | ~~Low~~ |
-| ~~35~~ | ~~Deprecation notes for broken v0.6.0 family tags~~ done — routed — TODO_LIST #2 | ~~Low~~ |
+| #      | Task                                                                                                                                    | Impact     |
+| ------ | --------------------------------------------------------------------------------------------------------------------------------------- | ---------- |
+| ~~32~~ | ~~Add pre-commit check for `replace` directives in tagged go.mod files~~ done — replace check                                           | ~~Medium~~ |
+| ~~33~~ | ~~Create release automation script for coordinated multi-module tag cutting~~ **Won't implement — declined — ROADMAP automation idea.** | ~~Low~~    |
+| ~~34~~ | ~~Add benchmark regression check to CI~~ **Won't implement — declined — benchmark CI via BuildFlow.**                                   | ~~Low~~    |
+| ~~35~~ | ~~Deprecation notes for broken v0.6.0 family tags~~ done — routed — TODO_LIST #2                                                        | ~~Low~~    |
 
 ### Website / Public Presence
 
-| #  | Task                                                            | Impact |
-| -- | --------------------------------------------------------------- | ------ |
-| ~~36~~ | ~~Add CSP to `astro.config.mjs` + `fix-csp.mjs` post-build script~~ **Won't implement — declined — CSP gap honest.** | ~~High~~ |
-| ~~37~~ | ~~Add OG images via `astro-og-canvas`~~ **Won't implement — declined — OG static preview.** | ~~Medium~~ |
-| ~~38~~ | ~~Design a proper logo for go-error-family~~ **Won't implement — declined — logo not adopted.** | ~~Medium~~ |
-| ~~39~~ | ~~Add Bridge package guide page (oops integration)~~ done — Bridge guide shipped | ~~Medium~~ |
-| ~~40~~ | ~~Add `errorfamilytest` guide page~~ done — errorfamilytest docs | ~~Low~~ |
+| #      | Task                                                                                                                  | Impact     |
+| ------ | --------------------------------------------------------------------------------------------------------------------- | ---------- |
+| ~~36~~ | ~~Add CSP to `astro.config.mjs` + `fix-csp.mjs` post-build script~~ **Won't implement — declined — CSP gap honest.**  | ~~High~~   |
+| ~~37~~ | ~~Add OG images via `astro-og-canvas`~~ **Won't implement — declined — OG static preview.**                           | ~~Medium~~ |
+| ~~38~~ | ~~Design a proper logo for go-error-family~~ **Won't implement — declined — logo not adopted.**                       | ~~Medium~~ |
+| ~~39~~ | ~~Add Bridge package guide page (oops integration)~~ done — Bridge guide shipped                                      | ~~Medium~~ |
+| ~~40~~ | ~~Add `errorfamilytest` guide page~~ done — errorfamilytest docs                                                      | ~~Low~~    |
 | ~~41~~ | ~~Add uptime monitor for `errorfamily.lars.software`~~ **Won't implement — declined — uptime monitor ROADMAP-grade.** | ~~Medium~~ |
-| ~~42~~ | ~~Fix corrupted `flake.lock` in the domains repo~~ done — domains flake.lock fixed | ~~Low~~ |
-| ~~43~~ | ~~Verify all docs pages return HTTP 200 on the custom domain~~ done — docs pages 200 | ~~Low~~ |
+| ~~42~~ | ~~Fix corrupted `flake.lock` in the domains repo~~ done — domains flake.lock fixed                                    | ~~Low~~    |
+| ~~43~~ | ~~Verify all docs pages return HTTP 200 on the custom domain~~ done — docs pages 200                                  | ~~Low~~    |
 
 ### Process
 
-| #  | Task                                                                                                     | Impact |
-| -- | -------------------------------------------------------------------------------------------------------- | ------ |
-| ~~44~~ | ~~Document the auto-commit hook in AGENTS.md so future sessions know about it~~ done — daemon documented | ~~High~~ |
+| #      | Task                                                                                                                                                                          | Impact     |
+| ------ | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ---------- |
+| ~~44~~ | ~~Document the auto-commit hook in AGENTS.md so future sessions know about it~~ done — daemon documented                                                                      | ~~High~~   |
 | ~~45~~ | ~~Consider splitting the auto-commit into logical units (docs, code, tests, CI) instead of one mega-commit~~ **Won't implement — declined — split auto-commits not adopted.** | ~~Design~~ |
-| ~~46~~ | ~~Add a pre-commit message template that prompts for scope-appropriate messages~~ done — message template documented | ~~Low~~ |
+| ~~46~~ | ~~Add a pre-commit message template that prompts for scope-appropriate messages~~ done — message template documented                                                          | ~~Low~~    |
 
 ---
 

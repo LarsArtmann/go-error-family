@@ -75,37 +75,37 @@ The "API Surface (v0.5.0)" header was not updated. The go.mod doesn't carry a se
 
 ### Documentation (ZERO references to new APIs in these files)
 
-| # | File                                              | What's Missing                                                                             |
-| - | ------------------------------------------------- | ------------------------------------------------------------------------------------------ |
-| ~~1~~ | ~~`SKILL.md`~~ done — SKILL.md updated (v0.9/v0.10 passes) | ~~No mention of `WrapOnce`, `ExitCoder`, `WithExitCode`, `WithContextAny`, `safeCauseString`~~ |
-| ~~2~~ | ~~`README.md`~~ done — README updated | ~~No mention of any new API in the feature table or examples~~ |
-| ~~3~~ | ~~`FEATURES.md`~~ done — FEATURES updated | ~~No feature inventory entry for the 4 new capabilities~~ |
-| ~~4~~ | ~~`CHANGELOG.md`~~ done — CHANGELOG updated | ~~No changelog entry for this session's changes~~ |
-| ~~5~~ | ~~`website/src/content/docs/api-reference.mdx`~~ done — api-reference.mdx current | ~~No API table entries for `WrapOnce`, `ExitCoder`, `WithExitCode`, `WithContextAny`~~ |
-| ~~6~~ | ~~`website/src/content/docs/guides/error-types.mdx`~~ done — error-types.mdx current | ~~No guide section on `ExitCoder` or `WrapOnce` patterns~~ |
-| ~~7~~ | ~~`example_test.go`~~ done — examples current | ~~No runnable `Example*` functions for any new API~~ |
+| #     | File                                                                                 | What's Missing                                                                                 |
+| ----- | ------------------------------------------------------------------------------------ | ---------------------------------------------------------------------------------------------- |
+| ~~1~~ | ~~`SKILL.md`~~ done — SKILL.md updated (v0.9/v0.10 passes)                           | ~~No mention of `WrapOnce`, `ExitCoder`, `WithExitCode`, `WithContextAny`, `safeCauseString`~~ |
+| ~~2~~ | ~~`README.md`~~ done — README updated                                                | ~~No mention of any new API in the feature table or examples~~                                 |
+| ~~3~~ | ~~`FEATURES.md`~~ done — FEATURES updated                                            | ~~No feature inventory entry for the 4 new capabilities~~                                      |
+| ~~4~~ | ~~`CHANGELOG.md`~~ done — CHANGELOG updated                                          | ~~No changelog entry for this session's changes~~                                              |
+| ~~5~~ | ~~`website/src/content/docs/api-reference.mdx`~~ done — api-reference.mdx current    | ~~No API table entries for `WrapOnce`, `ExitCoder`, `WithExitCode`, `WithContextAny`~~         |
+| ~~6~~ | ~~`website/src/content/docs/guides/error-types.mdx`~~ done — error-types.mdx current | ~~No guide section on `ExitCoder` or `WrapOnce` patterns~~                                     |
+| ~~7~~ | ~~`example_test.go`~~ done — examples current                                        | ~~No runnable `Example*` functions for any new API~~                                           |
 
 ### Missing API Variants
 
-| # | Item                                                               | Rationale                                                                             |
-| - | ------------------------------------------------------------------ | ------------------------------------------------------------------------------------- |
-| ~~8~~ | ~~**`WrapOncef`** — formatted variant of `WrapOnce`~~ done — WrapOncef shipped | ~~BuildFlow has `Wrapf` alongside `Wrap`. The `f` variant is expected by Go convention.~~ |
-| ~~9~~ | ~~**Family-specific `WrapOnce` variants** (e.g. `WrapOnceTransient`)~~ done — family variants shipped | ~~Probably YAGNI, but considered for completeness~~ |
+| #     | Item                                                                                                  | Rationale                                                                                 |
+| ----- | ----------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------- |
+| ~~8~~ | ~~**`WrapOncef`** — formatted variant of `WrapOnce`~~ done — WrapOncef shipped                        | ~~BuildFlow has `Wrapf` alongside `Wrap`. The `f` variant is expected by Go convention.~~ |
+| ~~9~~ | ~~**Family-specific `WrapOnce` variants** (e.g. `WrapOnceTransient`)~~ done — family variants shipped | ~~Probably YAGNI, but considered for completeness~~                                       |
 
 ### Missing Tests
 
-| #  | Item                                                        | Rationale                                                                                                                                                 |
-| -- | ----------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| ~~10~~ | ~~**Benchmark for `WrapOnce`**~~ done — WrapOnce benchmark shipped | ~~`benchmark_test.go` has benchmarks for `Classify`, `ExitCode`, etc. — `WrapOnce` should be benchmarked to confirm the `errors.AsType` chain walk is fast.~~ |
-| ~~11~~ | ~~**Fuzz test for `contextValueToString` / `WithContextAny`**~~ done — contextValueToString fuzz shipped | ~~`fuzz_test.go` has fuzz tests for `ParseFamily`, `Classify`, etc. — `WithContextAny` accepts `any` and should be fuzzed with random types.~~ |
-| ~~12~~ | ~~**`errorfamilytest` assertions**~~ done — AssertExitCode shipped | ~~No `AssertExitCode(tb, err, want)` helper in the test subpackage. Consumers testing custom exit codes have to do it manually.~~ |
+| #      | Item                                                                                                     | Rationale                                                                                                                                                     |
+| ------ | -------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| ~~10~~ | ~~**Benchmark for `WrapOnce`**~~ done — WrapOnce benchmark shipped                                       | ~~`benchmark_test.go` has benchmarks for `Classify`, `ExitCode`, etc. — `WrapOnce` should be benchmarked to confirm the `errors.AsType` chain walk is fast.~~ |
+| ~~11~~ | ~~**Fuzz test for `contextValueToString` / `WithContextAny`**~~ done — contextValueToString fuzz shipped | ~~`fuzz_test.go` has fuzz tests for `ParseFamily`, `Classify`, etc. — `WithContextAny` accepts `any` and should be fuzzed with random types.~~                |
+| ~~12~~ | ~~**`errorfamilytest` assertions**~~ done — AssertExitCode shipped                                       | ~~No `AssertExitCode(tb, err, want)` helper in the test subpackage. Consumers testing custom exit codes have to do it manually.~~                             |
 
 ### Integration Gaps
 
-| #  | Item                                                        | Rationale                                                                                                                                                                                                                                                                              |
-| -- | ----------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| #      | Item                                                                                            | Rationale                                                                                                                                                                                                                                                                                  |
+| ------ | ----------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
 | ~~13~~ | ~~**Bridge `ClassifiedError` does not implement `ExitCoder`**~~ done — bridge ExitCoder handled | ~~`bridge/bridge.go`'s `ClassifiedError` satisfies `Coded`, `Classified`, `Retryable`, `Contextual` — but NOT `ExitCoder`. If a bridged error needs a custom exit code, there's no way to attach one. May be intentional (bridge defers to family), but should be a documented decision.~~ |
-| ~~14~~ | ~~**`stdlib.go` no exit code overrides**~~ done — stdlib overrides documented | ~~`RegisterStdlibDefaults` registers family classifications but no exit code overrides. Some stdlib errors might benefit from non-standard exit codes (e.g. `os.ErrPermission` → exit 77 `EX_NOPERM` instead of family default 1).~~ |
+| ~~14~~ | ~~**`stdlib.go` no exit code overrides**~~ done — stdlib overrides documented                   | ~~`RegisterStdlibDefaults` registers family classifications but no exit code overrides. Some stdlib errors might benefit from non-standard exit codes (e.g. `os.ErrPermission` → exit 77 `EX_NOPERM` instead of family default 1).~~                                                       |
 
 ---
 

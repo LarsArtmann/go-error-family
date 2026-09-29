@@ -51,23 +51,23 @@ No `v0.0.0-00010101000000-...` anywhere. Real versions only.
 
 ## b) PARTIALLY DONE ⚠️
 
-| # | Item                               | What's done                                                                                                        | What remains                                                                                                                                                                                                                                              |
-| - | ---------------------------------- | ------------------------------------------------------------------------------------------------------------------ | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| ~~1~~ | ~~**Patch releases for broken tags**~~ done — patch tags cut and pushed 2026-07-05 (see 21-00 report) | ~~Source `go.mod` files fixed in working tree~~ | ~~Tags `v0.6.0`, `diagnose/v0.1.0`, `agent/v0.1.0` are **permanently broken** upstream — must cut `v0.6.1`, `diagnose/v0.1.1`, `agent/v0.1.1`, and tag `examples/v0.1.0`~~ |
-| ~~2~~ | ~~**Submodule root-version pins**~~ done — pins bumped in every coordinated release since | ~~`bridge`, `diagnose/git`, `diagnose/postgres` already use real versions (v0.5.1 / v0.1.0) — they were never broken~~ | ~~They still pin root at `v0.5.1` rather than `v0.6.0`. Valid via MVS (lower bound), but stale. Bump on next release.~~ |
-| ~~3~~ | ~~**Docs cleanup**~~ done — CHANGELOG has the [0.6.1] entry | ~~AGENTS.md workspace + CI lines updated~~ | ~~CHANGELOG.md line 58 still says "Local `replace` directives added until published versions resolve the extraction" — now historically accurate but reads as if still true; could clarify. SKILL.md not audited for stale replace references this session.~~ |
+| #     | Item                                                                                                  | What's done                                                                                                            | What remains                                                                                                                                                                                                                                                  |
+| ----- | ----------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| ~~1~~ | ~~**Patch releases for broken tags**~~ done — patch tags cut and pushed 2026-07-05 (see 21-00 report) | ~~Source `go.mod` files fixed in working tree~~                                                                        | ~~Tags `v0.6.0`, `diagnose/v0.1.0`, `agent/v0.1.0` are **permanently broken** upstream — must cut `v0.6.1`, `diagnose/v0.1.1`, `agent/v0.1.1`, and tag `examples/v0.1.0`~~                                                                                    |
+| ~~2~~ | ~~**Submodule root-version pins**~~ done — pins bumped in every coordinated release since             | ~~`bridge`, `diagnose/git`, `diagnose/postgres` already use real versions (v0.5.1 / v0.1.0) — they were never broken~~ | ~~They still pin root at `v0.5.1` rather than `v0.6.0`. Valid via MVS (lower bound), but stale. Bump on next release.~~                                                                                                                                       |
+| ~~3~~ | ~~**Docs cleanup**~~ done — CHANGELOG has the [0.6.1] entry                                           | ~~AGENTS.md workspace + CI lines updated~~                                                                             | ~~CHANGELOG.md line 58 still says "Local `replace` directives added until published versions resolve the extraction" — now historically accurate but reads as if still true; could clarify. SKILL.md not audited for stale replace references this session.~~ |
 
 ---
 
 ## c) NOT STARTED ⏭️
 
-| # | Item                                                                                                   |
-| - | ------------------------------------------------------------------------------------------------------ |
+| #     | Item                                                                                                                                        |
+| ----- | ------------------------------------------------------------------------------------------------------------------------------------------- |
 | ~~1~~ | ~~Cutting the actual patch-release tags (`v0.6.1`, `diagnose/v0.1.1`, `agent/v0.1.1`, `examples/v0.1.0`)~~ done — patch tags cut 2026-07-05 |
-| ~~2~~ | ~~Updating `bridge`, `diagnose/git`, `diagnose/postgres` to pin root `v0.6.0`~~ done — pins ride the coordinated releases |
+| ~~2~~ | ~~Updating `bridge`, `diagnose/git`, `diagnose/postgres` to pin root `v0.6.0`~~ done — pins ride the coordinated releases                   |
 | ~~3~~ | ~~Auditing SKILL.md for any remaining stale "replace directive" / "not yet published" language~~ done — SKILL.md overhauled in later passes |
-| ~~4~~ | ~~Committing the working-tree changes (user hasn't said "commit")~~ done — committed |
-| ~~5~~ | ~~Pushing anything to remote~~ done — pushed, release live |
+| ~~4~~ | ~~Committing the working-tree changes (user hasn't said "commit")~~ done — committed                                                        |
+| ~~5~~ | ~~Pushing anything to remote~~ done — pushed, release live                                                                                  |
 
 ---
 
@@ -118,33 +118,33 @@ There _was_ a `GOWORK=off go build ./...` CI step — but `go build` does not re
 
 Ranked roughly by impact × urgency.
 
-| #  | Task                                                                                                            | Impact                                         |
-| -- | --------------------------------------------------------------------------------------------------------------- | ---------------------------------------------- |
-| ~~1~~  | ~~**Commit the working-tree fixes** (this session's changes)~~ done — committed as part of the 2026-07-05 release | ~~🔴 Unblock everything~~ |
-| ~~2~~  | ~~**Cut `diagnose/v0.1.1`** tag (its go.mod requires root v0.6.0 — already exists)~~ done — diagnose patch tag cut 2026-07-05 | ~~🔴 Fixes diagnose for consumers~~ |
-| ~~3~~  | ~~**Cut `v0.6.1`** tag on root (requires diagnose v0.1.0 — already exists)~~ done — v0.6.1 on the module proxy | ~~🔴 Fixes root for consumers incl. project-meta~~ |
-| ~~4~~  | ~~**Cut `agent/v0.1.1`** tag (requires root v0.6.0 + diagnose v0.1.0 — both exist)~~ done — agent patch tag cut 2026-07-05 | ~~🔴 Fixes agent for consumers~~ |
-| ~~5~~  | ~~**Cut `examples/v0.1.0`** tag (first release of the new examples module)~~ done — examples tagged; now at examples/v0.3.2 | ~~🟠 Publishes the extraction~~ |
-| ~~6~~  | ~~**Add CI gate: `GOWORK=off go list -m all`** in each module dir~~ done — ci.yml runs GOWORK=off go build + go list -m all | ~~🔴 Prevents recurrence~~ |
-| ~~7~~  | ~~**Add CI consumer-simulation job** (`go get ...@<tag>` in a throwaway module)~~ done — consumer-simulation job in ci.yml | ~~🔴 Honest release proof~~ |
-| ~~8~~  | ~~**Add CI invariant: root `go list -m all` returns exactly 1 line**~~ done — GOWORK=off go list -m all gate in ci.yml | ~~🟠 Enforces zero-dep claim~~ |
-| ~~9~~  | ~~**Bump `bridge` root pin v0.5.1 → v0.6.0** (after v0.6.1 cut)~~ done — pins ride coordinated releases (now v0.10.2) | ~~🟠 Pin freshness~~ |
-| ~~10~~ | ~~**Bump `diagnose/git` root pin v0.5.1 → v0.6.0**~~ done — pins ride coordinated releases (now v0.10.2) | ~~🟠~~ |
-| ~~11~~ | ~~**Bump `diagnose/postgres` root pin v0.5.1 → v0.6.0**~~ done — pins ride coordinated releases (now v0.10.2) | ~~🟠~~ |
-| ~~12~~ | ~~**Audit SKILL.md** for stale "replace" / "not yet published" language~~ done — SKILL.md overhauled in later passes | ~~🟡 Doc honesty~~ |
-| ~~13~~ | ~~**Update CHANGELOG.md** with a v0.6.1 entry documenting the fix + the examples extraction~~ done — [0.6.1] entry in CHANGELOG | ~~🟡~~ |
-| ~~14~~ | ~~**Add a `CONTRIBUTING.md`/release checklist** note: "never ship `replace` in a tagged go.mod; use go.work"~~ done — note added to CONTRIBUTING.md PR checklist 2026-09-27 | ~~🟡 Process~~ |
-| ~~15~~ | ~~**Normalize `require` style** across all submodule `go.mod` files (inline vs block)~~ done — require style normalized repo-wide | ~~🟢 Polish~~ |
-| ~~16~~ | ~~**Consider `go mod tidy` in CI** for each module (catches missing go.sum entries)~~ **Won't implement — superseded — tidy is a release-process step (post-tagcut tidy), not a CI step.** | ~~🟡~~ |
-| ~~17~~ | ~~**Tag the existing broken tags as deprecated** in release notes / README~~ done — routed — TODO_LIST #2 (retract directives still pending) | ~~🟢 Public hygiene~~ |
-| ~~18~~ | ~~**Add `go vet ./...` to CI** if not already present (defense in depth)~~ done — go vet ./... in ci.yml | ~~🟢~~ |
-| ~~19~~ | ~~**Document the release-tag sequence** (depended-on modules first) in AGENTS.md~~ done — AGENTS.md documents sub-tags-before-root-tag sequencing | ~~🟡 Process~~ |
-| ~~20~~ | ~~**Review whether `errorfamilytest` should be its own module** (it's currently under root but imports `testing`)~~ **Won't implement — declined — errorfamilytest intentionally stays a subpackage (mirrors net/http/httptest).** | ~~🟢 Future~~ |
-| ~~21~~ | ~~**Add a `make`/`just`/nix target for cutting coordinated multi-module releases**~~ done — routed — ROADMAP theme 3 release-automation idea | ~~🟢 Tooling~~ |
-| ~~22~~ | ~~**Check `go.work.sum` is consistent** after the examples addition~~ done — go.work.sum consistent across subsequent releases | ~~🟢~~ |
-| ~~23~~ | ~~**Verify the nix flake still builds** (`nix build`, `nix flake check`) after module changes~~ done — nix flake builds verified green via BuildFlow | ~~🟡~~ |
-| ~~24~~ | ~~**Consider a `renovate`/`dependabot` config** for multi-module version pinning~~ done — Dependabot configures go_modules for all 7 modules | ~~🟢~~ |
-| ~~25~~ | ~~**Post-mortem note in README/CHANGELOG** explaining what went wrong with v0.6.0 and how it's now prevented~~ done — incident documented in ROADMAP theme 3 | ~~🟡 Trust~~ |
+| #      | Task                                                                                                                                                                                                                               | Impact                                             |
+| ------ | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------- |
+| ~~1~~  | ~~**Commit the working-tree fixes** (this session's changes)~~ done — committed as part of the 2026-07-05 release                                                                                                                  | ~~🔴 Unblock everything~~                          |
+| ~~2~~  | ~~**Cut `diagnose/v0.1.1`** tag (its go.mod requires root v0.6.0 — already exists)~~ done — diagnose patch tag cut 2026-07-05                                                                                                      | ~~🔴 Fixes diagnose for consumers~~                |
+| ~~3~~  | ~~**Cut `v0.6.1`** tag on root (requires diagnose v0.1.0 — already exists)~~ done — v0.6.1 on the module proxy                                                                                                                     | ~~🔴 Fixes root for consumers incl. project-meta~~ |
+| ~~4~~  | ~~**Cut `agent/v0.1.1`** tag (requires root v0.6.0 + diagnose v0.1.0 — both exist)~~ done — agent patch tag cut 2026-07-05                                                                                                         | ~~🔴 Fixes agent for consumers~~                   |
+| ~~5~~  | ~~**Cut `examples/v0.1.0`** tag (first release of the new examples module)~~ done — examples tagged; now at examples/v0.3.2                                                                                                        | ~~🟠 Publishes the extraction~~                    |
+| ~~6~~  | ~~**Add CI gate: `GOWORK=off go list -m all`** in each module dir~~ done — ci.yml runs GOWORK=off go build + go list -m all                                                                                                        | ~~🔴 Prevents recurrence~~                         |
+| ~~7~~  | ~~**Add CI consumer-simulation job** (`go get ...@<tag>` in a throwaway module)~~ done — consumer-simulation job in ci.yml                                                                                                         | ~~🔴 Honest release proof~~                        |
+| ~~8~~  | ~~**Add CI invariant: root `go list -m all` returns exactly 1 line**~~ done — GOWORK=off go list -m all gate in ci.yml                                                                                                             | ~~🟠 Enforces zero-dep claim~~                     |
+| ~~9~~  | ~~**Bump `bridge` root pin v0.5.1 → v0.6.0** (after v0.6.1 cut)~~ done — pins ride coordinated releases (now v0.10.2)                                                                                                              | ~~🟠 Pin freshness~~                               |
+| ~~10~~ | ~~**Bump `diagnose/git` root pin v0.5.1 → v0.6.0**~~ done — pins ride coordinated releases (now v0.10.2)                                                                                                                           | ~~🟠~~                                             |
+| ~~11~~ | ~~**Bump `diagnose/postgres` root pin v0.5.1 → v0.6.0**~~ done — pins ride coordinated releases (now v0.10.2)                                                                                                                      | ~~🟠~~                                             |
+| ~~12~~ | ~~**Audit SKILL.md** for stale "replace" / "not yet published" language~~ done — SKILL.md overhauled in later passes                                                                                                               | ~~🟡 Doc honesty~~                                 |
+| ~~13~~ | ~~**Update CHANGELOG.md** with a v0.6.1 entry documenting the fix + the examples extraction~~ done — [0.6.1] entry in CHANGELOG                                                                                                    | ~~🟡~~                                             |
+| ~~14~~ | ~~**Add a `CONTRIBUTING.md`/release checklist** note: "never ship `replace` in a tagged go.mod; use go.work"~~ done — note added to CONTRIBUTING.md PR checklist 2026-09-27                                                        | ~~🟡 Process~~                                     |
+| ~~15~~ | ~~**Normalize `require` style** across all submodule `go.mod` files (inline vs block)~~ done — require style normalized repo-wide                                                                                                  | ~~🟢 Polish~~                                      |
+| ~~16~~ | ~~**Consider `go mod tidy` in CI** for each module (catches missing go.sum entries)~~ **Won't implement — superseded — tidy is a release-process step (post-tagcut tidy), not a CI step.**                                         | ~~🟡~~                                             |
+| ~~17~~ | ~~**Tag the existing broken tags as deprecated** in release notes / README~~ done — routed — TODO_LIST #2 (retract directives still pending)                                                                                       | ~~🟢 Public hygiene~~                              |
+| ~~18~~ | ~~**Add `go vet ./...` to CI** if not already present (defense in depth)~~ done — go vet ./... in ci.yml                                                                                                                           | ~~🟢~~                                             |
+| ~~19~~ | ~~**Document the release-tag sequence** (depended-on modules first) in AGENTS.md~~ done — AGENTS.md documents sub-tags-before-root-tag sequencing                                                                                  | ~~🟡 Process~~                                     |
+| ~~20~~ | ~~**Review whether `errorfamilytest` should be its own module** (it's currently under root but imports `testing`)~~ **Won't implement — declined — errorfamilytest intentionally stays a subpackage (mirrors net/http/httptest).** | ~~🟢 Future~~                                      |
+| ~~21~~ | ~~**Add a `make`/`just`/nix target for cutting coordinated multi-module releases**~~ done — routed — ROADMAP theme 3 release-automation idea                                                                                       | ~~🟢 Tooling~~                                     |
+| ~~22~~ | ~~**Check `go.work.sum` is consistent** after the examples addition~~ done — go.work.sum consistent across subsequent releases                                                                                                     | ~~🟢~~                                             |
+| ~~23~~ | ~~**Verify the nix flake still builds** (`nix build`, `nix flake check`) after module changes~~ done — nix flake builds verified green via BuildFlow                                                                               | ~~🟡~~                                             |
+| ~~24~~ | ~~**Consider a `renovate`/`dependabot` config** for multi-module version pinning~~ done — Dependabot configures go_modules for all 7 modules                                                                                       | ~~🟢~~                                             |
+| ~~25~~ | ~~**Post-mortem note in README/CHANGELOG** explaining what went wrong with v0.6.0 and how it's now prevented~~ done — incident documented in ROADMAP theme 3                                                                       | ~~🟡 Trust~~                                       |
 
 ---
 

@@ -134,58 +134,58 @@ Nothing is irreversibly broken. But there are real problems:
 
 ## F) Up to 50 Things to Get Done Next
 
-| #  | Task                                                                                              | Priority | Effort |
-| -- | ------------------------------------------------------------------------------------------------- | -------- | ------ |
-| ~~1~~  | ~~Add `GOEXPERIMENT=jsonv2` warning to README installation section~~ done — GOEXPERIMENT removed | ~~Critical~~ | ~~2 min~~ |
-| ~~2~~  | ~~Create Firebase hosting site: `firebase hosting:sites:create errorfamily --project lars-software`~~ done — site live | ~~Critical~~ | ~~1 min~~ |
-| ~~3~~  | ~~Deploy website: `cd website && nix run .#deploy`~~ done — deployed | ~~Critical~~ | ~~5 min~~ |
-| ~~4~~  | ~~Add custom domain in Firebase console after deploy~~ done — custom domain live | ~~Critical~~ | ~~2 min~~ |
-| ~~5~~  | ~~Add `_acme-challenge.errorfamily` TXT record to Terraform after Firebase generates it~~ done — ACME TXT applied (verified 2026-09-15) | ~~Critical~~ | ~~2 min~~ |
-| ~~6~~  | ~~Run `terraform apply` in domains/ to make DNS live~~ done — terraform applied | ~~Critical~~ | ~~2 min~~ |
-| ~~7~~  | ~~Generate `flake.lock` in website/~~ done — flake.lock committed | ~~High~~ | ~~1 min~~ |
-| ~~8~~  | ~~Commit `package-lock.json`~~ done — package-lock state managed via pnpm | ~~High~~ | ~~1 min~~ |
-| ~~9~~  | ~~Add CSP to astro.config.mjs + fix-csp.mjs post-build script~~ **Won't implement — declined — CSP gap remains (honest).** | ~~High~~ | ~~30 min~~ |
-| ~~10~~ | ~~Add website build job to `.github/workflows/ci.yml`~~ done — website-deploy workflow live | ~~High~~ | ~~15 min~~ |
-| ~~11~~ | ~~Design a proper logo for go-error-family~~ **Won't implement — declined — logo not adopted.** | ~~High~~ | ~~1 hr~~ |
-| ~~12~~ | ~~Add `astro-og-canvas` for OG image generation~~ **Won't implement — declined — OG canvas replaced by static preview.** | ~~Medium~~ | ~~30 min~~ |
-| ~~13~~ | ~~Add Bridge package guide page (oops integration)~~ done — Bridge guide shipped | ~~Medium~~ | ~~30 min~~ |
-| ~~14~~ | ~~Add `errorfamilytest` guide page~~ done — testing docs on site | ~~Medium~~ | ~~20 min~~ |
-| ~~15~~ | ~~Add Examples page with inline snippets~~ done — Examples page exists | ~~Medium~~ | ~~20 min~~ |
-| ~~16~~ | ~~Add `.buildflow.yml` for website~~ done — repo .buildflow.yml | ~~Medium~~ | ~~5 min~~ |
-| ~~17~~ | ~~Run html-validate as part of build~~ **Won't implement — declined — html-validate unwired.** | ~~Medium~~ | ~~10 min~~ |
-| ~~18~~ | ~~Add `dependents.astro` page (GitHub Code Search importers)~~ **Won't implement — declined — dependents page not adopted.** | ~~Low~~ | ~~30 min~~ |
-| ~~19~~ | ~~Add canonical URLs to doc pages~~ done — canonical URLs | ~~Low~~ | ~~10 min~~ |
-| ~~20~~ | ~~Add `errors.lars.software` as a shorter domain alias~~ done — alias handled by Firebase | ~~Low~~ | ~~10 min~~ |
-| ~~21~~ | ~~Add a "Philosophy" page explaining the design decisions~~ done — Philosophy in README + site | ~~Low~~ | ~~30 min~~ |
-| ~~22~~ | ~~Add interactive error classifier playground (web-based)~~ **Won't implement — declined — playground not adopted.** | ~~Low~~ | ~~2 hr~~ |
-| ~~23~~ | ~~Add search analytics / Pagefind optimization~~ **Won't implement — declined — search analytics not adopted.** | ~~Low~~ | ~~15 min~~ |
-| ~~24~~ | ~~Add `errtrace` or `panic` integration guide~~ **Won't implement — declined — errtrace guide not adopted.** | ~~Low~~ | ~~20 min~~ |
-| ~~25~~ | ~~Add a migration guide for users coming from `pkg/errors` or `emperror`~~ **Won't implement — declined — migration guide not adopted.** | ~~Low~~ | ~~30 min~~ |
-| ~~26~~ | ~~Add performance comparison chart (visual, not just table)~~ **Won't implement — declined — perf chart not adopted.** | ~~Low~~ | ~~30 min~~ |
-| ~~27~~ | ~~Add video/screencast embed on landing page~~ **Won't implement — declined — video not adopted.** | ~~Low~~ | ~~1 hr~~ |
-| ~~28~~ | ~~Add "Star History" widget to landing page~~ **Won't implement — declined — Star History n/a.** | ~~Low~~ | ~~15 min~~ |
-| ~~29~~ | ~~Add contributing guidelines for the website itself~~ done — website contributing page exists | ~~Low~~ | ~~10 min~~ |
-| ~~30~~ | ~~Add `llms.txt` for AI agent discoverability~~ **Won't implement — declined — llms.txt not adopted.** | ~~Low~~ | ~~15 min~~ |
-| ~~31~~ | ~~Add multi-language i18n support (Starlight supports it)~~ **Won't implement — declined — i18n not adopted.** | ~~Low~~ | ~~2 hr~~ |
-| ~~32~~ | ~~Add a blog section for release announcements~~ **Won't implement — declined — blog not adopted.** | ~~Low~~ | ~~30 min~~ |
-| ~~33~~ | ~~Add a "Why not X?" FAQ comparing to palantir/stacktrace, emperror, etc.~~ **Won't implement — declined — Why-not-X not adopted.** | ~~Low~~ | ~~30 min~~ |
-| ~~34~~ | ~~Add structured testing guide with `errorfamilytest` examples~~ done — testing guide on site | ~~Low~~ | ~~20 min~~ |
-| ~~35~~ | ~~Add a decision flowchart for choosing the right Family~~ **Won't implement — declined — flowchart not adopted.** | ~~Low~~ | ~~30 min~~ |
-| ~~36~~ | ~~Add badge for test coverage on landing page~~ **Won't implement — declined — coverage badge not adopted.** | ~~Low~~ | ~~5 min~~ |
-| ~~37~~ | ~~Add badge for latest release version~~ done — release badges on README | ~~Low~~ | ~~5 min~~ |
-| ~~38~~ | ~~Add GitHub Discussions link in Header/Footer~~ **Won't implement — declined — Discussions not enabled.** | ~~Low~~ | ~~5 min~~ |
-| ~~39~~ | ~~Add "Sponsors" section if applicable~~ **Won't implement — declined — Sponsors n/a.** | ~~Low~~ | ~~5 min~~ |
-| ~~40~~ | ~~Add a CLI tool reference page (if a CLI exists or is planned)~~ done — API reference on site | ~~Low~~ | ~~20 min~~ |
-| ~~41~~ | ~~Add retry pattern guide (backoff, jitter, circuit breaker integration)~~ done — retry guidance in guides | ~~Low~~ | ~~30 min~~ |
-| ~~42~~ | ~~Add partial success recipe guide~~ done — partial-success recipe in SKILL.md + site | ~~Low~~ | ~~20 min~~ |
-| ~~43~~ | ~~Add structured logging deep-dive (slog integration patterns)~~ done — logging guide on site (twelve-factor) | ~~Low~~ | ~~20 min~~ |
-| ~~44~~ | ~~Add gRPC interceptor guide~~ **Won't implement — declined — gRPC guide is ROADMAP idea.** | ~~Low~~ | ~~20 min~~ |
-| ~~45~~ | ~~Add GraphQL error handling guide~~ **Won't implement — declined — GraphQL n/a.** | ~~Low~~ | ~~20 min~~ |
-| ~~46~~ | ~~Add middleware chain composition guide~~ done — HTTP middleware documented | ~~Low~~ | ~~20 min~~ |
-| ~~47~~ | ~~Add a "Common Pitfalls" / "Gotchas" page~~ done — pitfalls in SKILL.md gotchas | ~~Low~~ | ~~20 min~~ |
-| ~~48~~ | ~~Add versioned docs (v0.7, v0.6, etc.)~~ **Won't implement — declined — versioned docs not adopted.** | ~~Low~~ | ~~1 hr~~ |
-| ~~49~~ | ~~Add RSS feed for changelog~~ **Won't implement — declined — RSS not adopted.** | ~~Low~~ | ~~15 min~~ |
-| ~~50~~ | ~~Add analytics (Plausible/Umami privacy-friendly)~~ **Won't implement — declined — analytics not adopted.** | ~~Low~~ | ~~15 min~~ |
+| #      | Task                                                                                                                                     | Priority     | Effort     |
+| ------ | ---------------------------------------------------------------------------------------------------------------------------------------- | ------------ | ---------- |
+| ~~1~~  | ~~Add `GOEXPERIMENT=jsonv2` warning to README installation section~~ done — GOEXPERIMENT removed                                         | ~~Critical~~ | ~~2 min~~  |
+| ~~2~~  | ~~Create Firebase hosting site: `firebase hosting:sites:create errorfamily --project lars-software`~~ done — site live                   | ~~Critical~~ | ~~1 min~~  |
+| ~~3~~  | ~~Deploy website: `cd website && nix run .#deploy`~~ done — deployed                                                                     | ~~Critical~~ | ~~5 min~~  |
+| ~~4~~  | ~~Add custom domain in Firebase console after deploy~~ done — custom domain live                                                         | ~~Critical~~ | ~~2 min~~  |
+| ~~5~~  | ~~Add `_acme-challenge.errorfamily` TXT record to Terraform after Firebase generates it~~ done — ACME TXT applied (verified 2026-09-15)  | ~~Critical~~ | ~~2 min~~  |
+| ~~6~~  | ~~Run `terraform apply` in domains/ to make DNS live~~ done — terraform applied                                                          | ~~Critical~~ | ~~2 min~~  |
+| ~~7~~  | ~~Generate `flake.lock` in website/~~ done — flake.lock committed                                                                        | ~~High~~     | ~~1 min~~  |
+| ~~8~~  | ~~Commit `package-lock.json`~~ done — package-lock state managed via pnpm                                                                | ~~High~~     | ~~1 min~~  |
+| ~~9~~  | ~~Add CSP to astro.config.mjs + fix-csp.mjs post-build script~~ **Won't implement — declined — CSP gap remains (honest).**               | ~~High~~     | ~~30 min~~ |
+| ~~10~~ | ~~Add website build job to `.github/workflows/ci.yml`~~ done — website-deploy workflow live                                              | ~~High~~     | ~~15 min~~ |
+| ~~11~~ | ~~Design a proper logo for go-error-family~~ **Won't implement — declined — logo not adopted.**                                          | ~~High~~     | ~~1 hr~~   |
+| ~~12~~ | ~~Add `astro-og-canvas` for OG image generation~~ **Won't implement — declined — OG canvas replaced by static preview.**                 | ~~Medium~~   | ~~30 min~~ |
+| ~~13~~ | ~~Add Bridge package guide page (oops integration)~~ done — Bridge guide shipped                                                         | ~~Medium~~   | ~~30 min~~ |
+| ~~14~~ | ~~Add `errorfamilytest` guide page~~ done — testing docs on site                                                                         | ~~Medium~~   | ~~20 min~~ |
+| ~~15~~ | ~~Add Examples page with inline snippets~~ done — Examples page exists                                                                   | ~~Medium~~   | ~~20 min~~ |
+| ~~16~~ | ~~Add `.buildflow.yml` for website~~ done — repo .buildflow.yml                                                                          | ~~Medium~~   | ~~5 min~~  |
+| ~~17~~ | ~~Run html-validate as part of build~~ **Won't implement — declined — html-validate unwired.**                                           | ~~Medium~~   | ~~10 min~~ |
+| ~~18~~ | ~~Add `dependents.astro` page (GitHub Code Search importers)~~ **Won't implement — declined — dependents page not adopted.**             | ~~Low~~      | ~~30 min~~ |
+| ~~19~~ | ~~Add canonical URLs to doc pages~~ done — canonical URLs                                                                                | ~~Low~~      | ~~10 min~~ |
+| ~~20~~ | ~~Add `errors.lars.software` as a shorter domain alias~~ done — alias handled by Firebase                                                | ~~Low~~      | ~~10 min~~ |
+| ~~21~~ | ~~Add a "Philosophy" page explaining the design decisions~~ done — Philosophy in README + site                                           | ~~Low~~      | ~~30 min~~ |
+| ~~22~~ | ~~Add interactive error classifier playground (web-based)~~ **Won't implement — declined — playground not adopted.**                     | ~~Low~~      | ~~2 hr~~   |
+| ~~23~~ | ~~Add search analytics / Pagefind optimization~~ **Won't implement — declined — search analytics not adopted.**                          | ~~Low~~      | ~~15 min~~ |
+| ~~24~~ | ~~Add `errtrace` or `panic` integration guide~~ **Won't implement — declined — errtrace guide not adopted.**                             | ~~Low~~      | ~~20 min~~ |
+| ~~25~~ | ~~Add a migration guide for users coming from `pkg/errors` or `emperror`~~ **Won't implement — declined — migration guide not adopted.** | ~~Low~~      | ~~30 min~~ |
+| ~~26~~ | ~~Add performance comparison chart (visual, not just table)~~ **Won't implement — declined — perf chart not adopted.**                   | ~~Low~~      | ~~30 min~~ |
+| ~~27~~ | ~~Add video/screencast embed on landing page~~ **Won't implement — declined — video not adopted.**                                       | ~~Low~~      | ~~1 hr~~   |
+| ~~28~~ | ~~Add "Star History" widget to landing page~~ **Won't implement — declined — Star History n/a.**                                         | ~~Low~~      | ~~15 min~~ |
+| ~~29~~ | ~~Add contributing guidelines for the website itself~~ done — website contributing page exists                                           | ~~Low~~      | ~~10 min~~ |
+| ~~30~~ | ~~Add `llms.txt` for AI agent discoverability~~ **Won't implement — declined — llms.txt not adopted.**                                   | ~~Low~~      | ~~15 min~~ |
+| ~~31~~ | ~~Add multi-language i18n support (Starlight supports it)~~ **Won't implement — declined — i18n not adopted.**                           | ~~Low~~      | ~~2 hr~~   |
+| ~~32~~ | ~~Add a blog section for release announcements~~ **Won't implement — declined — blog not adopted.**                                      | ~~Low~~      | ~~30 min~~ |
+| ~~33~~ | ~~Add a "Why not X?" FAQ comparing to palantir/stacktrace, emperror, etc.~~ **Won't implement — declined — Why-not-X not adopted.**      | ~~Low~~      | ~~30 min~~ |
+| ~~34~~ | ~~Add structured testing guide with `errorfamilytest` examples~~ done — testing guide on site                                            | ~~Low~~      | ~~20 min~~ |
+| ~~35~~ | ~~Add a decision flowchart for choosing the right Family~~ **Won't implement — declined — flowchart not adopted.**                       | ~~Low~~      | ~~30 min~~ |
+| ~~36~~ | ~~Add badge for test coverage on landing page~~ **Won't implement — declined — coverage badge not adopted.**                             | ~~Low~~      | ~~5 min~~  |
+| ~~37~~ | ~~Add badge for latest release version~~ done — release badges on README                                                                 | ~~Low~~      | ~~5 min~~  |
+| ~~38~~ | ~~Add GitHub Discussions link in Header/Footer~~ **Won't implement — declined — Discussions not enabled.**                               | ~~Low~~      | ~~5 min~~  |
+| ~~39~~ | ~~Add "Sponsors" section if applicable~~ **Won't implement — declined — Sponsors n/a.**                                                  | ~~Low~~      | ~~5 min~~  |
+| ~~40~~ | ~~Add a CLI tool reference page (if a CLI exists or is planned)~~ done — API reference on site                                           | ~~Low~~      | ~~20 min~~ |
+| ~~41~~ | ~~Add retry pattern guide (backoff, jitter, circuit breaker integration)~~ done — retry guidance in guides                               | ~~Low~~      | ~~30 min~~ |
+| ~~42~~ | ~~Add partial success recipe guide~~ done — partial-success recipe in SKILL.md + site                                                    | ~~Low~~      | ~~20 min~~ |
+| ~~43~~ | ~~Add structured logging deep-dive (slog integration patterns)~~ done — logging guide on site (twelve-factor)                            | ~~Low~~      | ~~20 min~~ |
+| ~~44~~ | ~~Add gRPC interceptor guide~~ **Won't implement — declined — gRPC guide is ROADMAP idea.**                                              | ~~Low~~      | ~~20 min~~ |
+| ~~45~~ | ~~Add GraphQL error handling guide~~ **Won't implement — declined — GraphQL n/a.**                                                       | ~~Low~~      | ~~20 min~~ |
+| ~~46~~ | ~~Add middleware chain composition guide~~ done — HTTP middleware documented                                                             | ~~Low~~      | ~~20 min~~ |
+| ~~47~~ | ~~Add a "Common Pitfalls" / "Gotchas" page~~ done — pitfalls in SKILL.md gotchas                                                         | ~~Low~~      | ~~20 min~~ |
+| ~~48~~ | ~~Add versioned docs (v0.7, v0.6, etc.)~~ **Won't implement — declined — versioned docs not adopted.**                                   | ~~Low~~      | ~~1 hr~~   |
+| ~~49~~ | ~~Add RSS feed for changelog~~ **Won't implement — declined — RSS not adopted.**                                                         | ~~Low~~      | ~~15 min~~ |
+| ~~50~~ | ~~Add analytics (Plausible/Umami privacy-friendly)~~ **Won't implement — declined — analytics not adopted.**                             | ~~Low~~      | ~~15 min~~ |
 
 ---
 

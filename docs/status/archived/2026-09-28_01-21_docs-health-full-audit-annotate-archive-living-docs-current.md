@@ -24,7 +24,7 @@ Executed a full docs-health AUDIT over every `2026-0*` file in the repo. Verifie
 4. **Website** — `contributing.mdx:54` "four interfaces" → six (flagged 2026-07-23 20-34 §B.2, re-flagged 2026-07-26, never fixed until now); `quick-start.mdx` "The Five Families in Action" → Six (code block already had Orchestration; only the heading lied). `astro check` after edits: **0 errors / 0 warnings / 0 hints**.
 5. **CHANGELOG.md** — the `[Unreleased]` content that actually shipped 2026-09-22 is now a real **`[0.10.2] - 2026-09-22`** section (intro, Added/Changed/Fixed, full 7-module Modules table, go-directive policy change documented as superseding the uniform-1.26.7 rule); fresh `[Unreleased]` carries this pass's doc fixes. The "tagged release with no CHANGELOG entry" finding is closed.
 6. **AGENTS.md** — status line: v0.10.2 (verified: tag pushed, `proxy.golang.org` `@v/list` contains v0.10.2, master CI green on `aefb86a`, pkg.go.dev claim updated), website green since 2026-09-19, Release-workflow gap recorded; **go-directive bullet rewritten** to the true-dependency-floors policy (root/git/pg/agent/diagnose = 1.26; bridge/examples = 1.26.0 dep-forced by x/text v0.42.0; go.work = 1.26.7 toolchain) with an explicit "do NOT normalize" — the old bullet would have made the next session revert the v0.10.2 release; "API Surface" header de-dated; coverage table replaced with live numbers; new **Docs Layout** section documenting the archive convention.
-7. **ROADMAP.md** — Direction updated to v0.10.2, the false "pnpm-audit re-enabled" claim corrected (the step is skipped; manual `pnpm audit` in `website/` is the working check), broken markdown in theme 4 repaired (a `- ` bullet was breaking a sentence mid-line), new raw ideas (release-automation reinforced by the v0.10.2 incident, gRPC status-mapping guide, typed `DiagnosticResult.Details`, middleware example, constructor-example symmetry), and a new **Open Questions** section owning the three standing decisions (art-dupl threshold policy, fleet-churn root vs canaries, bridge invest-or-freeze).
+7. **ROADMAP.md** — Direction updated to v0.10.2, the false "pnpm-audit re-enabled" claim corrected (the step is skipped; manual `pnpm audit` in `website/` is the working check), broken markdown in theme 4 repaired (a `-` bullet was breaking a sentence mid-line), new raw ideas (release-automation reinforced by the v0.10.2 incident, gRPC status-mapping guide, typed `DiagnosticResult.Details`, middleware example, constructor-example symmetry), and a new **Open Questions** section owning the three standing decisions (art-dupl threshold policy, fleet-churn root vs canaries, bridge invest-or-freeze).
 8. **TODO_LIST.md rebuilt** — deleted the 43-line "Design Decisions Resolved (2026-07-23)" trophy section (completed items belong in CHANGELOG; the decisions were already in FEATURES + the 2026-07-23 HTML record); now exactly 10 bounded, sourced, verified-open items (see f).
 9. **FEATURES.md** — "Last verified" → 2026-09-27 against v0.10.2 with live numbers; coverage table re-measured; Known Gaps cross-references no longer point at the deleted TODO_LIST section.
 10. **CONTRIBUTING.md** — PR checklist gained "**Never ship a `replace` directive in a tagged `go.mod`**" (open since 2026-07-05 §20-26 f14 — verified still missing today, now done).
@@ -49,7 +49,7 @@ Executed a full docs-health AUDIT over every `2026-0*` file in the repo. Verifie
 20. **Both HTML dashboards annotated** (hand-edited per skill) — inline resolution banners with `<s>` strikethroughs of the stale hero claims, citing v0.8.0/v0.9.0/v0.10.2 shipments. The item three prior sessions skipped.
 21. **Tooling discipline held**: `annotate-rows.py`/`annotate-prose.py` used with mandatory dry-runs, section scoping, and the tools' atomic write + shape verification; `python3` hand-strikes only for heading-style sections the tools can't match.
 22. **ARCHIVE executed with `git mv`**: `docs/status/archived/` (50 md + 2 html), `docs/planning/archived/` (5 md + 2 html), `docs/feedback/archived/` (3 md) — 62 files total. `docs/status/` and `docs/planning/` now contain only `archived/`.
-23. **Completeness gates pass**: `grep -rLn '~~' --include='*.md' archived-dirs` → 0 files; `check-rows.py` over every archived table → every flagged row is a table *header* (correctly unstruck), zero missed data rows. Five files the first sweep missed (see d.1) were caught by these gates and fixed before the report.
+23. **Completeness gates pass**: `grep -rLn '~~' --include='*.md' archived-dirs` → 0 files; `check-rows.py` over every archived table → every flagged row is a table _header_ (correctly unstruck), zero missed data rows. Five files the first sweep missed (see d.1) were caught by these gates and fixed before the report.
 24. **Cross-references repaired**: TODO_LIST and FEATURES citations updated to the `archived/` paths; AGENTS.md Docs Layout section records the convention so future reports get harvested + archived the same way.
 25. **Auto-commit daemon captured everything**; working tree clean at report time.
 
@@ -83,7 +83,7 @@ Executed a full docs-health AUDIT over every `2026-0*` file in the repo. Verifie
 ## d) TOTALLY FUCKED UP!
 
 1. **The first sweep missed 5 files, and only my own gates caught it.** `2026-06-05_07-11_bridge-submodule-complete.md` was never annotated at all (skipped in the June batch entirely); `2026-07-23_20-34`, `2026-07-24_19-09`, and `2026-07-26_07-50` were read but never annotated; `browser-history.md` was archived without a strike. The grep gate + `check-rows.py` caught all five AFTER `git mv` — fixed in place, no permanent harm, but my per-file tracking lived in memory instead of a checklist, and memory had holes. That is the exact "skipping items you didn't check" failure the skill names as its #1 failure mode, caught one gate run away from shipping.
-2. **I hit the same annotate-tool footgun three times.** Section headings containing `#25` (e.g. `## f) Top #25 Things...`) are parsed by the tool as heading-prefix `## f) Top ` + occurrence `25` — three failed calls (`09-17`, `09-40`, `09-52`) before I consistently used the `#1` occurrence suffix. Should have generalized after the first failure.
+2. **I hit the same annotate-tool footgun three times.** Section headings containing `#25` (e.g. `## f) Top #25 Things...`) are parsed by the tool as heading-prefix `## f) Top` + occurrence `25` — three failed calls (`09-17`, `09-40`, `09-52`) before I consistently used the `#1` occurrence suffix. Should have generalized after the first failure.
 3. **Incomplete spec for the 2026-07-26 audit's f-table** — I wrote verdicts for rows 1–39 but the table had rows 40–50 in a later sub-block; `check-rows.py` flagged the partial table and I fixed it with a second pass. Sloppy spec generation against a file I had read.
 4. **Wrong tool for heading-style sections, twice** — ran `annotate-prose` against `### 1. Heading` style items (04-32 §b, 20-34 §B) which the tool can't match; two wasted calls each before switching to targeted python strikes. The digests had told me the sections were subheading-based; I didn't adapt the first time.
 5. **Wrote a claim before executing it.** The AGENTS.md status line was edited to say the v0.10.2 GitHub Release was "created manually" BEFORE I ran `gh release create`. It succeeded — but had it failed, the doc would have lied with my name on it. Command first, doc second. Same class: TODO_LIST #6 baselines were written from the 09-22 report (83.9/80.3) before I measured; the live run changed two numbers and added a regression (git 98.5→91.0) I then had to fold in.
@@ -114,78 +114,78 @@ _Sources: [T] = already a TODO_LIST item (do NOT re-harvest, they're current), [
 
 ### Immediate (this session's loose ends)
 
-| #  | Task                                                                                          | Impact   | Effort | Src |
-| -- | --------------------------------------------------------------------------------------------- | -------- | ------ | --- |
-| ~~1~~  | ~~**Push master (16 ahead)** — CI validates the sweep; `website-deploy` fires on the mdx edits~~ done — pushed 09-28 (e1d46ff); CI + Deploy green | ~~Critical~~ | ~~S~~ | ~~S~~ |
-| ~~2~~  | ~~Run `astro build` locally before/with the push (check alone ran this session)~~ done — astro build green; canary enforces in CI | ~~High~~ | ~~S~~ | ~~S~~ |
-| ~~3~~  | ~~**Investigate why release.yml skipped v0.10.2** (workflow file at tag ref? push mechanics?)~~ done — root-caused (M02, archived note) | ~~High~~ | ~~M~~ | ~~[T3]~~ |
-| ~~4~~  | ~~Curate the v0.10.2 GitHub Release notes (auto-generated now; v0.10.1 was curated)~~ done — curated (M03) | ~~Low~~ | ~~S~~ | ~~S~~ |
-| ~~5~~  | ~~Explicit `erraudit` re-run + go-structure-linter CLI + full buildflow + website `nix build` (the claims battery)~~ done — battery 09-28 + 09-29 (erraudit 1c6809a) | ~~Medium~~ | ~~M~~ | ~~[T7]~~ |
-| ~~6~~  | ~~Annotate + archive `docs/feedback/sec-consumer-feedback.md` (only file outside the 2026-0* sweep)~~ done — M14 archived; inline resolutions added 09-29 | ~~Low~~ | ~~S~~ | ~~S~~ |
+| #     | Task                                                                                                                                                                 | Impact       | Effort | Src      |
+| ----- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------ | ------ | -------- |
+| ~~1~~ | ~~**Push master (16 ahead)** — CI validates the sweep; `website-deploy` fires on the mdx edits~~ done — pushed 09-28 (e1d46ff); CI + Deploy green                    | ~~Critical~~ | ~~S~~  | ~~S~~    |
+| ~~2~~ | ~~Run `astro build` locally before/with the push (check alone ran this session)~~ done — astro build green; canary enforces in CI                                    | ~~High~~     | ~~S~~  | ~~S~~    |
+| ~~3~~ | ~~**Investigate why release.yml skipped v0.10.2** (workflow file at tag ref? push mechanics?)~~ done — root-caused (M02, archived note)                              | ~~High~~     | ~~M~~  | ~~[T3]~~ |
+| ~~4~~ | ~~Curate the v0.10.2 GitHub Release notes (auto-generated now; v0.10.1 was curated)~~ done — curated (M03)                                                           | ~~Low~~      | ~~S~~  | ~~S~~    |
+| ~~5~~ | ~~Explicit `erraudit` re-run + go-structure-linter CLI + full buildflow + website `nix build` (the claims battery)~~ done — battery 09-28 + 09-29 (erraudit 1c6809a) | ~~Medium~~   | ~~M~~  | ~~[T7]~~ |
+| ~~6~~ | ~~Annotate + archive `docs/feedback/sec-consumer-feedback.md` (only file outside the 2026-0* sweep)~~ done — M14 archived; inline resolutions added 09-29            | ~~Low~~      | ~~S~~  | ~~S~~    |
 
 ### TODO_LIST Active items (verified open 2026-09-27 — no changes needed, just execute)
 
-| #  | Task                                                                     | Impact | Effort | Src  |
-| -- | ------------------------------------------------------------------------- | ------ | ------ | ---- |
-| ~~7~~  | ~~Announce the Bridge Patterns guide publicly~~ done — routed to TODO_LIST #1 (channel decision still open) | ~~High~~ | ~~M~~ | ~~[T1]~~ |
-| ~~8~~  | ~~Retract broken v0.6.x tags (`retract` directives + verify proxy)~~ done — v0.10.3 retraction (M04) | ~~High~~ | ~~M~~ | ~~[T2]~~ |
-| ~~9~~  | ~~Website guard canaries (TS-6 pin, frozen-lockfile + astro check, Dependabot decision)~~ done — website-check.yml (M05) | ~~High~~ | ~~S~~ | ~~[T4]~~ |
-| ~~10~~ | ~~art-dupl suppression/baseline + standing threshold policy~~ done — baseline + policy (M09) | ~~Medium~~ | ~~S~~ | ~~[T5]~~ |
-| ~~11~~ | ~~Coverage lifts: diagnose 84.2→90, postgres 78.5→85, git back 91.0→95+~~ done — 97.4 / 98.7 / 89.2 (M06) | ~~Medium~~ | ~~M~~ | ~~[T6]~~ |
-| ~~12~~ | ~~File upstream BuildFlow issues (pnpm-audit subdirectory lockfiles; phantom IsIgnored)~~ done — #23 filed + #19 evidence comment (M10) | ~~High~~ | ~~S~~ | ~~[T8]~~ |
-| ~~13~~ | ~~Website chores: `minimumReleaseAgeStrict` decision~~ done — minimumReleaseAgeStrict (M12) | ~~Low~~ | ~~S~~ | ~~[T9]~~ |
-| ~~14~~ | ~~Plan v0.11.0 scope~~ done — v0.11.0 shipped 2026-09-29 | ~~Medium~~ | ~~S~~ | ~~[T10]~~ |
+| #      | Task                                                                                                                                    | Impact     | Effort | Src       |
+| ------ | --------------------------------------------------------------------------------------------------------------------------------------- | ---------- | ------ | --------- |
+| ~~7~~  | ~~Announce the Bridge Patterns guide publicly~~ done — routed to TODO_LIST #1 (channel decision still open)                             | ~~High~~   | ~~M~~  | ~~[T1]~~  |
+| ~~8~~  | ~~Retract broken v0.6.x tags (`retract` directives + verify proxy)~~ done — v0.10.3 retraction (M04)                                    | ~~High~~   | ~~M~~  | ~~[T2]~~  |
+| ~~9~~  | ~~Website guard canaries (TS-6 pin, frozen-lockfile + astro check, Dependabot decision)~~ done — website-check.yml (M05)                | ~~High~~   | ~~S~~  | ~~[T4]~~  |
+| ~~10~~ | ~~art-dupl suppression/baseline + standing threshold policy~~ done — baseline + policy (M09)                                            | ~~Medium~~ | ~~S~~  | ~~[T5]~~  |
+| ~~11~~ | ~~Coverage lifts: diagnose 84.2→90, postgres 78.5→85, git back 91.0→95+~~ done — 97.4 / 98.7 / 89.2 (M06)                               | ~~Medium~~ | ~~M~~  | ~~[T6]~~  |
+| ~~12~~ | ~~File upstream BuildFlow issues (pnpm-audit subdirectory lockfiles; phantom IsIgnored)~~ done — #23 filed + #19 evidence comment (M10) | ~~High~~   | ~~S~~  | ~~[T8]~~  |
+| ~~13~~ | ~~Website chores: `minimumReleaseAgeStrict` decision~~ done — minimumReleaseAgeStrict (M12)                                             | ~~Low~~    | ~~S~~  | ~~[T9]~~  |
+| ~~14~~ | ~~Plan v0.11.0 scope~~ done — v0.11.0 shipped 2026-09-29                                                                                | ~~Medium~~ | ~~S~~  | ~~[T10]~~ |
 
 ### Structural / hygiene
 
-| #  | Task                                                                                            | Impact | Effort | Src |
-| -- | ------------------------------------------------------------------------------------------------ | ------ | ------ | --- |
-| ~~15~~ | ~~**Trim AGENTS.md below 30 KB** — move release-era narrative bullets (2026-05/06/07 incident stories) to `docs/`, keep current-state rules~~ done — M13 (18,020 bytes) | ~~Medium~~ | ~~M~~ | ~~S~~ |
-| ~~16~~ | ~~Add a one-line comment in `go.work` (or AGENTS) explaining the deliberate `1.26.7` toolchain floor vs per-module `1.26`/`1.26.0` floors~~ done — M14 go.work comment | ~~Low~~ | ~~S~~ | ~~S~~ |
-| ~~17~~ | ~~Line-verify the peripheral doc surfaces (research/, modularization/, comparison html, top-5 docs)~~ done — M14 peripheral audit note | ~~Low~~ | ~~M~~ | ~~S~~ |
-| ~~18~~ | ~~Annotate `architecture-understanding/` renders as point-in-time (or date-stamp their intro)~~ done — 09-29 pass stamped the HTML render + d2 files point-in-time | ~~Low~~ | ~~S~~ | ~~S~~ |
-| ~~19~~ | ~~Decide the fate of `best-of-both-worlds.html` (archived with planning; verify it's not referenced anywhere live)~~ done — M14 confirmed archived, zero dangling refs | ~~Low~~ | ~~S~~ | ~~S~~ |
-| ~~20~~ | ~~Record the `#N` occurrence-suffix footgun of annotate-rows/prose in the docs-health skill notes (upstream-able)~~ done — skill documents the #N suffix + level-aware scoping | ~~Low~~ | ~~S~~ | ~~S~~ |
-| ~~21~~ | ~~Convention: every future status report ends HARVEST-closed — harvest + annotate + archive in the next docs-health pass~~ done — convention followed by the 09-29 pass | ~~Medium~~ | ~~—~~ | ~~S~~ |
-| ~~22~~ | ~~Consider `docs/status/README.md` one-pager index (current convention + archive pointer) for human discoverability~~ done — routed to ROADMAP fuel (status index, still open) | ~~Low~~ | ~~S~~ | ~~S~~ |
-| ~~23~~ | ~~Add CI md-link check so moved/archived files can't break living-doc citations silently~~ done — routed to ROADMAP fuel (lychee CI gate, still open) | ~~Medium~~ | ~~S~~ | ~~S~~ |
-| ~~24~~ | ~~Triage the 6 open Dependabot PR branches (CI ran green on them today) — merge or close with intent~~ done — M18 closed #6-#11 | ~~Medium~~ | ~~S~~ | ~~S~~ |
+| #      | Task                                                                                                                                                                           | Impact     | Effort | Src   |
+| ------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | ---------- | ------ | ----- |
+| ~~15~~ | ~~**Trim AGENTS.md below 30 KB** — move release-era narrative bullets (2026-05/06/07 incident stories) to `docs/`, keep current-state rules~~ done — M13 (18,020 bytes)        | ~~Medium~~ | ~~M~~  | ~~S~~ |
+| ~~16~~ | ~~Add a one-line comment in `go.work` (or AGENTS) explaining the deliberate `1.26.7` toolchain floor vs per-module `1.26`/`1.26.0` floors~~ done — M14 go.work comment         | ~~Low~~    | ~~S~~  | ~~S~~ |
+| ~~17~~ | ~~Line-verify the peripheral doc surfaces (research/, modularization/, comparison html, top-5 docs)~~ done — M14 peripheral audit note                                         | ~~Low~~    | ~~M~~  | ~~S~~ |
+| ~~18~~ | ~~Annotate `architecture-understanding/` renders as point-in-time (or date-stamp their intro)~~ done — 09-29 pass stamped the HTML render + d2 files point-in-time             | ~~Low~~    | ~~S~~  | ~~S~~ |
+| ~~19~~ | ~~Decide the fate of `best-of-both-worlds.html` (archived with planning; verify it's not referenced anywhere live)~~ done — M14 confirmed archived, zero dangling refs         | ~~Low~~    | ~~S~~  | ~~S~~ |
+| ~~20~~ | ~~Record the `#N` occurrence-suffix footgun of annotate-rows/prose in the docs-health skill notes (upstream-able)~~ done — skill documents the #N suffix + level-aware scoping | ~~Low~~    | ~~S~~  | ~~S~~ |
+| ~~21~~ | ~~Convention: every future status report ends HARVEST-closed — harvest + annotate + archive in the next docs-health pass~~ done — convention followed by the 09-29 pass        | ~~Medium~~ | ~~—~~  | ~~S~~ |
+| ~~22~~ | ~~Consider `docs/status/README.md` one-pager index (current convention + archive pointer) for human discoverability~~ done — routed to ROADMAP fuel (status index, still open) | ~~Low~~    | ~~S~~  | ~~S~~ |
+| ~~23~~ | ~~Add CI md-link check so moved/archived files can't break living-doc citations silently~~ done — routed to ROADMAP fuel (lychee CI gate, still open)                          | ~~Medium~~ | ~~S~~  | ~~S~~ |
+| ~~24~~ | ~~Triage the 6 open Dependabot PR branches (CI ran green on them today) — merge or close with intent~~ done — M18 closed #6-#11                                                | ~~Medium~~ | ~~S~~  | ~~S~~ |
 
 ### From the 09-18/09-22 reports (carried, unchanged priority)
 
-| #  | Task                                                                                  | Impact | Effort | Src |
-| -- | --------------------------------------------------------------------------------------- | ------ | ------ | --- |
-| ~~25~~ | ~~CI canary: typescript major ≠ 6 fails CI (see #9)~~ done — canary (M05) | ~~Critical~~ | ~~S~~ | ~~[T4]~~ |
-| ~~26~~ | ~~CI: `pnpm install --frozen-lockfile` + `astro check` for `website/**` PRs (see #9)~~ done — canary (M05) | ~~High~~ | ~~S~~ | ~~[T4]~~ |
-| ~~27~~ | ~~Decide/disable Dependabot security-updates auto-run for `/website` (see #9)~~ done — decision verified + recorded (M05) | ~~High~~ | ~~S~~ | ~~[T4]~~ |
-| ~~28~~ | ~~ROADMAP answer: fleet churn root-fix vs per-repo canaries forever~~ done — routed to ROADMAP OQ2 (open) | ~~High~~ | ~~—~~ | ~~[R-OQ2]~~ |
-| ~~29~~ | ~~ROADMAP answer: bridge & enrichment APIs — invest or freeze?~~ done — routed to ROADMAP OQ3 (open) | ~~High~~ | ~~—~~ | ~~[R-OQ3]~~ |
-| ~~30~~ | ~~ROADMAP answer: art-dupl `-t 1` routine vs deep-sweep threshold~~ done — OQ1 resolved with recorded default | ~~Medium~~ | ~~—~~ | ~~[R-OQ1]~~ |
+| #      | Task                                                                                                                      | Impact       | Effort | Src         |
+| ------ | ------------------------------------------------------------------------------------------------------------------------- | ------------ | ------ | ----------- |
+| ~~25~~ | ~~CI canary: typescript major ≠ 6 fails CI (see #9)~~ done — canary (M05)                                                 | ~~Critical~~ | ~~S~~  | ~~[T4]~~    |
+| ~~26~~ | ~~CI: `pnpm install --frozen-lockfile` + `astro check` for `website/**` PRs (see #9)~~ done — canary (M05)                | ~~High~~     | ~~S~~  | ~~[T4]~~    |
+| ~~27~~ | ~~Decide/disable Dependabot security-updates auto-run for `/website` (see #9)~~ done — decision verified + recorded (M05) | ~~High~~     | ~~S~~  | ~~[T4]~~    |
+| ~~28~~ | ~~ROADMAP answer: fleet churn root-fix vs per-repo canaries forever~~ done — routed to ROADMAP OQ2 (open)                 | ~~High~~     | ~~—~~  | ~~[R-OQ2]~~ |
+| ~~29~~ | ~~ROADMAP answer: bridge & enrichment APIs — invest or freeze?~~ done — routed to ROADMAP OQ3 (open)                      | ~~High~~     | ~~—~~  | ~~[R-OQ3]~~ |
+| ~~30~~ | ~~ROADMAP answer: art-dupl `-t 1` routine vs deep-sweep threshold~~ done — OQ1 resolved with recorded default             | ~~Medium~~   | ~~—~~  | ~~[R-OQ1]~~ |
 
 ### Adoption / docs backlog (ROADMAP fuel, not commitments)
 
-| #  | Task                                                                                  | Impact | Effort | Src |
-| -- | --------------------------------------------------------------------------------------- | ------ | ------ | --- |
-| ~~31~~ | ~~Examples for `errorfamilytest` + `diagnose` subpackages (pkg.go.dev gap)~~ done — M15 examples | ~~Medium~~ | ~~M~~ | ~~R~~ |
-| ~~32~~ | ~~End-to-end `HTTPHandler` middleware example (net/http or Chi)~~ done — M17 (covered by ExampleHTTPHandler; deviation documented) | ~~Medium~~ | ~~M~~ | ~~R~~ |
-| ~~33~~ | ~~Example symmetry: `ExampleNewConflict/Corruption/Infrastructure/Orchestration` set~~ done — M17 constructor symmetry | ~~Low~~ | ~~S~~ | ~~R~~ |
-| ~~34~~ | ~~gRPC status-mapping guide (family → codes.Internal/Unavailable/InvalidArgument)~~ done — M16 gRPC guide | ~~Medium~~ | ~~M~~ | ~~R~~ |
-| ~~35~~ | ~~OpenAPI/schema generation for the canonical error JSON~~ done — routed to ROADMAP backlog (OpenAPI) | ~~Medium~~ | ~~L~~ | ~~R~~ |
-| ~~36~~ | ~~`httperror` subpackage RFC~~ done — routed to ROADMAP backlog (httperror RFC) | ~~Medium~~ | ~~L~~ | ~~R~~ |
-| ~~37~~ | ~~Diagnostic submodules: redis, then docker/kubectl~~ done — routed to ROADMAP backlog (diagnostic submodules) | ~~Medium~~ | ~~M/L~~ | ~~R~~ |
-| ~~38~~ | ~~Typed `DiagnosticResult.Details` (kills strTrue/strFalse at root) — next major only~~ done — routed to ROADMAP backlog (typed Details, next major) | ~~Low~~ | ~~L~~ | ~~R~~ |
-| ~~39~~ | ~~Release automation script with explicit trigger verification (ends the #3 class)~~ done — routed to ROADMAP theme 3 (automation script) | ~~High~~ | ~~L~~ | ~~R~~ |
-| ~~40~~ | ~~Framework integration guides: Chi, Echo, Gin~~ done — routed to ROADMAP theme 4 (framework guides) | ~~Medium~~ | ~~M~~ | ~~R~~ |
-| ~~41~~ | ~~Benchmark suite tracked across versions~~ done — routed to ROADMAP theme 4 (benchmark suite) | ~~Low~~ | ~~M~~ | ~~R~~ |
-| ~~42~~ | ~~CSP headers for the website (honest standing gap; declining it forever is also a decision)~~ done — declined with revisit trigger (M18 DR-1) | ~~Low~~ | ~~S~~ | ~~S~~ |
-| ~~43~~ | ~~Uptime monitor for errorfamily.lars.software (recurring idea, never adopted — decide once)~~ done — declined with revisit trigger (M18 DR-2) | ~~Low~~ | ~~S~~ | ~~R~~ |
-| ~~44~~ | ~~`Code()` vs `ErrorCode()` convergence proposal (next major)~~ done — routed to ROADMAP theme 1 (next-major convergence) | ~~Low~~ | ~~S~~ | ~~R~~ |
-| ~~45~~ | ~~Consumer survey refresh: who uses LogError/HTTPHandler/errorfamilytest today (last audit 2026-07-23)~~ done — routed to ROADMAP fuel (survey refresh) | ~~Medium~~ | ~~M~~ | ~~R~~ |
-| ~~46~~ | ~~Review `WithContextf`/`WithContextMap` example gap (only WithContextAny has one)~~ done — routed to ROADMAP fuel (WithContextf/Map examples still absent) | ~~Low~~ | ~~S~~ | ~~S~~ |
-| ~~47~~ | ~~Consider a weekly `gh run list` triage habit (red workflows persisted 3 days unnoticed once)~~ **Won't implement — standing personal cadence, not a repo task.** | ~~Medium~~ | ~~S~~ | ~~S~~ |
-| ~~48~~ | ~~`minimumReleaseAgeStrict` decision is #13; this row intentionally left as a pointer~~ **NOT-DO — pointer row, intentionally empty.** | ~~—~~ | ~~—~~ | ~~—~~ |
-| ~~49~~ | ~~Check whether `docs/research/` content is still referenced by anything (or archivable)~~ done — M14 audit: REFERENCE keep | ~~Low~~ | ~~S~~ | ~~S~~ |
-| ~~50~~ | ~~Next docs-health pass: harvest THIS report's f-section, then annotate + archive it~~ done — this pass harvested, annotated, and archived this file | ~~Medium~~ | ~~S~~ | ~~S~~ |
+| #      | Task                                                                                                                                                               | Impact     | Effort  | Src   |
+| ------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------ | ---------- | ------- | ----- |
+| ~~31~~ | ~~Examples for `errorfamilytest` + `diagnose` subpackages (pkg.go.dev gap)~~ done — M15 examples                                                                   | ~~Medium~~ | ~~M~~   | ~~R~~ |
+| ~~32~~ | ~~End-to-end `HTTPHandler` middleware example (net/http or Chi)~~ done — M17 (covered by ExampleHTTPHandler; deviation documented)                                 | ~~Medium~~ | ~~M~~   | ~~R~~ |
+| ~~33~~ | ~~Example symmetry: `ExampleNewConflict/Corruption/Infrastructure/Orchestration` set~~ done — M17 constructor symmetry                                             | ~~Low~~    | ~~S~~   | ~~R~~ |
+| ~~34~~ | ~~gRPC status-mapping guide (family → codes.Internal/Unavailable/InvalidArgument)~~ done — M16 gRPC guide                                                          | ~~Medium~~ | ~~M~~   | ~~R~~ |
+| ~~35~~ | ~~OpenAPI/schema generation for the canonical error JSON~~ done — routed to ROADMAP backlog (OpenAPI)                                                              | ~~Medium~~ | ~~L~~   | ~~R~~ |
+| ~~36~~ | ~~`httperror` subpackage RFC~~ done — routed to ROADMAP backlog (httperror RFC)                                                                                    | ~~Medium~~ | ~~L~~   | ~~R~~ |
+| ~~37~~ | ~~Diagnostic submodules: redis, then docker/kubectl~~ done — routed to ROADMAP backlog (diagnostic submodules)                                                     | ~~Medium~~ | ~~M/L~~ | ~~R~~ |
+| ~~38~~ | ~~Typed `DiagnosticResult.Details` (kills strTrue/strFalse at root) — next major only~~ done — routed to ROADMAP backlog (typed Details, next major)               | ~~Low~~    | ~~L~~   | ~~R~~ |
+| ~~39~~ | ~~Release automation script with explicit trigger verification (ends the #3 class)~~ done — routed to ROADMAP theme 3 (automation script)                          | ~~High~~   | ~~L~~   | ~~R~~ |
+| ~~40~~ | ~~Framework integration guides: Chi, Echo, Gin~~ done — routed to ROADMAP theme 4 (framework guides)                                                               | ~~Medium~~ | ~~M~~   | ~~R~~ |
+| ~~41~~ | ~~Benchmark suite tracked across versions~~ done — routed to ROADMAP theme 4 (benchmark suite)                                                                     | ~~Low~~    | ~~M~~   | ~~R~~ |
+| ~~42~~ | ~~CSP headers for the website (honest standing gap; declining it forever is also a decision)~~ done — declined with revisit trigger (M18 DR-1)                     | ~~Low~~    | ~~S~~   | ~~S~~ |
+| ~~43~~ | ~~Uptime monitor for errorfamily.lars.software (recurring idea, never adopted — decide once)~~ done — declined with revisit trigger (M18 DR-2)                     | ~~Low~~    | ~~S~~   | ~~R~~ |
+| ~~44~~ | ~~`Code()` vs `ErrorCode()` convergence proposal (next major)~~ done — routed to ROADMAP theme 1 (next-major convergence)                                          | ~~Low~~    | ~~S~~   | ~~R~~ |
+| ~~45~~ | ~~Consumer survey refresh: who uses LogError/HTTPHandler/errorfamilytest today (last audit 2026-07-23)~~ done — routed to ROADMAP fuel (survey refresh)            | ~~Medium~~ | ~~M~~   | ~~R~~ |
+| ~~46~~ | ~~Review `WithContextf`/`WithContextMap` example gap (only WithContextAny has one)~~ done — routed to ROADMAP fuel (WithContextf/Map examples still absent)        | ~~Low~~    | ~~S~~   | ~~S~~ |
+| ~~47~~ | ~~Consider a weekly `gh run list` triage habit (red workflows persisted 3 days unnoticed once)~~ **Won't implement — standing personal cadence, not a repo task.** | ~~Medium~~ | ~~S~~   | ~~S~~ |
+| ~~48~~ | ~~`minimumReleaseAgeStrict` decision is #13; this row intentionally left as a pointer~~ **NOT-DO — pointer row, intentionally empty.**                             | ~~—~~      | ~~—~~   | ~~—~~ |
+| ~~49~~ | ~~Check whether `docs/research/` content is still referenced by anything (or archivable)~~ done — M14 audit: REFERENCE keep                                        | ~~Low~~    | ~~S~~   | ~~S~~ |
+| ~~50~~ | ~~Next docs-health pass: harvest THIS report's f-section, then annotate + archive it~~ done — this pass harvested, annotated, and archived this file               | ~~Medium~~ | ~~S~~   | ~~S~~ |
 
 ---
 
@@ -197,4 +197,4 @@ _Sources: [T] = already a TODO_LIST item (do NOT re-harvest, they're current), [
 
 ---
 
-*Point-in-time snapshot — stale on contact. Written as Markdown per explicit user request (status-report skill's canonical format is HTML; one-off override, not propagated). Verify claims against the repo before acting on them.*
+_Point-in-time snapshot — stale on contact. Written as Markdown per explicit user request (status-report skill's canonical format is HTML; one-off override, not propagated). Verify claims against the repo before acting on them._

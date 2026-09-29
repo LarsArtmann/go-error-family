@@ -120,7 +120,7 @@ Nothing. All changes are verified: build ✓, tests ✓ (race), lint 0 issues ac
 7. ~~**Add context-value escaping** — single-pass replacement or use a delimiter that can't appear in keys~~ done — resolved — documented CLI-only; HTML escaping out of scope
 8. ~~**Add `Error.WithContextMap(map[string]string)`** — batch context addition without repeated chaining~~ done — WithContextMap shipped
 9. ~~**Fuzz test the new `{key}` template substitution** — verify no injection or double-substitution~~ done — applyContext fuzzed
-10. ~~**Add `Error.Clone()` as a public method** — consumers may want to branch an error~~ **Won't implement — declined — copy-on-write With* chosen instead.**
+10. ~~**Add `Error.Clone()` as a public method** — consumers may want to branch an error~~ __Won't implement — declined — copy-on-write With_ chosen instead._*
 11. ~~**Document the `Registry` pattern in SKILL.md with a full integration example**~~ done — SKILL.md Registry section
 12. ~~**Add `HandleConfig.Validate()` method** — catch nil writers, conflicting options early~~ **Won't implement — declined — config validated by construction.**
 

@@ -114,23 +114,23 @@ Nothing was left half-finished in terms of the BuildFlow failures.
 
 ## f) Up to 50 Things to Get Done Next
 
-| #  | Priority | Task                                                                                  |
-| -- | -------- | ------------------------------------------------------------------------------------- |
-| ~~1~~  | ~~CRITICAL~~ done — resolved — documented standing fleet daemon in AGENTS.md | ~~Investigate and fix the auto-commit hook that generates misleading commit messages~~ |
-| ~~2~~  | ~~CRITICAL~~ done — later runs green (89/89 on 2026-09-15, 105/105 on 2026-09-18) | ~~Run actual `buildflow` command to verify full pipeline passes~~ |
-| ~~3~~  | ~~CRITICAL~~ done — repaired 2026-07-26 | ~~Fix `gitignore-upserter:repair` (was `○` in BuildFlow output)~~ |
-| ~~4~~  | ~~HIGH~~ done — v2.12.2 then v2.13.2 | ~~Pin `version: latest` → specific version in release.yml (3 occurrences)~~ |
-| ~~5~~  | ~~HIGH~~ done — AGENTS.md updated | ~~Update AGENTS.md with flake.nix `...` fix, nolint patterns, SHA pinning policy~~ |
-| ~~6~~  | ~~HIGH~~ **Won't implement — NOT-DO — linter proven nonexistent.** | ~~Investigate hierarchical-errors config file support to reduce nolint noise~~ |
-| ~~7~~  | ~~HIGH~~ done — directives removed 2026-07-26 | ~~Silence golangci-lint "unknown linters" warning for hierarchical-errors/legacyerrors~~ |
-| ~~8~~  | ~~MEDIUM~~ **Won't implement — won't implement — pushed history stays as-is; rewriting rejected.** | ~~Consider squashing the 11 misleading auto-commits into meaningful commits~~ |
-| ~~9~~  | ~~MEDIUM~~ **Won't implement — NOT-DO — nonexistent tool.** | ~~File issue/contribute to hierarchical-errors: fmt.Formatter false positives~~ |
-| ~~10~~ | ~~MEDIUM~~ **Won't implement — NOT-DO — nonexistent tool.** | ~~File issue/contribute to hierarchical-errors: cleanup `_ = f.Close()` false positives~~ |
-| ~~11~~ | ~~MEDIUM~~ **Won't implement — NOT-DO — directives removed instead; removal documented in AGENTS.md.** | ~~Add `//nolint:hierarchical-errors` documentation to AGENTS.md lint section~~ |
-| ~~12~~ | ~~MEDIUM~~ **Won't implement — NOT-DO — nonexistent tool.** | ~~Consider a `.hierarchical-errors.toml` or similar config if supported~~ |
-| ~~13~~ | ~~LOW~~ **Won't implement — NOT-DO — nonexistent tool.** | ~~Review whether `hierarchical-errors` `generic_return` finding type has value at all~~ |
-| ~~14~~ | ~~LOW~~ **Won't implement — NOT-DO — nonexistent tool.** | ~~Consider excluding `ignored` finding type globally for diagnose package~~ |
-| ~~15~~ | ~~LOW~~ done — mid-release daemon commits reviewed retroactively (2026-09-15 report f1) | ~~Review the 11 auto-commits for any unintended changes~~ |
+| #      | Priority                                                                                               | Task                                                                                      |
+| ------ | ------------------------------------------------------------------------------------------------------ | ----------------------------------------------------------------------------------------- |
+| ~~1~~  | ~~CRITICAL~~ done — resolved — documented standing fleet daemon in AGENTS.md                           | ~~Investigate and fix the auto-commit hook that generates misleading commit messages~~    |
+| ~~2~~  | ~~CRITICAL~~ done — later runs green (89/89 on 2026-09-15, 105/105 on 2026-09-18)                      | ~~Run actual `buildflow` command to verify full pipeline passes~~                         |
+| ~~3~~  | ~~CRITICAL~~ done — repaired 2026-07-26                                                                | ~~Fix `gitignore-upserter:repair` (was `○` in BuildFlow output)~~                         |
+| ~~4~~  | ~~HIGH~~ done — v2.12.2 then v2.13.2                                                                   | ~~Pin `version: latest` → specific version in release.yml (3 occurrences)~~               |
+| ~~5~~  | ~~HIGH~~ done — AGENTS.md updated                                                                      | ~~Update AGENTS.md with flake.nix `...` fix, nolint patterns, SHA pinning policy~~        |
+| ~~6~~  | ~~HIGH~~ **Won't implement — NOT-DO — linter proven nonexistent.**                                     | ~~Investigate hierarchical-errors config file support to reduce nolint noise~~            |
+| ~~7~~  | ~~HIGH~~ done — directives removed 2026-07-26                                                          | ~~Silence golangci-lint "unknown linters" warning for hierarchical-errors/legacyerrors~~  |
+| ~~8~~  | ~~MEDIUM~~ **Won't implement — won't implement — pushed history stays as-is; rewriting rejected.**     | ~~Consider squashing the 11 misleading auto-commits into meaningful commits~~             |
+| ~~9~~  | ~~MEDIUM~~ **Won't implement — NOT-DO — nonexistent tool.**                                            | ~~File issue/contribute to hierarchical-errors: fmt.Formatter false positives~~           |
+| ~~10~~ | ~~MEDIUM~~ **Won't implement — NOT-DO — nonexistent tool.**                                            | ~~File issue/contribute to hierarchical-errors: cleanup `_ = f.Close()` false positives~~ |
+| ~~11~~ | ~~MEDIUM~~ **Won't implement — NOT-DO — directives removed instead; removal documented in AGENTS.md.** | ~~Add `//nolint:hierarchical-errors` documentation to AGENTS.md lint section~~            |
+| ~~12~~ | ~~MEDIUM~~ **Won't implement — NOT-DO — nonexistent tool.**                                            | ~~Consider a `.hierarchical-errors.toml` or similar config if supported~~                 |
+| ~~13~~ | ~~LOW~~ **Won't implement — NOT-DO — nonexistent tool.**                                               | ~~Review whether `hierarchical-errors` `generic_return` finding type has value at all~~   |
+| ~~14~~ | ~~LOW~~ **Won't implement — NOT-DO — nonexistent tool.**                                               | ~~Consider excluding `ignored` finding type globally for diagnose package~~               |
+| ~~15~~ | ~~LOW~~ done — mid-release daemon commits reviewed retroactively (2026-09-15 report f1)                | ~~Review the 11 auto-commits for any unintended changes~~                                 |
 
 ---
 
@@ -154,13 +154,13 @@ This is the most recent session. Its open items are current:
 > linter was never installed), and v0.9.0 is tagged and live. Remaining open:
 > the domains repo `flake.lock` corruption (cross-repo, not actionable here).
 
-| Open item (this report)                            | Status                                                                                                                                  | Tracked in          |
-| -------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------- | ------------------- |
-| ~~`gitignore-upserter:repair` failure (c.1)~~ done — RESOLVED 2026-07-26: `gitignore-upserter:detect` now succeeds; BuildFlow 38/39 pass | ~~**Still open** — never investigated~~ | ~~TODO_LIST (removed)~~ |
-| ~~Actual `buildflow` command never run (d.3)~~ done — RESOLVED 2026-07-26: `buildflow --dry-run` verified end-to-end | ~~**Still open** — individual tools pass, full pipeline unverified~~ | ~~TODO_LIST (removed)~~ |
-| ~~`version: latest` in release.yml (c.3)~~ done — RESOLVED 2026-07-26: pinned to `v2.12.2` matching `ci.yml` | ~~**Still open** — 3 occurrences unpinned~~ | ~~TODO_LIST (removed)~~ |
-| ~~50 `//nolint:hierarchical-errors` directives (d.2)~~ done — RESOLVED 2026-07-26: all 52 directives removed; the linter was never installed | ~~**Still open**~~ | ~~TODO_LIST (removed)~~ |
-| ~~Domains repo `flake.lock` corruption~~ done — domains repo recovered its lockfile; cross-repo item closed | ~~**Still open** — pre-existing, cross-repo~~ | ~~Not actionable here~~ |
-| ~~v0.8.0 untagged~~ done — RESOLVED: v0.8.0 tagged; project is now at v0.10.2 | ~~**Still open**~~ | ~~TODO_LIST (removed)~~ |
+| Open item (this report)                                                                                                                      | Status                                                               | Tracked in              |
+| -------------------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------- | ----------------------- |
+| ~~`gitignore-upserter:repair` failure (c.1)~~ done — RESOLVED 2026-07-26: `gitignore-upserter:detect` now succeeds; BuildFlow 38/39 pass     | ~~**Still open** — never investigated~~                              | ~~TODO_LIST (removed)~~ |
+| ~~Actual `buildflow` command never run (d.3)~~ done — RESOLVED 2026-07-26: `buildflow --dry-run` verified end-to-end                         | ~~**Still open** — individual tools pass, full pipeline unverified~~ | ~~TODO_LIST (removed)~~ |
+| ~~`version: latest` in release.yml (c.3)~~ done — RESOLVED 2026-07-26: pinned to `v2.12.2` matching `ci.yml`                                 | ~~**Still open** — 3 occurrences unpinned~~                          | ~~TODO_LIST (removed)~~ |
+| ~~50 `//nolint:hierarchical-errors` directives (d.2)~~ done — RESOLVED 2026-07-26: all 52 directives removed; the linter was never installed | ~~**Still open**~~                                                   | ~~TODO_LIST (removed)~~ |
+| ~~Domains repo `flake.lock` corruption~~ done — domains repo recovered its lockfile; cross-repo item closed                                  | ~~**Still open** — pre-existing, cross-repo~~                        | ~~Not actionable here~~ |
+| ~~v0.8.0 untagged~~ done — RESOLVED: v0.8.0 tagged; project is now at v0.10.2                                                                | ~~**Still open**~~                                                   | ~~TODO_LIST (removed)~~ |
 
 ~~The auto-commit hook (Q1) and squash question (Q2) remain unresolved design choices — the 11 generic auto-commits stand in git history.~~ resolved — the auto-commit daemon is documented standing fleet behavior (AGENTS.md); history left as-is by policy.

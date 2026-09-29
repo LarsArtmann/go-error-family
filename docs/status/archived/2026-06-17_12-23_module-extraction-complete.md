@@ -70,16 +70,16 @@ The plan (`docs/planning/2026-06-17_11-51_module-extraction-and-polish.md`) has 
 
 ## c) NOT STARTED
 
-| #  | Task                                                   | Impact | Effort |
-| -- | ------------------------------------------------------ | ------ | ------ |
-| ~~9~~  | ~~`Registry.Clone()` method~~ done — Registry.Clone shipped | ~~Medium~~ | ~~20min~~ |
-| ~~10~~ | ~~`Registry.RegisterTemplates()` batch~~ done — RegisterTemplates shipped | ~~Low~~ | ~~15min~~ |
-| ~~11~~ | ~~DRY `resolveSuggestedFix` / `renderCLI`~~ done — resolveTemplate helper shared | ~~Medium~~ | ~~30min~~ |
-| ~~12~~ | ~~Update README for new module structure~~ done — README module structure current | ~~Medium~~ | ~~30min~~ |
-| ~~13~~ | ~~Update AGENTS.md build commands per module~~ done — AGENTS.md per-module commands | ~~Medium~~ | ~~20min~~ |
-| ~~14~~ | ~~Update SKILL.md details (beyond architecture overview)~~ done — SKILL.md module docs | ~~Low~~ | ~~20min~~ |
-| ~~16~~ | ~~Check/update DOMAIN_LANGUAGE.md~~ done — DOMAIN_LANGUAGE.md current | ~~Low~~ | ~~10min~~ |
-| ~~17~~ | ~~Final full verification + release prep~~ done — v0.6.0+ released; verification standard since | ~~Low~~ | ~~10min~~ |
+| #      | Task                                                                                            | Impact     | Effort    |
+| ------ | ----------------------------------------------------------------------------------------------- | ---------- | --------- |
+| ~~9~~  | ~~`Registry.Clone()` method~~ done — Registry.Clone shipped                                     | ~~Medium~~ | ~~20min~~ |
+| ~~10~~ | ~~`Registry.RegisterTemplates()` batch~~ done — RegisterTemplates shipped                       | ~~Low~~    | ~~15min~~ |
+| ~~11~~ | ~~DRY `resolveSuggestedFix` / `renderCLI`~~ done — resolveTemplate helper shared                | ~~Medium~~ | ~~30min~~ |
+| ~~12~~ | ~~Update README for new module structure~~ done — README module structure current               | ~~Medium~~ | ~~30min~~ |
+| ~~13~~ | ~~Update AGENTS.md build commands per module~~ done — AGENTS.md per-module commands             | ~~Medium~~ | ~~20min~~ |
+| ~~14~~ | ~~Update SKILL.md details (beyond architecture overview)~~ done — SKILL.md module docs          | ~~Low~~    | ~~20min~~ |
+| ~~16~~ | ~~Check/update DOMAIN_LANGUAGE.md~~ done — DOMAIN_LANGUAGE.md current                           | ~~Low~~    | ~~10min~~ |
+| ~~17~~ | ~~Final full verification + release prep~~ done — v0.6.0+ released; verification standard since | ~~Low~~    | ~~10min~~ |
 
 ---
 

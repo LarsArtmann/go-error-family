@@ -59,27 +59,27 @@ This session focused on **deduplication, CHANGELOG accuracy, and release readine
 
 ## c) NOT STARTED
 
-| #  | Task                                                                  | Priority     | Effort |
-| -- | --------------------------------------------------------------------- | ------------ | ------ |
-| ~~1~~  | ~~Tag v0.3.0 release + push~~ done — v0.3.0+ tagged and pushed | ~~**Critical**~~ | ~~Low~~ |
-| ~~2~~  | ~~Update go.mod version in git/postgres submodules to v0.3.0~~ done — submodule pins ride coordinated releases | ~~High~~ | ~~Low~~ |
-| ~~3~~  | ~~Concurrent safety tests for registries~~ done — concurrency tests + atomic snapshot | ~~High~~ | ~~Low~~ |
-| ~~4~~  | ~~`FilesystemRule.Run` respect context cancellation~~ done — FilesystemRule honors ctx | ~~High~~ | ~~Low~~ |
-| ~~5~~  | ~~Consolidate `DiagnosticFinding` vs `DiagnosticResult` (split brain)~~ done — DiagnosticResult with Fix consolidated | ~~High~~ | ~~Medium~~ |
-| ~~6~~  | ~~Rename `DebugAgent` → `Agent` interface~~ done — resolved — DebugAgent name kept | ~~Medium~~ | ~~Low~~ |
-| ~~7~~  | ~~Add `NewRejectionf`, `NewTransientf` etc. (fmt-style constructors)~~ done — New{Family}f shipped | ~~Medium~~ | ~~Medium~~ |
-| ~~8~~  | ~~Add `errors.Join`-aware `Compose` that returns worst family~~ done — Compose shipped then removed v0.5.0 | ~~Medium~~ | ~~Medium~~ |
-| ~~9~~  | ~~Add `Mark(err, sentinel)` for identity stamping~~ **Won't implement — declined — Mark never adopted.** | ~~Medium~~ | ~~Medium~~ |
-| ~~10~~ | ~~Add structured logging adapter (slog integration)~~ done — LogError shipped | ~~Medium~~ | ~~Medium~~ |
-| ~~11~~ | ~~Full pipeline integration test (error → classify → diagnose → handle)~~ done — full-pipeline covered | ~~Medium~~ | ~~Medium~~ |
-| ~~12~~ | ~~Benchmark `Runner.Run` with context cancellation path~~ done — Runner benchmarks | ~~Low~~ | ~~Low~~ |
-| ~~13~~ | ~~Add `Error.Format(state, verb)` for `%+v` verbose output~~ done — FuzzErrorFormatting | ~~Low~~ | ~~Low~~ |
-| ~~14~~ | ~~Add `Errors(err) []error` unwrapping helper~~ **Won't implement — declined — errors.Join chosen.** | ~~Low~~ | ~~Low~~ |
-| ~~15~~ | ~~Add `IsFamily(err, Family) bool` convenience~~ **Won't implement — declined — Classify chosen.** | ~~Low~~ | ~~Low~~ |
-| ~~16~~ | ~~Add `Corruption` family diagnostic rules~~ done — severity-ordered multi-error | ~~Medium~~ | ~~High~~ |
-| ~~17~~ | ~~Add `Conflict` family diagnostic rules~~ done — OnDiagnosed hook | ~~Medium~~ | ~~High~~ |
-| ~~18~~ | ~~Add observability hooks (metrics, tracing)~~ **Won't implement — declined — not adopted.** | ~~Medium~~ | ~~High~~ |
-| ~~19~~ | ~~Add `CODEOWNERS` file~~ done — CI + workflows live | ~~Low~~ | ~~Low~~ |
+| #      | Task                                                                                                                  | Priority         | Effort     |
+| ------ | --------------------------------------------------------------------------------------------------------------------- | ---------------- | ---------- |
+| ~~1~~  | ~~Tag v0.3.0 release + push~~ done — v0.3.0+ tagged and pushed                                                        | ~~**Critical**~~ | ~~Low~~    |
+| ~~2~~  | ~~Update go.mod version in git/postgres submodules to v0.3.0~~ done — submodule pins ride coordinated releases        | ~~High~~         | ~~Low~~    |
+| ~~3~~  | ~~Concurrent safety tests for registries~~ done — concurrency tests + atomic snapshot                                 | ~~High~~         | ~~Low~~    |
+| ~~4~~  | ~~`FilesystemRule.Run` respect context cancellation~~ done — FilesystemRule honors ctx                                | ~~High~~         | ~~Low~~    |
+| ~~5~~  | ~~Consolidate `DiagnosticFinding` vs `DiagnosticResult` (split brain)~~ done — DiagnosticResult with Fix consolidated | ~~High~~         | ~~Medium~~ |
+| ~~6~~  | ~~Rename `DebugAgent` → `Agent` interface~~ done — resolved — DebugAgent name kept                                    | ~~Medium~~       | ~~Low~~    |
+| ~~7~~  | ~~Add `NewRejectionf`, `NewTransientf` etc. (fmt-style constructors)~~ done — New{Family}f shipped                    | ~~Medium~~       | ~~Medium~~ |
+| ~~8~~  | ~~Add `errors.Join`-aware `Compose` that returns worst family~~ done — Compose shipped then removed v0.5.0            | ~~Medium~~       | ~~Medium~~ |
+| ~~9~~  | ~~Add `Mark(err, sentinel)` for identity stamping~~ **Won't implement — declined — Mark never adopted.**              | ~~Medium~~       | ~~Medium~~ |
+| ~~10~~ | ~~Add structured logging adapter (slog integration)~~ done — LogError shipped                                         | ~~Medium~~       | ~~Medium~~ |
+| ~~11~~ | ~~Full pipeline integration test (error → classify → diagnose → handle)~~ done — full-pipeline covered                | ~~Medium~~       | ~~Medium~~ |
+| ~~12~~ | ~~Benchmark `Runner.Run` with context cancellation path~~ done — Runner benchmarks                                    | ~~Low~~          | ~~Low~~    |
+| ~~13~~ | ~~Add `Error.Format(state, verb)` for `%+v` verbose output~~ done — FuzzErrorFormatting                               | ~~Low~~          | ~~Low~~    |
+| ~~14~~ | ~~Add `Errors(err) []error` unwrapping helper~~ **Won't implement — declined — errors.Join chosen.**                  | ~~Low~~          | ~~Low~~    |
+| ~~15~~ | ~~Add `IsFamily(err, Family) bool` convenience~~ **Won't implement — declined — Classify chosen.**                    | ~~Low~~          | ~~Low~~    |
+| ~~16~~ | ~~Add `Corruption` family diagnostic rules~~ done — severity-ordered multi-error                                      | ~~Medium~~       | ~~High~~   |
+| ~~17~~ | ~~Add `Conflict` family diagnostic rules~~ done — OnDiagnosed hook                                                    | ~~Medium~~       | ~~High~~   |
+| ~~18~~ | ~~Add observability hooks (metrics, tracing)~~ **Won't implement — declined — not adopted.**                          | ~~Medium~~       | ~~High~~   |
+| ~~19~~ | ~~Add `CODEOWNERS` file~~ done — CI + workflows live                                                                  | ~~Low~~          | ~~Low~~    |
 
 ---
 
@@ -113,33 +113,33 @@ This session focused on **deduplication, CHANGELOG accuracy, and release readine
 
 Sorted by impact × effort (Pareto principle):
 
-| #  | Task                                                                                     | Impact   | Effort | Category     |
-| -- | ---------------------------------------------------------------------------------------- | -------- | ------ | ------------ |
-| ~~1~~  | ~~**Tag v0.3.0 and push**~~ done — v0.3.0+ shipped | ~~Critical~~ | ~~Low~~ | ~~Release~~ |
-| ~~2~~  | ~~Bump submodule go.mod to reference v0.3.0~~ done — pins ride coordinated releases | ~~High~~ | ~~Low~~ | ~~Release~~ |
-| ~~3~~  | ~~Create FEATURES.md with honest feature inventory~~ done — FEATURES.md exists | ~~High~~ | ~~Low~~ | ~~Docs~~ |
-| ~~4~~  | ~~Create TODO_LIST.md from this report's "NOT STARTED" list~~ done — TODO_LIST.md exists | ~~High~~ | ~~Low~~ | ~~Docs~~ |
-| ~~5~~  | ~~Concurrent safety tests for `RegisterClassification` + `RegisterTemplate`~~ done — atomic snapshot | ~~High~~ | ~~Low~~ | ~~Test~~ |
-| ~~6~~  | ~~Make `FilesystemRule.Run` respect context cancellation~~ done — ctx honored | ~~High~~ | ~~Low~~ | ~~Correctness~~ |
-| ~~7~~  | ~~Add internal test for `MockCommandRunner` to boost diagnose coverage~~ done — MockCommandRunner internal-tested | ~~Medium~~ | ~~Low~~ | ~~Test~~ |
-| ~~8~~  | ~~Consolidate `DiagnosticFinding` vs `DiagnosticResult` (split brain)~~ done — Fix struct consolidated | ~~High~~ | ~~Medium~~ | ~~Architecture~~ |
-| ~~9~~  | ~~Add Example functions for `HandleErrorWithContext`, `MockCommandRunner`, `ResolveRunner`~~ done — 26 examples | ~~Medium~~ | ~~Low~~ | ~~Docs~~ |
-| ~~10~~ | ~~Rename `DebugAgent` → `Agent` interface~~ done — resolved — name kept | ~~Medium~~ | ~~Low~~ | ~~API~~ |
-| ~~11~~ | ~~Increase `diagnose/postgres` coverage 80% → 90%~~ done — postgres 78.5% (2026-09-27); TODO target | ~~Medium~~ | ~~Medium~~ | ~~Test~~ |
-| ~~12~~ | ~~Increase `diagnose` core coverage 61.7% → 80%+~~ done — diagnose 84.2% (2026-09-27) | ~~Medium~~ | ~~Medium~~ | ~~Test~~ |
-| ~~13~~ | ~~Add full pipeline integration test~~ done — full-pipeline covered | ~~Medium~~ | ~~Medium~~ | ~~Test~~ |
-| ~~14~~ | ~~Add `NewRejectionf`, `NewTransientf` fmt-style constructors~~ done — Wrap{Family}f | ~~Medium~~ | ~~Medium~~ | ~~Feature~~ |
-| ~~15~~ | ~~Add `Compose` that returns worst family (not just `errors.Join`)~~ done — Compose removed v0.5.0 | ~~Medium~~ | ~~Medium~~ | ~~Feature~~ |
-| ~~16~~ | ~~Add `Mark(err, sentinel)` identity stamping~~ **Won't implement — declined — Mark never adopted.** | ~~Medium~~ | ~~Medium~~ | ~~Feature~~ |
-| ~~17~~ | ~~Add structured logging adapter (slog integration)~~ done — LogError shipped | ~~Medium~~ | ~~Medium~~ | ~~Feature~~ |
-| ~~18~~ | ~~Add `go build` verification for examples~~ done — examples tested in CI | ~~Medium~~ | ~~Low~~ | ~~CI~~ |
-| ~~19~~ | ~~Set up GitHub Actions CI (test + lint + coverage)~~ done — three workflows live | ~~Medium~~ | ~~Medium~~ | ~~CI~~ |
-| ~~20~~ | ~~Add `Error.Format(state, verb)` for `%+v` verbose output~~ done — Format tested | ~~Low~~ | ~~Low~~ | ~~Feature~~ |
-| ~~21~~ | ~~Add `Errors(err) []error` unwrapping helper~~ **Won't implement — declined — errors.Join chosen.** | ~~Low~~ | ~~Low~~ | ~~Feature~~ |
-| ~~22~~ | ~~Add `IsFamily(err, Family) bool` convenience~~ **Won't implement — declined — Classify chosen.** | ~~Low~~ | ~~Low~~ | ~~Feature~~ |
-| ~~23~~ | ~~Add `Corruption` family diagnostic rules~~ done — severity-ordered multi-error | ~~Medium~~ | ~~High~~ | ~~Feature~~ |
-| ~~24~~ | ~~Add `Conflict` family diagnostic rules~~ done — Conflict rules + tests | ~~Medium~~ | ~~High~~ | ~~Feature~~ |
-| ~~25~~ | ~~Add observability hooks (metrics, tracing)~~ done — OnDiagnosed hook | ~~Medium~~ | ~~High~~ | ~~Feature~~ |
+| #      | Task                                                                                                              | Impact       | Effort     | Category         |
+| ------ | ----------------------------------------------------------------------------------------------------------------- | ------------ | ---------- | ---------------- |
+| ~~1~~  | ~~**Tag v0.3.0 and push**~~ done — v0.3.0+ shipped                                                                | ~~Critical~~ | ~~Low~~    | ~~Release~~      |
+| ~~2~~  | ~~Bump submodule go.mod to reference v0.3.0~~ done — pins ride coordinated releases                               | ~~High~~     | ~~Low~~    | ~~Release~~      |
+| ~~3~~  | ~~Create FEATURES.md with honest feature inventory~~ done — FEATURES.md exists                                    | ~~High~~     | ~~Low~~    | ~~Docs~~         |
+| ~~4~~  | ~~Create TODO_LIST.md from this report's "NOT STARTED" list~~ done — TODO_LIST.md exists                          | ~~High~~     | ~~Low~~    | ~~Docs~~         |
+| ~~5~~  | ~~Concurrent safety tests for `RegisterClassification` + `RegisterTemplate`~~ done — atomic snapshot              | ~~High~~     | ~~Low~~    | ~~Test~~         |
+| ~~6~~  | ~~Make `FilesystemRule.Run` respect context cancellation~~ done — ctx honored                                     | ~~High~~     | ~~Low~~    | ~~Correctness~~  |
+| ~~7~~  | ~~Add internal test for `MockCommandRunner` to boost diagnose coverage~~ done — MockCommandRunner internal-tested | ~~Medium~~   | ~~Low~~    | ~~Test~~         |
+| ~~8~~  | ~~Consolidate `DiagnosticFinding` vs `DiagnosticResult` (split brain)~~ done — Fix struct consolidated            | ~~High~~     | ~~Medium~~ | ~~Architecture~~ |
+| ~~9~~  | ~~Add Example functions for `HandleErrorWithContext`, `MockCommandRunner`, `ResolveRunner`~~ done — 26 examples   | ~~Medium~~   | ~~Low~~    | ~~Docs~~         |
+| ~~10~~ | ~~Rename `DebugAgent` → `Agent` interface~~ done — resolved — name kept                                           | ~~Medium~~   | ~~Low~~    | ~~API~~          |
+| ~~11~~ | ~~Increase `diagnose/postgres` coverage 80% → 90%~~ done — postgres 78.5% (2026-09-27); TODO target               | ~~Medium~~   | ~~Medium~~ | ~~Test~~         |
+| ~~12~~ | ~~Increase `diagnose` core coverage 61.7% → 80%+~~ done — diagnose 84.2% (2026-09-27)                             | ~~Medium~~   | ~~Medium~~ | ~~Test~~         |
+| ~~13~~ | ~~Add full pipeline integration test~~ done — full-pipeline covered                                               | ~~Medium~~   | ~~Medium~~ | ~~Test~~         |
+| ~~14~~ | ~~Add `NewRejectionf`, `NewTransientf` fmt-style constructors~~ done — Wrap{Family}f                              | ~~Medium~~   | ~~Medium~~ | ~~Feature~~      |
+| ~~15~~ | ~~Add `Compose` that returns worst family (not just `errors.Join`)~~ done — Compose removed v0.5.0                | ~~Medium~~   | ~~Medium~~ | ~~Feature~~      |
+| ~~16~~ | ~~Add `Mark(err, sentinel)` identity stamping~~ **Won't implement — declined — Mark never adopted.**              | ~~Medium~~   | ~~Medium~~ | ~~Feature~~      |
+| ~~17~~ | ~~Add structured logging adapter (slog integration)~~ done — LogError shipped                                     | ~~Medium~~   | ~~Medium~~ | ~~Feature~~      |
+| ~~18~~ | ~~Add `go build` verification for examples~~ done — examples tested in CI                                         | ~~Medium~~   | ~~Low~~    | ~~CI~~           |
+| ~~19~~ | ~~Set up GitHub Actions CI (test + lint + coverage)~~ done — three workflows live                                 | ~~Medium~~   | ~~Medium~~ | ~~CI~~           |
+| ~~20~~ | ~~Add `Error.Format(state, verb)` for `%+v` verbose output~~ done — Format tested                                 | ~~Low~~      | ~~Low~~    | ~~Feature~~      |
+| ~~21~~ | ~~Add `Errors(err) []error` unwrapping helper~~ **Won't implement — declined — errors.Join chosen.**              | ~~Low~~      | ~~Low~~    | ~~Feature~~      |
+| ~~22~~ | ~~Add `IsFamily(err, Family) bool` convenience~~ **Won't implement — declined — Classify chosen.**                | ~~Low~~      | ~~Low~~    | ~~Feature~~      |
+| ~~23~~ | ~~Add `Corruption` family diagnostic rules~~ done — severity-ordered multi-error                                  | ~~Medium~~   | ~~High~~   | ~~Feature~~      |
+| ~~24~~ | ~~Add `Conflict` family diagnostic rules~~ done — Conflict rules + tests                                          | ~~Medium~~   | ~~High~~   | ~~Feature~~      |
+| ~~25~~ | ~~Add observability hooks (metrics, tracing)~~ done — OnDiagnosed hook                                            | ~~Medium~~   | ~~High~~   | ~~Feature~~      |
 
 ---
 

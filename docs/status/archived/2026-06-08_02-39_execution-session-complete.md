@@ -69,33 +69,33 @@
 
 ## C) NOT STARTED ⬜
 
-| #  | Item                                                                   | Effort  | Impact                         |
-| -- | ---------------------------------------------------------------------- | ------- | ------------------------------ |
-| ~~1~~  | ~~Fix `NetworkRule.resolveHost` to check `KeyURL`/`KeyAddress`~~ done — resolveHost checks KeyURL/KeyAddress | ~~Small~~ | ~~Medium (bug)~~ |
-| ~~2~~  | ~~Fix `stripHost` for IPv6 using `net.SplitHostPort`~~ done — SplitHostPort IPv6 handling | ~~Small~~ | ~~Medium (bug)~~ |
-| ~~3~~  | ~~Fix `PostgresRule.resolveHost` to parse `KeyDatabaseURL`~~ done — KeyDatabaseURL parsed | ~~Small~~ | ~~Medium (bug)~~ |
-| ~~4~~  | ~~Update submodule go.mod files to reference new version~~ done — pins ride coordinated releases | ~~Trivial~~ | ~~Medium (publishing)~~ |
-| ~~5~~  | ~~Add `go test -coverprofile` to CI with 70% threshold~~ done — BuildFlow coverage gates | ~~Small~~ | ~~Medium (regression protection)~~ |
-| ~~6~~  | ~~`agent` coverage: `looksLikeCommand` at 62.5%~~ done — looksLikeCommand covered | ~~Small~~ | ~~Low~~ |
-| ~~7~~  | ~~`diagnose` coverage: `handleStatError` at 37.5% (generic stat error)~~ done — handleStatError covered | ~~Small~~ | ~~Low~~ |
-| ~~8~~  | ~~`diagnose` coverage: `DefaultCommandRunner.Run/Exists` at 0%~~ done — DefaultCommandRunner covered | ~~Small~~ | ~~Low~~ |
-| ~~9~~  | ~~`diagnose` coverage: `MockCommandRunner` methods at 0%~~ done — MockCommandRunner covered | ~~Small~~ | ~~Low~~ |
-| ~~10~~ | ~~Deduplicate string constants across submodules~~ done — constants deduplicated (strTrue/strFalse accepted dup documented) | ~~Medium~~ | ~~Low~~ |
-| ~~11~~ | ~~`Error.WithTimestamp` test (currently 0% coverage)~~ done — WithTimestamp tested | ~~Trivial~~ | ~~Low~~ |
-| ~~12~~ | ~~`Error.Format` verbose path more complete test (85.7%)~~ done — FuzzErrorFormatting covers verbose | ~~Small~~ | ~~Low~~ |
-| ~~13~~ | ~~Add `httptest`-based test for HTTP example~~ done — httptest tests in examples | ~~Medium~~ | ~~Low~~ |
-| ~~14~~ | ~~Bridge submodule benchmarks~~ done — bridge benchmarks verified | ~~Small~~ | ~~Low~~ |
-| ~~15~~ | ~~`Tone` as int-based enum with `IsValid()`~~ **Won't implement — declined — Tone stays string.** | ~~Medium~~ | ~~Low~~ |
-| ~~16~~ | ~~Move `HandleError` to `cli` package (kill `any` in interface)~~ **Won't implement — declined — HandleError stays in root (flat policy).** | ~~Large~~ | ~~Medium (architectural)~~ |
-| ~~17~~ | ~~`ClassifiedError` pointer-embed `*oops.OopsError`~~ done — resolved — value-embed kept; guards documented | ~~Large~~ | ~~Medium (breaking)~~ |
-| ~~18~~ | ~~Tag v0.4.0 or v1.0.0 release~~ done — tagged (v0.4.0+) | ~~Trivial~~ | ~~High~~ |
-| ~~19~~ | ~~Remove `result` from git tracking (already in .gitignore)~~ done — result untracked | ~~Trivial~~ | ~~Low~~ |
-| ~~20~~ | ~~Add `Family.UnmarshalJSON` for REST API consumers~~ **Won't implement — declined — TextMarshaler chosen.** | ~~Small~~ | ~~Low~~ |
-| ~~21~~ | ~~Write CONTRIBUTING.md update with `//nolint` convention~~ done — CONTRIBUTING nolint section | ~~Small~~ | ~~Low~~ |
-| ~~22~~ | ~~Add `DiagnosticResult.Duration` to `HandleResult` output~~ done — Duration in Details map | ~~Small~~ | ~~Low~~ |
-| ~~23~~ | ~~Consider `errors.Join` multi-error support in `HandleErrorWithContext`~~ done — worst-severity Join classification | ~~Medium~~ | ~~Medium~~ |
-| ~~24~~ | ~~Add `Family.GoString()` for `fmt.Printf("%#v")`~~ **Won't implement — declined — GoString not adopted.** | ~~Trivial~~ | ~~Low~~ |
-| ~~25~~ | ~~Evaluate `modernize` linter for Go 1.26 idioms~~ done — resolved — modernize handled via BuildFlow + erraudit | ~~Small~~ | ~~Low~~ |
+| #      | Item                                                                                                                                        | Effort      | Impact                             |
+| ------ | ------------------------------------------------------------------------------------------------------------------------------------------- | ----------- | ---------------------------------- |
+| ~~1~~  | ~~Fix `NetworkRule.resolveHost` to check `KeyURL`/`KeyAddress`~~ done — resolveHost checks KeyURL/KeyAddress                                | ~~Small~~   | ~~Medium (bug)~~                   |
+| ~~2~~  | ~~Fix `stripHost` for IPv6 using `net.SplitHostPort`~~ done — SplitHostPort IPv6 handling                                                   | ~~Small~~   | ~~Medium (bug)~~                   |
+| ~~3~~  | ~~Fix `PostgresRule.resolveHost` to parse `KeyDatabaseURL`~~ done — KeyDatabaseURL parsed                                                   | ~~Small~~   | ~~Medium (bug)~~                   |
+| ~~4~~  | ~~Update submodule go.mod files to reference new version~~ done — pins ride coordinated releases                                            | ~~Trivial~~ | ~~Medium (publishing)~~            |
+| ~~5~~  | ~~Add `go test -coverprofile` to CI with 70% threshold~~ done — BuildFlow coverage gates                                                    | ~~Small~~   | ~~Medium (regression protection)~~ |
+| ~~6~~  | ~~`agent` coverage: `looksLikeCommand` at 62.5%~~ done — looksLikeCommand covered                                                           | ~~Small~~   | ~~Low~~                            |
+| ~~7~~  | ~~`diagnose` coverage: `handleStatError` at 37.5% (generic stat error)~~ done — handleStatError covered                                     | ~~Small~~   | ~~Low~~                            |
+| ~~8~~  | ~~`diagnose` coverage: `DefaultCommandRunner.Run/Exists` at 0%~~ done — DefaultCommandRunner covered                                        | ~~Small~~   | ~~Low~~                            |
+| ~~9~~  | ~~`diagnose` coverage: `MockCommandRunner` methods at 0%~~ done — MockCommandRunner covered                                                 | ~~Small~~   | ~~Low~~                            |
+| ~~10~~ | ~~Deduplicate string constants across submodules~~ done — constants deduplicated (strTrue/strFalse accepted dup documented)                 | ~~Medium~~  | ~~Low~~                            |
+| ~~11~~ | ~~`Error.WithTimestamp` test (currently 0% coverage)~~ done — WithTimestamp tested                                                          | ~~Trivial~~ | ~~Low~~                            |
+| ~~12~~ | ~~`Error.Format` verbose path more complete test (85.7%)~~ done — FuzzErrorFormatting covers verbose                                        | ~~Small~~   | ~~Low~~                            |
+| ~~13~~ | ~~Add `httptest`-based test for HTTP example~~ done — httptest tests in examples                                                            | ~~Medium~~  | ~~Low~~                            |
+| ~~14~~ | ~~Bridge submodule benchmarks~~ done — bridge benchmarks verified                                                                           | ~~Small~~   | ~~Low~~                            |
+| ~~15~~ | ~~`Tone` as int-based enum with `IsValid()`~~ **Won't implement — declined — Tone stays string.**                                           | ~~Medium~~  | ~~Low~~                            |
+| ~~16~~ | ~~Move `HandleError` to `cli` package (kill `any` in interface)~~ **Won't implement — declined — HandleError stays in root (flat policy).** | ~~Large~~   | ~~Medium (architectural)~~         |
+| ~~17~~ | ~~`ClassifiedError` pointer-embed `*oops.OopsError`~~ done — resolved — value-embed kept; guards documented                                 | ~~Large~~   | ~~Medium (breaking)~~              |
+| ~~18~~ | ~~Tag v0.4.0 or v1.0.0 release~~ done — tagged (v0.4.0+)                                                                                    | ~~Trivial~~ | ~~High~~                           |
+| ~~19~~ | ~~Remove `result` from git tracking (already in .gitignore)~~ done — result untracked                                                       | ~~Trivial~~ | ~~Low~~                            |
+| ~~20~~ | ~~Add `Family.UnmarshalJSON` for REST API consumers~~ **Won't implement — declined — TextMarshaler chosen.**                                | ~~Small~~   | ~~Low~~                            |
+| ~~21~~ | ~~Write CONTRIBUTING.md update with `//nolint` convention~~ done — CONTRIBUTING nolint section                                              | ~~Small~~   | ~~Low~~                            |
+| ~~22~~ | ~~Add `DiagnosticResult.Duration` to `HandleResult` output~~ done — Duration in Details map                                                 | ~~Small~~   | ~~Low~~                            |
+| ~~23~~ | ~~Consider `errors.Join` multi-error support in `HandleErrorWithContext`~~ done — worst-severity Join classification                        | ~~Medium~~  | ~~Medium~~                         |
+| ~~24~~ | ~~Add `Family.GoString()` for `fmt.Printf("%#v")`~~ **Won't implement — declined — GoString not adopted.**                                  | ~~Trivial~~ | ~~Low~~                            |
+| ~~25~~ | ~~Evaluate `modernize` linter for Go 1.26 idioms~~ done — resolved — modernize handled via BuildFlow + erraudit                             | ~~Small~~   | ~~Low~~                            |
 
 ---
 
@@ -141,48 +141,48 @@ Sorted by impact × effort (Pareto order):
 
 ### Tier 1: Bugs + High Impact, Low Effort (do immediately)
 
-| # | Task                                                         | Why                                                   | Effort |
-| - | ------------------------------------------------------------ | ----------------------------------------------------- | ------ |
-| ~~1~~ | ~~Fix `NetworkRule.resolveHost` to check `KeyURL`/`KeyAddress`~~ done — KeyURL/KeyAddress checked | ~~Rule matches but can't resolve host — bug~~ | ~~2 min~~ |
-| ~~2~~ | ~~Fix `stripHost` for IPv6 using `net.SplitHostPort`~~ done — IPv6 handled | ~~Bare `::1` breaks host extraction — bug~~ | ~~5 min~~ |
-| ~~3~~ | ~~Fix `PostgresRule.resolveHost` to parse `database_url`~~ done — database_url parsed | ~~Only `database_url` context → default host:port — bug~~ | ~~10 min~~ |
-| ~~4~~ | ~~Tag v0.4.0 release (breaking change: agent disabled)~~ done — tagged | ~~9 commits of improvements, one breaking change~~ | ~~2 min~~ |
-| ~~5~~ | ~~Update submodule go.mod to new version after release~~ done — pins ride releases | ~~Consumers get stale v0.3.0 without workspace~~ | ~~5 min~~ |
+| #     | Task                                                                                              | Why                                                       | Effort     |
+| ----- | ------------------------------------------------------------------------------------------------- | --------------------------------------------------------- | ---------- |
+| ~~1~~ | ~~Fix `NetworkRule.resolveHost` to check `KeyURL`/`KeyAddress`~~ done — KeyURL/KeyAddress checked | ~~Rule matches but can't resolve host — bug~~             | ~~2 min~~  |
+| ~~2~~ | ~~Fix `stripHost` for IPv6 using `net.SplitHostPort`~~ done — IPv6 handled                        | ~~Bare `::1` breaks host extraction — bug~~               | ~~5 min~~  |
+| ~~3~~ | ~~Fix `PostgresRule.resolveHost` to parse `database_url`~~ done — database_url parsed             | ~~Only `database_url` context → default host:port — bug~~ | ~~10 min~~ |
+| ~~4~~ | ~~Tag v0.4.0 release (breaking change: agent disabled)~~ done — tagged                            | ~~9 commits of improvements, one breaking change~~        | ~~2 min~~  |
+| ~~5~~ | ~~Update submodule go.mod to new version after release~~ done — pins ride releases                | ~~Consumers get stale v0.3.0 without workspace~~          | ~~5 min~~  |
 
 ### Tier 2: High Impact, Medium Effort (do this week)
 
-| #  | Task                                                     | Why                                    | Effort |
-| -- | -------------------------------------------------------- | -------------------------------------- | ------ |
-| ~~6~~  | ~~Add `go test -coverprofile` to CI with 70% threshold~~ done — BuildFlow coverage gates | ~~Coverage regression protection~~ | ~~5 min~~ |
-| ~~7~~  | ~~Add `Error.WithTimestamp` test (0% → 100%)~~ done — tested | ~~Dead-simple, closes gap~~ | ~~2 min~~ |
-| ~~8~~  | ~~Add more `extractCommand` test cases for agent coverage~~ done — covered | ~~`looksLikeCommand` at 62.5%~~ | ~~5 min~~ |
-| ~~9~~  | ~~Add `handleStatError` generic stat error test~~ done — covered | ~~37.5% → 100%~~ | ~~5 min~~ |
+| #      | Task                                                                                         | Why                                        | Effort     |
+| ------ | -------------------------------------------------------------------------------------------- | ------------------------------------------ | ---------- |
+| ~~6~~  | ~~Add `go test -coverprofile` to CI with 70% threshold~~ done — BuildFlow coverage gates     | ~~Coverage regression protection~~         | ~~5 min~~  |
+| ~~7~~  | ~~Add `Error.WithTimestamp` test (0% → 100%)~~ done — tested                                 | ~~Dead-simple, closes gap~~                | ~~2 min~~  |
+| ~~8~~  | ~~Add more `extractCommand` test cases for agent coverage~~ done — covered                   | ~~`looksLikeCommand` at 62.5%~~            | ~~5 min~~  |
+| ~~9~~  | ~~Add `handleStatError` generic stat error test~~ done — covered                             | ~~37.5% → 100%~~                           | ~~5 min~~  |
 | ~~10~~ | ~~Add `DiagnosticResult.Duration` to `HandleResult` output~~ done — Details carries Duration | ~~Duration is collected but not surfaced~~ | ~~15 min~~ |
 
 ### Tier 3: Medium Impact, Medium Effort (do this month)
 
-| #  | Task                                                           | Why                                                             | Effort |
-| -- | -------------------------------------------------------------- | --------------------------------------------------------------- | ------ |
-| ~~11~~ | ~~Add `httptest`-based test for HTTP example~~ done — httptest in examples | ~~Validate the HTTP integration pattern works~~ | ~~30 min~~ |
-| ~~12~~ | ~~Consider `errors.Join` multi-error in `HandleErrorWithContext`~~ done — worst-severity Join | ~~Classify handles it but HandleError doesn't surface individuals~~ | ~~1 hr~~ |
-| ~~13~~ | ~~Write CONTRIBUTING.md update with `//nolint` convention~~ done — CONTRIBUTING section | ~~Contributors need to know the pattern~~ | ~~15 min~~ |
-| ~~14~~ | ~~Add `Family.UnmarshalJSON` for REST API consumers~~ **Won't implement — declined — TextMarshaler chosen.** | ~~JSON request/response with Family fields~~ | ~~30 min~~ |
-| ~~15~~ | ~~Evaluate `modernize` linter for Go 1.26 idioms~~ done — resolved — via BuildFlow + erraudit instead | ~~May catch non-idiomatic patterns~~ | ~~15 min~~ |
+| #      | Task                                                                                                         | Why                                                                 | Effort     |
+| ------ | ------------------------------------------------------------------------------------------------------------ | ------------------------------------------------------------------- | ---------- |
+| ~~11~~ | ~~Add `httptest`-based test for HTTP example~~ done — httptest in examples                                   | ~~Validate the HTTP integration pattern works~~                     | ~~30 min~~ |
+| ~~12~~ | ~~Consider `errors.Join` multi-error in `HandleErrorWithContext`~~ done — worst-severity Join                | ~~Classify handles it but HandleError doesn't surface individuals~~ | ~~1 hr~~   |
+| ~~13~~ | ~~Write CONTRIBUTING.md update with `//nolint` convention~~ done — CONTRIBUTING section                      | ~~Contributors need to know the pattern~~                           | ~~15 min~~ |
+| ~~14~~ | ~~Add `Family.UnmarshalJSON` for REST API consumers~~ **Won't implement — declined — TextMarshaler chosen.** | ~~JSON request/response with Family fields~~                        | ~~30 min~~ |
+| ~~15~~ | ~~Evaluate `modernize` linter for Go 1.26 idioms~~ done — resolved — via BuildFlow + erraudit instead        | ~~May catch non-idiomatic patterns~~                                | ~~15 min~~ |
 
 ### Tier 4: Strategic / Architectural (plan carefully)
 
-| #  | Task                                              | Why                                                | Effort           |
-| -- | ------------------------------------------------- | -------------------------------------------------- | ---------------- |
-| ~~16~~ | ~~Move `HandleError` to `cli` package~~ **Won't implement — declined — flat policy keeps HandleError in root.** | ~~Kill `any` return, proper package split~~ | ~~2 hr + migration~~ |
-| ~~17~~ | ~~`ClassifiedError` pointer-embed `*oops.OopsError`~~ done — resolved — value-embed kept; guards documented | ~~More defensive, but API-breaking~~ | ~~2 hr + migration~~ |
-| ~~18~~ | ~~`Tone` as int-based enum with `IsValid()`~~ **Won't implement — declined — Tone stays string.** | ~~String-based Tone can't have range validation~~ | ~~30 min~~ |
-| ~~19~~ | ~~Deduplicate string constants across submodules~~ done — strTrue/strFalse accepted dup (2026-09-22) | ~~Export from shared package or accept as documented~~ | ~~1 hr~~ |
-| ~~20~~ | ~~Add `Family.GoString()` for `fmt.Printf("%#v")`~~ **Won't implement — declined — not adopted.** | ~~Debugging convenience~~ | ~~5 min~~ |
-| ~~21~~ | ~~Bridge submodule benchmarks~~ done — bridge benchmarks verified | ~~Verify no performance regression~~ | ~~15 min~~ |
-| ~~22~~ | ~~DefaultCommandRunner integration test~~ done — DefaultCommandRunner covered | ~~0% coverage on thin exec wrapper~~ | ~~15 min~~ |
-| ~~23~~ | ~~MockCommandRunner method coverage~~ done — MockCommandRunner covered | ~~0% — used by submodules but not directly tested~~ | ~~10 min~~ |
-| ~~24~~ | ~~Error.Format verbose path more complete test~~ done — FuzzErrorFormatting | ~~85.7% — edge case with empty context~~ | ~~5 min~~ |
-| ~~25~~ | ~~Add `ParseTone` function (mirrors `ParseFamily`)~~ **Won't implement — declined — ParseTone not needed.** | ~~API completeness for all enums~~ | ~~5 min~~ |
+| #      | Task                                                                                                            | Why                                                    | Effort               |
+| ------ | --------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------ | -------------------- |
+| ~~16~~ | ~~Move `HandleError` to `cli` package~~ **Won't implement — declined — flat policy keeps HandleError in root.** | ~~Kill `any` return, proper package split~~            | ~~2 hr + migration~~ |
+| ~~17~~ | ~~`ClassifiedError` pointer-embed `*oops.OopsError`~~ done — resolved — value-embed kept; guards documented     | ~~More defensive, but API-breaking~~                   | ~~2 hr + migration~~ |
+| ~~18~~ | ~~`Tone` as int-based enum with `IsValid()`~~ **Won't implement — declined — Tone stays string.**               | ~~String-based Tone can't have range validation~~      | ~~30 min~~           |
+| ~~19~~ | ~~Deduplicate string constants across submodules~~ done — strTrue/strFalse accepted dup (2026-09-22)            | ~~Export from shared package or accept as documented~~ | ~~1 hr~~             |
+| ~~20~~ | ~~Add `Family.GoString()` for `fmt.Printf("%#v")`~~ **Won't implement — declined — not adopted.**               | ~~Debugging convenience~~                              | ~~5 min~~            |
+| ~~21~~ | ~~Bridge submodule benchmarks~~ done — bridge benchmarks verified                                               | ~~Verify no performance regression~~                   | ~~15 min~~           |
+| ~~22~~ | ~~DefaultCommandRunner integration test~~ done — DefaultCommandRunner covered                                   | ~~0% coverage on thin exec wrapper~~                   | ~~15 min~~           |
+| ~~23~~ | ~~MockCommandRunner method coverage~~ done — MockCommandRunner covered                                          | ~~0% — used by submodules but not directly tested~~    | ~~10 min~~           |
+| ~~24~~ | ~~Error.Format verbose path more complete test~~ done — FuzzErrorFormatting                                     | ~~85.7% — edge case with empty context~~               | ~~5 min~~            |
+| ~~25~~ | ~~Add `ParseTone` function (mirrors `ParseFamily`)~~ **Won't implement — declined — ParseTone not needed.**     | ~~API completeness for all enums~~                     | ~~5 min~~            |
 
 ---
 

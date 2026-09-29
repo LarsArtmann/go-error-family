@@ -57,13 +57,13 @@ examples/             ← OWN MODULE: runnable examples (depends on root + diagn
 
 ## The Six Families
 
-| Family           | Retry?  | Exit | Whose fault | Audience | Tone          | When                                             |
-| ---------------- | ------- | ---- | ----------- | -------- | ------------- | ------------------------------------------------ |
-| `Rejection`      | No      | 1    | User        | User     | Instructional | Bad input, unauthorized, not found               |
-| `Conflict`       | No      | 1    | User        | User     | Explanatory   | Version mismatch, duplicate, state clash         |
-| `Transient`      | **Yes** | 75   | System      | All      | Reassuring    | Temporary infra failure (the only retryable one) |
-| `Corruption`     | No      | 65   | System      | Ops      | Urgent        | Source of truth damaged, unparseable data        |
-| `Infrastructure` | No      | 69   | System      | Ops      | Apologetic    | System cannot serve, nil deps, startup fail      |
+| Family           | Retry?  | Exit | Whose fault | Audience | Tone          | When                                                        |
+| ---------------- | ------- | ---- | ----------- | -------- | ------------- | ----------------------------------------------------------- |
+| `Rejection`      | No      | 1    | User        | User     | Instructional | Bad input, unauthorized, not found                          |
+| `Conflict`       | No      | 1    | User        | User     | Explanatory   | Version mismatch, duplicate, state clash                    |
+| `Transient`      | **Yes** | 75   | System      | All      | Reassuring    | Temporary infra failure (the only retryable one)            |
+| `Corruption`     | No      | 65   | System      | Ops      | Urgent        | Source of truth damaged, unparseable data                   |
+| `Infrastructure` | No      | 69   | System      | Ops      | Apologetic    | System cannot serve, nil deps, startup fail                 |
 | `Orchestration`  | No      | 70   | Program     | Ops      | Apologetic    | Internal coordination failure — the program's own logic bug |
 
 Only `Transient` is retryable. Everything else is not. This is the core design decision.

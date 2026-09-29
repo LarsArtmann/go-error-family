@@ -202,58 +202,58 @@ Build is clean. Tests pass. No compile errors. No panics.
 
 ### Critical — Quality (Do First)
 
-| # | Task                                                                    | Effort | Impact                               |
-| - | ----------------------------------------------------------------------- | ------ | ------------------------------------ |
-| ~~1~~ | ~~Write diagnose package tests (FilesystemRule with temp dirs)~~ done — diagnose fully tested | ~~2h~~ | ~~Rules are currently untested~~ |
-| ~~2~~ | ~~Fix all LSP hints/warnings (unused funcs, string hints)~~ done — resolved long ago | ~~30min~~ | ~~Code hygiene~~ |
-| ~~3~~ | ~~Write agent package tests (involvement levels, deterministic analysis)~~ done — agent at 100% coverage | ~~1h~~ | ~~Agent is untested~~ |
-| ~~4~~ | ~~Write HandleError tests (all families, templates, context substitution)~~ done — handle.go fully tested | ~~1h~~ | ~~CLI handler is untested~~ |
-| ~~5~~ | ~~Wire HandleError to diagnostic runner~~ done — DiagnosticFunc wiring shipped | ~~30min~~ | ~~Two systems don't talk to each other~~ |
+| #     | Task                                                                                                      | Effort    | Impact                                   |
+| ----- | --------------------------------------------------------------------------------------------------------- | --------- | ---------------------------------------- |
+| ~~1~~ | ~~Write diagnose package tests (FilesystemRule with temp dirs)~~ done — diagnose fully tested             | ~~2h~~    | ~~Rules are currently untested~~         |
+| ~~2~~ | ~~Fix all LSP hints/warnings (unused funcs, string hints)~~ done — resolved long ago                      | ~~30min~~ | ~~Code hygiene~~                         |
+| ~~3~~ | ~~Write agent package tests (involvement levels, deterministic analysis)~~ done — agent at 100% coverage  | ~~1h~~    | ~~Agent is untested~~                    |
+| ~~4~~ | ~~Write HandleError tests (all families, templates, context substitution)~~ done — handle.go fully tested | ~~1h~~    | ~~CLI handler is untested~~              |
+| ~~5~~ | ~~Wire HandleError to diagnostic runner~~ done — DiagnosticFunc wiring shipped                            | ~~30min~~ | ~~Two systems don't talk to each other~~ |
 
 ### High — Testability
 
-| # | Task                                                        | Effort | Impact                       |
-| - | ----------------------------------------------------------- | ------ | ---------------------------- |
-| ~~6~~ | ~~Extract CommandRunner interface for diagnose rules~~ done — CommandRunner interface shipped | ~~1h~~ | ~~Makes all rules mockable~~ |
+| #     | Task                                                                                                                                  | Effort    | Impact                           |
+| ----- | ------------------------------------------------------------------------------------------------------------------------------------- | --------- | -------------------------------- |
+| ~~6~~ | ~~Extract CommandRunner interface for diagnose rules~~ done — CommandRunner interface shipped                                         | ~~1h~~    | ~~Makes all rules mockable~~     |
 | ~~7~~ | ~~Add ConnectionTester interface for PostgresRule/NetworkRule~~ **Won't implement — declined — subsumed by NetworkRule dial checks.** | ~~30min~~ | ~~Makes network rules mockable~~ |
-| ~~8~~ | ~~Write PostgresRule integration test with mock server~~ done — PostgresRule mock-tested | ~~1h~~ | ~~Validates pg_isready logic~~ |
-| ~~9~~ | ~~Write GitRule integration test with temp repos~~ done — GitRule temp-repo-tested | ~~1h~~ | ~~Validates git status logic~~ |
+| ~~8~~ | ~~Write PostgresRule integration test with mock server~~ done — PostgresRule mock-tested                                              | ~~1h~~    | ~~Validates pg_isready logic~~   |
+| ~~9~~ | ~~Write GitRule integration test with temp repos~~ done — GitRule temp-repo-tested                                                    | ~~1h~~    | ~~Validates git status logic~~   |
 
 ### High — Ecosystem Integration
 
-| #  | Task                                                          | Effort | Impact                             |
-| -- | ------------------------------------------------------------- | ------ | ---------------------------------- |
-| ~~10~~ | ~~Push repo to GitHub~~ done — public on GitHub | ~~15min~~ | ~~Importable by consumers~~ |
-| ~~11~~ | ~~Tag v0.1.0-alpha~~ done — v0.1.0+ shipped; v0.10.2 latest | ~~5min~~ | ~~Signals API stability expectations~~ |
-| ~~12~~ | ~~Add go-error-family to docs/LIBRARY_GUIDE.md~~ **Won't implement — declined — superseded by README + SKILL.md.** | ~~30min~~ | ~~Discoverability~~ |
-| ~~13~~ | ~~Add go-error-family to projects-management-automation go.work~~ done — go.work in place | ~~15min~~ | ~~Workspace integration~~ |
+| #      | Task                                                                                                               | Effort    | Impact                                 |
+| ------ | ------------------------------------------------------------------------------------------------------------------ | --------- | -------------------------------------- |
+| ~~10~~ | ~~Push repo to GitHub~~ done — public on GitHub                                                                    | ~~15min~~ | ~~Importable by consumers~~            |
+| ~~11~~ | ~~Tag v0.1.0-alpha~~ done — v0.1.0+ shipped; v0.10.2 latest                                                        | ~~5min~~  | ~~Signals API stability expectations~~ |
+| ~~12~~ | ~~Add go-error-family to docs/LIBRARY_GUIDE.md~~ **Won't implement — declined — superseded by README + SKILL.md.** | ~~30min~~ | ~~Discoverability~~                    |
+| ~~13~~ | ~~Add go-error-family to projects-management-automation go.work~~ done — go.work in place                          | ~~15min~~ | ~~Workspace integration~~              |
 
 ### Medium — Feature Completeness
 
-| #  | Task                                                     | Effort | Impact                                    |
-| -- | -------------------------------------------------------- | ------ | ----------------------------------------- |
-| ~~14~~ | ~~Add `Mark(err, sentinel)` function~~ **Won't implement — declined — Classify + RegisterClassification cover it; never adopted.** | ~~30min~~ | ~~Identity stamping without global registry~~ |
-| ~~15~~ | ~~Add golangci.yml configuration~~ done — .golangci.yml curated | ~~30min~~ | ~~Consistent linting~~ |
-| ~~16~~ | ~~Write ADR-001: Why Family int over string categories~~ **Won't implement — declined — rationale lives in README + code comments.** | ~~30min~~ | ~~Architecture documentation~~ |
-| ~~17~~ | ~~Add Nix flake.nix for build/test automation~~ done — flake.nix in place | ~~1h~~ | ~~Ecosystem standard~~ |
-| ~~18~~ | ~~Add CI pipeline (GitHub Actions: build, test, vet, lint)~~ done — ci.yml + release.yml + website-deploy.yml | ~~1h~~ | ~~Automated quality gates~~ |
+| #      | Task                                                                                                                                 | Effort    | Impact                                        |
+| ------ | ------------------------------------------------------------------------------------------------------------------------------------ | --------- | --------------------------------------------- |
+| ~~14~~ | ~~Add `Mark(err, sentinel)` function~~ **Won't implement — declined — Classify + RegisterClassification cover it; never adopted.**   | ~~30min~~ | ~~Identity stamping without global registry~~ |
+| ~~15~~ | ~~Add golangci.yml configuration~~ done — .golangci.yml curated                                                                      | ~~30min~~ | ~~Consistent linting~~                        |
+| ~~16~~ | ~~Write ADR-001: Why Family int over string categories~~ **Won't implement — declined — rationale lives in README + code comments.** | ~~30min~~ | ~~Architecture documentation~~                |
+| ~~17~~ | ~~Add Nix flake.nix for build/test automation~~ done — flake.nix in place                                                            | ~~1h~~    | ~~Ecosystem standard~~                        |
+| ~~18~~ | ~~Add CI pipeline (GitHub Actions: build, test, vet, lint)~~ done — ci.yml + release.yml + website-deploy.yml                        | ~~1h~~    | ~~Automated quality gates~~                   |
 
 ### Medium — First Consumer Migration
 
-| #  | Task                                                             | Effort | Impact                    |
-| -- | ---------------------------------------------------------------- | ------ | ------------------------- |
-| ~~19~~ | ~~Migrate go-cqrs-lite: import go-error-family for Family/Classify~~ **Won't implement — declined — the library pivoted to standalone go-error-family.** | ~~2h~~ | ~~Proves the protocol works~~ |
-| ~~20~~ | ~~Add interfaces to docs-organizer (Is, ErrorCode, ErrorContext)~~ **Won't implement — declined — out of scope for the error protocol.** | ~~30min~~ | ~~Second consumer~~ |
-| ~~21~~ | ~~Add interfaces to go-finding (ErrorCode, ErrorContext)~~ **Won't implement — declined — out of scope for the error protocol.** | ~~30min~~ | ~~Third consumer~~ |
+| #      | Task                                                                                                                                                     | Effort    | Impact                        |
+| ------ | -------------------------------------------------------------------------------------------------------------------------------------------------------- | --------- | ----------------------------- |
+| ~~19~~ | ~~Migrate go-cqrs-lite: import go-error-family for Family/Classify~~ **Won't implement — declined — the library pivoted to standalone go-error-family.** | ~~2h~~    | ~~Proves the protocol works~~ |
+| ~~20~~ | ~~Add interfaces to docs-organizer (Is, ErrorCode, ErrorContext)~~ **Won't implement — declined — out of scope for the error protocol.**                 | ~~30min~~ | ~~Second consumer~~           |
+| ~~21~~ | ~~Add interfaces to go-finding (ErrorCode, ErrorContext)~~ **Won't implement — declined — out of scope for the error protocol.**                         | ~~30min~~ | ~~Third consumer~~            |
 
 ### Lower — Polish
 
-| #  | Task                                                    | Effort | Impact               |
-| -- | ------------------------------------------------------- | ------ | -------------------- |
-| ~~22~~ | ~~Wire AI agent to a real provider (Crush SDK or OpenAI)~~ **Won't implement — declined — agent is analysis-only by design.** | ~~3h~~ | ~~Agent actually works~~ |
-| ~~23~~ | ~~Add message template overrides for common error codes~~ done — HandleConfig.TemplateOverride | ~~1h~~ | ~~Better default UX~~ |
-| ~~24~~ | ~~Add IsPostgresRunning standalone helper to go-cqrs-lite~~ done — IsPostgresRunning in diagnose/postgres | ~~15min~~ | ~~Useful utility~~ |
-| ~~25~~ | ~~Write examples/ directory with runnable Go examples~~ done — examples/ module with 5 demos | ~~1h~~ | ~~GoDoc integration~~ |
+| #      | Task                                                                                                                          | Effort    | Impact                   |
+| ------ | ----------------------------------------------------------------------------------------------------------------------------- | --------- | ------------------------ |
+| ~~22~~ | ~~Wire AI agent to a real provider (Crush SDK or OpenAI)~~ **Won't implement — declined — agent is analysis-only by design.** | ~~3h~~    | ~~Agent actually works~~ |
+| ~~23~~ | ~~Add message template overrides for common error codes~~ done — HandleConfig.TemplateOverride                                | ~~1h~~    | ~~Better default UX~~    |
+| ~~24~~ | ~~Add IsPostgresRunning standalone helper to go-cqrs-lite~~ done — IsPostgresRunning in diagnose/postgres                     | ~~15min~~ | ~~Useful utility~~       |
+| ~~25~~ | ~~Write examples/ directory with runnable Go examples~~ done — examples/ module with 5 demos                                  | ~~1h~~    | ~~GoDoc integration~~    |
 
 ---
 

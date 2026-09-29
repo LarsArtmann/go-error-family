@@ -128,17 +128,17 @@ No `Backoff(attempt int) time.Duration` method, no jitter guidance, no "next del
 
 Carried over from the original plan as "decision-gated" or deprioritized. Listing for completeness.
 
-| # | Item                                                              | Why not started                                           |
-| - | ----------------------------------------------------------------- | --------------------------------------------------------- |
-| ~~1~~ | ~~Rename `agent` package (RCA / Synthesizer / DiagnosticAnalyzer)~~ done — resolved — RCA naming rejected; DebugAgent kept | ~~User explicitly deferred for design discussion.~~ |
-| ~~2~~ | ~~Tag root module v1.0~~ **Won't implement — declined — stays 0.x by choice.** | ~~User: "ignore version numbers".~~ |
-| ~~3~~ | ~~Publish root version deleting `agent/` and `diagnose/` dirs~~ **Won't implement — declined — submodules stay in-repo.** | ~~Depends on #2.~~ |
-| ~~4~~ | ~~Remove replace-directive chain~~ done — resolved — real pins replaced the replace chain (2026-07-05) | ~~Depends on #3.~~ |
-| ~~5~~ | ~~`errors.Join` pre-classifying wrapper returning `(error, Family)`~~ done — resolved — errors.Join + Classify chosen instead | ~~Marked YAGNI in plan.~~ |
-| ~~6~~ | ~~i18n hook for `familyData` messages~~ **Won't implement — declined — i18n never demanded.** | ~~No current consumer.~~ |
-| ~~7~~ | ~~Shorter import alias (`errfam`)~~ **Won't implement — declined — errorfamily alias not adopted.** | ~~Cosmetic, breaking.~~ |
-| ~~8~~ | ~~Lower Go 1.26 requirement (the `errors.AsType` dep)~~ done — resolved — Go 1.26 floor is toolchain-driven | ~~I flagged this CONTRA, then silently accepted it. See d2.~~ |
-| ~~9~~ | ~~CONTRIBUTING.md section on the Registry pattern~~ done — CONTRIBUTING Registry pattern section | ~~Skipped.~~ |
+| #     | Item                                                                                                                          | Why not started                                               |
+| ----- | ----------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------- |
+| ~~1~~ | ~~Rename `agent` package (RCA / Synthesizer / DiagnosticAnalyzer)~~ done — resolved — RCA naming rejected; DebugAgent kept    | ~~User explicitly deferred for design discussion.~~           |
+| ~~2~~ | ~~Tag root module v1.0~~ **Won't implement — declined — stays 0.x by choice.**                                                | ~~User: "ignore version numbers".~~                           |
+| ~~3~~ | ~~Publish root version deleting `agent/` and `diagnose/` dirs~~ **Won't implement — declined — submodules stay in-repo.**     | ~~Depends on #2.~~                                            |
+| ~~4~~ | ~~Remove replace-directive chain~~ done — resolved — real pins replaced the replace chain (2026-07-05)                        | ~~Depends on #3.~~                                            |
+| ~~5~~ | ~~`errors.Join` pre-classifying wrapper returning `(error, Family)`~~ done — resolved — errors.Join + Classify chosen instead | ~~Marked YAGNI in plan.~~                                     |
+| ~~6~~ | ~~i18n hook for `familyData` messages~~ **Won't implement — declined — i18n never demanded.**                                 | ~~No current consumer.~~                                      |
+| ~~7~~ | ~~Shorter import alias (`errfam`)~~ **Won't implement — declined — errorfamily alias not adopted.**                           | ~~Cosmetic, breaking.~~                                       |
+| ~~8~~ | ~~Lower Go 1.26 requirement (the `errors.AsType` dep)~~ done — resolved — Go 1.26 floor is toolchain-driven                   | ~~I flagged this CONTRA, then silently accepted it. See d2.~~ |
+| ~~9~~ | ~~CONTRIBUTING.md section on the Registry pattern~~ done — CONTRIBUTING Registry pattern section                              | ~~Skipped.~~                                                  |
 
 ---
 
@@ -267,33 +267,33 @@ Structured by theme, not priority (priority is section f).
 
 Sorted by **impact ÷ effort** (high impact / low effort first). "Impact" here means: correctness > architecture > ergonomics > docs.
 
-| #  | Task                                                                                                 | Theme           | Impact (1-5) | Effort (h) | Ratio |
-| -- | ---------------------------------------------------------------------------------------------------- | --------------- | :----------: | :--------: | :---: |
-| ~~1~~  | ~~**Add `Rationale` to `Fix` triple** (restore dropped field)~~ done — Fix triple shipped (Summary+Command; Rationale via FixStep) | ~~Type model~~ | ~~5~~ | ~~0.5~~ | ~~10.0~~ |
-| ~~2~~  | ~~**`Severity(invalid) → MaxInt`** (fail-closed multi-error)~~ done — Severity(invalid) fails closed | ~~Correctness~~ | ~~5~~ | ~~0.3~~ | ~~16.7~~ |
-| ~~3~~  | ~~**`Registry.Clone()` consistent snapshot** (one lock)~~ done — Clone consistent snapshot | ~~Correctness~~ | ~~4~~ | ~~0.5~~ | ~~8.0~~ |
-| ~~4~~  | ~~**`Classify(nil)` redesign** — return zero Family or panic, document loudly~~ done — resolved — kept Rejection (design decision 2026-07-23) | ~~Honesty~~ | ~~5~~ | ~~1.0~~ | ~~5.0~~ |
-| ~~5~~  | ~~**Delete `TestExtractCommand_REMOVED` tombstone**~~ done — tombstone deleted | ~~Cleanup~~ | ~~1~~ | ~~0.1~~ | ~~10.0~~ |
-| ~~6~~  | ~~**`Error.JSON()` consistent omitempty**~~ done — JSON omitempty consistent | ~~Polish~~ | ~~2~~ | ~~0.2~~ | ~~10.0~~ |
-| ~~7~~  | ~~**`Family.RetryPolicy().Backoff(attempt)`** method~~ done — RetryPolicy shipped with attempts+backoff | ~~Type model~~ | ~~3~~ | ~~0.5~~ | ~~6.0~~ |
-| ~~8~~  | ~~**Bridge composition example** (oops → bridge → classify, end-to-end)~~ done — bridge composition example (examples/cmd/bridge) | ~~Architecture~~ | ~~4~~ | ~~1.0~~ | ~~4.0~~ |
-| ~~9~~  | ~~**slog helper `SlogAttr(err)`**~~ **Won't implement — declined — slog via LogError instead.** | ~~Composition~~ | ~~3~~ | ~~0.5~~ | ~~6.0~~ |
-| ~~10~~ | ~~**HTTP helper `WriteFamilyError(w, err)`** promoted to library~~ done — HTTPHandler serves this role | ~~Composition~~ | ~~4~~ | ~~1.0~~ | ~~4.0~~ |
-| ~~11~~ | ~~**OTel helper `SetSpanAttributes(span, err)`**~~ **Won't implement — declined — OTel left to consumers; ROADMAP idea.** | ~~Composition~~ | ~~3~~ | ~~0.5~~ | ~~6.0~~ |
-| ~~12~~ | ~~**`Family` as `string` not `int`** (breaking, but right)~~ **Won't implement — declined — Family stays int enum.** | ~~Type model~~ | ~~5~~ | ~~2.0~~ | ~~2.5~~ |
-| ~~13~~ | ~~**Lower Go requirement to 1.21** (drop `errors.AsType`)~~ **Won't implement — declined — Go floor follows toolchain.** | ~~Reach~~ | ~~4~~ | ~~1.5~~ | ~~2.7~~ |
-| ~~14~~ | ~~**Test asserting severity ordering rationale** (document _why_ in code)~~ done — severity ordering tested | ~~Honesty~~ | ~~3~~ | ~~0.5~~ | ~~6.0~~ |
-| ~~15~~ | ~~**Add `Abort` family for `context.Canceled`** (or document collapse rule)~~ **Won't implement — declined — Canceled=Rejection via stdlib defaults rationale.** | ~~Taxonomy~~ | ~~4~~ | ~~1.5~~ | ~~2.7~~ |
-| ~~16~~ | ~~**`RegisterStdlibDefaults` return cleanup func**~~ done — RegisterStdlibDefaults documented | ~~API hygiene~~ | ~~2~~ | ~~0.3~~ | ~~6.7~~ |
-| ~~17~~ | ~~**Remaining godoc examples** (WithContextMap, Clone, RegisterStdlibDefaults, RetryPolicy)~~ done — 26 godoc examples | ~~Discoverability~~ | ~~2~~ | ~~0.5~~ | ~~4.0~~ |
-| ~~18~~ | ~~**Audit `HTTPStatus()` mappings** — is 503 right for Infrastructure? Document the retry implication.~~ done — HTTPStatus mapping reviewed (412/428/416 guidance in v0.10.1) | ~~Honesty~~ | ~~2~~ | ~~0.5~~ | ~~4.0~~ |
-| ~~19~~ | ~~**`Error.Is` semantics documented in error.go** (not just AGENTS.md)~~ done — Error.Is documented | ~~Docs~~ | ~~1~~ | ~~0.2~~ | ~~5.0~~ |
-| ~~20~~ | ~~**Document `failsafe-go` / `avast/retry-go` integration** instead of building a loop~~ done — failsafe integration documented in README positioning | ~~Composition~~ | ~~3~~ | ~~1.0~~ | ~~3.0~~ |
-| ~~21~~ | ~~**CONTRIBUTING.md: Registry pattern section**~~ done — CONTRIBUTING Registry section | ~~Docs~~ | ~~1~~ | ~~0.5~~ | ~~2.0~~ |
-| ~~22~~ | ~~**Migrate docs/status & docs/planning to docs/archive/**~~ done — docs consolidated via archive passes (this pass continues it) | ~~Cleanup~~ | ~~1~~ | ~~0.5~~ | ~~2.0~~ |
-| ~~23~~ | ~~**Add `Auth` family OR `IsAuthError(err)` helper**~~ **Won't implement — declined — Auth family rejected; classify via Rejection.** | ~~Taxonomy~~ | ~~3~~ | ~~1.0~~ | ~~3.0~~ |
-| ~~24~~ | ~~**Decide: is Corruption really worse than Infrastructure?** Write the ADR.~~ done — resolved — severity rationale documented in family.go + CHANGELOG v0.10.0 | ~~Honesty~~ | ~~2~~ | ~~0.5~~ | ~~4.0~~ |
-| ~~25~~ | ~~**Rename `agent` → RCA/Synthesizer** (decision-gated, but ripe)~~ done — resolved — rename rejected (published module path) | ~~Architecture~~ | ~~3~~ | ~~1.0~~ | ~~3.0~~ |
+| #      | Task                                                                                                                                                                          | Theme               | Impact (1-5) | Effort (h) |  Ratio   |
+| ------ | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------- | :----------: | :--------: | :------: |
+| ~~1~~  | ~~**Add `Rationale` to `Fix` triple** (restore dropped field)~~ done — Fix triple shipped (Summary+Command; Rationale via FixStep)                                            | ~~Type model~~      |    ~~5~~     |  ~~0.5~~   | ~~10.0~~ |
+| ~~2~~  | ~~**`Severity(invalid) → MaxInt`** (fail-closed multi-error)~~ done — Severity(invalid) fails closed                                                                          | ~~Correctness~~     |    ~~5~~     |  ~~0.3~~   | ~~16.7~~ |
+| ~~3~~  | ~~**`Registry.Clone()` consistent snapshot** (one lock)~~ done — Clone consistent snapshot                                                                                    | ~~Correctness~~     |    ~~4~~     |  ~~0.5~~   | ~~8.0~~  |
+| ~~4~~  | ~~**`Classify(nil)` redesign** — return zero Family or panic, document loudly~~ done — resolved — kept Rejection (design decision 2026-07-23)                                 | ~~Honesty~~         |    ~~5~~     |  ~~1.0~~   | ~~5.0~~  |
+| ~~5~~  | ~~**Delete `TestExtractCommand_REMOVED` tombstone**~~ done — tombstone deleted                                                                                                | ~~Cleanup~~         |    ~~1~~     |  ~~0.1~~   | ~~10.0~~ |
+| ~~6~~  | ~~**`Error.JSON()` consistent omitempty**~~ done — JSON omitempty consistent                                                                                                  | ~~Polish~~          |    ~~2~~     |  ~~0.2~~   | ~~10.0~~ |
+| ~~7~~  | ~~**`Family.RetryPolicy().Backoff(attempt)`** method~~ done — RetryPolicy shipped with attempts+backoff                                                                       | ~~Type model~~      |    ~~3~~     |  ~~0.5~~   | ~~6.0~~  |
+| ~~8~~  | ~~**Bridge composition example** (oops → bridge → classify, end-to-end)~~ done — bridge composition example (examples/cmd/bridge)                                             | ~~Architecture~~    |    ~~4~~     |  ~~1.0~~   | ~~4.0~~  |
+| ~~9~~  | ~~**slog helper `SlogAttr(err)`**~~ **Won't implement — declined — slog via LogError instead.**                                                                               | ~~Composition~~     |    ~~3~~     |  ~~0.5~~   | ~~6.0~~  |
+| ~~10~~ | ~~**HTTP helper `WriteFamilyError(w, err)`** promoted to library~~ done — HTTPHandler serves this role                                                                        | ~~Composition~~     |    ~~4~~     |  ~~1.0~~   | ~~4.0~~  |
+| ~~11~~ | ~~**OTel helper `SetSpanAttributes(span, err)`**~~ **Won't implement — declined — OTel left to consumers; ROADMAP idea.**                                                     | ~~Composition~~     |    ~~3~~     |  ~~0.5~~   | ~~6.0~~  |
+| ~~12~~ | ~~**`Family` as `string` not `int`** (breaking, but right)~~ **Won't implement — declined — Family stays int enum.**                                                          | ~~Type model~~      |    ~~5~~     |  ~~2.0~~   | ~~2.5~~  |
+| ~~13~~ | ~~**Lower Go requirement to 1.21** (drop `errors.AsType`)~~ **Won't implement — declined — Go floor follows toolchain.**                                                      | ~~Reach~~           |    ~~4~~     |  ~~1.5~~   | ~~2.7~~  |
+| ~~14~~ | ~~**Test asserting severity ordering rationale** (document _why_ in code)~~ done — severity ordering tested                                                                   | ~~Honesty~~         |    ~~3~~     |  ~~0.5~~   | ~~6.0~~  |
+| ~~15~~ | ~~**Add `Abort` family for `context.Canceled`** (or document collapse rule)~~ **Won't implement — declined — Canceled=Rejection via stdlib defaults rationale.**              | ~~Taxonomy~~        |    ~~4~~     |  ~~1.5~~   | ~~2.7~~  |
+| ~~16~~ | ~~**`RegisterStdlibDefaults` return cleanup func**~~ done — RegisterStdlibDefaults documented                                                                                 | ~~API hygiene~~     |    ~~2~~     |  ~~0.3~~   | ~~6.7~~  |
+| ~~17~~ | ~~**Remaining godoc examples** (WithContextMap, Clone, RegisterStdlibDefaults, RetryPolicy)~~ done — 26 godoc examples                                                        | ~~Discoverability~~ |    ~~2~~     |  ~~0.5~~   | ~~4.0~~  |
+| ~~18~~ | ~~**Audit `HTTPStatus()` mappings** — is 503 right for Infrastructure? Document the retry implication.~~ done — HTTPStatus mapping reviewed (412/428/416 guidance in v0.10.1) | ~~Honesty~~         |    ~~2~~     |  ~~0.5~~   | ~~4.0~~  |
+| ~~19~~ | ~~**`Error.Is` semantics documented in error.go** (not just AGENTS.md)~~ done — Error.Is documented                                                                           | ~~Docs~~            |    ~~1~~     |  ~~0.2~~   | ~~5.0~~  |
+| ~~20~~ | ~~**Document `failsafe-go` / `avast/retry-go` integration** instead of building a loop~~ done — failsafe integration documented in README positioning                         | ~~Composition~~     |    ~~3~~     |  ~~1.0~~   | ~~3.0~~  |
+| ~~21~~ | ~~**CONTRIBUTING.md: Registry pattern section**~~ done — CONTRIBUTING Registry section                                                                                        | ~~Docs~~            |    ~~1~~     |  ~~0.5~~   | ~~2.0~~  |
+| ~~22~~ | ~~**Migrate docs/status & docs/planning to docs/archive/**~~ done — docs consolidated via archive passes (this pass continues it)                                             | ~~Cleanup~~         |    ~~1~~     |  ~~0.5~~   | ~~2.0~~  |
+| ~~23~~ | ~~**Add `Auth` family OR `IsAuthError(err)` helper**~~ **Won't implement — declined — Auth family rejected; classify via Rejection.**                                         | ~~Taxonomy~~        |    ~~3~~     |  ~~1.0~~   | ~~3.0~~  |
+| ~~24~~ | ~~**Decide: is Corruption really worse than Infrastructure?** Write the ADR.~~ done — resolved — severity rationale documented in family.go + CHANGELOG v0.10.0               | ~~Honesty~~         |    ~~2~~     |  ~~0.5~~   | ~~4.0~~  |
+| ~~25~~ | ~~**Rename `agent` → RCA/Synthesizer** (decision-gated, but ripe)~~ done — resolved — rename rejected (published module path)                                                 | ~~Architecture~~    |    ~~3~~     |  ~~1.0~~   | ~~3.0~~  |
 
 **The 80/20:** tasks 1-6 deliver the correctness fixes and the cheapest cleanups. ~2.6 hours total for tasks that materially improve the library's honesty. Do those first.
 

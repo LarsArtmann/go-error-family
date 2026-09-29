@@ -151,33 +151,33 @@
 
 Sorted by impact × effort (highest first):
 
-| #  | Task                                                                 | Impact   | Effort | Category     |
-| -- | -------------------------------------------------------------------- | -------- | ------ | ------------ |
-| ~~1~~  | ~~Fix `Compose` doc comment (it's a lie)~~ done — Compose removed in v0.5.0 | ~~Critical~~ | ~~2min~~ | ~~Bug~~ |
-| ~~2~~  | ~~Fix `extractCommand` to match actual fix formats~~ done — replaced by structured Fix | ~~Critical~~ | ~~10min~~ | ~~Bug~~ |
-| ~~3~~  | ~~Add `t.Cleanup()` for test registry pollution~~ done — t.Cleanup + registries | ~~High~~ | ~~15min~~ | ~~Bug~~ |
-| ~~4~~  | ~~Fix `FilesystemRule.suggestCreate` file/dir detection~~ done — suggestCreate fixed | ~~High~~ | ~~10min~~ | ~~Bug~~ |
-| ~~5~~  | ~~Fix `NetworkRule.resolveHost` with `net/url.Parse`~~ done — net/url parsing shipped | ~~Medium~~ | ~~15min~~ | ~~Bug~~ |
-| ~~6~~  | ~~Use `net.Dialer` + `DialContext` in NetworkRule~~ done — Dialer injection supported | ~~Medium~~ | ~~10min~~ | ~~Bug~~ |
-| ~~7~~  | ~~Rename `diagnose/context.go` → `diagnose/command.go`~~ done — renamed command.go | ~~Low~~ | ~~1min~~ | ~~Cleanup~~ |
-| ~~8~~  | ~~Deduplicate mock runners to shared helper~~ done — MockCommandRunner | ~~Low~~ | ~~20min~~ | ~~Cleanup~~ |
-| ~~9~~  | ~~Use `diagnose.KeyGit` in git spec instead of raw string~~ done — KeyGit constant | ~~Low~~ | ~~2min~~ | ~~Cleanup~~ |
-| ~~10~~ | ~~Add missing `ContextKey` constants for postgres_port, PGHOST, PGPORT~~ done — postgres ContextKeys | ~~Low~~ | ~~5min~~ | ~~Feature~~ |
-| ~~11~~ | ~~Use ContextKey constants in PostgresRule.resolvePort~~ done — resolvePort constants | ~~Low~~ | ~~5min~~ | ~~Cleanup~~ |
-| ~~12~~ | ~~Update SKILL.md for v0.3.0 APIs~~ done — SKILL.md overhauled repeatedly | ~~High~~ | ~~30min~~ | ~~Docs~~ |
-| ~~13~~ | ~~Remove dead `var _ = fmt.Sprintf` from postgres tests~~ done — dead code removed | ~~Low~~ | ~~1min~~ | ~~Cleanup~~ |
-| ~~14~~ | ~~Add `Runner.Run` context cancellation enforcement~~ done — Runner honors ctx | ~~Medium~~ | ~~20min~~ | ~~Feature~~ |
-| ~~15~~ | ~~Add concurrent safety tests for registries~~ done — concurrency tests | ~~Medium~~ | ~~15min~~ | ~~Test~~ |
-| ~~16~~ | ~~Add `applyContext` unit tests~~ done — applyContext fuzzed | ~~Low~~ | ~~10min~~ | ~~Test~~ |
-| ~~17~~ | ~~Add family-specific format constructors~~ done — Wrap{Family}f shipped | ~~Low~~ | ~~15min~~ | ~~Feature~~ |
-| ~~18~~ | ~~Consolidate `DiagnosticFinding` vs `DiagnosticResult` types~~ done — DiagnosticResult carries Fix (consolidation done) | ~~High~~ | ~~60min~~ | ~~Architecture~~ |
-| ~~19~~ | ~~Consider renaming `DebugAgent` → `Agent` interface~~ done — resolved — DebugAgent name kept (analysis-only identity) | ~~Low~~ | ~~10min~~ | ~~API~~ |
-| ~~20~~ | ~~Remove unused `IsPostgresRunning` or add real tests~~ done — IsPostgresRunning tested | ~~Low~~ | ~~10min~~ | ~~Cleanup~~ |
-| ~~21~~ | ~~Add `HandleErrorWithContext` direct tests~~ done — HandleErrorWithContext tested | ~~Medium~~ | ~~10min~~ | ~~Test~~ |
-| ~~22~~ | ~~Add `Error.Is` tests through wrapped error chains~~ done — Error.Is chain tested | ~~Low~~ | ~~5min~~ | ~~Test~~ |
-| ~~23~~ | ~~Add godoc examples for diagnose package helpers~~ done — diagnose godoc examples exist in README + docs | ~~Low~~ | ~~20min~~ | ~~Docs~~ |
-| ~~24~~ | ~~Consider removing `KeyDirectory` alias (just use `KeyDir`)~~ done — alias removed | ~~Low~~ | ~~5min~~ | ~~Cleanup~~ |
-| ~~25~~ | ~~Remove unused `KeyRepoPath` or document why it exists~~ done — removed | ~~Low~~ | ~~5min~~ | ~~Cleanup~~ |
+| #      | Task                                                                                                                     | Impact       | Effort    | Category         |
+| ------ | ------------------------------------------------------------------------------------------------------------------------ | ------------ | --------- | ---------------- |
+| ~~1~~  | ~~Fix `Compose` doc comment (it's a lie)~~ done — Compose removed in v0.5.0                                              | ~~Critical~~ | ~~2min~~  | ~~Bug~~          |
+| ~~2~~  | ~~Fix `extractCommand` to match actual fix formats~~ done — replaced by structured Fix                                   | ~~Critical~~ | ~~10min~~ | ~~Bug~~          |
+| ~~3~~  | ~~Add `t.Cleanup()` for test registry pollution~~ done — t.Cleanup + registries                                          | ~~High~~     | ~~15min~~ | ~~Bug~~          |
+| ~~4~~  | ~~Fix `FilesystemRule.suggestCreate` file/dir detection~~ done — suggestCreate fixed                                     | ~~High~~     | ~~10min~~ | ~~Bug~~          |
+| ~~5~~  | ~~Fix `NetworkRule.resolveHost` with `net/url.Parse`~~ done — net/url parsing shipped                                    | ~~Medium~~   | ~~15min~~ | ~~Bug~~          |
+| ~~6~~  | ~~Use `net.Dialer` + `DialContext` in NetworkRule~~ done — Dialer injection supported                                    | ~~Medium~~   | ~~10min~~ | ~~Bug~~          |
+| ~~7~~  | ~~Rename `diagnose/context.go` → `diagnose/command.go`~~ done — renamed command.go                                       | ~~Low~~      | ~~1min~~  | ~~Cleanup~~      |
+| ~~8~~  | ~~Deduplicate mock runners to shared helper~~ done — MockCommandRunner                                                   | ~~Low~~      | ~~20min~~ | ~~Cleanup~~      |
+| ~~9~~  | ~~Use `diagnose.KeyGit` in git spec instead of raw string~~ done — KeyGit constant                                       | ~~Low~~      | ~~2min~~  | ~~Cleanup~~      |
+| ~~10~~ | ~~Add missing `ContextKey` constants for postgres_port, PGHOST, PGPORT~~ done — postgres ContextKeys                     | ~~Low~~      | ~~5min~~  | ~~Feature~~      |
+| ~~11~~ | ~~Use ContextKey constants in PostgresRule.resolvePort~~ done — resolvePort constants                                    | ~~Low~~      | ~~5min~~  | ~~Cleanup~~      |
+| ~~12~~ | ~~Update SKILL.md for v0.3.0 APIs~~ done — SKILL.md overhauled repeatedly                                                | ~~High~~     | ~~30min~~ | ~~Docs~~         |
+| ~~13~~ | ~~Remove dead `var _ = fmt.Sprintf` from postgres tests~~ done — dead code removed                                       | ~~Low~~      | ~~1min~~  | ~~Cleanup~~      |
+| ~~14~~ | ~~Add `Runner.Run` context cancellation enforcement~~ done — Runner honors ctx                                           | ~~Medium~~   | ~~20min~~ | ~~Feature~~      |
+| ~~15~~ | ~~Add concurrent safety tests for registries~~ done — concurrency tests                                                  | ~~Medium~~   | ~~15min~~ | ~~Test~~         |
+| ~~16~~ | ~~Add `applyContext` unit tests~~ done — applyContext fuzzed                                                             | ~~Low~~      | ~~10min~~ | ~~Test~~         |
+| ~~17~~ | ~~Add family-specific format constructors~~ done — Wrap{Family}f shipped                                                 | ~~Low~~      | ~~15min~~ | ~~Feature~~      |
+| ~~18~~ | ~~Consolidate `DiagnosticFinding` vs `DiagnosticResult` types~~ done — DiagnosticResult carries Fix (consolidation done) | ~~High~~     | ~~60min~~ | ~~Architecture~~ |
+| ~~19~~ | ~~Consider renaming `DebugAgent` → `Agent` interface~~ done — resolved — DebugAgent name kept (analysis-only identity)   | ~~Low~~      | ~~10min~~ | ~~API~~          |
+| ~~20~~ | ~~Remove unused `IsPostgresRunning` or add real tests~~ done — IsPostgresRunning tested                                  | ~~Low~~      | ~~10min~~ | ~~Cleanup~~      |
+| ~~21~~ | ~~Add `HandleErrorWithContext` direct tests~~ done — HandleErrorWithContext tested                                       | ~~Medium~~   | ~~10min~~ | ~~Test~~         |
+| ~~22~~ | ~~Add `Error.Is` tests through wrapped error chains~~ done — Error.Is chain tested                                       | ~~Low~~      | ~~5min~~  | ~~Test~~         |
+| ~~23~~ | ~~Add godoc examples for diagnose package helpers~~ done — diagnose godoc examples exist in README + docs                | ~~Low~~      | ~~20min~~ | ~~Docs~~         |
+| ~~24~~ | ~~Consider removing `KeyDirectory` alias (just use `KeyDir`)~~ done — alias removed                                      | ~~Low~~      | ~~5min~~  | ~~Cleanup~~      |
+| ~~25~~ | ~~Remove unused `KeyRepoPath` or document why it exists~~ done — removed                                                 | ~~Low~~      | ~~5min~~  | ~~Cleanup~~      |
 
 ---
 

@@ -32,27 +32,27 @@
 
 ## b) PARTIALLY DONE
 
-| # | Item                              | What's done                                                         | What remains                                                                                                                                                                                                                            |
-| - | --------------------------------- | ------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| ~~1~~ | ~~**Historical doc annotations**~~ done — DOMAIN_LANGUAGE verified and updated (2026-09-27) | ~~8 of 13 files annotated with specific, evidence-cited corrections~~ | ~~5 files correctly left untouched (already accurate). But I did NOT re-verify `docs/DOMAIN_LANGUAGE.md` — the 2026-07-13 audit said it was updated but I didn't confirm it's still current after v0.8.0.~~ |
-| ~~2~~ | ~~**Living doc freshness**~~ done — README/CONTRIBUTING/SKILL verified (2026-09-27) | ~~TODO_LIST, ROADMAP, FEATURES, CHANGELOG, AGENTS all updated~~ | ~~README.md, CONTRIBUTING.md, SKILL.md were NOT verified this session. The 2026-07-13 audit fixed issues in README/CONTRIBUTING/SKILL but I did not confirm those fixes persist or check for new v0.8.0 drift.~~ |
+| #     | Item                                                                                                | What's done                                                             | What remains                                                                                                                                                                                                                                |
+| ----- | --------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| ~~1~~ | ~~**Historical doc annotations**~~ done — DOMAIN_LANGUAGE verified and updated (2026-09-27)         | ~~8 of 13 files annotated with specific, evidence-cited corrections~~   | ~~5 files correctly left untouched (already accurate). But I did NOT re-verify `docs/DOMAIN_LANGUAGE.md` — the 2026-07-13 audit said it was updated but I didn't confirm it's still current after v0.8.0.~~                                 |
+| ~~2~~ | ~~**Living doc freshness**~~ done — README/CONTRIBUTING/SKILL verified (2026-09-27)                 | ~~TODO_LIST, ROADMAP, FEATURES, CHANGELOG, AGENTS all updated~~         | ~~README.md, CONTRIBUTING.md, SKILL.md were NOT verified this session. The 2026-07-13 audit fixed issues in README/CONTRIBUTING/SKILL but I did not confirm those fixes persist or check for new v0.8.0 drift.~~                            |
 | ~~3~~ | ~~**DiscordSync feedback appendix**~~ done — resolved — DiscordSync scorecard resolved via appendix | ~~Updated D6, RegisterClassifications map, ParseFamily gotcha to DONE~~ | ~~3 items remain correctly NOT STARTED (New\* vs Wrap\*, Newf/Wrapf prominence, errkit pattern). But I did NOT update the "Summary Scorecard" section which rates HTTP integration 6/10 — that was pre-HTTPHandler and is now misleading.~~ |
-| ~~4~~ | ~~**Quality gate**~~ done — gates green (BuildFlow 115/115) | ~~`go build`, `go test -race`, basic lint check run~~ | ~~Did NOT run `nix flake check` (the project's canonical gate per AGENTS.md). Did NOT run `golangci-lint` to completion (pre-existing lint issues found, not from my changes).~~ |
+| ~~4~~ | ~~**Quality gate**~~ done — gates green (BuildFlow 115/115)                                         | ~~`go build`, `go test -race`, basic lint check run~~                   | ~~Did NOT run `nix flake check` (the project's canonical gate per AGENTS.md). Did NOT run `golangci-lint` to completion (pre-existing lint issues found, not from my changes).~~                                                            |
 
 ---
 
 ## c) NOT STARTED
 
-| # | Item                                                 | Why                                                                                                                                                                                                                      |
-| - | ---------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| #     | Item                                                                                 | Why                                                                                                                                                                                                                          |
+| ----- | ------------------------------------------------------------------------------------ | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | ~~1~~ | ~~**Website docs audit** (`website/src/content/docs/`)~~ done — website docs audited | ~~The 2026-07-13 audit flagged this as CRITICAL (section d.1). I added it to TODO_LIST but did NOT audit it. The website `.mdx` files likely contain stale `SuggestedFix`/`context.go`/`Diagnose:`/missing `GOEXPERIMENT`.~~ |
-| ~~2~~ | ~~**`docs/DOMAIN_LANGUAGE.md` freshness check**~~ done — DOMAIN_LANGUAGE current | ~~Never read or verified this session. May have stale references after v0.8.0 (ExitCoder, WrapOnce, WithContextAny not in glossary?).~~ |
-| ~~3~~ | ~~**README.md freshness check**~~ done — README current | ~~Never verified this session. The 2026-07-13 audit fixed ghost `context.go`, `Diagnose: true`, `SuggestedFix`. Did not confirm those fixes persist or check for v0.8.0 drift (WrapOnce, ExitCoder, WithContextAny).~~ |
-| ~~4~~ | ~~**CONTRIBUTING.md freshness check**~~ done — CONTRIBUTING current | ~~Never verified this session. Same potential drift as README.~~ |
-| ~~5~~ | ~~**SKILL.md freshness check**~~ done — SKILL current | ~~Checked specific items via sub-agent (confirmed 9/11 done) but did NOT do a full freshness audit. The 2026-07-16 report says SKILL.md WithContextAny description says "etc." — vague, should list all 10 types.~~ |
-| ~~6~~ | ~~**`nix flake check`**~~ done — flake check green | ~~The project's canonical quality gate. I only ran `go build` and `go test`. AGENTS.md says "Check flake.nix first."~~ |
-| ~~7~~ | ~~**Submodule tests**~~ done — submodule tests green | ~~Only ran root + errorfamilytest tests. Did NOT re-run bridge, diagnose, agent, diagnose/git, diagnose/postgres tests this session (they were verified in the prior session).~~ |
-| ~~8~~ | ~~**Committing the changes**~~ done — committed | ~~User hasn't said "commit". 14 files uncommitted.~~ |
+| ~~2~~ | ~~**`docs/DOMAIN_LANGUAGE.md` freshness check**~~ done — DOMAIN_LANGUAGE current     | ~~Never read or verified this session. May have stale references after v0.8.0 (ExitCoder, WrapOnce, WithContextAny not in glossary?).~~                                                                                      |
+| ~~3~~ | ~~**README.md freshness check**~~ done — README current                              | ~~Never verified this session. The 2026-07-13 audit fixed ghost `context.go`, `Diagnose: true`, `SuggestedFix`. Did not confirm those fixes persist or check for v0.8.0 drift (WrapOnce, ExitCoder, WithContextAny).~~       |
+| ~~4~~ | ~~**CONTRIBUTING.md freshness check**~~ done — CONTRIBUTING current                  | ~~Never verified this session. Same potential drift as README.~~                                                                                                                                                             |
+| ~~5~~ | ~~**SKILL.md freshness check**~~ done — SKILL current                                | ~~Checked specific items via sub-agent (confirmed 9/11 done) but did NOT do a full freshness audit. The 2026-07-16 report says SKILL.md WithContextAny description says "etc." — vague, should list all 10 types.~~          |
+| ~~6~~ | ~~**`nix flake check`**~~ done — flake check green                                   | ~~The project's canonical quality gate. I only ran `go build` and `go test`. AGENTS.md says "Check flake.nix first."~~                                                                                                       |
+| ~~7~~ | ~~**Submodule tests**~~ done — submodule tests green                                 | ~~Only ran root + errorfamilytest tests. Did NOT re-run bridge, diagnose, agent, diagnose/git, diagnose/postgres tests this session (they were verified in the prior session).~~                                             |
+| ~~8~~ | ~~**Committing the changes**~~ done — committed                                      | ~~User hasn't said "commit". 14 files uncommitted.~~                                                                                                                                                                         |
 
 ---
 
@@ -106,88 +106,88 @@ I scored Accuracy at 9.25/10 based only on the docs I checked. If I had checked 
 
 ### Immediate (gaps from this session)
 
-| # | Task                                                                                                     | Impact      |
-| - | -------------------------------------------------------------------------------------------------------- | ----------- |
-| ~~1~~ | ~~**Verify `docs/DOMAIN_LANGUAGE.md`** against current API — check for ExitCoder, WrapOnce, WithContextAny~~ done — DOMAIN_LANGUAGE verified | ~~🟠~~ |
-| ~~2~~ | ~~**Verify README.md** for v0.8.0 drift (WrapOnce, ExitCoder, WithContextAny in feature table/examples)~~ done — README verified | ~~🟠~~ |
-| ~~3~~ | ~~**Verify CONTRIBUTING.md** for stale refs~~ done — CONTRIBUTING verified | ~~🟡~~ |
-| ~~4~~ | ~~**Full SKILL.md freshness audit** — WithContextAny "etc." → list all 10 types; verify all API refs~~ done — SKILL audited | ~~🟠~~ |
-| ~~5~~ | ~~**Audit website docs** (`website/src/content/docs/`) for stale API references~~ done — website docs audited | ~~🔴 Critical~~ |
-| ~~6~~ | ~~**Run `nix flake check`** — the canonical quality gate I skipped~~ done — flake check green | ~~🟠~~ |
-| ~~7~~ | ~~**Fix the `Compose` split brain** — verify source, update either FEATURES.md or CHANGELOG.md~~ done — resolved — Compose removed | ~~🟠~~ |
-| ~~8~~ | ~~**Commit the 14 file changes** from this session~~ done — committed | ~~🔴~~ |
+| #     | Task                                                                                                                                         | Impact          |
+| ----- | -------------------------------------------------------------------------------------------------------------------------------------------- | --------------- |
+| ~~1~~ | ~~**Verify `docs/DOMAIN_LANGUAGE.md`** against current API — check for ExitCoder, WrapOnce, WithContextAny~~ done — DOMAIN_LANGUAGE verified | ~~🟠~~          |
+| ~~2~~ | ~~**Verify README.md** for v0.8.0 drift (WrapOnce, ExitCoder, WithContextAny in feature table/examples)~~ done — README verified             | ~~🟠~~          |
+| ~~3~~ | ~~**Verify CONTRIBUTING.md** for stale refs~~ done — CONTRIBUTING verified                                                                   | ~~🟡~~          |
+| ~~4~~ | ~~**Full SKILL.md freshness audit** — WithContextAny "etc." → list all 10 types; verify all API refs~~ done — SKILL audited                  | ~~🟠~~          |
+| ~~5~~ | ~~**Audit website docs** (`website/src/content/docs/`) for stale API references~~ done — website docs audited                                | ~~🔴 Critical~~ |
+| ~~6~~ | ~~**Run `nix flake check`** — the canonical quality gate I skipped~~ done — flake check green                                                | ~~🟠~~          |
+| ~~7~~ | ~~**Fix the `Compose` split brain** — verify source, update either FEATURES.md or CHANGELOG.md~~ done — resolved — Compose removed           | ~~🟠~~          |
+| ~~8~~ | ~~**Commit the 14 file changes** from this session~~ done — committed                                                                        | ~~🔴~~          |
 
 ### From TODO_LIST.md (genuinely open work)
 
-| #  | Task                                                           | Impact |
-| -- | -------------------------------------------------------------- | ------ |
-| ~~9~~  | ~~Add CI gate: `GOWORK=off go list -m all` per module~~ done — GOWORK gate live | ~~🔴~~ |
-| ~~10~~ | ~~Add CI consumer-simulation job~~ done — consumer-sim live | ~~🔴~~ |
-| ~~11~~ | ~~Add mutators section to website `api-reference.mdx`~~ done — mutators on site | ~~HIGH~~ |
-| ~~12~~ | ~~Rebuild and deploy website~~ done — website rebuilt+deployed | ~~HIGH~~ |
-| ~~13~~ | ~~Add `New*` vs `Wrap*` guidance to SKILL.md~~ done — New/Wrap guidance | ~~MED~~ |
-| ~~14~~ | ~~Add `errkit` consumer pattern example to SKILL.md~~ done — errkit example | ~~MED~~ |
-| ~~15~~ | ~~Add `writeHTTPError` error-branch test~~ done — writeHTTPError fixed | ~~MED~~ |
-| ~~16~~ | ~~Document or validate negative exit codes~~ done — negative exits documented | ~~MED~~ |
-| ~~17~~ | ~~Refactor `contextValueToString` to eliminate `//nolint:cyclop`~~ done — resolved — exclusions policy documented | ~~LOW~~ |
-| ~~18~~ | ~~Add `time.Duration` case to `contextValueToString`~~ done — Duration case | ~~LOW~~ |
-| ~~19~~ | ~~Apply ACME TXT DNS record~~ done — ACME TXT applied | ~~LOW~~ |
-| ~~20~~ | ~~Set up CI/CD for website deploys~~ done — website CI/CD live | ~~LOW~~ |
+| #      | Task                                                                                                              | Impact   |
+| ------ | ----------------------------------------------------------------------------------------------------------------- | -------- |
+| ~~9~~  | ~~Add CI gate: `GOWORK=off go list -m all` per module~~ done — GOWORK gate live                                   | ~~🔴~~   |
+| ~~10~~ | ~~Add CI consumer-simulation job~~ done — consumer-sim live                                                       | ~~🔴~~   |
+| ~~11~~ | ~~Add mutators section to website `api-reference.mdx`~~ done — mutators on site                                   | ~~HIGH~~ |
+| ~~12~~ | ~~Rebuild and deploy website~~ done — website rebuilt+deployed                                                    | ~~HIGH~~ |
+| ~~13~~ | ~~Add `New*` vs `Wrap*` guidance to SKILL.md~~ done — New/Wrap guidance                                           | ~~MED~~  |
+| ~~14~~ | ~~Add `errkit` consumer pattern example to SKILL.md~~ done — errkit example                                       | ~~MED~~  |
+| ~~15~~ | ~~Add `writeHTTPError` error-branch test~~ done — writeHTTPError fixed                                            | ~~MED~~  |
+| ~~16~~ | ~~Document or validate negative exit codes~~ done — negative exits documented                                     | ~~MED~~  |
+| ~~17~~ | ~~Refactor `contextValueToString` to eliminate `//nolint:cyclop`~~ done — resolved — exclusions policy documented | ~~LOW~~  |
+| ~~18~~ | ~~Add `time.Duration` case to `contextValueToString`~~ done — Duration case                                       | ~~LOW~~  |
+| ~~19~~ | ~~Apply ACME TXT DNS record~~ done — ACME TXT applied                                                             | ~~LOW~~  |
+| ~~20~~ | ~~Set up CI/CD for website deploys~~ done — website CI/CD live                                                    | ~~LOW~~  |
 
 ### Design decisions (need user input)
 
-| #  | Task                                                      | Impact |
-| -- | --------------------------------------------------------- | ------ |
-| ~~21~~ | ~~**v0.8.0 release** — tag exists? or wait?~~ done — resolved — v0.8.0 tagged long since | ~~🔴~~ |
-| ~~22~~ | ~~Per-error HTTP status override (`WithHTTPStatus`)~~ done — WithHTTPStatus shipped | ~~Design~~ |
-| ~~23~~ | ~~`Classify(nil)` semantics (keep Rejection vs change)~~ done — resolved — Classify(nil) kept | ~~Design~~ |
-| ~~24~~ | ~~Constructor context ergonomics (builder/variadic/options)~~ done — resolved — ergonomics declined | ~~Design~~ |
-| ~~25~~ | ~~"Frozen" registry flag~~ done — resolved — frozen flag declined | ~~Design~~ |
-| ~~26~~ | ~~`RegisterClassificationType[T error]` generic~~ done — RegisterClassificationType shipped | ~~Design~~ |
+| #      | Task                                                                                                   | Impact     |
+| ------ | ------------------------------------------------------------------------------------------------------ | ---------- |
+| ~~21~~ | ~~**v0.8.0 release** — tag exists? or wait?~~ done — resolved — v0.8.0 tagged long since               | ~~🔴~~     |
+| ~~22~~ | ~~Per-error HTTP status override (`WithHTTPStatus`)~~ done — WithHTTPStatus shipped                    | ~~Design~~ |
+| ~~23~~ | ~~`Classify(nil)` semantics (keep Rejection vs change)~~ done — resolved — Classify(nil) kept          | ~~Design~~ |
+| ~~24~~ | ~~Constructor context ergonomics (builder/variadic/options)~~ done — resolved — ergonomics declined    | ~~Design~~ |
+| ~~25~~ | ~~"Frozen" registry flag~~ done — resolved — frozen flag declined                                      | ~~Design~~ |
+| ~~26~~ | ~~`RegisterClassificationType[T error]` generic~~ done — RegisterClassificationType shipped            | ~~Design~~ |
 | ~~27~~ | ~~json/v2 migration strategy (keep/revert/centralize)~~ done — resolved — json/v2 reverted permanently | ~~Design~~ |
 
 ### Documentation polish
 
-| #  | Task                                                                            | Impact |
-| -- | ------------------------------------------------------------------------------- | ------ |
-| ~~28~~ | ~~Annotate DiscordSync scorecard with "ratings reflect v0.5.1" disclaimer~~ done — scorecard disclaimer via appendices | ~~🟡~~ |
-| ~~29~~ | ~~Add "last verified" date to README benchmark table~~ done — benchmark date-stamped | ~~🟢~~ |
+| #      | Task                                                                                                                            | Impact |
+| ------ | ------------------------------------------------------------------------------------------------------------------------------- | ------ |
+| ~~28~~ | ~~Annotate DiscordSync scorecard with "ratings reflect v0.5.1" disclaimer~~ done — scorecard disclaimer via appendices          | ~~🟡~~ |
+| ~~29~~ | ~~Add "last verified" date to README benchmark table~~ done — benchmark date-stamped                                            | ~~🟢~~ |
 | ~~30~~ | ~~Check if CHANGELOG `[0.1.0]` `{{.key}}` reference should note the syntax change~~ done — {{.key}} note replaced by {key} docs | ~~🟢~~ |
-| ~~31~~ | ~~Verify `CONTRIBUTING.md` references `CODE_OF_CONDUCT.md` which may not exist~~ done — CODE_OF_CONDUCT exists | ~~🟢~~ |
-| ~~32~~ | ~~Check markdown formatting compliance with treefmt (may need `nix fmt`)~~ done — treefmt green | ~~🟡~~ |
+| ~~31~~ | ~~Verify `CONTRIBUTING.md` references `CODE_OF_CONDUCT.md` which may not exist~~ done — CODE_OF_CONDUCT exists                  | ~~🟢~~ |
+| ~~32~~ | ~~Check markdown formatting compliance with treefmt (may need `nix fmt`)~~ done — treefmt green                                 | ~~🟡~~ |
 
 ### Testing
 
-| #  | Task                                                                                           | Impact |
-| -- | ---------------------------------------------------------------------------------------------- | ------ |
-| ~~33~~ | ~~Run extended fuzz sessions (`-fuzztime=30s`) for all 14 fuzz functions~~ done — extended fuzz run | ~~🟡~~ |
+| #      | Task                                                                                                                            | Impact |
+| ------ | ------------------------------------------------------------------------------------------------------------------------------- | ------ |
+| ~~33~~ | ~~Run extended fuzz sessions (`-fuzztime=30s`) for all 14 fuzz functions~~ done — extended fuzz run                             | ~~🟡~~ |
 | ~~34~~ | ~~Add integration test: `HandleError` return value respects `WithExitCode` (end-to-end CLI path)~~ done — HandleError exit test | ~~🟡~~ |
-| ~~35~~ | ~~Add test: `safeCauseString` with non-string panic value (`panic(42)`, `panic(nil)`)~~ done — safeCauseString panic tests | ~~🟡~~ |
-| ~~36~~ | ~~Add benchmark: `contextValueToString` per type (type switch vs `fmt.Sprint`)~~ done — contextValueToString benchmark | ~~🟢~~ |
-| ~~37~~ | ~~Add `fmt.Stringer` case to `contextValueToString` with panic recovery~~ done — Stringer case | ~~🟢~~ |
+| ~~35~~ | ~~Add test: `safeCauseString` with non-string panic value (`panic(42)`, `panic(nil)`)~~ done — safeCauseString panic tests      | ~~🟡~~ |
+| ~~36~~ | ~~Add benchmark: `contextValueToString` per type (type switch vs `fmt.Sprint`)~~ done — contextValueToString benchmark          | ~~🟢~~ |
+| ~~37~~ | ~~Add `fmt.Stringer` case to `contextValueToString` with panic recovery~~ done — Stringer case                                  | ~~🟢~~ |
 
 ### CI / Release
 
-| #  | Task                                                                      | Impact |
-| -- | ------------------------------------------------------------------------- | ------ |
-| ~~38~~ | ~~Add `go vet ./...` to CI~~ done — vet in CI | ~~🟢~~ |
-| ~~39~~ | ~~Add pre-commit check for `replace` directives in tagged go.mod files~~ done — replace check via consumer-sim | ~~🟡~~ |
+| #      | Task                                                                                                                                            | Impact |
+| ------ | ----------------------------------------------------------------------------------------------------------------------------------------------- | ------ |
+| ~~38~~ | ~~Add `go vet ./...` to CI~~ done — vet in CI                                                                                                   | ~~🟢~~ |
+| ~~39~~ | ~~Add pre-commit check for `replace` directives in tagged go.mod files~~ done — replace check via consumer-sim                                  | ~~🟡~~ |
 | ~~40~~ | ~~Create release automation script for coordinated multi-module tag cutting~~ **Won't implement — declined — ROADMAP automation idea instead.** | ~~🟢~~ |
-| ~~41~~ | ~~Add benchmark regression check to CI~~ **Won't implement — declined — benchmark CI via BuildFlow.** | ~~🟡~~ |
-| ~~42~~ | ~~Deprecation notes for broken v0.6.0 family tags~~ done — routed — TODO_LIST #2 (retraction pending) | ~~🟡~~ |
+| ~~41~~ | ~~Add benchmark regression check to CI~~ **Won't implement — declined — benchmark CI via BuildFlow.**                                           | ~~🟡~~ |
+| ~~42~~ | ~~Deprecation notes for broken v0.6.0 family tags~~ done — routed — TODO_LIST #2 (retraction pending)                                           | ~~🟡~~ |
 
 ### Website / Public Presence
 
-| #  | Task                                                                                        | Impact |
-| -- | ------------------------------------------------------------------------------------------- | ------ |
-| ~~43~~ | ~~Add CSP to `astro.config.mjs` + `fix-csp.mjs` post-build script~~ **Won't implement — declined — CSP gap honest.** | ~~HIGH~~ |
-| ~~44~~ | ~~Add OG images via `astro-og-canvas`~~ **Won't implement — declined — OG via static preview.** | ~~MED~~ |
-| ~~45~~ | ~~Design a proper logo for go-error-family~~ **Won't implement — declined — logo not adopted.** | ~~MED~~ |
-| ~~46~~ | ~~Add Bridge package guide page (oops integration)~~ done — Bridge guide shipped | ~~MED~~ |
-| ~~47~~ | ~~Add `errorfamilytest` guide page~~ done — errorfamilytest in docs | ~~LOW~~ |
-| ~~48~~ | ~~Add uptime monitor for `errorfamily.lars.software`~~ **Won't implement — declined — uptime monitor ROADMAP-grade.** | ~~MED~~ |
-| ~~49~~ | ~~Fix corrupted `flake.lock` in the domains repo (pre-existing, affects all project websites)~~ done — domains flake.lock fixed | ~~🟡~~ |
-| ~~50~~ | ~~Verify all docs pages return HTTP 200 on the custom domain~~ done — docs pages 200 | ~~🟡~~ |
+| #      | Task                                                                                                                            | Impact   |
+| ------ | ------------------------------------------------------------------------------------------------------------------------------- | -------- |
+| ~~43~~ | ~~Add CSP to `astro.config.mjs` + `fix-csp.mjs` post-build script~~ **Won't implement — declined — CSP gap honest.**            | ~~HIGH~~ |
+| ~~44~~ | ~~Add OG images via `astro-og-canvas`~~ **Won't implement — declined — OG via static preview.**                                 | ~~MED~~  |
+| ~~45~~ | ~~Design a proper logo for go-error-family~~ **Won't implement — declined — logo not adopted.**                                 | ~~MED~~  |
+| ~~46~~ | ~~Add Bridge package guide page (oops integration)~~ done — Bridge guide shipped                                                | ~~MED~~  |
+| ~~47~~ | ~~Add `errorfamilytest` guide page~~ done — errorfamilytest in docs                                                             | ~~LOW~~  |
+| ~~48~~ | ~~Add uptime monitor for `errorfamily.lars.software`~~ **Won't implement — declined — uptime monitor ROADMAP-grade.**           | ~~MED~~  |
+| ~~49~~ | ~~Fix corrupted `flake.lock` in the domains repo (pre-existing, affects all project websites)~~ done — domains flake.lock fixed | ~~🟡~~   |
+| ~~50~~ | ~~Verify all docs pages return HTTP 200 on the custom domain~~ done — docs pages 200                                            | ~~🟡~~   |
 
 ---
 

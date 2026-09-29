@@ -188,53 +188,53 @@ Build clean. 121/121 tests pass. Race detector clean. `go vet` clean. Zero gopls
 
 ### Critical — Honesty & Publishing
 
-| # | Task                                  | Effort | Impact                 |
-| - | ------------------------------------- | ------ | ---------------------- |
-| ~~1~~ | ~~Update README.md for post-cleanup API~~ done — README rewritten | ~~30min~~ | ~~Docs match reality~~ |
-| ~~2~~ | ~~Update CHANGELOG.md~~ done — CHANGELOG maintained | ~~20min~~ | ~~Historical accuracy~~ |
-| ~~3~~ | ~~Tag `v0.1.0-alpha`~~ done — v0.1.x shipped | ~~5min~~ | ~~API stability signal~~ |
-| ~~4~~ | ~~Add GitHub Actions CI~~ done — three workflows live | ~~1h~~ | ~~Automated quality gate~~ |
+| #     | Task                                                              | Effort    | Impact                     |
+| ----- | ----------------------------------------------------------------- | --------- | -------------------------- |
+| ~~1~~ | ~~Update README.md for post-cleanup API~~ done — README rewritten | ~~30min~~ | ~~Docs match reality~~     |
+| ~~2~~ | ~~Update CHANGELOG.md~~ done — CHANGELOG maintained               | ~~20min~~ | ~~Historical accuracy~~    |
+| ~~3~~ | ~~Tag `v0.1.0-alpha`~~ done — v0.1.x shipped                      | ~~5min~~  | ~~API stability signal~~   |
+| ~~4~~ | ~~Add GitHub Actions CI~~ done — three workflows live             | ~~1h~~    | ~~Automated quality gate~~ |
 
 ### High — Test Coverage
 
-| #  | Task                                                  | Effort | Impact                             |
-| -- | ----------------------------------------------------- | ------ | ---------------------------------- |
-| ~~5~~  | ~~Extract CommandRunner interface in diagnose~~ done — CommandRunner shipped | ~~1h~~ | ~~Makes rules mockable~~ |
-| ~~6~~  | ~~Integration tests for GitRule (dirty repo, conflicts)~~ done — GitRule tested | ~~1h~~ | ~~GitRule only tested for clean repo~~ |
-| ~~7~~  | ~~Integration tests for PostgresRule (mock server)~~ done — PostgresRule tested | ~~1h~~ | ~~PostgresRule TCP path untested~~ |
-| ~~8~~  | ~~Integration tests for NetworkRule (DNS, TCP, timeout)~~ done — NetworkRule tested | ~~1h~~ | ~~NetworkRule Run path untested~~ |
-| ~~9~~  | ~~FilesystemRule writability + permission tests~~ done — FilesystemRule tested | ~~30min~~ | ~~Permission paths untested~~ |
-| ~~10~~ | ~~Add `RegisterTemplate` tests~~ done — RegisterTemplate tested | ~~15min~~ | ~~New API untested in tests~~ |
+| #      | Task                                                                                | Effort    | Impact                                 |
+| ------ | ----------------------------------------------------------------------------------- | --------- | -------------------------------------- |
+| ~~5~~  | ~~Extract CommandRunner interface in diagnose~~ done — CommandRunner shipped        | ~~1h~~    | ~~Makes rules mockable~~               |
+| ~~6~~  | ~~Integration tests for GitRule (dirty repo, conflicts)~~ done — GitRule tested     | ~~1h~~    | ~~GitRule only tested for clean repo~~ |
+| ~~7~~  | ~~Integration tests for PostgresRule (mock server)~~ done — PostgresRule tested     | ~~1h~~    | ~~PostgresRule TCP path untested~~     |
+| ~~8~~  | ~~Integration tests for NetworkRule (DNS, TCP, timeout)~~ done — NetworkRule tested | ~~1h~~    | ~~NetworkRule Run path untested~~      |
+| ~~9~~  | ~~FilesystemRule writability + permission tests~~ done — FilesystemRule tested      | ~~30min~~ | ~~Permission paths untested~~          |
+| ~~10~~ | ~~Add `RegisterTemplate` tests~~ done — RegisterTemplate tested                     | ~~15min~~ | ~~New API untested in tests~~          |
 
 ### High — Ecosystem Integration
 
-| #  | Task                                           | Effort | Impact                |
-| -- | ---------------------------------------------- | ------ | --------------------- |
-| ~~11~~ | ~~Migrate go-cqrs-lite to import go-error-family~~ **Won't implement — declined — pivoted to standalone go-error-family.** | ~~2h~~ | ~~First real consumer~~ |
-| ~~12~~ | ~~Add go-error-family to workspace go.work~~ done — go.work in place | ~~15min~~ | ~~Workspace integration~~ |
-| ~~13~~ | ~~Add ErrorCode/ErrorContext to go-finding~~ **Won't implement — declined — out of scope.** | ~~30min~~ | ~~Second consumer~~ |
-| ~~14~~ | ~~Add ErrorCode/ErrorContext to docs-organizer~~ **Won't implement — declined — out of scope.** | ~~30min~~ | ~~Third consumer~~ |
+| #      | Task                                                                                                                       | Effort    | Impact                    |
+| ------ | -------------------------------------------------------------------------------------------------------------------------- | --------- | ------------------------- |
+| ~~11~~ | ~~Migrate go-cqrs-lite to import go-error-family~~ **Won't implement — declined — pivoted to standalone go-error-family.** | ~~2h~~    | ~~First real consumer~~   |
+| ~~12~~ | ~~Add go-error-family to workspace go.work~~ done — go.work in place                                                       | ~~15min~~ | ~~Workspace integration~~ |
+| ~~13~~ | ~~Add ErrorCode/ErrorContext to go-finding~~ **Won't implement — declined — out of scope.**                                | ~~30min~~ | ~~Second consumer~~       |
+| ~~14~~ | ~~Add ErrorCode/ErrorContext to docs-organizer~~ **Won't implement — declined — out of scope.**                            | ~~30min~~ | ~~Third consumer~~        |
 
 ### Medium — Feature Completeness
 
-| #  | Task                                               | Effort | Impact                                |
-| -- | -------------------------------------------------- | ------ | ------------------------------------- |
+| #      | Task                                                                                            | Effort    | Impact                                    |
+| ------ | ----------------------------------------------------------------------------------------------- | --------- | ----------------------------------------- |
 | ~~15~~ | ~~Add `Mark(err, sentinel)` identity stamping~~ **Won't implement — declined — never adopted.** | ~~30min~~ | ~~Alternative to RegisterClassification~~ |
-| ~~16~~ | ~~Wire AI agent to real provider~~ **Won't implement — declined — analysis-only by design.** | ~~3h~~ | ~~Agent actually works~~ |
-| ~~17~~ | ~~Add `.golangci.yml`~~ done — curated config | ~~30min~~ | ~~Consistent linting~~ |
-| ~~18~~ | ~~Add `flake.nix`~~ done — flake.nix in place | ~~1h~~ | ~~Ecosystem standard~~ |
-| ~~19~~ | ~~Write ADR-001: Family design~~ **Won't implement — declined — rationale in README + code.** | ~~30min~~ | ~~Architecture documentation~~ |
-| ~~20~~ | ~~Add `DiagnosticFunc` adapter for `diagnose.Runner`~~ done — DiagnosticFunc adapter shipped | ~~15min~~ | ~~Bridge between packages~~ |
+| ~~16~~ | ~~Wire AI agent to real provider~~ **Won't implement — declined — analysis-only by design.**    | ~~3h~~    | ~~Agent actually works~~                  |
+| ~~17~~ | ~~Add `.golangci.yml`~~ done — curated config                                                   | ~~30min~~ | ~~Consistent linting~~                    |
+| ~~18~~ | ~~Add `flake.nix`~~ done — flake.nix in place                                                   | ~~1h~~    | ~~Ecosystem standard~~                    |
+| ~~19~~ | ~~Write ADR-001: Family design~~ **Won't implement — declined — rationale in README + code.**   | ~~30min~~ | ~~Architecture documentation~~            |
+| ~~20~~ | ~~Add `DiagnosticFunc` adapter for `diagnose.Runner`~~ done — DiagnosticFunc adapter shipped    | ~~15min~~ | ~~Bridge between packages~~               |
 
 ### Lower — Polish
 
-| #  | Task                                                         | Effort | Impact                             |
-| -- | ------------------------------------------------------------ | ------ | ---------------------------------- |
-| ~~21~~ | ~~Write examples/ directory~~ done — examples/ module | ~~1h~~ | ~~GoDoc integration~~ |
-| ~~22~~ | ~~Update planning docs (mark items resolved)~~ done — planning docs executed (see docs/planning/) | ~~15min~~ | ~~Keep docs honest~~ |
-| ~~23~~ | ~~Benchmark Classify() performance~~ done — Classify benchmarks | ~~30min~~ | ~~Performance baseline~~ |
-| ~~24~~ | ~~Add BDD tests with Ginkgo~~ **Won't implement — declined — Ginkgo BDD not adopted; table-driven stdlib tests.** | ~~2h~~ | ~~Higher-level behavior verification~~ |
-| ~~25~~ | ~~Write ADR-002: Why template registry over substring matching~~ **Won't implement — declined — template registry design chosen instead.** | ~~20min~~ | ~~Records the decision~~ |
+| #      | Task                                                                                                                                       | Effort    | Impact                                 |
+| ------ | ------------------------------------------------------------------------------------------------------------------------------------------ | --------- | -------------------------------------- |
+| ~~21~~ | ~~Write examples/ directory~~ done — examples/ module                                                                                      | ~~1h~~    | ~~GoDoc integration~~                  |
+| ~~22~~ | ~~Update planning docs (mark items resolved)~~ done — planning docs executed (see docs/planning/)                                          | ~~15min~~ | ~~Keep docs honest~~                   |
+| ~~23~~ | ~~Benchmark Classify() performance~~ done — Classify benchmarks                                                                            | ~~30min~~ | ~~Performance baseline~~               |
+| ~~24~~ | ~~Add BDD tests with Ginkgo~~ **Won't implement — declined — Ginkgo BDD not adopted; table-driven stdlib tests.**                          | ~~2h~~    | ~~Higher-level behavior verification~~ |
+| ~~25~~ | ~~Write ADR-002: Why template registry over substring matching~~ **Won't implement — declined — template registry design chosen instead.** | ~~20min~~ | ~~Records the decision~~               |
 
 ---
 

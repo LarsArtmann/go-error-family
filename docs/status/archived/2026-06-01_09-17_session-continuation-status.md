@@ -76,33 +76,33 @@ Nothing. All 184 tests pass, 0 lint issues, 0 race conditions across all 5 modul
 
 Sorted by impact × effort (Pareto):
 
-| #  | Task                                                                                         | Impact | Effort | Category     |
-| -- | -------------------------------------------------------------------------------------------- | ------ | ------ | ------------ |
-| ~~1~~  | ~~Add concurrent safety tests for registries (`RegisterClassification`, `RegisterTemplate`)~~ done — atomic snapshot + tests | ~~High~~ | ~~Low~~ | ~~Test~~ |
-| ~~2~~  | ~~Make `FilesystemRule.Run` respect context cancellation~~ done — ctx honored | ~~High~~ | ~~Low~~ | ~~Correctness~~ |
-| ~~3~~  | ~~Consolidate `DiagnosticFinding` vs `DiagnosticResult` (split brain)~~ done — Fix struct consolidated | ~~High~~ | ~~Medium~~ | ~~Architecture~~ |
-| ~~4~~  | ~~Rename `DebugAgent` → `Agent` interface~~ done — resolved — name kept deliberately | ~~Medium~~ | ~~Low~~ | ~~API~~ |
-| ~~5~~  | ~~Add `UnregisterClassification`/`UnregisterTemplate` to AGENTS.md~~ done — AGENTS.md documents Unregister | ~~Medium~~ | ~~Low~~ | ~~Docs~~ |
-| ~~6~~  | ~~Add Example functions for `HandleErrorWithContext`, `UnregisterClassification`, `ContextKey`~~ done — 26 Example functions | ~~Medium~~ | ~~Low~~ | ~~Docs~~ |
-| ~~7~~  | ~~Increase `diagnose` coverage from 66.9% to 80%+~~ done — 84.2% (2026-09-27) | ~~Medium~~ | ~~Medium~~ | ~~Test~~ |
-| ~~8~~  | ~~Increase `diagnose/postgres` coverage from 80.3% to 90%+~~ done — postgres 78.5% (2026-09-27); TODO_LIST lift target | ~~Medium~~ | ~~Medium~~ | ~~Test~~ |
-| ~~9~~  | ~~Add integration test: full pipeline (create error → classify → diagnose → handle)~~ done — full-pipeline covered by examples + integration tests | ~~Medium~~ | ~~Medium~~ | ~~Test~~ |
-| ~~10~~ | ~~Add `Family-specific format constructors` (NewRejectionf, NewTransientf)~~ done — Wrap{Family}f shipped | ~~Medium~~ | ~~Medium~~ | ~~Feature~~ |
-| ~~11~~ | ~~Add `errors.Join`-aware `Compose` that returns worst family~~ done — Compose shipped then removed in v0.5.0 | ~~Medium~~ | ~~Medium~~ | ~~Feature~~ |
-| ~~12~~ | ~~Add `Mark(err, sentinel)` for identity stamping~~ **Won't implement — declined — Mark never adopted.** | ~~Medium~~ | ~~Medium~~ | ~~Feature~~ |
-| ~~13~~ | ~~Add structured logging adapter (slog integration)~~ done — LogError slog integration shipped (v0.9.0 hook too) | ~~Medium~~ | ~~Medium~~ | ~~Feature~~ |
-| ~~14~~ | ~~Benchmark `Runner.Run` with context cancellation path~~ done — Runner benchmarks exist | ~~Low~~ | ~~Low~~ | ~~Perf~~ |
-| ~~15~~ | ~~Add `Runner.Register` concurrent safety test~~ done — Runner safety tested | ~~Low~~ | ~~Low~~ | ~~Test~~ |
-| ~~16~~ | ~~Add fuzz tests for `ParseFamily`, `Classify`~~ done — FuzzParseFamily + FuzzClassify | ~~Low~~ | ~~Medium~~ | ~~Test~~ |
-| ~~17~~ | ~~Add `Error.Format(state, verb)` for `%+v` verbose output~~ done — Format state/verb tested (FuzzErrorFormatting) | ~~Low~~ | ~~Low~~ | ~~Feature~~ |
-| ~~18~~ | ~~Add `Errors(err) []error` unwrapping helper~~ **Won't implement — declined — errors.Join + Classify chosen instead.** | ~~Low~~ | ~~Low~~ | ~~Feature~~ |
-| ~~19~~ | ~~Add `IsFamily(err, Family) bool` convenience function~~ **Won't implement — declined — Classify + interfaces chosen instead.** | ~~Low~~ | ~~Low~~ | ~~Feature~~ |
-| ~~20~~ | ~~Add `Corruption` family diagnostic rules~~ done — severity-ordered multi-error covers corruption class | ~~Medium~~ | ~~High~~ | ~~Feature~~ |
-| ~~21~~ | ~~Add `Conflict` family diagnostic rules~~ done — Conflict covered by rules + tests | ~~Medium~~ | ~~High~~ | ~~Feature~~ |
-| ~~22~~ | ~~Add observability hooks (metrics, tracing)~~ done — OnDiagnosed hook shipped | ~~Medium~~ | ~~High~~ | ~~Feature~~ |
-| ~~23~~ | ~~Extract `diagnose/internal/testutil` for shared mock runners~~ done — test helpers shared in diagnose | ~~Low~~ | ~~Medium~~ | ~~Cleanup~~ |
-| ~~24~~ | ~~Add `go vet` line-length check or custom linter~~ done — vet in CI | ~~Low~~ | ~~Low~~ | ~~Tooling~~ |
-| ~~25~~ | ~~Add `CODEOWNERS` file~~ **Won't implement — declined — CODEOWNERS not adopted.** | ~~Low~~ | ~~Low~~ | ~~Process~~ |
+| #      | Task                                                                                                                                               | Impact     | Effort     | Category         |
+| ------ | -------------------------------------------------------------------------------------------------------------------------------------------------- | ---------- | ---------- | ---------------- |
+| ~~1~~  | ~~Add concurrent safety tests for registries (`RegisterClassification`, `RegisterTemplate`)~~ done — atomic snapshot + tests                       | ~~High~~   | ~~Low~~    | ~~Test~~         |
+| ~~2~~  | ~~Make `FilesystemRule.Run` respect context cancellation~~ done — ctx honored                                                                      | ~~High~~   | ~~Low~~    | ~~Correctness~~  |
+| ~~3~~  | ~~Consolidate `DiagnosticFinding` vs `DiagnosticResult` (split brain)~~ done — Fix struct consolidated                                             | ~~High~~   | ~~Medium~~ | ~~Architecture~~ |
+| ~~4~~  | ~~Rename `DebugAgent` → `Agent` interface~~ done — resolved — name kept deliberately                                                               | ~~Medium~~ | ~~Low~~    | ~~API~~          |
+| ~~5~~  | ~~Add `UnregisterClassification`/`UnregisterTemplate` to AGENTS.md~~ done — AGENTS.md documents Unregister                                         | ~~Medium~~ | ~~Low~~    | ~~Docs~~         |
+| ~~6~~  | ~~Add Example functions for `HandleErrorWithContext`, `UnregisterClassification`, `ContextKey`~~ done — 26 Example functions                       | ~~Medium~~ | ~~Low~~    | ~~Docs~~         |
+| ~~7~~  | ~~Increase `diagnose` coverage from 66.9% to 80%+~~ done — 84.2% (2026-09-27)                                                                      | ~~Medium~~ | ~~Medium~~ | ~~Test~~         |
+| ~~8~~  | ~~Increase `diagnose/postgres` coverage from 80.3% to 90%+~~ done — postgres 78.5% (2026-09-27); TODO_LIST lift target                             | ~~Medium~~ | ~~Medium~~ | ~~Test~~         |
+| ~~9~~  | ~~Add integration test: full pipeline (create error → classify → diagnose → handle)~~ done — full-pipeline covered by examples + integration tests | ~~Medium~~ | ~~Medium~~ | ~~Test~~         |
+| ~~10~~ | ~~Add `Family-specific format constructors` (NewRejectionf, NewTransientf)~~ done — Wrap{Family}f shipped                                          | ~~Medium~~ | ~~Medium~~ | ~~Feature~~      |
+| ~~11~~ | ~~Add `errors.Join`-aware `Compose` that returns worst family~~ done — Compose shipped then removed in v0.5.0                                      | ~~Medium~~ | ~~Medium~~ | ~~Feature~~      |
+| ~~12~~ | ~~Add `Mark(err, sentinel)` for identity stamping~~ **Won't implement — declined — Mark never adopted.**                                           | ~~Medium~~ | ~~Medium~~ | ~~Feature~~      |
+| ~~13~~ | ~~Add structured logging adapter (slog integration)~~ done — LogError slog integration shipped (v0.9.0 hook too)                                   | ~~Medium~~ | ~~Medium~~ | ~~Feature~~      |
+| ~~14~~ | ~~Benchmark `Runner.Run` with context cancellation path~~ done — Runner benchmarks exist                                                           | ~~Low~~    | ~~Low~~    | ~~Perf~~         |
+| ~~15~~ | ~~Add `Runner.Register` concurrent safety test~~ done — Runner safety tested                                                                       | ~~Low~~    | ~~Low~~    | ~~Test~~         |
+| ~~16~~ | ~~Add fuzz tests for `ParseFamily`, `Classify`~~ done — FuzzParseFamily + FuzzClassify                                                             | ~~Low~~    | ~~Medium~~ | ~~Test~~         |
+| ~~17~~ | ~~Add `Error.Format(state, verb)` for `%+v` verbose output~~ done — Format state/verb tested (FuzzErrorFormatting)                                 | ~~Low~~    | ~~Low~~    | ~~Feature~~      |
+| ~~18~~ | ~~Add `Errors(err) []error` unwrapping helper~~ **Won't implement — declined — errors.Join + Classify chosen instead.**                            | ~~Low~~    | ~~Low~~    | ~~Feature~~      |
+| ~~19~~ | ~~Add `IsFamily(err, Family) bool` convenience function~~ **Won't implement — declined — Classify + interfaces chosen instead.**                   | ~~Low~~    | ~~Low~~    | ~~Feature~~      |
+| ~~20~~ | ~~Add `Corruption` family diagnostic rules~~ done — severity-ordered multi-error covers corruption class                                           | ~~Medium~~ | ~~High~~   | ~~Feature~~      |
+| ~~21~~ | ~~Add `Conflict` family diagnostic rules~~ done — Conflict covered by rules + tests                                                                | ~~Medium~~ | ~~High~~   | ~~Feature~~      |
+| ~~22~~ | ~~Add observability hooks (metrics, tracing)~~ done — OnDiagnosed hook shipped                                                                     | ~~Medium~~ | ~~High~~   | ~~Feature~~      |
+| ~~23~~ | ~~Extract `diagnose/internal/testutil` for shared mock runners~~ done — test helpers shared in diagnose                                            | ~~Low~~    | ~~Medium~~ | ~~Cleanup~~      |
+| ~~24~~ | ~~Add `go vet` line-length check or custom linter~~ done — vet in CI                                                                               | ~~Low~~    | ~~Low~~    | ~~Tooling~~      |
+| ~~25~~ | ~~Add `CODEOWNERS` file~~ **Won't implement — declined — CODEOWNERS not adopted.**                                                                 | ~~Low~~    | ~~Low~~    | ~~Process~~      |
 
 ---
 

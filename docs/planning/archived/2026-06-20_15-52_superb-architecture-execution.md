@@ -179,16 +179,16 @@ Sorted by impact desc, effort asc. 78 tasks. Each is a single verifiable unit.
 
 ### Decision-gated (require user input — NOT auto-executed)
 
-| #  | Task                                                   | Why gated                                   |
-| -- | ------------------------------------------------------ | ------------------------------------------- |
-| ~~71~~ | ~~Rename `agent` package → RCA/Synthesizer~~ done — resolved — rename rejected (published module path) | ~~User deferred for design discussion~~ |
-| ~~72~~ | ~~Tag root module v1.0~~ **Won't implement — declined — stays 0.x by choice.** | ~~"Ignore version numbers"~~ |
-| ~~73~~ | ~~Publish root version deleting agent/diagnose dirs~~ **Won't implement — declined — submodules stay in-repo.** | ~~Depends on publish strategy~~ |
-| ~~74~~ | ~~Remove replace-directive chain~~ done — resolved — replace chain removed 2026-07-05 (real pins) | ~~Depends on #73~~ |
+| #      | Task                                                                                                                               | Why gated                                       |
+| ------ | ---------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------- |
+| ~~71~~ | ~~Rename `agent` package → RCA/Synthesizer~~ done — resolved — rename rejected (published module path)                             | ~~User deferred for design discussion~~         |
+| ~~72~~ | ~~Tag root module v1.0~~ **Won't implement — declined — stays 0.x by choice.**                                                     | ~~"Ignore version numbers"~~                    |
+| ~~73~~ | ~~Publish root version deleting agent/diagnose dirs~~ **Won't implement — declined — submodules stay in-repo.**                    | ~~Depends on publish strategy~~                 |
+| ~~74~~ | ~~Remove replace-directive chain~~ done — resolved — replace chain removed 2026-07-05 (real pins)                                  | ~~Depends on #73~~                              |
 | ~~75~~ | ~~`errors.Join` pre-classifying wrapper `(error,Family)`~~ **Won't implement — declined — errors.Join + Classify chosen instead.** | ~~YAGNI — recommend SKIP unless concrete need~~ |
-| ~~76~~ | ~~i18n hook for familyData messages~~ **Won't implement — declined — i18n never demanded.** | ~~No current consumer need~~ |
-| ~~77~~ | ~~Shorter import alias (`errfam`)~~ **Won't implement — declined — errorfamily alias not adopted.** | ~~Cosmetic, breaking~~ |
-| ~~78~~ | ~~Re-evaluate Go 1.26 → lower requirement~~ done — resolved — Go floor is toolchain/dependency-driven (v0.10.2 true floors) | ~~User: ignore version constraints~~ |
+| ~~76~~ | ~~i18n hook for familyData messages~~ **Won't implement — declined — i18n never demanded.**                                        | ~~No current consumer need~~                    |
+| ~~77~~ | ~~Shorter import alias (`errfam`)~~ **Won't implement — declined — errorfamily alias not adopted.**                                | ~~Cosmetic, breaking~~                          |
+| ~~78~~ | ~~Re-evaluate Go 1.26 → lower requirement~~ done — resolved — Go floor is toolchain/dependency-driven (v0.10.2 true floors)        | ~~User: ignore version constraints~~            |
 
 ---
 

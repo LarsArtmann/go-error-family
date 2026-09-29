@@ -180,33 +180,33 @@ The project is in strong shape. Root package is zero-dependency, 96% coverage, z
 
 Sorted by impact × effort (highest first):
 
-| #  | Task                                                                       | Impact | Effort | Module   |
-| -- | -------------------------------------------------------------------------- | ------ | ------ | -------- |
-| ~~1~~  | ~~Fix 7 bridge lint issues (errname, goconst, staticcheck, wrapcheck)~~ done — bridge lints clean | ~~High~~ | ~~Low~~ | ~~bridge~~ |
-| ~~2~~  | ~~Add bridge/ to CI workflow (.github/workflows/ci.yml)~~ done — bridge tested in CI (v0.10.1) | ~~High~~ | ~~Low~~ | ~~CI~~ |
-| ~~3~~  | ~~Update README.md with bridge section and comparison links~~ done — README documents bridge | ~~Medium~~ | ~~Low~~ | ~~docs~~ |
-| ~~4~~  | ~~Add CHANGELOG.md entry for bridge submodule~~ done — CHANGELOG documents bridge | ~~Medium~~ | ~~Low~~ | ~~docs~~ |
-| ~~5~~  | ~~Create FEATURES.md with honest feature inventory~~ done — FEATURES.md created | ~~Medium~~ | ~~Low~~ | ~~docs~~ |
-| ~~6~~  | ~~Modernize b.N → b.Loop() in all benchmark functions~~ done — modernized | ~~Low~~ | ~~Low~~ | ~~all~~ |
-| ~~7~~  | ~~Improve ErrorContext tags serialization (comma-join instead of fmt.Sprint)~~ done — tags serialized | ~~Medium~~ | ~~Low~~ | ~~bridge~~ |
-| ~~8~~  | ~~Add golangci-lint config overrides for bridge/~~ done — lint clean | ~~Medium~~ | ~~Low~~ | ~~bridge~~ |
-| ~~9~~  | ~~Investigate agent coverage drop (100% → 89.4%)~~ done — agent 100% | ~~Medium~~ | ~~Low~~ | ~~agent~~ |
-| ~~10~~ | ~~Create TODO_LIST.md from existing planning docs~~ done — TODO_LIST.md created | ~~Medium~~ | ~~Low~~ | ~~docs~~ |
-| ~~11~~ | ~~Build Phase 3 handle package (unified boundary handler)~~ **Won't implement — declined — Phase 3 handle package declined (composition documented instead).** | ~~High~~ | ~~Medium~~ | ~~handle~~ |
-| ~~12~~ | ~~Improve diagnose core coverage (61.7% → 80%+)~~ done — 84.2% (2026-09-27) | ~~Medium~~ | ~~Medium~~ | ~~diagnose~~ |
-| ~~13~~ | ~~Add bridge example (separate go.mod or integration test)~~ done — bridge example shipped (examples/cmd/bridge) | ~~Medium~~ | ~~Medium~~ | ~~examples~~ |
-| ~~14~~ | ~~Make InferFamily mapping tables configurable (functional options)~~ **Won't implement — declined — InferFamily options not adopted (documented tables).** | ~~Medium~~ | ~~Medium~~ | ~~bridge~~ |
-| ~~15~~ | ~~Add coverage threshold to CI (enforce 80% minimum)~~ done — coverage gates via BuildFlow | ~~Medium~~ | ~~Low~~ | ~~CI~~ |
-| ~~16~~ | ~~Document root package structure decision (why not /pkg/)~~ done — structure decision documented | ~~Low~~ | ~~Low~~ | ~~docs~~ |
-| ~~17~~ | ~~Add bridge/ to release workflow (.github/workflows/release.yml)~~ done — bridge in release process (tags) | ~~Medium~~ | ~~Low~~ | ~~CI~~ |
-| ~~18~~ | ~~Run bridge fuzz tests for extended period (find edge cases)~~ done — extended fuzz runs done | ~~Low~~ | ~~Low~~ | ~~bridge~~ |
-| ~~19~~ | ~~Add gitleaks exception for bridge/ if needed~~ done — gitleaks clean | ~~Low~~ | ~~Low~~ | ~~bridge~~ |
-| ~~20~~ | ~~Update docs/DOMAIN_LANGUAGE.md with bridge terms~~ done — DOMAIN_LANGUAGE covers bridge terms | ~~Low~~ | ~~Low~~ | ~~docs~~ |
-| ~~21~~ | ~~Consider structured tags in ErrorContext (not flat string)~~ done — structured ErrorContext documented | ~~Medium~~ | ~~Medium~~ | ~~bridge~~ |
-| ~~22~~ | ~~Add integration test: oops → AutoWrap → Classify → HandleError → exit code~~ done — integration proven by examples/cmd/bridge tests | ~~High~~ | ~~Medium~~ | ~~bridge~~ |
-| ~~23~~ | ~~Update flake.nix to include bridge in devShell test/lint targets~~ done — flake targets green | ~~Medium~~ | ~~Low~~ | ~~nix~~ |
-| ~~24~~ | ~~Audit all examples for accuracy against current API~~ done — examples accurate | ~~Low~~ | ~~Low~~ | ~~examples~~ |
-| ~~25~~ | ~~Consider version bump to v0.4.0 (bridge is a new feature)~~ done — versioned (bridge/v0.3.4) | ~~Medium~~ | ~~Low~~ | ~~release~~ |
+| #      | Task                                                                                                                                                           | Impact     | Effort     | Module       |
+| ------ | -------------------------------------------------------------------------------------------------------------------------------------------------------------- | ---------- | ---------- | ------------ |
+| ~~1~~  | ~~Fix 7 bridge lint issues (errname, goconst, staticcheck, wrapcheck)~~ done — bridge lints clean                                                              | ~~High~~   | ~~Low~~    | ~~bridge~~   |
+| ~~2~~  | ~~Add bridge/ to CI workflow (.github/workflows/ci.yml)~~ done — bridge tested in CI (v0.10.1)                                                                 | ~~High~~   | ~~Low~~    | ~~CI~~       |
+| ~~3~~  | ~~Update README.md with bridge section and comparison links~~ done — README documents bridge                                                                   | ~~Medium~~ | ~~Low~~    | ~~docs~~     |
+| ~~4~~  | ~~Add CHANGELOG.md entry for bridge submodule~~ done — CHANGELOG documents bridge                                                                              | ~~Medium~~ | ~~Low~~    | ~~docs~~     |
+| ~~5~~  | ~~Create FEATURES.md with honest feature inventory~~ done — FEATURES.md created                                                                                | ~~Medium~~ | ~~Low~~    | ~~docs~~     |
+| ~~6~~  | ~~Modernize b.N → b.Loop() in all benchmark functions~~ done — modernized                                                                                      | ~~Low~~    | ~~Low~~    | ~~all~~      |
+| ~~7~~  | ~~Improve ErrorContext tags serialization (comma-join instead of fmt.Sprint)~~ done — tags serialized                                                          | ~~Medium~~ | ~~Low~~    | ~~bridge~~   |
+| ~~8~~  | ~~Add golangci-lint config overrides for bridge/~~ done — lint clean                                                                                           | ~~Medium~~ | ~~Low~~    | ~~bridge~~   |
+| ~~9~~  | ~~Investigate agent coverage drop (100% → 89.4%)~~ done — agent 100%                                                                                           | ~~Medium~~ | ~~Low~~    | ~~agent~~    |
+| ~~10~~ | ~~Create TODO_LIST.md from existing planning docs~~ done — TODO_LIST.md created                                                                                | ~~Medium~~ | ~~Low~~    | ~~docs~~     |
+| ~~11~~ | ~~Build Phase 3 handle package (unified boundary handler)~~ **Won't implement — declined — Phase 3 handle package declined (composition documented instead).** | ~~High~~   | ~~Medium~~ | ~~handle~~   |
+| ~~12~~ | ~~Improve diagnose core coverage (61.7% → 80%+)~~ done — 84.2% (2026-09-27)                                                                                    | ~~Medium~~ | ~~Medium~~ | ~~diagnose~~ |
+| ~~13~~ | ~~Add bridge example (separate go.mod or integration test)~~ done — bridge example shipped (examples/cmd/bridge)                                               | ~~Medium~~ | ~~Medium~~ | ~~examples~~ |
+| ~~14~~ | ~~Make InferFamily mapping tables configurable (functional options)~~ **Won't implement — declined — InferFamily options not adopted (documented tables).**    | ~~Medium~~ | ~~Medium~~ | ~~bridge~~   |
+| ~~15~~ | ~~Add coverage threshold to CI (enforce 80% minimum)~~ done — coverage gates via BuildFlow                                                                     | ~~Medium~~ | ~~Low~~    | ~~CI~~       |
+| ~~16~~ | ~~Document root package structure decision (why not /pkg/)~~ done — structure decision documented                                                              | ~~Low~~    | ~~Low~~    | ~~docs~~     |
+| ~~17~~ | ~~Add bridge/ to release workflow (.github/workflows/release.yml)~~ done — bridge in release process (tags)                                                    | ~~Medium~~ | ~~Low~~    | ~~CI~~       |
+| ~~18~~ | ~~Run bridge fuzz tests for extended period (find edge cases)~~ done — extended fuzz runs done                                                                 | ~~Low~~    | ~~Low~~    | ~~bridge~~   |
+| ~~19~~ | ~~Add gitleaks exception for bridge/ if needed~~ done — gitleaks clean                                                                                         | ~~Low~~    | ~~Low~~    | ~~bridge~~   |
+| ~~20~~ | ~~Update docs/DOMAIN_LANGUAGE.md with bridge terms~~ done — DOMAIN_LANGUAGE covers bridge terms                                                                | ~~Low~~    | ~~Low~~    | ~~docs~~     |
+| ~~21~~ | ~~Consider structured tags in ErrorContext (not flat string)~~ done — structured ErrorContext documented                                                       | ~~Medium~~ | ~~Medium~~ | ~~bridge~~   |
+| ~~22~~ | ~~Add integration test: oops → AutoWrap → Classify → HandleError → exit code~~ done — integration proven by examples/cmd/bridge tests                          | ~~High~~   | ~~Medium~~ | ~~bridge~~   |
+| ~~23~~ | ~~Update flake.nix to include bridge in devShell test/lint targets~~ done — flake targets green                                                                | ~~Medium~~ | ~~Low~~    | ~~nix~~      |
+| ~~24~~ | ~~Audit all examples for accuracy against current API~~ done — examples accurate                                                                               | ~~Low~~    | ~~Low~~    | ~~examples~~ |
+| ~~25~~ | ~~Consider version bump to v0.4.0 (bridge is a new feature)~~ done — versioned (bridge/v0.3.4)                                                                 | ~~Medium~~ | ~~Low~~    | ~~release~~  |
 
 ---
 

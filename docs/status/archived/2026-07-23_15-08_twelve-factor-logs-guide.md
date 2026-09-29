@@ -18,20 +18,20 @@ User asked: "How does go-error-family compare to https://12factor.net/logs?" —
 
 ## b) PARTIALLY DONE
 
-| # | Task                  | Status | What Remains                                                                                                    |
-| - | --------------------- | ------ | --------------------------------------------------------------------------------------------------------------- |
-| ~~1~~ | ~~Guide content written~~ done — guide complete with JSON/Docker examples | ~~90%~~ | ~~Code example is simplified; could add a JSON-handler example and a Docker/Kubernetes routing example~~ |
-| ~~2~~ | ~~Sidebar integration~~ done — sidebar placement final | ~~90%~~ | ~~Placement is after "Performance" — may belong nearer "HTTP & CLI Boundaries" (both operational/boundary topics)~~ |
+| #     | Task                                                                      | Status  | What Remains                                                                                                        |
+| ----- | ------------------------------------------------------------------------- | ------- | ------------------------------------------------------------------------------------------------------------------- |
+| ~~1~~ | ~~Guide content written~~ done — guide complete with JSON/Docker examples | ~~90%~~ | ~~Code example is simplified; could add a JSON-handler example and a Docker/Kubernetes routing example~~            |
+| ~~2~~ | ~~Sidebar integration~~ done — sidebar placement final                    | ~~90%~~ | ~~Placement is after "Performance" — may belong nearer "HTTP & CLI Boundaries" (both operational/boundary topics)~~ |
 
 ## c) NOT STARTED
 
-| # | Task                                                                                                                                                     |
-| - | -------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| #     | Task                                                                                                                                                                                                           |
+| ----- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | ~~1~~ | ~~**Never verified the website builds** — no `pnpm dlx astro build` or `pnpm dlx astro check` was run after adding the .mdx and editing `astro.config.mjs`~~ done — build verified (astro check + build green) |
-| ~~2~~ | ~~No cross-links added from `http-and-cli.mdx` or `related-tools.mdx` to the new guide~~ done — cross-links added |
-| ~~3~~ | ~~No `AGENTS.md` update noting the new guide exists~~ done — AGENTS.md note added |
-| ~~4~~ | ~~Go code snippet in the .mdx is untested / not compiled~~ done — snippet verified compiling |
-| ~~5~~ | ~~No verification that frontmatter style matches other guides exactly~~ done — frontmatter style verified |
+| ~~2~~ | ~~No cross-links added from `http-and-cli.mdx` or `related-tools.mdx` to the new guide~~ done — cross-links added                                                                                              |
+| ~~3~~ | ~~No `AGENTS.md` update noting the new guide exists~~ done — AGENTS.md note added                                                                                                                              |
+| ~~4~~ | ~~Go code snippet in the .mdx is untested / not compiled~~ done — snippet verified compiling                                                                                                                   |
+| ~~5~~ | ~~No verification that frontmatter style matches other guides exactly~~ done — frontmatter style verified                                                                                                      |
 
 ## d) TOTALLY FUCKED UP
 

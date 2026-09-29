@@ -12,15 +12,15 @@ workflow run. The GitHub Release had to be created manually on 2026-09-27.
 
 ## Evidence
 
-| Check | v0.10.1 | v0.10.2 |
-| ----- | ------- | ------- |
-| `release.yml` at tag | trigger `push: tags: v[0-9]+.[0-9]+.[0-9]+*` | **byte-identical** (empty diff) |
-| Tag glob match | yes | yes |
-| Tag exists on origin, SHA matches local | yes | yes (annotated tag `fa896f4`) |
-| Release run | `35001405325`, `head_branch=v0.10.1`, 17:27:42Z | **none** (not even startup_failure) |
-| CI run on same commit | 17:27:44Z (master) | 20:33:37Z (master) |
-| PushEvent `refs/heads/master` | yes | yes (20:33:36Z, head `aefb86a`) |
-| PushEvent `refs/tags/v0.10.2` | (equivalent fired for v0.10.1) | **ABSENT** from the events API across the whole push window |
+| Check                                   | v0.10.1                                         | v0.10.2                                                     |
+| --------------------------------------- | ----------------------------------------------- | ----------------------------------------------------------- |
+| `release.yml` at tag                    | trigger `push: tags: v[0-9]+.[0-9]+.[0-9]+*`    | **byte-identical** (empty diff)                             |
+| Tag glob match                          | yes                                             | yes                                                         |
+| Tag exists on origin, SHA matches local | yes                                             | yes (annotated tag `fa896f4`)                               |
+| Release run                             | `35001405325`, `head_branch=v0.10.1`, 17:27:42Z | **none** (not even startup_failure)                         |
+| CI run on same commit                   | 17:27:44Z (master)                              | 20:33:37Z (master)                                          |
+| PushEvent `refs/heads/master`           | yes                                             | yes (20:33:36Z, head `aefb86a`)                             |
+| PushEvent `refs/tags/v0.10.2`           | (equivalent fired for v0.10.1)                  | **ABSENT** from the events API across the whole push window |
 
 The `refs/tags/v0.10.2` push webhook was **never delivered**, so the `push`-triggered
 release workflow was never evaluated. The commit-level CI ran fine because the

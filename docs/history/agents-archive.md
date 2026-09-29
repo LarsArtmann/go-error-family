@@ -149,15 +149,15 @@ Not a library type — partial success is a consumption pattern, not a classific
 
 Live `go test -race -cover` run, 2026-09-28 (M06 coverage lift wave):
 
-| Package              | Coverage | Δ vs 2026-09-27       |
-| -------------------- | -------- | --------------------- |
-| root (`errorfamily`) | 97.1%    | —                     |
-| `errorfamilytest`    | 96.3%    | —                     |
-| `agent`              | 100.0%   | —                     |
-| `bridge`             | 94.4%    | —                     |
-| `diagnose` (core)    | 97.4%    | +13.2 (was 84.2%)     |
-| `diagnose/git`       | 98.7%    | +7.7 (was 91.0%)      |
-| `diagnose/postgres`  | 89.2%    | +10.7 (was 78.5%)     |
+| Package              | Coverage | Δ vs 2026-09-27   |
+| -------------------- | -------- | ----------------- |
+| root (`errorfamily`) | 97.1%    | —                 |
+| `errorfamilytest`    | 96.3%    | —                 |
+| `agent`              | 100.0%   | —                 |
+| `bridge`             | 94.4%    | —                 |
+| `diagnose` (core)    | 97.4%    | +13.2 (was 84.2%) |
+| `diagnose/git`       | 98.7%    | +7.7 (was 91.0%)  |
+| `diagnose/postgres`  | 89.2%    | +10.7 (was 78.5%) |
 
 The 2026-09-27 dips (v0.10.1 erraudit run-path rewrites) are fully recovered and then some: diagnose core gained `command_test.go` (DefaultCommandRunner/RunCommand/ResolveRunner/CommandExists + helper/stripHost/sortByConfidence/filesystem error branches), git recovered via remote-failure branch tests (exit != 0, run error on `git remote` and `ls-remote`, cwd fallback), postgres via pg_isready run-error + TCP-refused-without-pg_isready + adaptive `IsPostgresRunning` closed-port tests. (`errorfamilytest` is intentionally thin — assertion helpers delegating to the main package.)
 

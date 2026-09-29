@@ -216,48 +216,48 @@ Ranked by impact × effort (Pareto ordering):
 
 ### Tier 1: HIGH IMPACT, LOW EFFORT (do these first)
 
-| # | Task                                                                                                            | Effort | Impact                                      |
-| - | --------------------------------------------------------------------------------------------------------------- | ------ | ------------------------------------------- |
-| ~~1~~ | ~~**Push 2 unpushed commits to origin**~~ done — pushed | ~~1 min~~ | ~~Prevents data loss~~ |
-| ~~2~~ | ~~**Add GitHub Actions CI** (`go test`, `go vet`, `go build` on push/PR)~~ done — ci.yml live | ~~15 min~~ | ~~Safety net for all future work~~ |
-| ~~3~~ | ~~**Update CHANGELOG `[Unreleased]`** with refactoring changes~~ done — CHANGELOG maintained | ~~5 min~~ | ~~Honest docs~~ |
-| ~~4~~ | ~~**Add `diagnose/context_test.go`** — direct tests for `runCommand()` (mockable scenarios) and `commandExists()`~~ done — diagnose fully tested | ~~20 min~~ | ~~Closes 2 coverage gaps~~ |
-| ~~5~~ | ~~**Add `ruleSpec.matches()` direct unit test**~~ done — ruleSpec.Matches tested | ~~10 min~~ | ~~Closes coverage gap for core matching logic~~ |
-| ~~6~~ | ~~**Add `*Rule.Name()` tests** (all 4 rules)~~ done — Name() covered | ~~5 min~~ | ~~Trivial 0% → 100% on 4 functions~~ |
-| ~~7~~ | ~~**Add `PostgresRule.suggestStartFix()` table-driven test**~~ done — suggestStartFix covered | ~~10 min~~ | ~~0% → ~100% on 4 branches~~ |
-| ~~8~~ | ~~**Add README license badge + changelog link**~~ done — README complete | ~~5 min~~ | ~~Professional polish~~ |
+| #     | Task                                                                                                                                             | Effort     | Impact                                          |
+| ----- | ------------------------------------------------------------------------------------------------------------------------------------------------ | ---------- | ----------------------------------------------- |
+| ~~1~~ | ~~**Push 2 unpushed commits to origin**~~ done — pushed                                                                                          | ~~1 min~~  | ~~Prevents data loss~~                          |
+| ~~2~~ | ~~**Add GitHub Actions CI** (`go test`, `go vet`, `go build` on push/PR)~~ done — ci.yml live                                                    | ~~15 min~~ | ~~Safety net for all future work~~              |
+| ~~3~~ | ~~**Update CHANGELOG `[Unreleased]`** with refactoring changes~~ done — CHANGELOG maintained                                                     | ~~5 min~~  | ~~Honest docs~~                                 |
+| ~~4~~ | ~~**Add `diagnose/context_test.go`** — direct tests for `runCommand()` (mockable scenarios) and `commandExists()`~~ done — diagnose fully tested | ~~20 min~~ | ~~Closes 2 coverage gaps~~                      |
+| ~~5~~ | ~~**Add `ruleSpec.matches()` direct unit test**~~ done — ruleSpec.Matches tested                                                                 | ~~10 min~~ | ~~Closes coverage gap for core matching logic~~ |
+| ~~6~~ | ~~**Add `*Rule.Name()` tests** (all 4 rules)~~ done — Name() covered                                                                             | ~~5 min~~  | ~~Trivial 0% → 100% on 4 functions~~            |
+| ~~7~~ | ~~**Add `PostgresRule.suggestStartFix()` table-driven test**~~ done — suggestStartFix covered                                                    | ~~10 min~~ | ~~0% → ~100% on 4 branches~~                    |
+| ~~8~~ | ~~**Add README license badge + changelog link**~~ done — README complete                                                                         | ~~5 min~~  | ~~Professional polish~~                         |
 
 ### Tier 2: HIGH IMPACT, MEDIUM EFFORT
 
-| #  | Task                                                                        | Effort | Impact                                 |
-| -- | --------------------------------------------------------------------------- | ------ | -------------------------------------- |
-| ~~9~~  | ~~**Extract `CommandRunner` interface in diagnose**~~ done — CommandRunner shipped | ~~1 hr~~ | ~~Unlocks full unit testing of all rules~~ |
-| ~~10~~ | ~~**Add GoReleaser config** for automated releases~~ **Won't implement — declined — release.yml instead.** | ~~30 min~~ | ~~Professional release pipeline~~ |
-| ~~11~~ | ~~**Add `flake.nix`** for reproducible builds~~ done — flake.nix in place | ~~30 min~~ | ~~Per AGENTS.md policy~~ |
-| ~~12~~ | ~~**Add concurrent `Runner.Run()` test** with `-race`~~ done — Runner concurrency tested | ~~20 min~~ | ~~Verifies thread safety~~ |
-| ~~13~~ | ~~**Add `Runner.Run()` nil-result filtering test**~~ done — filter tested | ~~10 min~~ | ~~Closes untested path~~ |
-| ~~14~~ | ~~**Test `GitRule.Run()` branches** — merge conflicts, dirty tree, no remotes~~ done — GitRule branches covered | ~~30 min~~ | ~~17.3% → ~70% coverage~~ |
-| ~~15~~ | ~~**Test `PostgresRule.Run()` branches** — TCP fallback, pg_isready success~~ done — PostgresRule branches covered | ~~20 min~~ | ~~35.5% → ~70%~~ |
+| #      | Task                                                                                                               | Effort     | Impact                                     |
+| ------ | ------------------------------------------------------------------------------------------------------------------ | ---------- | ------------------------------------------ |
+| ~~9~~  | ~~**Extract `CommandRunner` interface in diagnose**~~ done — CommandRunner shipped                                 | ~~1 hr~~   | ~~Unlocks full unit testing of all rules~~ |
+| ~~10~~ | ~~**Add GoReleaser config** for automated releases~~ **Won't implement — declined — release.yml instead.**         | ~~30 min~~ | ~~Professional release pipeline~~          |
+| ~~11~~ | ~~**Add `flake.nix`** for reproducible builds~~ done — flake.nix in place                                          | ~~30 min~~ | ~~Per AGENTS.md policy~~                   |
+| ~~12~~ | ~~**Add concurrent `Runner.Run()` test** with `-race`~~ done — Runner concurrency tested                           | ~~20 min~~ | ~~Verifies thread safety~~                 |
+| ~~13~~ | ~~**Add `Runner.Run()` nil-result filtering test**~~ done — filter tested                                          | ~~10 min~~ | ~~Closes untested path~~                   |
+| ~~14~~ | ~~**Test `GitRule.Run()` branches** — merge conflicts, dirty tree, no remotes~~ done — GitRule branches covered    | ~~30 min~~ | ~~17.3% → ~70% coverage~~                  |
+| ~~15~~ | ~~**Test `PostgresRule.Run()` branches** — TCP fallback, pg_isready success~~ done — PostgresRule branches covered | ~~20 min~~ | ~~35.5% → ~70%~~                           |
 
 ### Tier 3: MEDIUM IMPACT, LOW EFFORT
 
-| #  | Task                                                                                              | Effort | Impact                             |
-| -- | ------------------------------------------------------------------------------------------------- | ------ | ---------------------------------- |
-| ~~16~~ | ~~**Add `FilesystemRule.Run()` error branch tests** — permission denied, not writable, not readable~~ done — FilesystemRule branches covered | ~~20 min~~ | ~~47.5% → ~80%~~ |
-| ~~17~~ | ~~**Test `NetworkRule.Run()` uncovered branches**~~ done — NetworkRule branches covered | ~~15 min~~ | ~~59.3% → ~80%~~ |
-| ~~18~~ | ~~**Extract pure helper functions** (`stripAfter`, `resolvePort`, `resolvePath`, `resolveRepoPath`)~~ done — helpers extracted | ~~20 min~~ | ~~Testability~~ |
-| ~~19~~ | ~~**Add `CONTRIBUTING.md`** for open-source contributors~~ done — CONTRIBUTING.md exists | ~~15 min~~ | ~~Community readiness~~ |
-| ~~20~~ | ~~**Add Go Report Card badge** to README~~ done — badge live | ~~2 min~~ | ~~Already has it — verify link works~~ |
+| #      | Task                                                                                                                                         | Effort     | Impact                                 |
+| ------ | -------------------------------------------------------------------------------------------------------------------------------------------- | ---------- | -------------------------------------- |
+| ~~16~~ | ~~**Add `FilesystemRule.Run()` error branch tests** — permission denied, not writable, not readable~~ done — FilesystemRule branches covered | ~~20 min~~ | ~~47.5% → ~80%~~                       |
+| ~~17~~ | ~~**Test `NetworkRule.Run()` uncovered branches**~~ done — NetworkRule branches covered                                                      | ~~15 min~~ | ~~59.3% → ~80%~~                       |
+| ~~18~~ | ~~**Extract pure helper functions** (`stripAfter`, `resolvePort`, `resolvePath`, `resolveRepoPath`)~~ done — helpers extracted               | ~~20 min~~ | ~~Testability~~                        |
+| ~~19~~ | ~~**Add `CONTRIBUTING.md`** for open-source contributors~~ done — CONTRIBUTING.md exists                                                     | ~~15 min~~ | ~~Community readiness~~                |
+| ~~20~~ | ~~**Add Go Report Card badge** to README~~ done — badge live                                                                                 | ~~2 min~~  | ~~Already has it — verify link works~~ |
 
 ### Tier 4: NICE TO HAVE
 
-| #  | Task                                                                  | Effort | Impact                 |
-| -- | --------------------------------------------------------------------- | ------ | ---------------------- |
-| ~~21~~ | ~~**Add `example/` directory** with a working CLI app~~ done — examples/ module | ~~30 min~~ | ~~Discoverability~~ |
-| ~~22~~ | ~~**Add `NetworkRule.resolvePort()` direct test**~~ done — resolvePort tested | ~~10 min~~ | ~~Closes untested helper~~ |
-| ~~23~~ | ~~**Add versioning policy** to README (semver compatibility guarantees)~~ done — resolved — 0.x discipline + retract policy | ~~15 min~~ | ~~Consumer confidence~~ |
-| ~~24~~ | ~~**Plan v0.2.0 release** — milestone document with breaking changes~~ done — v0.2.0 shipped | ~~20 min~~ | ~~Release management~~ |
-| ~~25~~ | ~~**Add `IsPostgresRunning()` assertions** in existing smoke test~~ done — IsPostgresRunning tested | ~~5 min~~ | ~~53.8% → higher~~ |
+| #      | Task                                                                                                                        | Effort     | Impact                     |
+| ------ | --------------------------------------------------------------------------------------------------------------------------- | ---------- | -------------------------- |
+| ~~21~~ | ~~**Add `example/` directory** with a working CLI app~~ done — examples/ module                                             | ~~30 min~~ | ~~Discoverability~~        |
+| ~~22~~ | ~~**Add `NetworkRule.resolvePort()` direct test**~~ done — resolvePort tested                                               | ~~10 min~~ | ~~Closes untested helper~~ |
+| ~~23~~ | ~~**Add versioning policy** to README (semver compatibility guarantees)~~ done — resolved — 0.x discipline + retract policy | ~~15 min~~ | ~~Consumer confidence~~    |
+| ~~24~~ | ~~**Plan v0.2.0 release** — milestone document with breaking changes~~ done — v0.2.0 shipped                                | ~~20 min~~ | ~~Release management~~     |
+| ~~25~~ | ~~**Add `IsPostgresRunning()` assertions** in existing smoke test~~ done — IsPostgresRunning tested                         | ~~5 min~~  | ~~53.8% → higher~~         |
 
 ---
 

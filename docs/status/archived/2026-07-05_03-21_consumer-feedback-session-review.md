@@ -40,32 +40,32 @@
 
 ### From SwettySwipper feedback:
 
-| #  | Item                                                                 | Ask                                                                              |
-| -- | -------------------------------------------------------------------- | -------------------------------------------------------------------------------- |
-| ~~S1~~ | ~~`Classify(nil)` → Rejection in **godoc**~~ done — Classify nil-godoc shipped | ~~Document prominently on `Classify` itself, not just SKILL.md~~ |
-| ~~S2~~ | ~~`errors.Is` code+family matching in **godoc**~~ done — Is godoc + example shipped | ~~Add example to `Error.Is` godoc~~ |
-| ~~S3~~ | ~~`Wrap(nil,...)` → nil in **constructor godoc**~~ done — Wrap nil godoc shipped | ~~"Returns nil if err is nil — use `New*` for errors without a cause"~~ |
-| ~~S4~~ | ~~Template `{key}` substitution mechanism in **MessageTemplate godoc**~~ done — {key} substitution documented | ~~Document it's `strings.ReplaceAll`, no escaping~~ |
-| ~~S5~~ | ~~**Per-error HTTP status override**~~ done — WithHTTPStatus shipped in v0.8.0 | ~~`err.WithHTTPStatus(404)` — new feature, Family default + per-error override~~ |
-| ~~S6~~ | ~~Registry isolation testing pattern~~ done — Registry isolation documented in README + SKILL | ~~Document "use NewRegistry for test isolation" pattern~~ |
-| ~~S7~~ | ~~Error code in HTTP responses~~ done — HTTPHandler writes code in JSON body | ~~Partially solved by my `HTTPHandler`, but consumer's cqrs-htmx layer is separate~~ |
+| #      | Item                                                                                                          | Ask                                                                                  |
+| ------ | ------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------ |
+| ~~S1~~ | ~~`Classify(nil)` → Rejection in **godoc**~~ done — Classify nil-godoc shipped                                | ~~Document prominently on `Classify` itself, not just SKILL.md~~                     |
+| ~~S2~~ | ~~`errors.Is` code+family matching in **godoc**~~ done — Is godoc + example shipped                           | ~~Add example to `Error.Is` godoc~~                                                  |
+| ~~S3~~ | ~~`Wrap(nil,...)` → nil in **constructor godoc**~~ done — Wrap nil godoc shipped                              | ~~"Returns nil if err is nil — use `New*` for errors without a cause"~~              |
+| ~~S4~~ | ~~Template `{key}` substitution mechanism in **MessageTemplate godoc**~~ done — {key} substitution documented | ~~Document it's `strings.ReplaceAll`, no escaping~~                                  |
+| ~~S5~~ | ~~**Per-error HTTP status override**~~ done — WithHTTPStatus shipped in v0.8.0                                | ~~`err.WithHTTPStatus(404)` — new feature, Family default + per-error override~~     |
+| ~~S6~~ | ~~Registry isolation testing pattern~~ done — Registry isolation documented in README + SKILL                 | ~~Document "use NewRegistry for test isolation" pattern~~                            |
+| ~~S7~~ | ~~Error code in HTTP responses~~ done — HTTPHandler writes code in JSON body                                  | ~~Partially solved by my `HTTPHandler`, but consumer's cqrs-htmx layer is separate~~ |
 
 ### From DiscordSync feedback:
 
-| #   | Item                                                                   | Ask                                                                                       |
-| --- | ---------------------------------------------------------------------- | ----------------------------------------------------------------------------------------- |
-| ~~D1~~  | ~~No `Newf` with context (3 chained calls)~~ done — resolved — WithContextMap covers multi-context; design decision 2026-07-23 | ~~Variadic context or builder pattern~~ |
-| ~~D2~~  | ~~`RegisterClassification` global state concern~~ done — resolved — frozen flag declined (atomic snapshot safe); decision 2026-07-23 | ~~"Frozen" flag after first read, or better docs~~ |
-| ~~D3~~  | ~~`*Error` too many methods (Code vs ErrorCode etc.)~~ done — resolved — method sprawl reviewed; copy-on-write retained | ~~Partially addressed (doc clarification), but broader method-proliferation concern remains~~ |
-| ~~D4~~  | ~~`Classify(nil)` inconsistency with fail-open~~ done — resolved — Classify(nil)=Rejection kept; decision 2026-07-23 | ~~Debated changing to Infrastructure; not changed. Needs stronger rationale.~~ |
-| ~~D5~~  | ~~`RegisterClassificationType[T error]` (errors.As-based)~~ done — RegisterClassificationType shipped in v0.8.0 | ~~Generic type-based registration (RegisterClassifier partially solves this)~~ |
-| ~~D6~~  | ~~diagnose/ overkill — skill should say "skip if not needed"~~ done — diagnose opt-in note in SKILL.md | ~~One-liner guidance in SKILL.md~~ |
-| ~~D7~~  | ~~`TemplateRegistry` confusion (is RegisterTemplate on DefaultRegistry?)~~ done — RegisterTemplate documented in SKILL.md | ~~Clarify in docs — it IS, but consumers are confused~~ |
-| ~~D8~~  | ~~Batch/partial-success canonical example~~ done — batch registration + examples shipped | ~~Code example in SKILL.md~~ |
-| ~~D9~~  | ~~Skill: `New*` vs `Wrap*` guidance~~ done — New/Wrap guidance in SKILL.md | ~~"Use New* from scratch, Wrap* when you have a cause"~~ |
-| ~~D10~~ | ~~Skill: `errkit` consumer pattern example~~ done — errkit pattern section in SKILL.md | ~~Show the nil-safe wrapper pattern consumers build~~ |
-| ~~D11~~ | ~~Skill: `RegisterClassifications` map variant~~ done — WithContextMap is the map variant | ~~Only singular is shown in skill~~ |
-| ~~D12~~ | ~~Skill: `ParseFamily` default in gotchas table~~ done — ParseFamily gotcha documented | ~~Add to gotchas~~ |
+| #       | Item                                                                                                                                 | Ask                                                                                           |
+| ------- | ------------------------------------------------------------------------------------------------------------------------------------ | --------------------------------------------------------------------------------------------- |
+| ~~D1~~  | ~~No `Newf` with context (3 chained calls)~~ done — resolved — WithContextMap covers multi-context; design decision 2026-07-23       | ~~Variadic context or builder pattern~~                                                       |
+| ~~D2~~  | ~~`RegisterClassification` global state concern~~ done — resolved — frozen flag declined (atomic snapshot safe); decision 2026-07-23 | ~~"Frozen" flag after first read, or better docs~~                                            |
+| ~~D3~~  | ~~`*Error` too many methods (Code vs ErrorCode etc.)~~ done — resolved — method sprawl reviewed; copy-on-write retained              | ~~Partially addressed (doc clarification), but broader method-proliferation concern remains~~ |
+| ~~D4~~  | ~~`Classify(nil)` inconsistency with fail-open~~ done — resolved — Classify(nil)=Rejection kept; decision 2026-07-23                 | ~~Debated changing to Infrastructure; not changed. Needs stronger rationale.~~                |
+| ~~D5~~  | ~~`RegisterClassificationType[T error]` (errors.As-based)~~ done — RegisterClassificationType shipped in v0.8.0                      | ~~Generic type-based registration (RegisterClassifier partially solves this)~~                |
+| ~~D6~~  | ~~diagnose/ overkill — skill should say "skip if not needed"~~ done — diagnose opt-in note in SKILL.md                               | ~~One-liner guidance in SKILL.md~~                                                            |
+| ~~D7~~  | ~~`TemplateRegistry` confusion (is RegisterTemplate on DefaultRegistry?)~~ done — RegisterTemplate documented in SKILL.md            | ~~Clarify in docs — it IS, but consumers are confused~~                                       |
+| ~~D8~~  | ~~Batch/partial-success canonical example~~ done — batch registration + examples shipped                                             | ~~Code example in SKILL.md~~                                                                  |
+| ~~D9~~  | ~~Skill: `New*` vs `Wrap*` guidance~~ done — New/Wrap guidance in SKILL.md                                                           | ~~"Use New* from scratch, Wrap* when you have a cause"~~                                      |
+| ~~D10~~ | ~~Skill: `errkit` consumer pattern example~~ done — errkit pattern section in SKILL.md                                               | ~~Show the nil-safe wrapper pattern consumers build~~                                         |
+| ~~D11~~ | ~~Skill: `RegisterClassifications` map variant~~ done — WithContextMap is the map variant                                            | ~~Only singular is shown in skill~~                                                           |
+| ~~D12~~ | ~~Skill: `ParseFamily` default in gotchas table~~ done — ParseFamily gotcha documented                                               | ~~Add to gotchas~~                                                                            |
 
 ---
 

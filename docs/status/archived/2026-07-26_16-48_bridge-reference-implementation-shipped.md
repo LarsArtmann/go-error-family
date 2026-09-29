@@ -83,7 +83,6 @@
 
 ### ~~CI workflow (`ci.yml`) — NOT UPDATED~~ done — examples test + lint steps added (shipped in v0.10.1)
 
-
 The examples module CI step only runs `go build ./...`. It does NOT run:
 
 - `go test ./...` — my 19 new tests won't execute in CI
@@ -93,13 +92,11 @@ The examples module CI step only runs `go build ./...`. It does NOT run:
 
 ### ~~Website docs — NOT UPDATED~~ done — bridge guide + related-tools links shipped in v0.10.1
 
-
 - `website/src/content/docs/related-tools.mdx` mentions bridge APIs but does NOT link to the reference implementation
 - No guide page exists for the bridge patterns (guides exist for classification, diagnostics, HTTP/CLI, logs, benchmarks, error-types — but not bridge)
 - The reference implementation is the #1 adoption unblocker and should be prominently linked
 
 ### ~~ROADMAP.md — NOT UPDATED (DOCUMENTATION DRIFT)~~ done — marked SHIPPED in ROADMAP theme 4
-
 
 `ROADMAP.md` lines 79-85 still say:
 

@@ -39,10 +39,10 @@ Nothing. The task was small and binary (revert + commit).
 
 ## c) NOT STARTED
 
-| # | Item                 | Why it matters                                                                                                                       |
-| - | -------------------- | ------------------------------------------------------------------------------------------------------------------------------------ |
-| ~~1~~ | ~~**Push to remote**~~ done — pushed; releases through v0.10.2 live | ~~Commit is local only. AGENTS.md says never push unless asked — so this is correctly deferred, but the user should know it's pending.~~ |
-| ~~2~~ | ~~**AGENTS.md update**~~ done — AGENTS.md status refreshed many times since | ~~"Last Updated: 2026-07-05" — the dependency bump could warrant a one-line note, though this is minor and arguably out of scope.~~ |
+| #     | Item                                                                        | Why it matters                                                                                                                           |
+| ----- | --------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------- |
+| ~~1~~ | ~~**Push to remote**~~ done — pushed; releases through v0.10.2 live         | ~~Commit is local only. AGENTS.md says never push unless asked — so this is correctly deferred, but the user should know it's pending.~~ |
+| ~~2~~ | ~~**AGENTS.md update**~~ done — AGENTS.md status refreshed many times since | ~~"Last Updated: 2026-07-05" — the dependency bump could warrant a one-line note, though this is minor and arguably out of scope.~~      |
 
 ---
 

@@ -105,33 +105,33 @@ Go library for structured error classification. Three packages: root (`errorfami
 
 ## F) TOP #25 THINGS TO DO NEXT
 
-| #  | Priority    | Task                                                                                | Impact                               |
-| -- | ----------- | ----------------------------------------------------------------------------------- | ------------------------------------ |
-| ~~1~~  | ~~🔴 Critical~~ done — pushed long since | ~~Push the 3 commits to origin/master~~ | ~~Unblocking: current work is unpushed~~ |
-| ~~2~~  | ~~🔴 Critical~~ done — three workflows live | ~~Add CI pipeline (GitHub Actions: `go test`, `go vet`, `go build`)~~ | ~~Prevent regressions~~ |
-| ~~3~~  | ~~🟠 High~~ done — typed DiagnosticFunc | ~~Tighten `DiagnosticRunner` interface: return `[]*DiagnosticResult` instead of `any`~~ | ~~Type safety~~ |
-| ~~4~~  | ~~🟠 High~~ done — flag removed | ~~Wire or remove `HandleConfig.Verbose` field~~ | ~~Dead config smell~~ |
-| ~~5~~  | ~~🟠 High~~ done — UnregisterClassification/UnregisterTemplate exist | ~~Add `UnregisterClassification` / `ClearClassifications` for test isolation~~ | ~~Registry accumulates forever~~ |
-| ~~6~~  | ~~🟠 High~~ done — diagnose fully tested | ~~Add integration tests for `diagnose/` rules with mocked command execution~~ | ~~Push diagnose coverage to 80%+~~ |
-| ~~7~~  | ~~🟠 High~~ **Won't implement — declined — handle.go kept cohesive by the flat-structure policy.** | ~~Split `handle.go` into `handle.go` + `render.go` + `template.go`~~ | ~~Single file doing too much~~ |
-| ~~8~~  | ~~🟡 Medium~~ done — WithTimestamp shipped | ~~Add `Error.WithTimestamp(t time.Time)` for testing/replay~~ | ~~Testing, error replay~~ |
-| ~~9~~  | ~~🟡 Medium~~ done — 26 godoc examples | ~~Add example tests (`func ExampleNewRejection()`) for godoc~~ | ~~Documentation~~ |
-| ~~10~~ | ~~🟡 Medium~~ **Won't implement — declined — codes are consumer-defined by design.** | ~~Add error code validation (dot-separated lowercase) in constructors~~ | ~~Prevent invalid codes at creation~~ |
-| ~~11~~ | ~~🟡 Medium~~ done — template registry replaced codeToWhat/codeToFix | ~~Make `codeToWhat`/`codeToFix` configurable via `HandleConfig`~~ | ~~Extensibility~~ |
-| ~~12~~ | ~~🟡 Medium~~ done — benchmark suite | ~~Add benchmarks for `Classify()`, `Is()`, `Error()`, `Format()`~~ | ~~Performance baseline~~ |
-| ~~13~~ | ~~🟡 Medium~~ done — 11 fuzz targets | ~~Add fuzz tests for `ParseFamily`, `errorCodeContains`, `hasContextSubstring`~~ | ~~Edge case discovery~~ |
-| ~~14~~ | ~~🟡 Medium~~ done — diagnose helpers.go | ~~Extract diagnose matching helpers into testable, interface-driven package~~ | ~~Reduce coupling~~ |
-| ~~15~~ | ~~🟡 Medium~~ done — deleted with SystemSnapshot | ~~Audit `isSecretKey` regex against comprehensive secret key patterns~~ | ~~Security: leaked env vars~~ |
-| ~~16~~ | ~~🟢 Low~~ done — WithContextf shipped instead | ~~Add `WithContextE()` that returns `error` instead of `*Error`~~ | ~~Convenience~~ |
-| ~~17~~ | ~~🟢 Low~~ **Won't implement — declined — not adopted.** | ~~Add `GoString()` method to `Error` for `%#v` formatting~~ | ~~Debugging~~ |
-| ~~18~~ | ~~🟢 Low~~ done — AGENTS.md documents the atomic-snapshot design | ~~Document O(n) behavior of `lookupRegistered` for large sentinel counts~~ | ~~Performance documentation~~ |
-| ~~19~~ | ~~🟢 Low~~ done — RegisterClassifier shipped | ~~Add `RegisterClassificationFunc` for dynamic classification~~ | ~~Complex classification logic~~ |
-| ~~20~~ | ~~🟢 Low~~ done — worst-severity multi-error classification | ~~Add `errors.Join` support for multi-error classification~~ | ~~Go 1.20+ multi-errors~~ |
-| ~~21~~ | ~~🟢 Low~~ done — MarshalText/UnmarshalText on Family + Audience | ~~Add `Family.MarshalText`/`UnmarshalText` for JSON/YAML~~ | ~~Configuration files~~ |
-| ~~22~~ | ~~🟢 Low~~ done — Error.JSON() | ~~Add `Error.MarshalJSON` for structured logging~~ | ~~Observability~~ |
-| ~~23~~ | ~~🟢 Low~~ done — flake.nix in place | ~~Create `flake.nix` for reproducible builds~~ | ~~Nix ecosystem~~ |
-| ~~24~~ | ~~🟢 Low~~ done — CHANGELOG maintained | ~~Add `CHANGELOG.md` entry for this session's changes~~ | ~~Documentation~~ |
-| ~~25~~ | ~~🟢 Low~~ done — HandleErrorWithContext | ~~Consider `context.Context` propagation through error chain~~ | ~~Cancellation in error handling~~ |
+| #      | Priority                                                                                           | Task                                                                                    | Impact                                   |
+| ------ | -------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------- | ---------------------------------------- |
+| ~~1~~  | ~~🔴 Critical~~ done — pushed long since                                                           | ~~Push the 3 commits to origin/master~~                                                 | ~~Unblocking: current work is unpushed~~ |
+| ~~2~~  | ~~🔴 Critical~~ done — three workflows live                                                        | ~~Add CI pipeline (GitHub Actions: `go test`, `go vet`, `go build`)~~                   | ~~Prevent regressions~~                  |
+| ~~3~~  | ~~🟠 High~~ done — typed DiagnosticFunc                                                            | ~~Tighten `DiagnosticRunner` interface: return `[]*DiagnosticResult` instead of `any`~~ | ~~Type safety~~                          |
+| ~~4~~  | ~~🟠 High~~ done — flag removed                                                                    | ~~Wire or remove `HandleConfig.Verbose` field~~                                         | ~~Dead config smell~~                    |
+| ~~5~~  | ~~🟠 High~~ done — UnregisterClassification/UnregisterTemplate exist                               | ~~Add `UnregisterClassification` / `ClearClassifications` for test isolation~~          | ~~Registry accumulates forever~~         |
+| ~~6~~  | ~~🟠 High~~ done — diagnose fully tested                                                           | ~~Add integration tests for `diagnose/` rules with mocked command execution~~           | ~~Push diagnose coverage to 80%+~~       |
+| ~~7~~  | ~~🟠 High~~ **Won't implement — declined — handle.go kept cohesive by the flat-structure policy.** | ~~Split `handle.go` into `handle.go` + `render.go` + `template.go`~~                    | ~~Single file doing too much~~           |
+| ~~8~~  | ~~🟡 Medium~~ done — WithTimestamp shipped                                                         | ~~Add `Error.WithTimestamp(t time.Time)` for testing/replay~~                           | ~~Testing, error replay~~                |
+| ~~9~~  | ~~🟡 Medium~~ done — 26 godoc examples                                                             | ~~Add example tests (`func ExampleNewRejection()`) for godoc~~                          | ~~Documentation~~                        |
+| ~~10~~ | ~~🟡 Medium~~ **Won't implement — declined — codes are consumer-defined by design.**               | ~~Add error code validation (dot-separated lowercase) in constructors~~                 | ~~Prevent invalid codes at creation~~    |
+| ~~11~~ | ~~🟡 Medium~~ done — template registry replaced codeToWhat/codeToFix                               | ~~Make `codeToWhat`/`codeToFix` configurable via `HandleConfig`~~                       | ~~Extensibility~~                        |
+| ~~12~~ | ~~🟡 Medium~~ done — benchmark suite                                                               | ~~Add benchmarks for `Classify()`, `Is()`, `Error()`, `Format()`~~                      | ~~Performance baseline~~                 |
+| ~~13~~ | ~~🟡 Medium~~ done — 11 fuzz targets                                                               | ~~Add fuzz tests for `ParseFamily`, `errorCodeContains`, `hasContextSubstring`~~        | ~~Edge case discovery~~                  |
+| ~~14~~ | ~~🟡 Medium~~ done — diagnose helpers.go                                                           | ~~Extract diagnose matching helpers into testable, interface-driven package~~           | ~~Reduce coupling~~                      |
+| ~~15~~ | ~~🟡 Medium~~ done — deleted with SystemSnapshot                                                   | ~~Audit `isSecretKey` regex against comprehensive secret key patterns~~                 | ~~Security: leaked env vars~~            |
+| ~~16~~ | ~~🟢 Low~~ done — WithContextf shipped instead                                                     | ~~Add `WithContextE()` that returns `error` instead of `*Error`~~                       | ~~Convenience~~                          |
+| ~~17~~ | ~~🟢 Low~~ **Won't implement — declined — not adopted.**                                           | ~~Add `GoString()` method to `Error` for `%#v` formatting~~                             | ~~Debugging~~                            |
+| ~~18~~ | ~~🟢 Low~~ done — AGENTS.md documents the atomic-snapshot design                                   | ~~Document O(n) behavior of `lookupRegistered` for large sentinel counts~~              | ~~Performance documentation~~            |
+| ~~19~~ | ~~🟢 Low~~ done — RegisterClassifier shipped                                                       | ~~Add `RegisterClassificationFunc` for dynamic classification~~                         | ~~Complex classification logic~~         |
+| ~~20~~ | ~~🟢 Low~~ done — worst-severity multi-error classification                                        | ~~Add `errors.Join` support for multi-error classification~~                            | ~~Go 1.20+ multi-errors~~                |
+| ~~21~~ | ~~🟢 Low~~ done — MarshalText/UnmarshalText on Family + Audience                                   | ~~Add `Family.MarshalText`/`UnmarshalText` for JSON/YAML~~                              | ~~Configuration files~~                  |
+| ~~22~~ | ~~🟢 Low~~ done — Error.JSON()                                                                     | ~~Add `Error.MarshalJSON` for structured logging~~                                      | ~~Observability~~                        |
+| ~~23~~ | ~~🟢 Low~~ done — flake.nix in place                                                               | ~~Create `flake.nix` for reproducible builds~~                                          | ~~Nix ecosystem~~                        |
+| ~~24~~ | ~~🟢 Low~~ done — CHANGELOG maintained                                                             | ~~Add `CHANGELOG.md` entry for this session's changes~~                                 | ~~Documentation~~                        |
+| ~~25~~ | ~~🟢 Low~~ done — HandleErrorWithContext                                                           | ~~Consider `context.Context` propagation through error chain~~                          | ~~Cancellation in error handling~~       |
 
 ---
 
