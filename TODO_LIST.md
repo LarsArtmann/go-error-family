@@ -18,26 +18,17 @@ traceable to its source. When an item ships, remove it here and record it in
    voice-checker-clean and self-reviewed; pick a channel with real audience
    (r/golang candidate) before publishing. Bounded: one channel decision +
    one publish.
-
-The 2026-09-27/28 batch otherwise shipped in full (v0.11.0, 2026-09-29):
-
-2. ~~Website guard canaries in CI~~ — **DONE 2026-09-28:** `website-check.yml`
-   (TS-major==6, frozen-lockfile install, `astro check`+`build`); Dependabot
-   decision recorded in AGENTS.md (security updates stay enabled; red jobs are
-   the alert signal — no per-directory toggle exists).
-3. ~~art-dupl baseline + threshold policy~~ — **DONE 2026-09-28:**
-   `.art-dupl-baseline.json` (threshold 1, 3 accepted groups); policy recorded
-   in AGENTS.md, ROADMAP OQ1 resolved (routine `-t 5`, deep sweeps `-t 1`).
-4. ~~Lift diagnose-family coverage~~ — **DONE 2026-09-28:** diagnose 97.4%,
-   diagnose/git 98.7%, diagnose/postgres 89.2% — all targets exceeded.
-5. ~~Re-verify the standing claims battery~~ — **DONE 2026-09-29:** erraudit
-   0 findings ×7 modules, `go-structure-linter` exit 0 (flat preset),
-   `buildflow --build-mode full` exit 0 (115 success / 0 failed), website
-   frozen install + `astro check` + `astro build` green (16 pages).
-6. ~~File the two upstream BuildFlow issues~~ — **DONE 2026-09-28:**
-   BuildFlow #23 filed (phantom `IsIgnored` unwired in `pkg/phantom`);
-   evidence comment on #19 (pnpm-audit lockfile discovery).
-7. ~~Website chores~~ — **DONE 2026-09-28** (`minimumReleaseAgeStrict: true`,
-   install + check green; `bun.lock` gitignore verified 2026-09-27).
-8. ~~Cut v0.11.0~~ — **DONE 2026-09-29:** see `CHANGELOG.md` [0.11.0]
-   (gRPC guide landed, changelogs synced, tags per runbook, notes curated).
+2. **Heal the v0.11.0-tagged README on pkg.go.dev** (source: 2026-09-29
+   docs-health pass) — the tag was cut before the announcement-withdrawal
+   commit (`986a6a6`), so the README rendered at `@v0.11.0` still links the
+   deleted Discussion #12. Master is already clean; any next release heals
+   it. Bounded: decide standalone v0.11.1 vs ride-along on the next release.
+3. **Review the post-v0.11.0 Dependabot wave** (source: 2026-09-29 report
+   §f20) — submodule root-pin bumps (agent, bridge, diagnose, diagnose/git,
+   diagnose/postgres, examples → v0.11.0) arrive on the weekly schedule;
+   merge the green ones or hold for the next release. Bounded: one triage
+   pass.
+4. **Enforce the art-dupl baseline in CI** (source: 2026-09-28 Pareto report
+   §f5) — `.art-dupl-baseline.json` is committed but nothing runs
+   `art-dupl check -t 1 .` in CI; a baseline nobody executes is prose, not a
+   gate. Bounded: one `ci.yml` job.
