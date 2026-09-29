@@ -116,76 +116,76 @@ _Sources: [T] = already a TODO_LIST item (do NOT re-harvest, they're current), [
 
 | #  | Task                                                                                          | Impact   | Effort | Src |
 | -- | --------------------------------------------------------------------------------------------- | -------- | ------ | --- |
-| 1  | **Push master (16 ahead)** — CI validates the sweep; `website-deploy` fires on the mdx edits  | Critical | S      | S   |
-| 2  | Run `astro build` locally before/with the push (check alone ran this session)                  | High     | S      | S   |
-| 3  | **Investigate why release.yml skipped v0.10.2** (workflow file at tag ref? push mechanics?)    | High     | M      | [T3]|
-| 4  | Curate the v0.10.2 GitHub Release notes (auto-generated now; v0.10.1 was curated)              | Low      | S      | S   |
-| 5  | Explicit `erraudit` re-run + go-structure-linter CLI + full buildflow + website `nix build` (the claims battery) | Medium | M | [T7]|
-| 6  | Annotate + archive `docs/feedback/sec-consumer-feedback.md` (only file outside the 2026-0* sweep) | Low    | S      | S   |
+| ~~1~~  | ~~**Push master (16 ahead)** — CI validates the sweep; `website-deploy` fires on the mdx edits~~ done — pushed 09-28 (e1d46ff); CI + Deploy green | ~~Critical~~ | ~~S~~ | ~~S~~ |
+| ~~2~~  | ~~Run `astro build` locally before/with the push (check alone ran this session)~~ done — astro build green; canary enforces in CI | ~~High~~ | ~~S~~ | ~~S~~ |
+| ~~3~~  | ~~**Investigate why release.yml skipped v0.10.2** (workflow file at tag ref? push mechanics?)~~ done — root-caused (M02, archived note) | ~~High~~ | ~~M~~ | ~~[T3]~~ |
+| ~~4~~  | ~~Curate the v0.10.2 GitHub Release notes (auto-generated now; v0.10.1 was curated)~~ done — curated (M03) | ~~Low~~ | ~~S~~ | ~~S~~ |
+| ~~5~~  | ~~Explicit `erraudit` re-run + go-structure-linter CLI + full buildflow + website `nix build` (the claims battery)~~ done — battery 09-28 + 09-29 (erraudit 1c6809a) | ~~Medium~~ | ~~M~~ | ~~[T7]~~ |
+| ~~6~~  | ~~Annotate + archive `docs/feedback/sec-consumer-feedback.md` (only file outside the 2026-0* sweep)~~ done — M14 archived; inline resolutions added 09-29 | ~~Low~~ | ~~S~~ | ~~S~~ |
 
 ### TODO_LIST Active items (verified open 2026-09-27 — no changes needed, just execute)
 
 | #  | Task                                                                     | Impact | Effort | Src  |
 | -- | ------------------------------------------------------------------------- | ------ | ------ | ---- |
-| 7  | Announce the Bridge Patterns guide publicly                               | High   | M      | [T1] |
-| 8  | Retract broken v0.6.x tags (`retract` directives + verify proxy)          | High   | M      | [T2] |
-| 9  | Website guard canaries (TS-6 pin, frozen-lockfile + astro check, Dependabot decision) | High | S   | [T4] |
-| 10 | art-dupl suppression/baseline + standing threshold policy                 | Medium | S      | [T5] |
-| 11 | Coverage lifts: diagnose 84.2→90, postgres 78.5→85, git back 91.0→95+     | Medium | M      | [T6] |
-| 12 | File upstream BuildFlow issues (pnpm-audit subdirectory lockfiles; phantom IsIgnored) | High | S | [T8] |
-| 13 | Website chores: `minimumReleaseAgeStrict` decision                        | Low    | S      | [T9] |
-| 14 | Plan v0.11.0 scope                                                        | Medium | S      | [T10]|
+| ~~7~~  | ~~Announce the Bridge Patterns guide publicly~~ done — routed to TODO_LIST #1 (channel decision still open) | ~~High~~ | ~~M~~ | ~~[T1]~~ |
+| ~~8~~  | ~~Retract broken v0.6.x tags (`retract` directives + verify proxy)~~ done — v0.10.3 retraction (M04) | ~~High~~ | ~~M~~ | ~~[T2]~~ |
+| ~~9~~  | ~~Website guard canaries (TS-6 pin, frozen-lockfile + astro check, Dependabot decision)~~ done — website-check.yml (M05) | ~~High~~ | ~~S~~ | ~~[T4]~~ |
+| ~~10~~ | ~~art-dupl suppression/baseline + standing threshold policy~~ done — baseline + policy (M09) | ~~Medium~~ | ~~S~~ | ~~[T5]~~ |
+| ~~11~~ | ~~Coverage lifts: diagnose 84.2→90, postgres 78.5→85, git back 91.0→95+~~ done — 97.4 / 98.7 / 89.2 (M06) | ~~Medium~~ | ~~M~~ | ~~[T6]~~ |
+| ~~12~~ | ~~File upstream BuildFlow issues (pnpm-audit subdirectory lockfiles; phantom IsIgnored)~~ done — #23 filed + #19 evidence comment (M10) | ~~High~~ | ~~S~~ | ~~[T8]~~ |
+| ~~13~~ | ~~Website chores: `minimumReleaseAgeStrict` decision~~ done — minimumReleaseAgeStrict (M12) | ~~Low~~ | ~~S~~ | ~~[T9]~~ |
+| ~~14~~ | ~~Plan v0.11.0 scope~~ done — v0.11.0 shipped 2026-09-29 | ~~Medium~~ | ~~S~~ | ~~[T10]~~ |
 
 ### Structural / hygiene
 
 | #  | Task                                                                                            | Impact | Effort | Src |
 | -- | ------------------------------------------------------------------------------------------------ | ------ | ------ | --- |
-| 15 | **Trim AGENTS.md below 30 KB** — move release-era narrative bullets (2026-05/06/07 incident stories) to `docs/`, keep current-state rules | Medium | M | S |
-| 16 | Add a one-line comment in `go.work` (or AGENTS) explaining the deliberate `1.26.7` toolchain floor vs per-module `1.26`/`1.26.0` floors | Low | S | S |
-| 17 | Line-verify the peripheral doc surfaces (research/, modularization/, comparison html, top-5 docs) | Low  | M   | S |
-| 18 | Annotate `architecture-understanding/` renders as point-in-time (or date-stamp their intro)      | Low    | S      | S   |
-| 19 | Decide the fate of `best-of-both-worlds.html` (archived with planning; verify it's not referenced anywhere live) | Low | S | S |
-| 20 | Record the `#N` occurrence-suffix footgun of annotate-rows/prose in the docs-health skill notes (upstream-able) | Low | S | S |
-| 21 | Convention: every future status report ends HARVEST-closed — harvest + annotate + archive in the next docs-health pass | Medium | — | S |
-| 22 | Consider `docs/status/README.md` one-pager index (current convention + archive pointer) for human discoverability | Low | S | S |
-| 23 | Add CI md-link check so moved/archived files can't break living-doc citations silently           | Medium | S      | S   |
-| 24 | Triage the 6 open Dependabot PR branches (CI ran green on them today) — merge or close with intent | Medium | S   | S   |
+| ~~15~~ | ~~**Trim AGENTS.md below 30 KB** — move release-era narrative bullets (2026-05/06/07 incident stories) to `docs/`, keep current-state rules~~ done — M13 (18,020 bytes) | ~~Medium~~ | ~~M~~ | ~~S~~ |
+| ~~16~~ | ~~Add a one-line comment in `go.work` (or AGENTS) explaining the deliberate `1.26.7` toolchain floor vs per-module `1.26`/`1.26.0` floors~~ done — M14 go.work comment | ~~Low~~ | ~~S~~ | ~~S~~ |
+| ~~17~~ | ~~Line-verify the peripheral doc surfaces (research/, modularization/, comparison html, top-5 docs)~~ done — M14 peripheral audit note | ~~Low~~ | ~~M~~ | ~~S~~ |
+| ~~18~~ | ~~Annotate `architecture-understanding/` renders as point-in-time (or date-stamp their intro)~~ done — 09-29 pass stamped the HTML render + d2 files point-in-time | ~~Low~~ | ~~S~~ | ~~S~~ |
+| ~~19~~ | ~~Decide the fate of `best-of-both-worlds.html` (archived with planning; verify it's not referenced anywhere live)~~ done — M14 confirmed archived, zero dangling refs | ~~Low~~ | ~~S~~ | ~~S~~ |
+| ~~20~~ | ~~Record the `#N` occurrence-suffix footgun of annotate-rows/prose in the docs-health skill notes (upstream-able)~~ done — skill documents the #N suffix + level-aware scoping | ~~Low~~ | ~~S~~ | ~~S~~ |
+| ~~21~~ | ~~Convention: every future status report ends HARVEST-closed — harvest + annotate + archive in the next docs-health pass~~ done — convention followed by the 09-29 pass | ~~Medium~~ | ~~—~~ | ~~S~~ |
+| ~~22~~ | ~~Consider `docs/status/README.md` one-pager index (current convention + archive pointer) for human discoverability~~ done — routed to ROADMAP fuel (status index, still open) | ~~Low~~ | ~~S~~ | ~~S~~ |
+| ~~23~~ | ~~Add CI md-link check so moved/archived files can't break living-doc citations silently~~ done — routed to ROADMAP fuel (lychee CI gate, still open) | ~~Medium~~ | ~~S~~ | ~~S~~ |
+| ~~24~~ | ~~Triage the 6 open Dependabot PR branches (CI ran green on them today) — merge or close with intent~~ done — M18 closed #6-#11 | ~~Medium~~ | ~~S~~ | ~~S~~ |
 
 ### From the 09-18/09-22 reports (carried, unchanged priority)
 
 | #  | Task                                                                                  | Impact | Effort | Src |
 | -- | --------------------------------------------------------------------------------------- | ------ | ------ | --- |
-| 25 | CI canary: typescript major ≠ 6 fails CI (see #9)                                       | Critical | S   | [T4] |
-| 26 | CI: `pnpm install --frozen-lockfile` + `astro check` for `website/**` PRs (see #9)      | High   | S      | [T4] |
-| 27 | Decide/disable Dependabot security-updates auto-run for `/website` (see #9)             | High   | S      | [T4] |
-| 28 | ROADMAP answer: fleet churn root-fix vs per-repo canaries forever                       | High   | —      | [R-OQ2] |
-| 29 | ROADMAP answer: bridge & enrichment APIs — invest or freeze?                            | High   | —      | [R-OQ3] |
-| 30 | ROADMAP answer: art-dupl `-t 1` routine vs deep-sweep threshold                         | Medium | —      | [R-OQ1] |
+| ~~25~~ | ~~CI canary: typescript major ≠ 6 fails CI (see #9)~~ done — canary (M05) | ~~Critical~~ | ~~S~~ | ~~[T4]~~ |
+| ~~26~~ | ~~CI: `pnpm install --frozen-lockfile` + `astro check` for `website/**` PRs (see #9)~~ done — canary (M05) | ~~High~~ | ~~S~~ | ~~[T4]~~ |
+| ~~27~~ | ~~Decide/disable Dependabot security-updates auto-run for `/website` (see #9)~~ done — decision verified + recorded (M05) | ~~High~~ | ~~S~~ | ~~[T4]~~ |
+| ~~28~~ | ~~ROADMAP answer: fleet churn root-fix vs per-repo canaries forever~~ done — routed to ROADMAP OQ2 (open) | ~~High~~ | ~~—~~ | ~~[R-OQ2]~~ |
+| ~~29~~ | ~~ROADMAP answer: bridge & enrichment APIs — invest or freeze?~~ done — routed to ROADMAP OQ3 (open) | ~~High~~ | ~~—~~ | ~~[R-OQ3]~~ |
+| ~~30~~ | ~~ROADMAP answer: art-dupl `-t 1` routine vs deep-sweep threshold~~ done — OQ1 resolved with recorded default | ~~Medium~~ | ~~—~~ | ~~[R-OQ1]~~ |
 
 ### Adoption / docs backlog (ROADMAP fuel, not commitments)
 
 | #  | Task                                                                                  | Impact | Effort | Src |
 | -- | --------------------------------------------------------------------------------------- | ------ | ------ | --- |
-| 31 | Examples for `errorfamilytest` + `diagnose` subpackages (pkg.go.dev gap)                | Medium | M      | R   |
-| 32 | End-to-end `HTTPHandler` middleware example (net/http or Chi)                           | Medium | M      | R   |
-| 33 | Example symmetry: `ExampleNewConflict/Corruption/Infrastructure/Orchestration` set      | Low    | S      | R   |
-| 34 | gRPC status-mapping guide (family → codes.Internal/Unavailable/InvalidArgument)         | Medium | M      | R   |
-| 35 | OpenAPI/schema generation for the canonical error JSON                                  | Medium | L      | R   |
-| 36 | `httperror` subpackage RFC                                                              | Medium | L      | R   |
-| 37 | Diagnostic submodules: redis, then docker/kubectl                                       | Medium | M/L    | R   |
-| 38 | Typed `DiagnosticResult.Details` (kills strTrue/strFalse at root) — next major only     | Low    | L      | R   |
-| 39 | Release automation script with explicit trigger verification (ends the #3 class)        | High   | L      | R   |
-| 40 | Framework integration guides: Chi, Echo, Gin                                            | Medium | M      | R   |
-| 41 | Benchmark suite tracked across versions                                                 | Low    | M      | R   |
-| 42 | CSP headers for the website (honest standing gap; declining it forever is also a decision) | Low  | S      | S   |
-| 43 | Uptime monitor for errorfamily.lars.software (recurring idea, never adopted — decide once) | Low  | S      | R   |
-| 44 | `Code()` vs `ErrorCode()` convergence proposal (next major)                             | Low    | S      | R   |
-| 45 | Consumer survey refresh: who uses LogError/HTTPHandler/errorfamilytest today (last audit 2026-07-23) | Medium | M | R |
-| 46 | Review `WithContextf`/`WithContextMap` example gap (only WithContextAny has one)        | Low    | S      | S   |
-| 47 | Consider a weekly `gh run list` triage habit (red workflows persisted 3 days unnoticed once) | Medium | S  | S   |
-| 48 | `minimumReleaseAgeStrict` decision is #13; this row intentionally left as a pointer     | —      | —      | —   |
-| 49 | Check whether `docs/research/` content is still referenced by anything (or archivable)  | Low    | S      | S   |
-| 50 | Next docs-health pass: harvest THIS report's f-section, then annotate + archive it      | Medium | S      | S   |
+| ~~31~~ | ~~Examples for `errorfamilytest` + `diagnose` subpackages (pkg.go.dev gap)~~ done — M15 examples | ~~Medium~~ | ~~M~~ | ~~R~~ |
+| ~~32~~ | ~~End-to-end `HTTPHandler` middleware example (net/http or Chi)~~ done — M17 (covered by ExampleHTTPHandler; deviation documented) | ~~Medium~~ | ~~M~~ | ~~R~~ |
+| ~~33~~ | ~~Example symmetry: `ExampleNewConflict/Corruption/Infrastructure/Orchestration` set~~ done — M17 constructor symmetry | ~~Low~~ | ~~S~~ | ~~R~~ |
+| ~~34~~ | ~~gRPC status-mapping guide (family → codes.Internal/Unavailable/InvalidArgument)~~ done — M16 gRPC guide | ~~Medium~~ | ~~M~~ | ~~R~~ |
+| ~~35~~ | ~~OpenAPI/schema generation for the canonical error JSON~~ done — routed to ROADMAP backlog (OpenAPI) | ~~Medium~~ | ~~L~~ | ~~R~~ |
+| ~~36~~ | ~~`httperror` subpackage RFC~~ done — routed to ROADMAP backlog (httperror RFC) | ~~Medium~~ | ~~L~~ | ~~R~~ |
+| ~~37~~ | ~~Diagnostic submodules: redis, then docker/kubectl~~ done — routed to ROADMAP backlog (diagnostic submodules) | ~~Medium~~ | ~~M/L~~ | ~~R~~ |
+| ~~38~~ | ~~Typed `DiagnosticResult.Details` (kills strTrue/strFalse at root) — next major only~~ done — routed to ROADMAP backlog (typed Details, next major) | ~~Low~~ | ~~L~~ | ~~R~~ |
+| ~~39~~ | ~~Release automation script with explicit trigger verification (ends the #3 class)~~ done — routed to ROADMAP theme 3 (automation script) | ~~High~~ | ~~L~~ | ~~R~~ |
+| ~~40~~ | ~~Framework integration guides: Chi, Echo, Gin~~ done — routed to ROADMAP theme 4 (framework guides) | ~~Medium~~ | ~~M~~ | ~~R~~ |
+| ~~41~~ | ~~Benchmark suite tracked across versions~~ done — routed to ROADMAP theme 4 (benchmark suite) | ~~Low~~ | ~~M~~ | ~~R~~ |
+| ~~42~~ | ~~CSP headers for the website (honest standing gap; declining it forever is also a decision)~~ done — declined with revisit trigger (M18 DR-1) | ~~Low~~ | ~~S~~ | ~~S~~ |
+| ~~43~~ | ~~Uptime monitor for errorfamily.lars.software (recurring idea, never adopted — decide once)~~ done — declined with revisit trigger (M18 DR-2) | ~~Low~~ | ~~S~~ | ~~R~~ |
+| ~~44~~ | ~~`Code()` vs `ErrorCode()` convergence proposal (next major)~~ done — routed to ROADMAP theme 1 (next-major convergence) | ~~Low~~ | ~~S~~ | ~~R~~ |
+| ~~45~~ | ~~Consumer survey refresh: who uses LogError/HTTPHandler/errorfamilytest today (last audit 2026-07-23)~~ done — routed to ROADMAP fuel (survey refresh) | ~~Medium~~ | ~~M~~ | ~~R~~ |
+| ~~46~~ | ~~Review `WithContextf`/`WithContextMap` example gap (only WithContextAny has one)~~ done — routed to ROADMAP fuel (WithContextf/Map examples still absent) | ~~Low~~ | ~~S~~ | ~~S~~ |
+| ~~47~~ | ~~Consider a weekly `gh run list` triage habit (red workflows persisted 3 days unnoticed once)~~ **Won't implement — standing personal cadence, not a repo task.** | ~~Medium~~ | ~~S~~ | ~~S~~ |
+| ~~48~~ | ~~`minimumReleaseAgeStrict` decision is #13; this row intentionally left as a pointer~~ **NOT-DO — pointer row, intentionally empty.** | ~~—~~ | ~~—~~ | ~~—~~ |
+| ~~49~~ | ~~Check whether `docs/research/` content is still referenced by anything (or archivable)~~ done — M14 audit: REFERENCE keep | ~~Low~~ | ~~S~~ | ~~S~~ |
+| ~~50~~ | ~~Next docs-health pass: harvest THIS report's f-section, then annotate + archive it~~ done — this pass harvested, annotated, and archived this file | ~~Medium~~ | ~~S~~ | ~~S~~ |
 
 ---
 

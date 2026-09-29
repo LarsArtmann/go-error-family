@@ -17,54 +17,54 @@ final push (`8ff919f`).
 ## a) FULLY DONE (evidence-carried)
 
 | # | Item | Evidence |
-| - | ---- | -------- |
-| 1 | **M02 — release.yml no-fire ROOT-CAUSED** | Zero `refs/tags/v0.10.2` PushEvent in the events API; workflow byte-identical at both tags; tag SHA matches local → GitHub's combined branch+tag push silently dropped the tag webhook. Findings note: `docs/status/2026-09-28_02-10_release-yml-no-fire-root-cause-v0.10.2.md` |
-| 2 | **M02 — mitigation landed AND live-tested** | `workflow_dispatch` fallback in release.yml (explicit `tag_name`, force-fetch/checkout of input tag); dispatched on v0.10.3 → run 36478697983 `success`; runbook (separate tag/branch pushes, ~2-min trigger check) in AGENTS.md |
-| 3 | **M03 — v0.10.2 GitHub Release curated** | Notes published in v0.10.1 style (7-module table, highlights); G4 recommendation recorded: keep 0.x releases marked FULL, prerelease flag = literal alpha/beta/rc only |
-| 4 | **M04 — full tag audit: 60+ tags** | Found **5 broken tags, not the 2 the TODO assumed**: root `v0.5.0`, `v0.5.1`, `v0.6.0` (local-dir replaces; v0.6.0 + phantom pseudo-version) + `diagnose/v0.1.0` + `agent/v0.1.0`. `v0.6.1` verified CLEAN (zero requires) and deliberately NOT retracted |
-| 5 | **M04 — retraction shipped as coordinated v0.10.3** | Tags `diagnose/v0.2.5` → `agent/v0.2.5` → `v0.10.3` (release commit `7ffd883`), each pushed separately per the new runbook; Release workflow FIRED first try — validating the M02 root cause in practice |
-| 6 | **M04 — retraction verified end-to-end** | `go list -m -retracted` via `GOPROXY=direct` (origin): all 5 return the exact rationale; `v0.6.1`/`v0.10.3`/`v0.2.5`s clean; `@latest` resolves v0.10.3; proxy `.info` serves v0.10.3 |
-| 7 | **M04 — docs synced** | CHANGELOG `[0.10.3]` (+ factual fix to 0.10.2's Modules claim: submodules pin root v0.10.1 at tag time); website `changelog.mdx` gained **missing 0.10.1 AND 0.10.2** sections plus 0.10.3; ROADMAP theme 3 updated |
-| 8 | **M05 — website guard canary live** | `.github/workflows/website-check.yml`: TS-major==6 canary, `pnpm install --frozen-lockfile`, `astro check`, `astro build`; validated on its own first push (run 36483254236 `success`, 28s); PR-triggered too, so Dependabot TS bumps fail BEFORE merge |
-| 9 | **M05 — Dependabot decision verified, not guessed** | GitHub docs confirm: no per-directory security-update toggle; `open-pull-requests-limit: 0` does NOT disable security updates. Decision: leave enabled, red security job = the alert signal, remediate via `pnpm audit` (recorded in AGENTS.md) |
-| 10 | **M06 — coverage lift, all targets exceeded** | diagnose core 84.2→**97.4%** (target 88), diagnose/git 91.0→**98.7%** (95), postgres 78.5→**89.2%** (83); all with `-race`; new `diagnose/command_test.go` + git remote-failure branches + postgres run-error/TCP branches; FEATURES + AGENTS tables updated with Δ |
-| 11 | **M07 — battery caught a real regression + fixed** | erraudit 0 findings restored: Sep-22 erraudit binary added a blank-identifier-on-`recover` rule AFTER the Sep-15 zero-claim → `safeCauseString` now carries the documented `//nolint:legacyerrors` + rationale; all 7 modules 0 findings |
-| 12 | **M07 — rest of battery green (after one fix)** | structure-linter exit 0 (+ applied its `*.png binary` advisory); `buildflow --build-mode full` no-cache: the 1 failure was the treefmt FORMAT check (golines wanted new long lines wrapped) → `nix fmt`, format check green; website build via `nix run .#build` (15 pages) — claim corrected: flake exposes `apps.build`, NOT `packages.default` |
-| 13 | **M09 — art-dupl suppression + policy** | `baseline`/`check` subcommands exist; `.art-dupl-baseline.json` committed (3 accepted groups, threshold 1, check exits 0); policy recorded: routine gate `-t 5`, deep sweeps `-t 1` against baseline (resolves ROADMAP OQ1 as a default) |
-| 14 | **M10 — both BuildFlow diagnoses source-verified + filed** | (a) `lockfilePatterns` globs `**/pnpm-lock.yaml` while the detector runs at `rootDir` (js_tools.go:351/205) → added as evidence comment on existing issue **#19** (no duplicate filed); (b) phantom analyzer: `IsIgnored` wired in roleak/doanalyzerv2, ZERO calls in `pkg/phantom/` (7 files) despite the core ENUM declaring `phantom` → filed **BuildFlow#23**; both linked from `.buildflow.yml` |
-| 15 | **M11 — v0.11.0 scoped** | CHANGELOG `[Unreleased]` skeleton (discoverability release, no API changes); release checklist written into TODO_LIST #8 |
-| 16 | **M12 — supply-chain knob applied** | `minimumReleaseAgeStrict: true` in `website/pnpm-workspace.yaml` (docs-verified: pnpm 11 already defaults a 1-day cooldown; strict = fail-loud); frozen install passes the trustLockfile check ("492 entries in 2.2s"); `astro check` 0 issues |
-| 17 | **M13 — AGENTS.md trim, target beaten** | 39,865 → **18,020 bytes** (55% cut, target was <30 KB); every still-true rule kept, all narratives archived VERBATIM in `docs/history/agents-archive.md`; every internal citation path verified to exist |
-| 18 | **M14 — hygiene batch** | SEC feedback archived with verified-resolution banner (all PP1–5/IDEA1–4 shipped by v0.10.1); `go.work` floor-vs-toolchain comment; `best-of-both-worlds.html` confirmed correctly archived (zero dangling refs); peripheral-surface audit recorded (`docs/status/2026-09-28_03-00_m14-peripheral-surface-audit.md`) |
-| 19 | **M15 — errorfamilytest + diagnose examples** | 7 assertion-helper examples (package's first); executable `ExampleRuleSpec` (data-driven rule + Runner + `ResolveContextKey`); both modules lint 0 issues |
-| 20 | **M16 — gRPC guide shipped** | `website/src/content/docs/guides/grpc.mdx`: family→gRPC table (per Google's official HTTP↔gRPC mapping), interceptor, retry guidance (Infrastructure also = Unavailable but single-attempt); sidebar entry; `astro check` 0 issues, build **16 pages** |
-| 21 | **M17 — constructor symmetry** | `ExampleNewConflict/Corruption/Infrastructure/Orchestration` (root now **30 runnable examples**); one example fixed my wrong assumption (Infrastructure `IsRetryable()` = false) — the example now documents true behavior |
-| 22 | **M18 — triage + decision records** | 6 superseded Dependabot PRs (#6–#11, root 0.10.1→0.10.2) closed with rationale (v0.10.3 supersedes; Dependabot re-files); CSP + uptime-monitor both formally DECLINED with reasoning + revisit triggers (`docs/status/2026-09-28_03-30_decision-records-csp-uptime.md`) |
-| 23 | **Final verification — everything green** | All 7 modules `go test -race -cover` OK; golangci-lint 0 issues ×7; `GOWORK=off` build OK; `GOEXPERIMENT= go build` OK (CI-parity reflex); `nix build .#checks.x86_64-linux.format` green; final push `8ff919f` → CI `success` (1m2s), Website Check `success` (28s), Deploy Website `success` (54s) |
-| 24 | **M08 — announcement drafted + self-reviewed** | see b) — the publish is a deliberate user gate |
+| --- | ---- | -------- |
+| ~~1~~ | ~~**M02 — release.yml no-fire ROOT-CAUSED**~~ done — see the archived root-cause note | ~~Zero `refs/tags/v0.10.2` PushEvent in the events API; workflow byte-identical at both tags; tag SHA matches local → GitHub's combined branch+tag push silently dropped the tag webhook. Findings note: `docs/status/2026-09-28_02-10_release-yml-no-fire-root-cause-v0.10.2.md`~~ |
+| ~~2~~ | ~~**M02 — mitigation landed AND live-tested**~~ done — fallback live-tested on v0.10.3 + v0.11.0 | ~~`workflow_dispatch` fallback in release.yml (explicit `tag_name`, force-fetch/checkout of input tag); dispatched on v0.10.3 → run 36478697983 `success`; runbook (separate tag/branch pushes, ~2-min trigger check) in AGENTS.md~~ |
+| ~~3~~ | ~~**M03 — v0.10.2 GitHub Release curated**~~ done — curated; G4 recommendation recorded | ~~Notes published in v0.10.1 style (7-module table, highlights); G4 recommendation recorded: keep 0.x releases marked FULL, prerelease flag = literal alpha/beta/rc only~~ |
+| ~~4~~ | ~~**M04 — full tag audit: 60+ tags**~~ done — 5 broken tags found (not 2) | ~~Found **5 broken tags, not the 2 the TODO assumed**: root `v0.5.0`, `v0.5.1`, `v0.6.0` (local-dir replaces; v0.6.0 + phantom pseudo-version) + `diagnose/v0.1.0` + `agent/v0.1.0`. `v0.6.1` verified CLEAN (zero requires) and deliberately NOT retracted~~ |
+| ~~5~~ | ~~**M04 — retraction shipped as coordinated v0.10.3**~~ done — v0.10.3 coordinated release | ~~Tags `diagnose/v0.2.5` → `agent/v0.2.5` → `v0.10.3` (release commit `7ffd883`), each pushed separately per the new runbook; Release workflow FIRED first try — validating the M02 root cause in practice~~ |
+| ~~6~~ | ~~**M04 — retraction verified end-to-end**~~ done — origin-verified; later confirmed through the default proxy | ~~`go list -m -retracted` via `GOPROXY=direct` (origin): all 5 return the exact rationale; `v0.6.1`/`v0.10.3`/`v0.2.5`s clean; `@latest` resolves v0.10.3; proxy `.info` serves v0.10.3~~ |
+| ~~7~~ | ~~**M04 — docs synced**~~ done — CHANGELOG + website changelog synced | ~~CHANGELOG `[0.10.3]` (+ factual fix to 0.10.2's Modules claim: submodules pin root v0.10.1 at tag time); website `changelog.mdx` gained **missing 0.10.1 AND 0.10.2** sections plus 0.10.3; ROADMAP theme 3 updated~~ |
+| ~~8~~ | ~~**M05 — website guard canary live**~~ done — website-check.yml live | ~~`.github/workflows/website-check.yml`: TS-major==6 canary, `pnpm install --frozen-lockfile`, `astro check`, `astro build`; validated on its own first push (run 36483254236 `success`, 28s); PR-triggered too, so Dependabot TS bumps fail BEFORE merge~~ |
+| ~~9~~ | ~~**M05 — Dependabot decision verified, not guessed**~~ done — decision verified against GitHub docs | ~~GitHub docs confirm: no per-directory security-update toggle; `open-pull-requests-limit: 0` does NOT disable security updates. Decision: leave enabled, red security job = the alert signal, remediate via `pnpm audit` (recorded in AGENTS.md)~~ |
+| ~~10~~ | ~~**M06 — coverage lift, all targets exceeded**~~ done — 97.4 / 98.7 / 89.2, all -race | ~~diagnose core 84.2→**97.4%** (target 88), diagnose/git 91.0→**98.7%** (95), postgres 78.5→**89.2%** (83); all with `-race`; new `diagnose/command_test.go` + git remote-failure branches + postgres run-error/TCP branches; FEATURES + AGENTS tables updated with Δ~~ |
+| ~~11~~ | ~~**M07 — battery caught a real regression + fixed**~~ done — safeCauseString suppression; 0 findings x7 | ~~erraudit 0 findings restored: Sep-22 erraudit binary added a blank-identifier-on-`recover` rule AFTER the Sep-15 zero-claim → `safeCauseString` now carries the documented `//nolint:legacyerrors` + rationale; all 7 modules 0 findings~~ |
+| ~~12~~ | ~~**M07 — rest of battery green (after one fix)**~~ done — structure-linter 0; buildflow full green; website build 16 pages | ~~structure-linter exit 0 (+ applied its `*.png binary` advisory); `buildflow --build-mode full` no-cache: the 1 failure was the treefmt FORMAT check (golines wanted new long lines wrapped) → `nix fmt`, format check green; website build via `nix run .#build` (15 pages) — claim corrected: flake exposes `apps.build`, NOT `packages.default`~~ |
+| ~~13~~ | ~~**M09 — art-dupl suppression + policy**~~ done — baseline committed; policy recorded | ~~`baseline`/`check` subcommands exist; `.art-dupl-baseline.json` committed (3 accepted groups, threshold 1, check exits 0); policy recorded: routine gate `-t 5`, deep sweeps `-t 1` against baseline (resolves ROADMAP OQ1 as a default)~~ |
+| ~~14~~ | ~~**M10 — both BuildFlow diagnoses source-verified + filed**~~ done — BuildFlow #23 + #19 evidence | ~~(a) `lockfilePatterns` globs `**/pnpm-lock.yaml` while the detector runs at `rootDir` (js_tools.go:351/205) → added as evidence comment on existing issue **#19** (no duplicate filed); (b) phantom analyzer: `IsIgnored` wired in roleak/doanalyzerv2, ZERO calls in `pkg/phantom/` (7 files) despite the core ENUM declaring `phantom` → filed **BuildFlow#23**; both linked from `.buildflow.yml`~~ |
+| ~~15~~ | ~~**M11 — v0.11.0 scoped**~~ done — scope frozen; shipped as v0.11.0 | ~~CHANGELOG `[Unreleased]` skeleton (discoverability release, no API changes); release checklist written into TODO_LIST #8~~ |
+| ~~16~~ | ~~**M12 — supply-chain knob applied**~~ done — minimumReleaseAgeStrict: true | ~~`minimumReleaseAgeStrict: true` in `website/pnpm-workspace.yaml` (docs-verified: pnpm 11 already defaults a 1-day cooldown; strict = fail-loud); frozen install passes the trustLockfile check ("492 entries in 2.2s"); `astro check` 0 issues~~ |
+| ~~17~~ | ~~**M13 — AGENTS.md trim, target beaten**~~ done — 18,020 bytes; narratives archived | ~~39,865 → **18,020 bytes** (55% cut, target was <30 KB); every still-true rule kept, all narratives archived VERBATIM in `docs/history/agents-archive.md`; every internal citation path verified to exist~~ |
+| ~~18~~ | ~~**M14 — hygiene batch**~~ done — hygiene batch + peripheral audit | ~~SEC feedback archived with verified-resolution banner (all PP1–5/IDEA1–4 shipped by v0.10.1); `go.work` floor-vs-toolchain comment; `best-of-both-worlds.html` confirmed correctly archived (zero dangling refs); peripheral-surface audit recorded (`docs/status/2026-09-28_03-00_m14-peripheral-surface-audit.md`)~~ |
+| ~~19~~ | ~~**M15 — errorfamilytest + diagnose examples**~~ done — 7 helper examples | ~~7 assertion-helper examples (package's first); executable `ExampleRuleSpec` (data-driven rule + Runner + `ResolveContextKey`); both modules lint 0 issues~~ |
+| ~~20~~ | ~~**M16 — gRPC guide shipped**~~ done — guides/grpc live | ~~`website/src/content/docs/guides/grpc.mdx`: family→gRPC table (per Google's official HTTP↔gRPC mapping), interceptor, retry guidance (Infrastructure also = Unavailable but single-attempt); sidebar entry; `astro check` 0 issues, build **16 pages**~~ |
+| ~~21~~ | ~~**M17 — constructor symmetry**~~ done — 30 root examples | ~~`ExampleNewConflict/Corruption/Infrastructure/Orchestration` (root now **30 runnable examples**); one example fixed my wrong assumption (Infrastructure `IsRetryable()` = false) — the example now documents true behavior~~ |
+| ~~22~~ | ~~**M18 — triage + decision records**~~ done — 6 PRs closed; both DRs declined | ~~6 superseded Dependabot PRs (#6–#11, root 0.10.1→0.10.2) closed with rationale (v0.10.3 supersedes; Dependabot re-files); CSP + uptime-monitor both formally DECLINED with reasoning + revisit triggers (`docs/status/2026-09-28_03-30_decision-records-csp-uptime.md`)~~ |
+| ~~23~~ | ~~**Final verification — everything green**~~ done — all modules green; final push 8ff919f | ~~All 7 modules `go test -race -cover` OK; golangci-lint 0 issues ×7; `GOWORK=off` build OK; `GOEXPERIMENT= go build` OK (CI-parity reflex); `nix build .#checks.x86_64-linux.format` green; final push `8ff919f` → CI `success` (1m2s), Website Check `success` (28s), Deploy Website `success` (54s)~~ |
+| ~~24~~ | ~~**M08 — announcement drafted + self-reviewed**~~ done — drafted; publish gated (now TODO_LIST #1) | ~~see b) — the publish is a deliberate user gate~~ |
 
 ## b) PARTIALLY DONE
 
 | # | Item | State | What remains |
-| - | ---- | ----- | ------------ |
-| 1 | **M08 Bridge announcement** | Drafted at `docs/planning/2026-09-28_bridge-patterns-announcement-draft.md`; self-reviewed against guide content (no overclaiming; zero-consumers honesty; "19 tests" verified) | **USER GATE:** review, pick channel (GitHub Discussion vs r/golang), publish, cross-link from README/related-tools |
-| 2 | **Retraction propagation on proxy.golang.org** | Verified via `GOPROXY=direct` (origin truth); proxy `.info` already serves v0.10.3 | The proxy's cached `@latest` still returned v0.10.2 at last check — retraction semantics on the PROXY (not origin) propagate when that cache refreshes; re-verify `go list -m -retracted` WITHOUT `direct` later |
-| 3 | **v0.11.0 release** | Scope frozen, CHANGELOG skeleton written, checklist in TODO_LIST #8; the gRPC guide (its main content item) already landed and deployed | Cut the actual release (bump CHANGELOG date, sync website changelog, tags per runbook, curated notes) |
-| 4 | **TODO_LIST item 7 (website chores)** | Decision made + applied (`minimumReleaseAgeStrict`) | Item text still carries an inline "DONE 2026-09-28" marker instead of being removed — TODO_LIST convention says remove-on-ship |
-| 5 | **gRPC guide as shipped artifact** | Live on the website (16 pages, deployed) | The interceptor code sample is documentation-only — never compiled/CI-verified (no grpc dep in any module, by design) |
+| --- | ---- | ----- | ------------ |
+| ~~1~~ | ~~**M08 Bridge announcement**~~ done — routed to TODO_LIST #1 (channel decision still open) | ~~Drafted at `docs/planning/2026-09-28_bridge-patterns-announcement-draft.md`; self-reviewed against guide content (no overclaiming; zero-consumers honesty; "19 tests" verified)~~ | ~~**USER GATE:** review, pick channel (GitHub Discussion vs r/golang), publish, cross-link from README/related-tools~~ |
+| ~~2~~ | ~~**Retraction propagation on proxy.golang.org**~~ done — 2026-09-29 — go list -m serves the rationale; version list now tops at v0.11.0 | ~~Verified via `GOPROXY=direct` (origin truth); proxy `.info` already serves v0.10.3~~ | ~~The proxy's cached `@latest` still returned v0.10.2 at last check — retraction semantics on the PROXY (not origin) propagate when that cache refreshes; re-verify `go list -m -retracted` WITHOUT `direct` later~~ |
+| ~~3~~ | ~~**v0.11.0 release**~~ done — v0.11.0 cut 2026-09-29 (tags per runbook, notes curated) | ~~Scope frozen, CHANGELOG skeleton written, checklist in TODO_LIST #8; the gRPC guide (its main content item) already landed and deployed~~ | ~~Cut the actual release (bump CHANGELOG date, sync website changelog, tags per runbook, curated notes)~~ |
+| ~~4~~ | ~~**TODO_LIST item 7 (website chores)**~~ done — TODO_LIST rebuilt 2026-09-29; done items removed per convention | ~~Decision made + applied (`minimumReleaseAgeStrict`)~~ | ~~Item text still carries an inline "DONE 2026-09-28" marker instead of being removed — TODO_LIST convention says remove-on-ship~~ |
+| ~~5~~ | ~~**gRPC guide as shipped artifact**~~ done — stands — docs-only interceptor accepted; compile-verify routed to ROADMAP | ~~Live on the website (16 pages, deployed)~~ | ~~The interceptor code sample is documentation-only — never compiled/CI-verified (no grpc dep in any module, by design)~~ |
 
 ## c) NOT STARTED (deliberately out of this session's scope)
 
-1. ROADMAP Open Question **G2** (fleet churn: root-fix vs canaries-forever) — unblocked input arrived (BuildFlow #19/#23), decision pending
-2. ROADMAP Open Question **G3** (bridge: invest vs freeze) — follows announcement reception
-3. G1 got only a recorded **default** (art-dupl `-t 5` routine / `-t 1`+baseline sweeps); formal user confirmation still open
-4. Release automation script (ROADMAP theme 3; runbook exists, automation doesn't)
-5. `docs/status/` index file (current vs archived)
-6. CI markdown-link check (lychee) — battery ran it; not a CI gate; 2 known dead consumer-repo links in ARCHIVED feedback docs (frozen records, left alone)
-7. CI gate for `art-dupl check -t 1` (baseline committed but not enforced in CI)
-8. `pnpm audit` in `website-check` workflow (manual cadence still manual)
-9. Backlog (ROADMAP fuel, demand-gated): OpenAPI schema · `httperror` RFC · redis/docker/kubectl submodules · typed `DiagnosticResult.Details` · `Code()`/`ErrorCode()` convergence · benchmark suite · consumer survey refresh · Echo/Gin guides
-10. pkg.go.dev spot-checks (30 root examples, new errorfamilytest examples) — only visible after v0.11.0
+1. ~~ROADMAP Open Question **G2** (fleet churn: root-fix vs canaries-forever) — unblocked input arrived (BuildFlow #19/#23), decision pending~~ done — routed to ROADMAP OQ2 (still open)
+2. ~~ROADMAP Open Question **G3** (bridge: invest vs freeze) — follows announcement reception~~ done — routed to ROADMAP OQ3 (still open)
+3. ~~G1 got only a recorded **default** (art-dupl `-t 5` routine / `-t 1`+baseline sweeps); formal user confirmation still open~~ done — default recorded 2026-09-29; ROADMAP OQ1 struck
+4. ~~Release automation script (ROADMAP theme 3; runbook exists, automation doesn't)~~ done — routed to ROADMAP theme 3 (automation script, still open)
+5. ~~`docs/status/` index file (current vs archived)~~ done — routed to ROADMAP fuel (status index, still open)
+6. ~~CI markdown-link check (lychee) — battery ran it; not a CI gate; 2 known dead consumer-repo links in ARCHIVED feedback docs (frozen records, left alone)~~ done — routed to ROADMAP fuel (lychee CI gate, still open)
+7. ~~CI gate for `art-dupl check -t 1` (baseline committed but not enforced in CI)~~ done — routed to TODO_LIST #4 (art-dupl CI enforcement)
+8. ~~`pnpm audit` in `website-check` workflow (manual cadence still manual)~~ done — routed to ROADMAP fuel (pnpm audit in website-check)
+9. ~~Backlog (ROADMAP fuel, demand-gated): OpenAPI schema · `httperror` RFC · redis/docker/kubectl submodules · typed `DiagnosticResult.Details` · `Code()`/`ErrorCode()` convergence · benchmark suite · consumer survey refresh · Echo/Gin guides~~ done — routed to ROADMAP backlog (demand-gated)
+10. ~~pkg.go.dev spot-checks (30 root examples, new errorfamilytest examples) — only visible after v0.11.0~~ done — verified 2026-09-29: pkg.go.dev renders 30 root examples + the diagnose RuleSpec example
 
 ## d) TOTALLY FUCKED UP (honest list)
 
@@ -99,62 +99,62 @@ final push (`8ff919f`).
 > TODO_LIST-ready; 13–50 are ROADMAP fuel to be routed through docs-health
 > HARVEST with normal rigor. Sorted by impact.
 
-1. **User review + publish the bridge announcement** (gate; draft ready) and cross-link from README/related-tools
-2. **Cut v0.11.0** per TODO #8 checklist (content is already on master; sync website changelog, date the CHANGELOG section, tags per runbook, curated notes)
-3. **Re-verify retraction via the proxy** (`go list -m -retracted` without `direct`) once `@latest` cache refreshes; record the date
-4. **Confirm Dependabot re-files the 6 submodule bumps against v0.10.3**; triage those PRs (expected green, merge or hold for v0.11.0)
-5. **Add `art-dupl check -t 1 .` to CI** so the baseline is enforced, not decorative
-6. **Add `pnpm audit` to `website-check`** (covers the BuildFlow `pnpm-audit` skip locally until upstream lands #19)
-7. **Compile-verify the gRPC interceptor sample** (extract to `examples/cmd/grpcboundary` or build-tagged test)
-8. **Release automation script** (ROADMAP theme 3): tag sequence + 2-min Release-run check + dispatch fallback + proxy propagation check
-9. **Resolve G1 formally** (confirm or override the art-dupl threshold default)
-10. **Track BuildFlow #19/#23 to fix; remove the two `.buildflow.yml` skips when they land** (each removal re-enables real coverage)
-11. **Write `docs/status/` index** (living vs archived pointer table)
-12. **TODO_LIST hygiene pass**: remove item 7's inline-DONE, renumber; keep ≤10 bounded items
-13. Add retraction-aware consumer-simulation gate to CI (`go list -m -retracted` on pinned broken versions → expect failure)
-14. lychee md-link check as a CI step with an explicit allowlist for archived docs' dead external links
-15. pkg.go.dev spot-check after v0.11.0: 30 root examples render; errorfamilytest examples visible
-16. Verify `errorfamily.lars.software` live-serves the gRPC guide + synced changelog (URL fetch)
-17. SKILL.md sync: 30-example count, gRPC guide mention, v0.10.3 status line
-18. README: add gRPC guide cross-link in the boundary section (website sidebar done; README not yet)
-19. HTTP guide: add reciprocal "See Also" link to the gRPC guide (gRPC guide links out; reverse link missing)
-20. ROADMAP: mark theme 3's automation idea as partially shipped (runbook + dispatch fallback exist)
-21. ROADMAP: point OQ1 at the AGENTS art-dupl policy line (recorded default)
-22. Decide G2 (fleet churn strategy) once BuildFlow #19/#23 progress is visible
-23. Decide G3 (bridge invest-or-freeze) after announcement reception data
-24. Post-v0.11.0: re-cut Dependabot expectation list and record the new baseline pin state
-25. erraudit version stamp + dated tool table for the claims battery (process fix from d-3)
-26. Add battery item: website `nix run .#build` (correct invocation, with the `apps.build` note)
-27. Investigate daemon-pause option for release sequences (commit-boundary hygiene, d-6)
-28. `docs/history/agents-archive.md`: add a header pointer FROM AGENTS.md only (done) and ensure HARVEST never routes new narratives there without a rule reference
-29. Retract-scope precedent: write the "full inventory before family-fix" lesson into the project docs (AGENTS one-liner) or `references/lessons.md` in crush-config (cross-project)
-30. Consider `--diff-report` in deep art-dupl sweeps for triage UX
-31. diagnose/git: the `resolveRepoPath` `"."` fallback branch stays uncovered (os.Getwd failure) — accept explicitly or refactor for testability (gated, tiny)
-32. postgres `IsPostgresRunning` runErr branch uncovered without pg_isready-present+error env — same accept-or-refactor decision (touches published API shape → gated)
-33. `examples/cmd/http`: optional bridge-pattern HTTP variant (adoption gap for the enrichment layer)
-34. `errorfamilytest`: consider `AssertJSON` (consumer-demand-gated)
-35. Website: consider an `apps.check` in website flake bundling check+build (matches the corrected `apps.build` shape)
-36. Website: cache astro build artifacts in CI if deploy time ever matters (now 54s — skip unless it regresses)
-37. `go.work.sum` pruning step in the release checklist (documented incident class from the diagnose v0.2.2 re-point)
-38. Record the two dead consumer links (archived feedback docs) in the future lychee allowlist (item 14 dependency)
-39. `docs/DOMAIN_LANGUAGE.md`: no gRPC terms needed (website-only guide) — record that decision to close the question
-40. Consider a `retract` policy line in AGENTS release runbook (when to retract: any tag that fails a clean-room `GOWORK=off` consumer build)
-41. Add a clean-room consumer build smoke test (`GOWORK=off`, temp module, `go get root@latest`) to the release checklist — catches replace/require rot (the v0.6.x class) pre-tag
-42. pkg.go.dev: after v0.11.0, check the gRPC guide's discoverability from README (GitHub render) — README badge/links
-43. ROADMAP: benchmark-suite idea — scope it (benchstat across v0.10.x→v0.11.0) as a bounded spike
-44. Consumer survey refresh (ROADMAP) — schedule after the announcement has a week of signal
-45. Dependabot: revisit the declined npm ecosystem entry ONLY if GitHub ships per-directory security toggles (tracked via community discussion 69580)
-46. Consider shipping the bridge announcement ALSO as a GitHub Discussion so it is linkable from the repo README regardless of Reddit outcome
-47. `related-tools.mdx`: add the gRPC guide link if its structure lists guides
-48. AGENTS.md: add the "read `<subdir>/go.mod` at submodule tags" gotcha (d-1) as a one-liner — costs one line, prevents a repeat
-49. Celebrate-scan: verify no `//nolint` added this session lacks a rationale comment (erraudit/nolintlint contract) — quick grep
-50. Next session start: re-run the standing-claims battery WITH version stamps (items 25/26) to re-anchor post-release state
+1. ~~**User review + publish the bridge announcement** (gate; draft ready) and cross-link from README/related-tools~~ done — routed to TODO_LIST #1 (still open)
+2. ~~**Cut v0.11.0** per TODO #8 checklist (content is already on master; sync website changelog, date the CHANGELOG section, tags per runbook, curated notes)~~ done — v0.11.0 cut 2026-09-29 (2d0679e, 9b76a6a)
+3. ~~**Re-verify retraction via the proxy** (`go list -m -retracted` without `direct`) once `@latest` cache refreshes; record the date~~ done — verified 09-29 through the default proxy; version list refreshed 09-29
+4. ~~**Confirm Dependabot re-files the 6 submodule bumps against v0.10.3**; triage those PRs (expected green, merge or hold for v0.11.0)~~ done — routed to TODO_LIST #3 (Dependabot wave triage)
+5. ~~**Add `art-dupl check -t 1 .` to CI** so the baseline is enforced, not decorative~~ done — routed to TODO_LIST #4 (art-dupl CI enforcement)
+6. ~~**Add `pnpm audit` to `website-check`** (covers the BuildFlow `pnpm-audit` skip locally until upstream lands #19)~~ done — routed to ROADMAP fuel (pnpm audit in website-check)
+7. ~~**Compile-verify the gRPC interceptor sample** (extract to `examples/cmd/grpcboundary` or build-tagged test)~~ done — routed to ROADMAP theme 4 (compile-verify doc samples)
+8. ~~**Release automation script** (ROADMAP theme 3): tag sequence + 2-min Release-run check + dispatch fallback + proxy propagation check~~ done — routed to ROADMAP theme 3 (release automation)
+9. ~~**Resolve G1 formally** (confirm or override the art-dupl threshold default)~~ done — G1 default recorded 09-29; ROADMAP OQ1 struck
+10. ~~**Track BuildFlow #19/#23 to fix; remove the two `.buildflow.yml` skips when they land** (each removal re-enables real coverage)~~ done — routed to ROADMAP fuel (track BuildFlow #19/#23)
+11. ~~**Write `docs/status/` index** (living vs archived pointer table)~~ done — routed to ROADMAP fuel (status index)
+12. ~~**TODO_LIST hygiene pass**: remove item 7's inline-DONE, renumber; keep ≤10 bounded items~~ done — TODO_LIST rebuilt 2026-09-29 (done items removed, renumbered)
+13. ~~Add retraction-aware consumer-simulation gate to CI (`go list -m -retracted` on pinned broken versions → expect failure)~~ done — routed to ROADMAP fuel (retraction-aware CI gate)
+14. ~~lychee md-link check as a CI step with an explicit allowlist for archived docs' dead external links~~ done — routed to ROADMAP fuel (lychee + allowlist)
+15. ~~pkg.go.dev spot-check after v0.11.0: 30 root examples render; errorfamilytest examples visible~~ done — verified 09-29 on pkg.go.dev (30 examples render)
+16. ~~Verify `errorfamily.lars.software` live-serves the gRPC guide + synced changelog (URL fetch)~~ done — verified live 2026-09-29
+17. ~~SKILL.md sync: 30-example count, gRPC guide mention, v0.10.3 status line~~ done — verified 09-29: SKILL.md carries no stale counts or version stamps
+18. ~~README: add gRPC guide cross-link in the boundary section (website sidebar done; README not yet)~~ done — README gRPC cross-link added (09-29 pass)
+19. ~~HTTP guide: add reciprocal "See Also" link to the gRPC guide (gRPC guide links out; reverse link missing)~~ done — HTTP guide See-Also link added (09-29 pass)
+20. ~~ROADMAP: mark theme 3's automation idea as partially shipped (runbook + dispatch fallback exist)~~ done — ROADMAP theme 3 updated (09-29 pass)
+21. ~~ROADMAP: point OQ1 at the AGENTS art-dupl policy line (recorded default)~~ done — OQ1 struck with resolution + pointer (09-29)
+22. ~~Decide G2 (fleet churn strategy) once BuildFlow #19/#23 progress is visible~~ done — routed to ROADMAP OQ2 (open)
+23. ~~Decide G3 (bridge invest-or-freeze) after announcement reception data~~ done — routed to ROADMAP OQ3 (open)
+24. ~~Post-v0.11.0: re-cut Dependabot expectation list and record the new baseline pin state~~ done — routed to TODO_LIST #3 (Dependabot wave)
+25. ~~erraudit version stamp + dated tool table for the claims battery (process fix from d-3)~~ done — erraudit version stamped into AGENTS status (1c6809a, 09-29 pass)
+26. ~~Add battery item: website `nix run .#build` (correct invocation, with the `apps.build` note)~~ done — routed to ROADMAP fuel (battery additions)
+27. ~~Investigate daemon-pause option for release sequences (commit-boundary hygiene, d-6)~~ done — routed to ROADMAP fuel (daemon-pause investigation)
+28. ~~`docs/history/agents-archive.md`: add a header pointer FROM AGENTS.md only (done) and ensure HARVEST never routes new narratives there without a rule reference~~ done — AGENTS Docs Layout section records the convention
+29. ~~Retract-scope precedent: write the "full inventory before family-fix" lesson into the project docs (AGENTS one-liner) or `references/lessons.md` in crush-config (cross-project)~~ done — routed — cross-project lesson for crush-config references/lessons.md
+30. ~~Consider `--diff-report` in deep art-dupl sweeps for triage UX~~ done — routed to ROADMAP fuel (diff-report triage UX)
+31. ~~diagnose/git: the `resolveRepoPath` `"."` fallback branch stays uncovered (os.Getwd failure) — accept explicitly or refactor for testability (gated, tiny)~~ done — routed to ROADMAP fuel (resolveRepoPath branch)
+32. ~~postgres `IsPostgresRunning` runErr branch uncovered without pg_isready-present+error env — same accept-or-refactor decision (touches published API shape → gated)~~ done — routed to ROADMAP fuel (postgres runErr branch)
+33. ~~`examples/cmd/http`: optional bridge-pattern HTTP variant (adoption gap for the enrichment layer)~~ done — routed to ROADMAP theme 4 (http bridge variant)
+34. ~~`errorfamilytest`: consider `AssertJSON` (consumer-demand-gated)~~ done — routed to ROADMAP fuel (AssertJSON, demand-gated)
+35. ~~Website: consider an `apps.check` in website flake bundling check+build (matches the corrected `apps.build` shape)~~ done — routed to ROADMAP fuel (website apps.check)
+36. ~~Website: cache astro build artifacts in CI if deploy time ever matters (now 54s — skip unless it regresses)~~ **NOT-DO — explicitly skipped-unless-regressed by its own wording.**
+37. ~~`go.work.sum` pruning step in the release checklist (documented incident class from the diagnose v0.2.2 re-point)~~ done — routed to ROADMAP fuel (go.work.sum prune step)
+38. ~~Record the two dead consumer links (archived feedback docs) in the future lychee allowlist (item 14 dependency)~~ done — routed to ROADMAP fuel (lychee allowlist)
+39. ~~`docs/DOMAIN_LANGUAGE.md`: no gRPC terms needed (website-only guide) — record that decision to close the question~~ done — routed to ROADMAP fuel (DOMAIN_LANGUAGE decision note)
+40. ~~Consider a `retract` policy line in AGENTS release runbook (when to retract: any tag that fails a clean-room `GOWORK=off` consumer build)~~ done — routed to ROADMAP fuel (retract policy line)
+41. ~~Add a clean-room consumer build smoke test (`GOWORK=off`, temp module, `go get root@latest`) to the release checklist — catches replace/require rot (the v0.6.x class) pre-tag~~ done — routed to ROADMAP fuel (clean-room consumer smoke test)
+42. ~~pkg.go.dev: after v0.11.0, check the gRPC guide's discoverability from README (GitHub render) — README badge/links~~ done — routed to ROADMAP fuel (README badge/links)
+43. ~~ROADMAP: benchmark-suite idea — scope it (benchstat across v0.10.x→v0.11.0) as a bounded spike~~ done — routed to ROADMAP fuel (benchmark spike)
+44. ~~Consumer survey refresh (ROADMAP) — schedule after the announcement has a week of signal~~ done — routed to ROADMAP fuel (survey refresh)
+45. ~~Dependabot: revisit the declined npm ecosystem entry ONLY if GitHub ships per-directory security toggles (tracked via community discussion 69580)~~ done — routed to ROADMAP fuel (Dependabot npm recheck)
+46. ~~Consider shipping the bridge announcement ALSO as a GitHub Discussion so it is linkable from the repo README regardless of Reddit outcome~~ **NOT-DO — moot — the Discussion was withdrawn 2026-09-29.**
+47. ~~`related-tools.mdx`: add the gRPC guide link if its structure lists guides~~ done — verified: related-tools lists tools, not guides; condition correctly failed
+48. ~~AGENTS.md: add the "read `<subdir>/go.mod` at submodule tags" gotcha (d-1) as a one-liner — costs one line, prevents a repeat~~ done — AGENTS gotcha added (09-29 pass)
+49. ~~Celebrate-scan: verify no `//nolint` added this session lacks a rationale comment (erraudit/nolintlint contract) — quick grep~~ done — verified 09-29: every nolint directive carries a rationale comment
+50. ~~Next session start: re-run the standing-claims battery WITH version stamps (items 25/26) to re-anchor post-release state~~ done — this pass harvested, annotated, and archived this report
 
 ## g) Questions I can NOT figure out myself
 
-1. **Bridge announcement channel + publish consent:** GitHub Discussion on `go-error-family`, r/golang, or both? It goes out under your name — draft is ready (`docs/planning/2026-09-28_bridge-patterns-announcement-draft.md`), I will not publish without your go.
-2. **v0.11.0 timing:** cut it now (all content already on master, checklist ready, ~30 min per runbook) or hold it to bundle whatever comes out of the announcement/BuildFlow #19/#23? I can't infer your release-cadence appetite.
-3. **G1 art-dupl policy:** confirm the recorded default (routine `-t 5`; deep sweeps `-t 1` against the committed baseline; CI enforcement pending item 5) or state your preferred standing threshold — the ROADMAP Open Question stays open until you do.
+1. ~~**Bridge announcement channel + publish consent:** GitHub Discussion on `go-error-family`, r/golang, or both? It goes out under your name — draft is ready (`docs/planning/2026-09-28_bridge-patterns-announcement-draft.md`), I will not publish without your go.~~ done — routed to TODO_LIST #1 (channel decision, still open)
+2. ~~**v0.11.0 timing:** cut it now (all content already on master, checklist ready, ~30 min per runbook) or hold it to bundle whatever comes out of the announcement/BuildFlow #19/#23? I can't infer your release-cadence appetite.~~ done — v0.11.0 cut 2026-09-29 per runbook
+3. ~~**G1 art-dupl policy:** confirm the recorded default (routine `-t 5`; deep sweeps `-t 1` against the committed baseline; CI enforcement pending item 5) or state your preferred standing threshold — the ROADMAP Open Question stays open until you do.~~ done — G1 default recorded 2026-09-29 (ROADMAP OQ1 struck)
 
 ---
 
