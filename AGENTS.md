@@ -11,7 +11,10 @@ Structured error protocol library. Library only — no `main`, no build system, 
 go test ./... -count=1 -timeout 120s -race   # per module; root ./... does NOT span module dirs
 golangci-lint run ./...                        # lint (all modules)
 go build ./...                                 # build check
+md-go-validator .                              # all markdown Go blocks must parse (zero skip-validate anywhere; 114/114 valid 2026-09-29)
 ```
+
+**md-go-validator gotcha:** the system binary (`/run/current-system/sw/bin/md-go-validator`) can lag the source in `~/projects/md-go-validator` until the next NixOS rebuild — run `go run ./cmd/md-go-validator` from that repo for current behavior (prose directive mentions no longer poison blocks; `//nolint` is no longer an implicit skip).
 
 ## Release Runbook
 

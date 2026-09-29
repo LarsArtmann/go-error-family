@@ -141,7 +141,7 @@ No `go` directive for toolchain, no compatibility promise, no deprecation policy
 
 **Severity: HIGH.** The README's "AI Debug Agent" section shows code that literally cannot compile:
 
-```go
+```text
 cfg := agent.DefaultConfig()       // DOES NOT EXIST — function was deleted
 cfg.Involvement = agent.InvolvementSuggest  // DOES NOT EXIST — type was deleted
 cfg.ConfirmFunc = func(...) {}     // DOES NOT EXIST — field was deleted
