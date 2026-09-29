@@ -457,7 +457,7 @@ results := runner.Run(ctx, err)
 **Standalone helpers (postgres submodule):**
 
 ```go
-postgres.IsPostgresRunning(ctx, host, port) bool  // pg_isready or TCP check
+func IsPostgresRunning(ctx context.Context, host, port string) bool  // pg_isready or TCP check
 ```
 
 ### Partial Success (Recipe)
