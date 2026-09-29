@@ -351,7 +351,9 @@ func createOrder(w http.ResponseWriter, r *http.Request) error {
     return nil
 }
 
-mux.Handle("/api/orders", errorfamily.HTTPHandler(createOrder))
+func registerRoutes(mux *http.ServeMux) {
+    mux.Handle("/api/orders", errorfamily.HTTPHandler(createOrder))
+}
 // Rejection → 400, Conflict → 409, Transient → 503, ...
 ```
 
@@ -397,7 +399,9 @@ func getWidget(w http.ResponseWriter, r *http.Request) error {
     return nil
 }
 
-mux.Handle("/widgets/{id}", errorfamily.HTTPHandler(getWidget))
+func registerWidgetRoute(mux *http.ServeMux) {
+    mux.Handle("/widgets/{id}", errorfamily.HTTPHandler(getWidget))
+}
 // HTTPStatus(err) == 412 · Classify(err) == Conflict · IsRetryable(err) == false · ExitCode(err) == 1
 ```
 

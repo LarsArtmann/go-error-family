@@ -67,7 +67,8 @@ err := errorfamily.NewTransientf("db.timeout", "query took %s", duration).
 
 ```go
 func NewTransient(code, message string, context ...string) *Error
-func NewTransientf(code, format string, args ...any, context ...string) *Error // can't do this — Go can't distinguish
+// NewTransientf can't do this — Go can't distinguish two variadic parameters:
+// func NewTransientf(code, format string, args ...any, context ...string) *Error
 ```
 
 Better: a builder pattern or accept that `errkit`-style helpers are the answer and document them in the skill.

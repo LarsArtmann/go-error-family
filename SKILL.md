@@ -72,28 +72,28 @@ Only `Transient` is retryable. Everything else is not. This is the core design d
 
 ```go
 // Classification
-family.IsRetryable() bool      // true only for Transient
-family.IsValid() bool          // true if within defined range
-family.String() string         // "rejection", "transient", etc.
+func (f Family) IsRetryable() bool      // true only for Transient
+func (f Family) IsValid() bool          // true if within defined range
+func (f Family) String() string         // "rejection", "transient", etc.
 
 // Ordering & multi-error (powers errors.Join worst-severity selection)
-family.Severity() int          // total order: Transient(1) < Rejection(2) < Conflict(3) < Infrastructure(4) < Orchestration(5) < Corruption(6)
+func (f Family) Severity() int          // total order: Transient(1) < Rejection(2) < Conflict(3) < Infrastructure(4) < Orchestration(5) < Corruption(6)
 
 // Process & network boundaries
-family.ExitCode() int          // BSD sysexits.h code (see table above)
-family.HTTPStatus() int        // canonical family→HTTP (Rejection→400, Conflict→409, Transient→503, Infrastructure→503, Orchestration→500, Corruption→500)
-family.RetryPolicy() RetryPolicy  // advisory: Transient→{3 attempts, 100ms–5s backoff}; others→{1 attempt}
+func (f Family) ExitCode() int          // BSD sysexits.h code (see table above)
+func (f Family) HTTPStatus() int        // canonical family→HTTP (Rejection→400, Conflict→409, Transient→503, Infrastructure→503, Orchestration→500, Corruption→500)
+func (f Family) RetryPolicy() RetryPolicy  // advisory: Transient→{3 attempts, 100ms–5s backoff}; others→{1 attempt}
 
 // Presentation metadata
-family.Audience() Audience     // who to notify: User, Ops, or All
-family.Tone() Tone             // presentation tone hint
-family.DefaultMessage() string // generic human-readable message
-family.DefaultWhy() string     // generic "why" explanation
-family.DefaultFix() string     // generic fix suggestion
+func (f Family) Audience() Audience     // who to notify: User, Ops, or All
+func (f Family) Tone() Tone             // presentation tone hint
+func (f Family) DefaultMessage() string // generic human-readable message
+func (f Family) DefaultWhy() string     // generic "why" explanation
+func (f Family) DefaultFix() string     // generic fix suggestion
 
 // Config / serialization (implements encoding.TextMarshaler/TextUnmarshaler)
-family.MarshalText() ([]byte, error)   // YAML/JSON config: "transient"
-family.UnmarshalText([]byte) error     // case-insensitive parse, defaults to Transient
+func (f Family) MarshalText() ([]byte, error)   // YAML/JSON config: "transient"
+func (f *Family) UnmarshalText(text []byte) error // case-insensitive parse, defaults to Transient
 ```
 
 ### Audience & Tone Types
@@ -153,40 +153,45 @@ type HTTPStatuser interface { // per-error HTTP status override (0 = use family 
 
 ```go
 // Accessors (beyond the interface methods)
-err.ErrorCode() string                  // from Coded
-err.ErrorFamily() Family                // from Classified
-err.ErrorContext() map[string]string     // from Contextual (returns a copy)
-err.IsRetryable() bool                  // from Retryable
+func (e *Error) ErrorCode() string                  // from Coded
+func (e *Error) ErrorFamily() Family                // from Classified
+func (e *Error) ErrorContext() map[string]string    // from Contextual (returns a copy)
+func (e *Error) IsRetryable() bool                  // from Retryable
 
 // Direct accessors (no interface assertion needed)
-err.Code() string                       // same as ErrorCode()
-err.Family() Family                     // same as ErrorFamily()
-err.Message() string                    // human-readable technical message
-err.Cause() error                       // underlying error in the chain
-err.Timestamp() time.Time               // when the error was created
+func (e *Error) Code() string                       // same as ErrorCode()
+func (e *Error) Family() Family                     // same as ErrorFamily()
+func (e *Error) Message() string                    // human-readable technical message
+func (e *Error) Cause() error                       // underlying error in the chain
+func (e *Error) Timestamp() time.Time               // when the error was created
 
 // Mutators (chainable — all copy-on-write, return a NEW *Error)
-err.WithContext(key, value string) *Error
-err.WithContextMap(ctx map[string]string) *Error    // bulk set from a map
-err.WithContextf(key, format string, args ...any) *Error  // printf-style context value
-err.WithContextAny(key string, value any) *Error   // type-safe: string, int, int64, uint, uint64, float64, bool, []byte, time.Time, error, nil
-err.WithCause(cause error) *Error
-err.WithTimestamp(ts time.Time) *Error   // deterministic timestamp for tests
-err.WithExitCode(code int) *Error        // override family exit code (0 = use default)
-err.WithHTTPStatus(status int) *Error    // override family HTTP status (0 = use default)
+func (e *Error) WithContext(key, value string) *Error
+func (e *Error) WithContextMap(ctx map[string]string) *Error    // bulk set from a map
+func (e *Error) WithContextf(key, format string, args ...any) *Error  // printf-style context value
+func (e *Error) WithContextAny(key string, value any) *Error   // type-safe: string, int, int64, uint, uint64, float64, bool, []byte, time.Time, error, nil
+func (e *Error) WithCause(cause error) *Error
+func (e *Error) WithTimestamp(ts time.Time) *Error   // deterministic timestamp for tests
+func (e *Error) WithExitCode(code int) *Error        // override family exit code (0 = use default)
+func (e *Error) WithHTTPStatus(status int) *Error    // override family HTTP status (0 = use default)
 
 // Serialization
-err.JSON() ([]byte, error)              // canonical JSON for API boundaries: {family,code,message,context,retryable,timestamp}
+func (e *Error) JSON() ([]byte, error)              // canonical JSON for API boundaries: {family,code,message,context,retryable,timestamp}
 
 // Helpers
-err.HasContext(key string) bool
-err.ContextValue(key string) string
-err.Summary() string                    // "code: message" (no family prefix)
+func (e *Error) HasContext(key string) bool
+func (e *Error) ContextValue(key string) string
+func (e *Error) Summary() string                    // "code: message" (no family prefix)
+```
 
-// Formatting (fmt.Formatter)
-fmt.Sprintf("%v", err)    // [family:code] message[: cause]
-fmt.Sprintf("%+v", err)   // verbose: context, timestamp, cause chain
-fmt.Sprintf("%s", err)    // message only
+Formatting (implements `fmt.Formatter`):
+
+```go
+func formatting(err *Error) {
+    fmt.Sprintf("%v", err)    // [family:code] message[: cause]
+    fmt.Sprintf("%+v", err)   // verbose: context, timestamp, cause chain
+    fmt.Sprintf("%s", err)    // message only
+}
 ```
 
 ### Creating Errors
@@ -427,12 +432,16 @@ errorfamily.LogErrorContext(ctx, err, logger)  // propagates context
 exitCode := errorfamily.HandleErrorWithConfig(err, errorfamily.HandleConfig{
     Output: os.Stderr,
     DiagnosticFunc: func(ctx context.Context, err error) []errorfamily.DiagnosticFinding {
-        return ... // adapt diagnose.Runner results
+        return nil // adapt diagnose.Runner results here
     },
     TemplateOverride: map[string]errorfamily.MessageTemplate{
         "db.timeout": {What: "DB timed out on {host}", Fix: "Check {host}"},
     },
-    OnDiagnosed: func(err error, findings []errorfamily.DiagnosticFinding) { ... },
+    OnDiagnosed: func(err error, findings []errorfamily.DiagnosticFinding) {
+        for _, f := range findings {
+            slog.Warn("diagnostic", "rule", f.RuleName, "summary", f.Summary)
+        }
+    },
 })
 ```
 
