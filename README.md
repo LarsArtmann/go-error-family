@@ -408,6 +408,9 @@ implement the `HTTPStatuser` interface on your own type instead. To control the
 client-facing `message` in `HTTPHandler` responses, register a template for the
 code — `HTTPHandler` never leaks `err.Error()`.
 
+For gRPC services, the [gRPC status-mapping guide](https://errorfamily.lars.software/guides/grpc/)
+maps the same six families to gRPC status codes, with a ready interceptor pattern.
+
 ## Structured Logging
 
 `LogError` logs classified fields (`family`, `code`, `retryable`, and each

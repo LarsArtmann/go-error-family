@@ -3,7 +3,7 @@
 Honest inventory of what exists, what works, and what doesn't. Every claim is
 verifiable against the code — citations point at the source.
 
-**Last verified:** 2026-09-28 against v0.10.3 (live `go test -race -cover` run across all modules)
+**Last verified:** 2026-09-29 against v0.11.0 (live `go test -race -cover` run across all 7 modules; numbers unchanged from the 2026-09-28 sweep)
 
 ---
 
@@ -217,7 +217,7 @@ Separate Go module so root stays zero-dependency.
 
 ---
 
-## Test Coverage (verified 2026-09-28, live `go test -race -cover` run)
+## Test Coverage (verified 2026-09-29 against v0.11.0, live `go test -race -cover` run)
 
 | Package              | Coverage |
 | -------------------- | -------- |

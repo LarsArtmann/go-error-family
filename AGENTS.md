@@ -2,7 +2,7 @@
 
 Structured error protocol library. Library only — no `main`, no build system, no external deps. Full API reference: `SKILL.md`.
 
-**Status:** v0.11.0 released (2026-09-29, discoverability release with diagnose v0.2.6; prior: v0.10.3 retracted the proxy-broken v0.5.x/v0.6.0 root tags + diagnose/agent v0.1.0). All 7 modules proxy-indexed; retraction propagation verified through the default module proxy (2026-09-28: `go list -m` serves the retract rationale, `@versions` tops out at v0.10.3). CI + Release + Deploy Website green, tests pass with `-race`, golangci-lint v2.13.2 = 0 issues in all 7 modules, erraudit 0 findings (re-verified 2026-09-29 battery). Release-era narratives: `docs/history/agents-archive.md`.
+**Status:** v0.11.0 released (2026-09-29, discoverability release with diagnose v0.2.6; prior: v0.10.3 retracted the proxy-broken v0.5.x/v0.6.0 root tags + diagnose/agent v0.1.0). All 7 modules proxy-indexed; retraction propagation verified through the default module proxy (`go list -m` serves the retract rationale). pkg.go.dev verified 2026-09-29: root @v0.11.0 renders all 30 examples, diagnose @v0.2.6 renders `Example` (RuleSpec); **known gap:** the v0.11.0 tag predates the announcement-withdrawal README fix, so pkg.go.dev renders a dead Discussion #12 link until the next release (TODO_LIST #2). CI + Release + Deploy Website green, tests pass with `-race`, golangci-lint v2.13.2 = 0 issues in all 7 modules, erraudit (`1c6809a`) 0 findings (re-verified 2026-09-29 battery; the structure-linter `assets/` advisory is dispositioned N/A for a library). Release-era narratives: `docs/history/agents-archive.md`.
 **Workspace modules:** root (zero-dep), `agent`, `bridge` (oops integration), `diagnose`, `diagnose/git`, `diagnose/postgres`, `examples`, `website`
 
 ## Quick Start
@@ -18,6 +18,14 @@ go build ./...                                 # build check
 1. **Push tags SEPARATELY from the branch** (`git push origin master && git push origin vX.Y.Z`). A combined push can silently drop the tag webhook (v0.10.2 incident) and release.yml never fires.
 2. **Verify the Release run starts within ~2 min of the tag push** (`gh run list --workflow=release.yml`). If missing, dispatch manually: `gh workflow run release.yml -f tag=vX.Y.Z` (workflow_dispatch fallback).
 3. Sub-module tags go up before the root tag; verify proxy indexing with `go list -m -versions` before announcing. Submodules pin the PREVIOUS root version at tag time (chicken-and-egg); root pins ride the post-release Dependabot PRs.
+4. **Submodule tags get no Release run** — `release.yml` triggers on root `v*` tags only. No GitHub Release for `diagnose/vX.Y.Z` etc.; expected, don't dispatch for them.
+5. **The proxy version-list cache lags the tag** (minutes to hours); exact-version resolution works immediately. Verify with `go list -m <module>@vX.Y.Z` through the default proxy — don't poll `@v/list`.
+
+## Publishing Rules
+
+- Anything published under Lars's identity (Discussions, Reddit, release marketing) needs an explicit channel + consent decision, even inside a "do everything" directive. In-repo decisions with recorded defaults stay autonomous (Discussion #12 withdrawal, 2026-09-29).
+- Before publishing, render title + body exactly as the target surface will show them and read it once as a stranger.
+- Announcements never enter `CHANGELOG.md` or release notes — an announcement is not a change to the artifact.
 
 ## Docs Layout
 
@@ -50,6 +58,7 @@ The classification protocol is the **six interfaces** (`Coded`/`Classified`/`Con
 - **`Orchestration` is the 6th family** — internal coordination failures, severity 5, exit 70, HTTP 500. `Corruption` severity is 6. Order: Transient(1)<Rejection(2)<Conflict(3)<Infrastructure(4)<Orchestration(5)<Corruption(6).
 - **Conditional requests (issue #5):** 304 is a success path (write it, return `nil`; NEVER classify). 412 = `NewConflict(...).WithHTTPStatus(412)`. 428 = `NewRejection(...).WithHTTPStatus(428)`. 416 = `Rejection` + `WithHTTPStatus(416)`. Guarded by `Example_conditionalRequests`.
 - **Embedding `*Error` in a custom wrapper struct does NOT compile** — the embedded field `Error` shadows the promoted `Error() string` method, and a declared `Error()` method collides with the field. Use `WithHTTPStatus`/`WithExitCode` or a named field + explicit `Error`/`Unwrap` forwarding.
+- **Submodule tags serve the SUBDIRECTORY go.mod via the proxy** — auditing a submodule tag means reading `<subdir>/go.mod` AT the tag, never the repo-root go.mod (misreading this briefly "proved" a poisoned `bridge/v0.2.0` that was fine).
 - **go.work.sum can hold stale checksums because `GOPRIVATE` skips sumdb** — fix: delete the stale line and rebuild (workspace `use` re-resolves locally).
 - **bridge/examples fail to build between pin-bump and tag-push** — their external imports (oops) force loading unpublished sibling go.mods → `unknown revision`. Expected mid-release state; verify after tags land. `go test ./...` from root does NOT span module dirs — use per-module invocations.
 
@@ -98,7 +107,7 @@ Not a library type — a consumption pattern. Recipe in SKILL.md (collect outcom
 
 ## Test Coverage
 
-`go test -race -cover`, 2026-09-28 (M06 lift wave): root 97.1, `errorfamilytest` 96.3, `agent` 100.0, `bridge` 94.4, `diagnose` 97.4, `diagnose/git` 98.7, `diagnose/postgres` 89.2. All at 80%+; the v0.10.1 erraudit dips are fully recovered (`diagnose/command_test.go` + remote/pg run-error branch tests). 16 fuzz targets (root 11, bridge 5). `errorfamilytest` is intentionally thin.
+FEATURES.md owns the coverage table (single source — an AGENTS copy of the table drifted from it once); all 7 modules ≥ 89% on the latest live `-race -cover` sweep. 16 fuzz targets (root 11, bridge 5). `errorfamilytest` is intentionally thin.
 
 ## Adoption Reality (audited 2026-07-23)
 
