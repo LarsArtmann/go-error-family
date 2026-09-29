@@ -2,7 +2,7 @@
 
 **Date:** 2026-09-28
 **Status:** RESOLVED — root cause identified, mitigations landed (workflow_dispatch fallback + runbook).
-**Resolves:** TODO_LIST #3 (docs-health audit 2026-09-27), plan task M02.
+**Resolves:** ~~TODO_LIST #3 (docs-health audit 2026-09-27), plan task M02.~~ done — closed 2026-09-28; fallback live-tested on v0.10.3 and again on v0.11.0 (2026-09-29); runbook in AGENTS.md.
 
 ## Symptom
 
@@ -55,4 +55,5 @@ git annotated tag pushed from a clone.)
 - `gh api .../events` (20:00–21:00Z window) → two `refs/heads/master` PushEvents, zero tag PushEvents.
 - `git diff v0.10.1 v0.10.2 -- .github/workflows/release.yml` → empty.
 - Fallback path exercised on the next release (v0.10.3 retraction release, M04):
-  tags pushed separately from the branch; Release run confirmed within ~2 min.
+  tags pushed separately from the branch; Release run confirmed within ~2 min —
+  and repeated on v0.11.0 (2026-09-29).

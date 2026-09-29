@@ -41,4 +41,4 @@ change; Firebase's status page covers platform outages.
 backend logic) land on the domain, or the site becomes commercially load-bearing.
 
 ---
-Both decisions close the corresponding ROADMAP futures items. No code changes.
+~~Both decisions close the corresponding ROADMAP futures items.~~ Verified 2026-09-29 (docs-health pass): neither CSP nor an uptime monitor appears anywhere in ROADMAP.md — both closed here. No code changes.

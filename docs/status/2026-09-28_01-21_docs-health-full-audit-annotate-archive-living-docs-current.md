@@ -57,26 +57,26 @@ Executed a full docs-health AUDIT over every `2026-0*` file in the repo. Verifie
 
 ## b) PARTIALLY DONE
 
-1. **v0.10.2 Release remediation.** Done: the missing GitHub Release exists (manually created, `--latest`). Not done: WHY `release.yml` didn't trigger on the tag push is undiagnosed (tag + master pushed together at 20:33 UTC; CI ran, Release didn't; the workflow file and trigger pattern are unchanged since v0.10.1 which did fire). Routed as TODO_LIST #3.
-2. **AGENTS.md size.** Now ~37 KB (flag threshold 30 KB, fail 50 KB). Documented as a standing flag, deliberately not trimmed — the file is dense operational gotcha, and cutting without losing hard-won context is its own session. Needs your call (see g.2).
-3. **Website verification depth.** `astro check` ran clean after the two `.mdx` fixes; `astro build` did NOT re-run this session. The next `website/**` push (these edits are one) will exercise the full `website-deploy` pipeline.
-4. **Origin state.** `master` is **16 commits ahead** of `origin/master` — this entire pass (annotations, archives, living-doc fixes, the 124-file sweep commit) is local-only. No CI has validated any of it, and the push decision is yours (g.1).
-5. **erraudit "0 findings".** The BuildFlow findings gate passing (0 error-severity findings) implies it, but an explicit `erraudit` run was not performed this session; it remains in TODO_LIST #7's claims battery.
-6. **HTML dashboards.** Resolution banners added at the top (inline, not appendix-only), but their internal per-row items are not individually struck. Accepted: the banners name every open claim and its disposition.
-7. **Peripheral doc surfaces.** `docs/research/`, `docs/modularization/`, `comparison-samber-oops.html`, `top-5-stupidest-things.md` + its resolving doc, `architecture-understanding/` renders — grep-checked for the known drift patterns (clean) but not line-verified. `sec-consumer-feedback.md` untouched (no `2026-` prefix — outside the scope you set).
-8. **Verdict granularity disclosure.** ~2,100 verdicts were applied from release-history knowledge, CHANGELOG, FEATURES, and live repo state — each individually defensible, but not each was independently re-verified against code line-by-line. The health report discloses this; an unknown number of verdicts cite the release that made an item moot rather than the exact commit that closed it.
+1. ~~**v0.10.2 Release remediation.** Done: the missing GitHub Release exists (manually created, `--latest`). Not done: WHY `release.yml` didn't trigger on the tag push is undiagnosed (tag + master pushed together at 20:33 UTC; CI ran, Release didn't; the workflow file and trigger pattern are unchanged since v0.10.1 which did fire). Routed as TODO_LIST #3.~~ done — resolved — root-caused 2026-09-28 (M02); see the archived root-cause note
+2. ~~**AGENTS.md size.** Now ~37 KB (flag threshold 30 KB, fail 50 KB). Documented as a standing flag, deliberately not trimmed — the file is dense operational gotcha, and cutting without losing hard-won context is its own session. Needs your call (see g.2).~~ done — resolved — M13 trimmed AGENTS.md to 18,020 bytes
+3. ~~**Website verification depth.** `astro check` ran clean after the two `.mdx` fixes; `astro build` did NOT re-run this session. The next `website/**` push (these edits are one) will exercise the full `website-deploy` pipeline.~~ done — resolved — astro build green (16 pages); website-check canary now enforces it in CI
+4. ~~**Origin state.** `master` is **16 commits ahead** of `origin/master` — this entire pass (annotations, archives, living-doc fixes, the 124-file sweep commit) is local-only. No CI has validated any of it, and the push decision is yours (g.1).~~ done — resolved — pushed 2026-09-28 (e1d46ff); all later pushes green too
+5. ~~**erraudit "0 findings".** The BuildFlow findings gate passing (0 error-severity findings) implies it, but an explicit `erraudit` run was not performed this session; it remains in TODO_LIST #7's claims battery.~~ done — resolved — erraudit 0 findings re-verified 09-28 and 09-29 (binary 1c6809a)
+6. ~~**HTML dashboards.** Resolution banners added at the top (inline, not appendix-only), but their internal per-row items are not individually struck. Accepted: the banners name every open claim and its disposition.~~ done — stands as disclosed — banners accepted as the HTML-dashboard disposition
+7. ~~**Peripheral doc surfaces.** `docs/research/`, `docs/modularization/`, `comparison-samber-oops.html`, `top-5-stupidest-things.md` + its resolving doc, `architecture-understanding/` renders — grep-checked for the known drift patterns (clean) but not line-verified. `sec-consumer-feedback.md` untouched (no `2026-` prefix — outside the scope you set).~~ done — resolved — peripheral-surface audit recorded 2026-09-28 (M14 note, now archived)
+8. ~~**Verdict granularity disclosure.** ~2,100 verdicts were applied from release-history knowledge, CHANGELOG, FEATURES, and live repo state — each individually defensible, but not each was independently re-verified against code line-by-line. The health report discloses this; an unknown number of verdicts cite the release that made an item moot rather than the exact commit that closed it.~~ done — disclosure stands — verdicts cite real evidence; exact-commit citations not backfilled
 
 ---
 
 ## c) NOT STARTED
 
-1. **All 10 TODO_LIST items** — deliberately untouched this session (docs-health maintains the backlog; it doesn't execute it). Includes: bridge-guide announcement, v0.6.x tag retraction, release.yml investigation, website guard canaries, art-dupl suppression + threshold policy, coverage lifts, claims battery, upstream BuildFlow filings, website chores, v0.11.0 planning.
-2. **Root cause of the release.yml no-fire** (TODO_LIST #3) — not investigated at all yet.
-3. **AGENTS.md trim** — not started, pending your preference (g.2).
-4. **Push** — not started; 16 commits local-only (g.1).
-5. **`astro build` re-run** — not started (b.3).
-6. **ROADMAP Open Questions answers** (art-dupl threshold, fleet-churn architecture, bridge invest-or-freeze) — still awaiting you; now recorded in one place so they can't be lost.
-7. **Next-pass archive of THIS report** — per the new Docs Layout convention, this report gets harvested + annotated + archived on the next docs-health pass.
+1. ~~**All 10 TODO_LIST items** — deliberately untouched this session (docs-health maintains the backlog; it doesn't execute it). Includes: bridge-guide announcement, v0.6.x tag retraction, release.yml investigation, website guard canaries, art-dupl suppression + threshold policy, coverage lifts, claims battery, upstream BuildFlow filings, website chores, v0.11.0 planning.~~ done — the 2026-09-27/28 batch shipped in full through v0.11.0 (2026-09-29)
+2. ~~**Root cause of the release.yml no-fire** (TODO_LIST #3) — not investigated at all yet.~~ done — M02 root cause (archived note 2026-09-28_02-10)
+3. ~~**AGENTS.md trim** — not started, pending your preference (g.2).~~ done — M13 trim (18,020 bytes)
+4. ~~**Push** — not started; 16 commits local-only (g.1).~~ done — pushed; CI + Website Check + Deploy green
+5. ~~**`astro build` re-run** — not started (b.3).~~ done — astro build green 09-28/29; canary enforces in CI
+6. ~~**ROADMAP Open Questions answers** (art-dupl threshold, fleet-churn architecture, bridge invest-or-freeze) — still awaiting you; now recorded in one place so they can't be lost.~~ done — partially — G1 resolved (recorded default); G2/G3 remain open in ROADMAP
+7. ~~**Next-pass archive of THIS report** — per the new Docs Layout convention, this report gets harvested + annotated + archived on the next docs-health pass.~~ done — this file annotated + archived in the 2026-09-29 pass
 
 ---
 
@@ -191,9 +191,9 @@ _Sources: [T] = already a TODO_LIST item (do NOT re-harvest, they're current), [
 
 ## g) Questions I cannot figure out myself
 
-1. **Push now?** `master` is 16 commits ahead — the entire sweep, the living-doc fixes, and the v0.10.2 release-notes remediation are local-only, and the two `website/**` `.mdx` fixes mean the next push triggers the full `website-deploy` pipeline. Do you want me to push (and watch CI + website-deploy), do you push yourself, or does the fleet orchestrator own pushes on its own schedule?
-2. **AGENTS.md: trim or keep dense?** It is ~37 KB (flag threshold 30 KB). I can move the release-era narrative bullets (2026-05/06/07 incident stories, json/v2 saga details, lint-archaeology rationale) to `docs/` and keep only current-state rules — that would land it near 20 KB. Or is maximum density by design for this repo?
-3. **v0.10.2 GitHub Release notes: keep or curate?** I created the missing release with auto-generated notes (matching the workflow's `generate_release_notes: true`). v0.10.1's release was hand-curated (summary + modules table). Should I curate v0.10.2 the same way — and if yes, should the 0.x-releases-prerelease convention question (from the 09-15 report, still unanswered) be decided at the same time?
+1. ~~**Push now?** `master` is 16 commits ahead — the entire sweep, the living-doc fixes, and the v0.10.2 release-notes remediation are local-only, and the two `website/**` `.mdx` fixes mean the next push triggers the full `website-deploy` pipeline. Do you want me to push (and watch CI + website-deploy), do you push yourself, or does the fleet orchestrator own pushes on its own schedule?~~ done — pushed; all pipelines green on every subsequent push
+2. ~~**AGENTS.md: trim or keep dense?** It is ~37 KB (flag threshold 30 KB). I can move the release-era narrative bullets (2026-05/06/07 incident stories, json/v2 saga details, lint-archaeology rationale) to `docs/` and keep only current-state rules — that would land it near 20 KB. Or is maximum density by design for this repo?~~ done — M13 trimmed to 18,020 bytes; narratives archived verbatim
+3. ~~**v0.10.2 GitHub Release notes: keep or curate?** I created the missing release with auto-generated notes (matching the workflow's `generate_release_notes: true`). v0.10.1's release was hand-curated (summary + modules table). Should I curate v0.10.2 the same way — and if yes, should the 0.x-releases-prerelease convention question (from the 09-15 report, still unanswered) be decided at the same time?~~ done — M03 curated; G4 recommendation recorded (keep 0.x releases FULL)
 
 ---
 

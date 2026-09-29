@@ -42,29 +42,29 @@ One call registers `context.DeadlineExceeded→Transient`, `sql.ErrNoRows→Reje
 
 ## Pain points and friction
 
-### 1. No `errors.As` equivalent in the package
+### ~~1. No `errors.As` equivalent in the package~~ — SHIPPED: `Code(err)` (PP1)
 
 I initially tried `errorfamily.As(err, &coded)` and got a compile error. There's no `As` function — you must use stdlib `errors.As` with the `errorfamily.Coded` interface. This is correct (stdlib `errors.As` is the right tool) but it's not discoverable. I had to grep the source to find the `Coded` interface.
 
 **Suggestion:** Add a doc comment on `Classify` pointing to `errors.As(err, &coded)` for code extraction, or export a helper like `ErrorCode(err) string` that does the `errors.As` internally.
 
-### 2. `RegisterClassification` vs `Classified` interface — when to use which?
+### ~~2. `RegisterClassification` vs `Classified` interface — when to use which?~~ — SHIPPED: README decision tree (PP2)
 
 The distinction between "implement Classified on your own errors" vs "RegisterClassification for third-party errors" was clear from docs, but the practical boundary needed thought. Domain errors that I own → `NewRejection/NewConflict`. Third-party errors → `RegisterClassification`. This is correct but could use a decision-tree diagram in the README.
 
-### 3. `HandleConfig.TemplateOverride` unused — unclear how to wire it
+### ~~3. `HandleConfig.TemplateOverride` unused — unclear how to wire it~~ — SHIPPED: `TemplateForCode` (PP3)
 
 I registered templates via `RegisterTemplate` but the `HandleConfig` / `HandleError` pipeline isn't wired into my HTTP handlers. I extract the code manually via `errors.As` and look up my own `domainMessage(code)` function. The `HandleError` family of functions seems designed for a different use case (CLI? batch processing?) and the connection to HTTP error responses isn't obvious.
 
 **Suggestion:** Add an example showing `HandleErrorWithConfig` used at an HTTP boundary, or export a `TemplateForCode(code) (MessageTemplate, bool)` helper so consumers can look up registered templates without reimplementing the lookup.
 
-### 4. Five families — is Corruption really 422?
+### ~~4. Five families — is Corruption really 422?~~ — RESOLVED: Corruption is 500; per-family rationale documented (PP4)
 
 `Corruption → HTTP 422 (Unprocessable Entity)` surprised me. Corruption (stored data damage, unmarshal failure) feels more like a 500 (server error) than a 422 (client sent unprocessable data). The client didn't do anything wrong — the stored data is damaged. I'd expect Corruption → 500 and Infrastructure → 500, distinguished only by severity/logging.
 
 **Suggestion:** Document the rationale for each HTTP mapping. The current table in `family.go` is a good start but doesn't explain _why_.
 
-### 5. Missing: `IsRetryable(err) bool` convenience
+### ~~5. Missing: `IsRetryable(err) bool` convenience~~ — ALREADY EXISTED (PP5)
 
 `Retryable` is an interface but there's no top-level `IsRetryable(err) bool` helper. I have to do `errors.As(err, &retryable)` manually. A convenience function would match the `Classify(err)` pattern.
 
@@ -72,7 +72,7 @@ I registered templates via `RegisterTemplate` but the `HandleConfig` / `HandleEr
 
 ## Ideas for improvement
 
-### 1. `errorfamily.Code(err) string` — one-liner code extraction
+### ~~1. `errorfamily.Code(err) string` — one-liner code extraction~~ — SHIPPED (IDEA1)
 
 ```go
 func Code(err error) string {
@@ -86,15 +86,15 @@ func Code(err error) string {
 
 Would eliminate the 5-line boilerplate I wrote in `dispatchErrorCode`.
 
-### 2. HTTP middleware adapter
+### ~~2. HTTP middleware adapter~~ — SHIPPED: `HTTPHandler`/`HTTPStatus` (IDEA2)
 
 An `errorfamily.HTTPErrorHandler(fn ErrorHandler)` that wraps an `http.HandlerFunc` and catches errors returned from a handler. This would bridge the gap between the classification system and HTTP frameworks.
 
-### 3. Structured logging integration
+### ~~3. Structured logging integration~~ — SHIPPED: `LogError`/`LogErrorContext` (IDEA3)
 
 `HandleError` returns an `int` (exit code). Consider a `LogError(err, slog.Logger)` or similar that logs structured fields (family, code, message, retryable) — this is what every consumer will build anyway.
 
-### 4. Testing helpers
+### ~~4. Testing helpers~~ — SHIPPED: `errorfamilytest` subpackage (IDEA4)
 
 Export test assertion helpers: `AssertFamily(t, err, Family)`, `AssertCode(t, err, string)`. I wrote these myself in 3 projects now.
 
@@ -114,17 +114,17 @@ The main gap is discoverability — the `Coded` interface extraction pattern, th
 
 | #   | Item                                                               | Status                 | Resolution                                                                                                                                                                                                                                     |
 | --- | ------------------------------------------------------------------ | ---------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| PP1 | No `errors.As` equivalent — `Code(err)` helper                     | ✅ **DONE**            | Added `errorfamily.Code(err) string` in `classify.go`. Walks the unwrap chain via `errors.AsType[Coded]`. Returns `""` if no code found. `HandleError`'s internal `extractCode` refactored to delegate to it.                                  |
-| PP2 | Decision-tree for `RegisterClassification` vs `Classified`         | ✅ **DONE**            | Added ASCII decision tree to README: own→Classified, sentinel→RegisterClassification, dynamic→RegisterClassifier, else→Transient default.                                                                                                      |
-| PP3 | `HandleConfig.TemplateOverride` unclear; no template lookup helper | ✅ **DONE**            | Added `TemplateForCode(code) (MessageTemplate, bool)` — both as `Registry.TemplateForCode` and package-level convenience. Checks registered templates → built-in defaults. Lets HTTP/gRPC consumers look up messages without the CLI pipeline. |
-| PP4 | Corruption → 422 concern; document HTTP rationale                  | ✅ **RESOLVED**        | Corruption was already 500 (not 422 — this was based on an older version). Added per-family rationale to `Family.HTTPStatus()` godoc explaining each mapping and why Corruption→500 (not 422).                                                 |
-| PP5 | Missing `IsRetryable(err) bool` convenience                        | ✅ **ALREADY EXISTED** | `errorfamily.IsRetryable(err) bool` already existed in `classify.go` since v0.5.0. No action needed.                                                                                                                                           |
+| ~~PP1~~ | ~~No `errors.As` equivalent — `Code(err)` helper~~ done — shipped by v0.10.1 | ~~✅ **DONE**~~ | ~~Added `errorfamily.Code(err) string` in `classify.go`. Walks the unwrap chain via `errors.AsType[Coded]`. Returns `""` if no code found. `HandleError`'s internal `extractCode` refactored to delegate to it.~~ |
+| ~~PP2~~ | ~~Decision-tree for `RegisterClassification` vs `Classified`~~ done — shipped by v0.10.1 | ~~✅ **DONE**~~ | ~~Added ASCII decision tree to README: own→Classified, sentinel→RegisterClassification, dynamic→RegisterClassifier, else→Transient default.~~ |
+| ~~PP3~~ | ~~`HandleConfig.TemplateOverride` unclear; no template lookup helper~~ done — shipped by v0.10.1 | ~~✅ **DONE**~~ | ~~Added `TemplateForCode(code) (MessageTemplate, bool)` — both as `Registry.TemplateForCode` and package-level convenience. Checks registered templates → built-in defaults. Lets HTTP/gRPC consumers look up messages without the CLI pipeline.~~ |
+| ~~PP4~~ | ~~Corruption → 422 concern; document HTTP rationale~~ done — resolved (already 500; rationale documented) | ~~✅ **RESOLVED**~~ | ~~Corruption was already 500 (not 422 — this was based on an older version). Added per-family rationale to `Family.HTTPStatus()` godoc explaining each mapping and why Corruption→500 (not 422).~~ |
+| ~~PP5~~ | ~~Missing `IsRetryable(err) bool` convenience~~ done — already existed | ~~✅ **ALREADY EXISTED**~~ | ~~`errorfamily.IsRetryable(err) bool` already existed in `classify.go` since v0.5.0. No action needed.~~ |
 
 ### Ideas for Improvement
 
 | #     | Item                           | Status      | Resolution                                                                                                                                                                                                                                                                                |
 | ----- | ------------------------------ | ----------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| IDEA1 | `errorfamily.Code(err) string` | ✅ **DONE** | Implemented exactly as suggested. See PP1 above.                                                                                                                                                                                                                                          |
-| IDEA2 | HTTP middleware adapter        | ✅ **DONE** | Added `HTTPHandler(fn) http.Handler` and `HTTPStatus(err) int` in `http.go`. Wraps error-returning handlers, writes safe JSON responses (`{family, code, message}`) with the correct status code. **Never leaks `err.Error()`** — message comes only from a registered `MessageTemplate`. |
-| IDEA3 | Structured logging integration | ✅ **DONE** | Added `LogError(err, *slog.Logger)` and `LogErrorContext(ctx, err, logger)` in `log.go`. Transient→Warn, all others→Error. Logs `family`, `code`, `retryable`, and each context key prefixed with `context.`. Nil error = no-op; nil logger = `slog.Default()`.                           |
-| IDEA4 | Testing helpers                | ✅ **DONE** | Added `errorfamilytest` subpackage (`AssertFamily`, `AssertCode`, `AssertRetryable`, `AssertContext`, `AssertContextMissing`). Mirrors `net/http/httptest` — keeps `testing` out of the production package.                                                                               |
+| ~~IDEA1~~ | ~~`errorfamily.Code(err) string`~~ done — shipped by v0.10.1 | ~~✅ **DONE**~~ | ~~Implemented exactly as suggested. See PP1 above.~~ |
+| ~~IDEA2~~ | ~~HTTP middleware adapter~~ done — shipped by v0.10.1 | ~~✅ **DONE**~~ | ~~Added `HTTPHandler(fn) http.Handler` and `HTTPStatus(err) int` in `http.go`. Wraps error-returning handlers, writes safe JSON responses (`{family, code, message}`) with the correct status code. **Never leaks `err.Error()`** — message comes only from a registered `MessageTemplate`.~~ |
+| ~~IDEA3~~ | ~~Structured logging integration~~ done — shipped by v0.10.1 | ~~✅ **DONE**~~ | ~~Added `LogError(err, *slog.Logger)` and `LogErrorContext(ctx, err, logger)` in `log.go`. Transient→Warn, all others→Error. Logs `family`, `code`, `retryable`, and each context key prefixed with `context.`. Nil error = no-op; nil logger = `slog.Default()`.~~ |
+| ~~IDEA4~~ | ~~Testing helpers~~ done — shipped by v0.10.1 | ~~✅ **DONE**~~ | ~~Added `errorfamilytest` subpackage (`AssertFamily`, `AssertCode`, `AssertRetryable`, `AssertContext`, `AssertContextMissing`). Mirrors `net/http/httptest` — keeps `testing` out of the production package.~~ |
