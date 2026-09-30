@@ -142,4 +142,40 @@ Baseline (.art-dupl-baseline.json, recordedAt 2026-09-28T20:34:22Z, threshold 1)
   f5aa721ca6b28b15  diagnose/git/rules_git.go + diagnose/helpers.go
 ```
 
-*End of report. Section (f) is HARVEST-ready; HARVEST intentionally deferred per "WAIT FOR INSTRUCTIONS".*
+## Harvest Ledger (2026-09-30, post-decision pass)
+
+User decisions (§g): baseline = gate-only; record rationales in AGENTS.md; HARVEST first. Dispositions per `docs-health` HARVEST:
+
+| Source (§item) | Disposition | Destination / reason |
+|---|---|---|
+| f.1 AGENTS.md art-dupl bullet | done in code | AGENTS.md rewritten 2026-09-30 (gate-only policy + rationales + exit codes) |
+| f.4 exit-code semantics | done in code | Included in the same AGENTS.md rewrite |
+| f.7 rejected-ideas record | done in code | Rejection rationale encoded per-group in the bullet |
+| f.2 mechanical hash diff | new row | TODO_LIST #5 |
+| f.3 + f.27 flags-provenance + `--type-aware` parity upstream | new row | TODO_LIST #6 |
+| f.5 gopls nilness triage | new row | TODO_LIST #7 |
+| f.6 gate enforcement | existing row | TODO_LIST #4 (2026-09-30 evidence merged) |
+| f.8 check exclusion parity | new row | TODO_LIST #8 |
+| f.9 `-t 1` suppression spot-audit | new row | TODO_LIST #9 |
+| f.10 + f.29 re-baseline trigger | new row | TODO_LIST #10 |
+| f.11 pkg.go.dev README heal | existing row | TODO_LIST #2 (no change) |
+| f.12 Dependabot wave | existing row | TODO_LIST #3 (no change) |
+| f.13 pnpm-audit upstream | new row | TODO_LIST #11 |
+| f.14 branching-flow upstream | new row | TODO_LIST #12 |
+| f.15 structure-linter CLI diff | new row | TODO_LIST #13 |
+| f.16 erraudit after bump | declined | Conditional reminder; AGENTS.md release-verification practice covers it |
+| f.17 golangci pin sync | declined | Covered by AGENTS.md lint bullet ("keep pins in sync") |
+| f.18 website lockfile drift check | declined | Standing AGENTS.md lockfile-sync rule; no evidence of drift |
+| f.19 bun.lock canary | declined | Standing AGENTS.md rule; structural vigilance |
+| f.20 website-check.yml retro-check | declined | Guard is structural (fires on every website push/PR) |
+| f.21 bridge README showcase | new row | ROADMAP Theme 4 raw idea (adoption = long-term; announcement stays TODO_LIST #1) |
+| f.22 under-adopted API examples | new row | TODO_LIST #14 |
+| f.23 fuzzing cadence | new row | TODO_LIST #15 |
+| f.24 jsonv2 guard re-verify | declined | Structural guards (CI `GOWORK=off` build + depguard canary) |
+| f.25 md-go-validator after edits | declined | Covered by AGENTS.md Quick Start + gotcha note |
+| f.26 FEATURES coverage re-sweep | declined | FEATURES.md owns the table; re-sweep rides release verification |
+| f.28 negative-path fixture | merged | Into TODO_LIST #4 as conditional clause |
+| f.30 CHANGELOG checklist line | declined | Covered by AGENTS.md Publishing Rules |
+| g.1–g.3 questions | answered | 2026-09-30: gate-only / yes / HARVEST-first (applied above) |
+
+*End of report. HARVEST executed 2026-09-30 (see ledger above) — TODO_LIST now 15 rows, ROADMAP +1 raw idea; source report left otherwise untouched.*
