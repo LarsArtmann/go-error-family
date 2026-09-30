@@ -3,7 +3,7 @@
 Long-term direction and raw ideas not yet refined into actionable tasks.
 When an idea becomes bounded and actionable, it moves to `TODO_LIST.md`.
 
-**Last updated:** 2026-09-29
+**Last updated:** 2026-09-30 (bridge README showcase idea harvested from 2026-09-30_06-08_art-dupl-deep-sweep-triage.md)
 
 ---
 
@@ -85,6 +85,7 @@ use oops.
 **Raw ideas:**
 
 - ~~**Reference implementation for oops + bridge + error-family stack**~~ — **SHIPPED (2026-07-26):** `examples/cmd/bridge/` + `examples/checkout/`. Three patterns, 19 tests, pattern documentation in `cmd/bridge/README.md`. ~~Next: website guide page~~ — **guide page SHIPPED (v0.10.1):** `website/src/content/docs/guides/bridge.mdx`. Remaining: public announcement (TODO_LIST #1).
+- A bridge reference-implementation showcase section in the main README (short pointer to `examples/cmd/bridge/` + the website guide; distinct from the pending public announcement, TODO_LIST #1) — source: 2026-09-30 report §f21
 - More diagnostic submodules (`redis`, `docker`, `kubectl`)
 - Bridge packages for other error enrichment libraries beyond oops (only after oops bridge has proven consumers)
 - Integration guides for common frameworks (Echo, Gin, Chi) — ~~including a gRPC status-mapping guide (family → `codes.Internal`/`Unavailable`/`InvalidArgument`), a recurring consumer ask~~ — **gRPC guide SHIPPED (v0.11.0):** `guides/grpc` on the website (six-family table per Google's HTTP↔gRPC mapping + interceptor)
