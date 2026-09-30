@@ -2,7 +2,9 @@
 
 Short- and mid-term actionable improvement tasks. Each item is bounded and
 traceable to its source. When an item ships, remove it here and record it in
-`CHANGELOG.md` under the version it shipped in.
+`CHANGELOG.md` under the version it shipped in. Harvest routing policy
+(decision 2026-09-30): aggressive one-pass routing of every bounded item;
+the next docs-health pass prunes or promotes.
 
 **Last updated:** 2026-09-30 (HARVEST of `docs/status/2026-09-30_06-08_art-dupl-deep-sweep-triage.md` §f)
 
@@ -33,9 +35,10 @@ traceable to its source. When an item ships, remove it here and record it in
    committed but nothing runs `art-dupl check -t 1 .` in CI; a baseline nobody
    executes is prose, not a gate. 2026-09-30 verification: gate proven both
    ways (0 clean / 2 planted clone / 1 unknown-flag); `check` is plain-mode
-   ONLY, so the CI job must run the bare command. Bounded: one `ci.yml` job;
-   if it lands, add the planted-clone negative-path fixture as a check
-   (2026-09-30 report §f28).
+   ONLY, so the CI job must run the bare command. Decision 2026-09-30 (user):
+   CI enforces the baseline gate — `-t 1`, not the routine `-t 5`. Bounded:
+   one `ci.yml` job; if it lands, add the planted-clone negative-path fixture
+   as a check (2026-09-30 report §f28).
 5. **Mechanically diff deep-sweep hashes against the baseline** (source:
    2026-09-30 report §f2) — the 2026-09-30 triage matched the 3 reported
    groups by file pair + code read and the hash-based gate was green, but
