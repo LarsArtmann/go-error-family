@@ -10,7 +10,7 @@
 
 ## Self-Review (brutal, phase-scoped)
 
-1. **What did you forget?** The "grep other homes" step after rewriting a policy fact. I updated AGENTS.md and even *looked at* ROADMAP OQ#1 during harvest — and judged it fine because the pointer ("Policy lives in AGENTS.md") was correct, missing that the resolution **text itself** carried the stale claim. One repo-wide grep this round found 3 carriers.
+1. **What did you forget?** The "grep other homes" step after rewriting a policy fact. I updated AGENTS.md and even _looked at_ ROADMAP OQ#1 during harvest — and judged it fine because the pointer ("Policy lives in AGENTS.md") was correct, missing that the resolution **text itself** carried the stale claim. One repo-wide grep this round found 3 carriers.
 2. **Stupid thing we do anyway?** Living-doc policy facts have multiple homes (AGENTS.md, ROADMAP OQ resolutions, website changelog, archived reports) with no sync check after edits.
 3. **Could you have done better?** Run that grep immediately after the AGENTS.md rewrite, not one report later. Also: knowing the auto-commit daemon touches files (documented behavior), I still hit the edit tool's mod-time refusal once — a pre-emptive re-read would have avoided the round trip.
 4. **Could you still improve?** Split the now-very-long AGENTS.md art-dupl bullet into sub-bullets; add a rot-watch for the TODO_LIST that just grew +11 rows in one pass.
@@ -26,31 +26,31 @@
 
 ## a) FULLY DONE
 
-| # | Item | Evidence |
-|---|------|----------|
-| 1 | 3 questions asked and answered | Question-tool batch: baseline = gate-only; record rationales = yes; HARVEST first |
-| 2 | AGENTS.md art-dupl bullet rewritten: gate-only policy, per-group rationales (all 3), exit codes 0/1/2, `check` flag boundary | Pre-edit text re-read; all 5 original concepts carried (threshold/3-groups/check-new-only/-t 5/strTrue); daemon-committed `8de85f9`, `7751121` |
-| 3 | TODO_LIST harvest: 4 → 15 rows | #4 enriched with 2026-09-30 exit-code evidence + negative-path fixture clause; #5–#15 new, each citing `2026-09-30_06-08…md §f`; header dated |
-| 4 | ROADMAP Theme 4 +1 raw idea (bridge README showcase) + date bump | ROADMAP.md; announcement stays TODO_LIST #1 |
-| 5 | Harvest ledger appended to report #1 | 29 dispositions: 3 done-in-code, 11 new rows, 4 existing/merged, 1 ROADMAP, 8 declined-with-reasons, questions row; source body otherwise untouched |
-| 6 | Verification pass | `md-go-validator .` → Errors: 0, exit 0; `git status` audited — AGENTS/TODO_LIST/ROADMAP daemon-committed, only the ledger append pending |
-| 7 | ROADMAP OQ#1 stale claim corrected inline | "**Refined 2026-09-30 (gate-only decision):** …" appended to the resolved OQ; found via self-review grep, fixed before this report |
+| # | Item                                                                                                                         | Evidence                                                                                                                                            |
+| - | ---------------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------- |
+| 1 | 3 questions asked and answered                                                                                               | Question-tool batch: baseline = gate-only; record rationales = yes; HARVEST first                                                                   |
+| 2 | AGENTS.md art-dupl bullet rewritten: gate-only policy, per-group rationales (all 3), exit codes 0/1/2, `check` flag boundary | Pre-edit text re-read; all 5 original concepts carried (threshold/3-groups/check-new-only/-t 5/strTrue); daemon-committed `8de85f9`, `7751121`      |
+| 3 | TODO_LIST harvest: 4 → 15 rows                                                                                               | #4 enriched with 2026-09-30 exit-code evidence + negative-path fixture clause; #5–#15 new, each citing `2026-09-30_06-08…md §f`; header dated       |
+| 4 | ROADMAP Theme 4 +1 raw idea (bridge README showcase) + date bump                                                             | ROADMAP.md; announcement stays TODO_LIST #1                                                                                                         |
+| 5 | Harvest ledger appended to report #1                                                                                         | 29 dispositions: 3 done-in-code, 11 new rows, 4 existing/merged, 1 ROADMAP, 8 declined-with-reasons, questions row; source body otherwise untouched |
+| 6 | Verification pass                                                                                                            | `md-go-validator .` → Errors: 0, exit 0; `git status` audited — AGENTS/TODO_LIST/ROADMAP daemon-committed, only the ledger append pending           |
+| 7 | ROADMAP OQ#1 stale claim corrected inline                                                                                    | "**Refined 2026-09-30 (gate-only decision):** …" appended to the resolved OQ; found via self-review grep, fixed before this report                  |
 
 ## b) PARTIALLY DONE
 
-| # | Item | Works | Open | Effort |
-|---|------|-------|------|--------|
-| 1 | Report #1 ledger | Content complete | Commit pending auto-daemon (manual commit forbidden by harness) | — |
-| 2 | art-dupl upstream ask | Policy decided (gate-only); exact asks drafted (flags field + `--type-aware` parity) | Issue unfiled — TODO_LIST #6, verify-before-filing gate | M |
-| 3 | TODO rows #5–#15 | Routed with citations | None started (by design — harvest routes, execution is next) | S–M each |
+| # | Item                  | Works                                                                                | Open                                                            | Effort   |
+| - | --------------------- | ------------------------------------------------------------------------------------ | --------------------------------------------------------------- | -------- |
+| 1 | Report #1 ledger      | Content complete                                                                     | Commit pending auto-daemon (manual commit forbidden by harness) | —        |
+| 2 | art-dupl upstream ask | Policy decided (gate-only); exact asks drafted (flags field + `--type-aware` parity) | Issue unfiled — TODO_LIST #6, verify-before-filing gate         | M        |
+| 3 | TODO rows #5–#15      | Routed with citations                                                                | None started (by design — harvest routes, execution is next)    | S–M each |
 
 ## c) NOT STARTED
 
-| # | Item | Why | Priority |
-|---|------|-----|----------|
-| 1 | CI gate job (TODO_LIST #4) | Threshold question open — see §g.1 (routine `-t 5` vs baseline `-t 1` as THE CI gate) | High |
-| 2 | gopls `[nilness][nilpanic]` triage, `error_test.go:567:44` | Routed to TODO_LIST #7 this phase | Medium |
-| 3 | Next-release items (README heal TODO #2, Dependabot #3) | Release-gated; untouched this phase | High when releasing |
+| # | Item                                                       | Why                                                                                   | Priority            |
+| - | ---------------------------------------------------------- | ------------------------------------------------------------------------------------- | ------------------- |
+| 1 | CI gate job (TODO_LIST #4)                                 | Threshold question open — see §g.1 (routine `-t 5` vs baseline `-t 1` as THE CI gate) | High                |
+| 2 | gopls `[nilness][nilpanic]` triage, `error_test.go:567:44` | Routed to TODO_LIST #7 this phase                                                     | Medium              |
+| 3 | Next-release items (README heal TODO #2, Dependabot #3)    | Release-gated; untouched this phase                                                   | High when releasing |
 
 ## d) TOTALLY FUCKED UP
 
@@ -72,33 +72,33 @@
 
 Items 1–15 are the TODO_LIST rows in suggested execution order (details + citations there — not duplicated here); 16–19 are new meta items from this phase.
 
-| # | Task | Impact | Effort | Category |
-|---|------|--------|--------|----------|
-| 1 | TODO #4 — CI gate job (threshold: see §g.1) | High | S | Quality |
-| 2 | TODO #7 — gopls nilness triage `error_test.go:567:44` | Medium | S | Bug |
-| 3 | TODO #5 — mechanical hash diff vs baseline | Medium | S | Quality |
-| 4 | TODO #6 — file art-dupl upstream ask (flags field + `--type-aware` parity) | Medium | M | Upstream |
-| 5 | TODO #10 — re-baseline trigger clause in AGENTS.md | Low | S | Quality |
-| 6 | TODO #8 — `check` exclusion-parity repro | Low | S | Quality |
-| 7 | TODO #9 — `-t 1` suppression-class spot-audit | Medium | M | Quality |
-| 8 | TODO #2 — next-release decision: standalone v0.11.1 vs ride-along (heals pkg.go.dev README) | High | M | Release |
-| 9 | TODO #3 — post-v0.11.0 Dependabot triage | Medium | S | Release |
-| 10 | TODO #11 — pnpm-audit upstream repro | Medium | M | Upstream |
-| 11 | TODO #12 — branching-flow `IsIgnored` upstream repro | Medium | M | Upstream |
-| 12 | TODO #13 — go-structure-linter direct-CLI diff | Low | M | Quality |
-| 13 | TODO #14 — under-adopted API examples (`LogError`, `HTTPHandler`, `errorfamilytest`) | Medium | M | Documentation |
-| 14 | TODO #15 — fuzzing cadence for 16 targets | Medium | M | Quality |
-| 15 | TODO #1 — Bridge Patterns announcement channel decision (pre-existing) | Medium | S | Feature |
-| 16 | NEW: split AGENTS.md art-dupl bullet into sub-bullets | Low | S | Documentation |
-| 17 | NEW: note the gate-only clarification in the next release's changelog (the website changelog carrier stays stale until a release mentions it) | Low | S | Documentation |
-| 18 | NEW: record the split-brain lesson in crush-config `references/lessons.md` (needs §g.2 consent) | Low | S | Documentation |
-| 19 | NEW: TODO_LIST rot-watch at next docs-health pass (prune or promote #5–#15) | Medium | S | Quality |
+| #  | Task                                                                                                                                          | Impact | Effort | Category      |
+| -- | --------------------------------------------------------------------------------------------------------------------------------------------- | ------ | ------ | ------------- |
+| 1  | TODO #4 — CI gate job (threshold: see §g.1)                                                                                                   | High   | S      | Quality       |
+| 2  | TODO #7 — gopls nilness triage `error_test.go:567:44`                                                                                         | Medium | S      | Bug           |
+| 3  | TODO #5 — mechanical hash diff vs baseline                                                                                                    | Medium | S      | Quality       |
+| 4  | TODO #6 — file art-dupl upstream ask (flags field + `--type-aware` parity)                                                                    | Medium | M      | Upstream      |
+| 5  | TODO #10 — re-baseline trigger clause in AGENTS.md                                                                                            | Low    | S      | Quality       |
+| 6  | TODO #8 — `check` exclusion-parity repro                                                                                                      | Low    | S      | Quality       |
+| 7  | TODO #9 — `-t 1` suppression-class spot-audit                                                                                                 | Medium | M      | Quality       |
+| 8  | TODO #2 — next-release decision: standalone v0.11.1 vs ride-along (heals pkg.go.dev README)                                                   | High   | M      | Release       |
+| 9  | TODO #3 — post-v0.11.0 Dependabot triage                                                                                                      | Medium | S      | Release       |
+| 10 | TODO #11 — pnpm-audit upstream repro                                                                                                          | Medium | M      | Upstream      |
+| 11 | TODO #12 — branching-flow `IsIgnored` upstream repro                                                                                          | Medium | M      | Upstream      |
+| 12 | TODO #13 — go-structure-linter direct-CLI diff                                                                                                | Low    | M      | Quality       |
+| 13 | TODO #14 — under-adopted API examples (`LogError`, `HTTPHandler`, `errorfamilytest`)                                                          | Medium | M      | Documentation |
+| 14 | TODO #15 — fuzzing cadence for 16 targets                                                                                                     | Medium | M      | Quality       |
+| 15 | TODO #1 — Bridge Patterns announcement channel decision (pre-existing)                                                                        | Medium | S      | Feature       |
+| 16 | NEW: split AGENTS.md art-dupl bullet into sub-bullets                                                                                         | Low    | S      | Documentation |
+| 17 | NEW: note the gate-only clarification in the next release's changelog (the website changelog carrier stays stale until a release mentions it) | Low    | S      | Documentation |
+| 18 | NEW: record the split-brain lesson in crush-config `references/lessons.md` (needs §g.2 consent)                                               | Low    | S      | Documentation |
+| 19 | NEW: TODO_LIST rot-watch at next docs-health pass (prune or promote #5–#15)                                                                   | Medium | S      | Quality       |
 
 ## g) Questions I Cannot Answer Myself
 
 **Answered 2026-09-30 (applied):** (1) CI enforces the baseline gate `-t 1` → TODO_LIST #4 + ROADMAP OQ#1 updated; (2) lesson committed to crush-config `references/lessons.md`; (3) aggressive one-pass routing kept → recorded in TODO_LIST header.
 
-1. **CI gate threshold:** TODO #4 as written enforces `art-dupl check -t 1 .` (baseline), while OQ#1's recorded default calls `-t 5` the *routine* gate. Which is THE CI enforcement — baseline-strict `-t 1`, routine `-t 5`, or both as separate jobs? I read both policy texts and cannot derive the intent.
+1. **CI gate threshold:** TODO #4 as written enforces `art-dupl check -t 1 .` (baseline), while OQ#1's recorded default calls `-t 5` the _routine_ gate. Which is THE CI enforcement — baseline-strict `-t 1`, routine `-t 5`, or both as separate jobs? I read both policy texts and cannot derive the intent.
 2. **Lessons commit:** May I draft and commit the "policy facts have multiple homes — grep after edits" lesson to the crush-config repo's `references/lessons.md`? It requires a commit in a repo outside this session's write scope.
 3. **Routing bar:** Keep the aggressive one-pass harvest (TODO_LIST now 15 rows) or tighten to ~2-week actionables with the rest routed to ROADMAP? This decides how future harvests behave.
 
@@ -120,4 +120,4 @@ $ git log -4 → 7751121 (AGENTS/ROADMAP/TODO_LIST batch), 02f5ddf + 8de85f9 (re
   AGENTS.md rewrite), 7e57cb4 (session start); only report-ledger append uncommitted at write time
 ```
 
-*End of report. Waiting for instructions; §g answers will direct the next phase.*
+_End of report. Waiting for instructions; §g answers will direct the next phase._

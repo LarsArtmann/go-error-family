@@ -87,4 +87,4 @@ the next docs-health pass prunes or promotes.
 15. **Define a fuzzing cadence for the 16 fuzz targets** (source: 2026-09-30
     report §f23) — targets exist (root 11, bridge 5) but no schedule;
     decide nightly job vs pre-release run and wire it. Bounded: one decision
-    + wiring. Effort M.
+    - wiring. Effort M.

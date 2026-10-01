@@ -34,30 +34,30 @@
 
 ## a) FULLY DONE
 
-| # | Item | Evidence |
-|---|------|----------|
-| 1 | Deep-sweep triage: all 3 reported clone groups identified as the accepted baseline groups | `.art-dupl-baseline.json` (3 entries, hash `29b9…`/`c4cf…`/`f5aa…`) ↔ report file pairs, all 6 code locations read: `error.go:117-141`, `bridge/bridge.go:224-263`, `diagnose/rules_network.go:31-40`, `diagnose/postgres/rules_postgres.go:58-67`, `diagnose/git/rules_git.go:203-206`, `diagnose/helpers.go:101-108` |
-| 2 | Per-clone dispositions with rationale (Accept ×3) | Format methods: parallel `fmt.Formatter` for distinct types across modules, verbose branches differ, generic extraction needs a dependency root can't have. `resolveHost/Port` pair: 2-line idiomatic setup, cross-module extraction costs more than it saves. `strTrue/strFalse`: AGENTS.md disposition (unexported, can't cross module boundary) |
-| 3 | Plain-mode gate verified green | `art-dupl check -t 1 .` → "✅ No new clones detected (baseline: 3 groups)", exit 0 |
-| 4 | Gate failure path proven (not assumed) | Planted duplicate funcs in `/tmp/artdupl-gate-test` → "🔴 1 new clone group(s) detected (baseline had 3)", exit 2; dir removed via `trash` |
-| 5 | Flag-surface boundary mapped | `art-dupl check -t 1 --suggest-generics .` → exit 1, "Unknown flag: --suggest-generics" — `check` runs plain-mode only |
-| 6 | Skills loaded and followed | `deduplicate-code` (triage turn); `status-report` + `brutal-self-review` + `docs-health` + section-quality-guide (this turn) |
+| # | Item                                                                                      | Evidence                                                                                                                                                                                                                                                                                                                                           |
+| - | ----------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| 1 | Deep-sweep triage: all 3 reported clone groups identified as the accepted baseline groups | `.art-dupl-baseline.json` (3 entries, hash `29b9…`/`c4cf…`/`f5aa…`) ↔ report file pairs, all 6 code locations read: `error.go:117-141`, `bridge/bridge.go:224-263`, `diagnose/rules_network.go:31-40`, `diagnose/postgres/rules_postgres.go:58-67`, `diagnose/git/rules_git.go:203-206`, `diagnose/helpers.go:101-108`                             |
+| 2 | Per-clone dispositions with rationale (Accept ×3)                                         | Format methods: parallel `fmt.Formatter` for distinct types across modules, verbose branches differ, generic extraction needs a dependency root can't have. `resolveHost/Port` pair: 2-line idiomatic setup, cross-module extraction costs more than it saves. `strTrue/strFalse`: AGENTS.md disposition (unexported, can't cross module boundary) |
+| 3 | Plain-mode gate verified green                                                            | `art-dupl check -t 1 .` → "✅ No new clones detected (baseline: 3 groups)", exit 0                                                                                                                                                                                                                                                                 |
+| 4 | Gate failure path proven (not assumed)                                                    | Planted duplicate funcs in `/tmp/artdupl-gate-test` → "🔴 1 new clone group(s) detected (baseline had 3)", exit 2; dir removed via `trash`                                                                                                                                                                                                         |
+| 5 | Flag-surface boundary mapped                                                              | `art-dupl check -t 1 --suggest-generics .` → exit 1, "Unknown flag: --suggest-generics" — `check` runs plain-mode only                                                                                                                                                                                                                             |
+| 6 | Skills loaded and followed                                                                | `deduplicate-code` (triage turn); `status-report` + `brutal-self-review` + `docs-health` + section-quality-guide (this turn)                                                                                                                                                                                                                       |
 
 ## b) PARTIALLY DONE
 
-| # | Item | Works | Open | Effort |
-|---|------|-------|------|--------|
-| 1 | Hash-level baseline correspondence | File pairs + current line numbers verified against code | Scan-vs-baseline **hash** diff not run mechanically (paste carried no hashes; rerun with extraction pending) | S |
-| 2 | Durable disposition docs | AGENTS.md covers `strTrue` rationale + "3 accepted groups" | Rationales for clones 1–2 exist only in transcripts/this report | S |
-| 3 | Baseline flags provenance | Problem precisely scoped: `check` can't take the flag at all; baseline JSON has no `flags` field | Fix undecided: AGENTS.md doc note (S) vs upstream feature request (M/L, verify-before-filing gate first) | S–M |
+| # | Item                               | Works                                                                                            | Open                                                                                                         | Effort |
+| - | ---------------------------------- | ------------------------------------------------------------------------------------------------ | ------------------------------------------------------------------------------------------------------------ | ------ |
+| 1 | Hash-level baseline correspondence | File pairs + current line numbers verified against code                                          | Scan-vs-baseline **hash** diff not run mechanically (paste carried no hashes; rerun with extraction pending) | S      |
+| 2 | Durable disposition docs           | AGENTS.md covers `strTrue` rationale + "3 accepted groups"                                       | Rationales for clones 1–2 exist only in transcripts/this report                                              | S      |
+| 3 | Baseline flags provenance          | Problem precisely scoped: `check` can't take the flag at all; baseline JSON has no `flags` field | Fix undecided: AGENTS.md doc note (S) vs upstream feature request (M/L, verify-before-filing gate first)     | S–M    |
 
 ## c) NOT STARTED
 
-| # | Item | Why not started | Priority |
-|---|------|-----------------|----------|
-| 1 | Upstream candidate: baseline `flags` field + `check` flag parity (art-dupl) | Out of session scope; needs repro packaging + verify-before-filing | Medium |
-| 2 | gopls `[nilness][nilpanic]` triage at `error_test.go:567:44` | File outside session scope (user: no unrelated research); warning is diagnostic-level only | Low-Medium |
-| 3 | HARVEST of section (f) into `TODO_LIST.md`/`ROADMAP.md` | Deliberately deferred: user said "THEN WAIT FOR INSTRUCTIONS" | Next-session first step |
+| # | Item                                                                        | Why not started                                                                            | Priority                |
+| - | --------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------ | ----------------------- |
+| 1 | Upstream candidate: baseline `flags` field + `check` flag parity (art-dupl) | Out of session scope; needs repro packaging + verify-before-filing                         | Medium                  |
+| 2 | gopls `[nilness][nilpanic]` triage at `error_test.go:567:44`                | File outside session scope (user: no unrelated research); warning is diagnostic-level only | Low-Medium              |
+| 3 | HARVEST of section (f) into `TODO_LIST.md`/`ROADMAP.md`                     | Deliberately deferred: user said "THEN WAIT FOR INSTRUCTIONS"                              | Next-session first step |
 
 ## d) TOTALLY FUCKED UP
 
@@ -68,7 +68,7 @@
 
 ## e) WHAT WE SHOULD IMPROVE
 
-1. **Pin canonical commands** in the AGENTS.md art-dupl bullet: gate = `art-dupl check -t 1 .`; deep sweep = `art-dupl --sort total-tokens -t 1 --suggest-generics --timing --rich-text` (drop `--type-aware`; overridden, tool warns each run). Impact: stops per-session flag roulette. 
+1. **Pin canonical commands** in the AGENTS.md art-dupl bullet: gate = `art-dupl check -t 1 .`; deep sweep = `art-dupl --sort total-tokens -t 1 --suggest-generics --timing --rich-text` (drop `--type-aware`; overridden, tool warns each run). Impact: stops per-session flag roulette.
 2. **One-line rationale per accepted group** next to the baseline reference in AGENTS.md. Impact: dispositions survive sessions; kills the AGENTS/JSON split brain.
 3. **Baseline `flags` provenance field** (doc note now, upstream later). Impact: makes hash mismatch detectable instead of mysterious.
 4. **Match by hash, not by eye.** Rerun the scan, extract hashes, diff against the baseline JSON. Impact: turns eyeball triage into a mechanical check.
@@ -79,38 +79,38 @@
 
 HARVEST input — route bounded items to `TODO_LIST.md`, vague/long-term to `ROADMAP.md`. `[dup]` = this session's thread; `[noticed]` = pre-existing, from session context (no new research).
 
-| # | Task | Impact | Effort | Category |
-|---|------|--------|--------|----------|
-| 1 | Extend AGENTS.md art-dupl bullet: per-group rationales (clones 1–2) + canonical gate/sweep commands `[dup]` | High | S | Documentation |
-| 2 | Rerun deep sweep, extract group hashes, diff vs baseline JSON mechanically `[dup]` | Medium | S | Quality |
-| 3 | Decide flags-provenance fix: AGENTS.md note now; upstream `flags` field after verify-before-filing `[dup]` | Medium | S–M | Quality |
-| 4 | Record exit-code semantics (0/1/2) in AGENTS.md art-dupl bullet `[dup]` | Low | S | Documentation |
-| 5 | Triage gopls `[nilness][nilpanic]` at `error_test.go:567:44`: deliberate or real? `[noticed]` | Medium | S | Bug |
-| 6 | Find where the art-dupl gates are enforced (CI/BuildFlow/pre-commit); if nowhere, wire `art-dupl check -t 5 .` into the routine gate `[dup]` | High | S | Quality |
-| 7 | Add "considered and rejected: generic Format extraction / cross-module resolveHost helper" line to AGENTS.md so future agents don't re-litigate `[dup]` | Low | S | Documentation |
-| 8 | Verify `art-dupl check` respects generated/test exclusion patterns same as scan `[dup]` | Low | S | Quality |
-| 9 | Spot-audit the `-t 1` "221 non-actionable + 96 suppressed" classes once — confirm nothing actionable hides there `[dup]` | Medium | M | Quality |
-| 10 | Set re-baseline trigger: after any cross-module refactor, re-record deliberately (never silently) `[dup]` | Low | S | Quality |
-| 11 | Ship next release: README Discussion-#12-withdrawal fix kills the dead pkg.go.dev link (TODO_LIST #2) `[noticed]` | High | M | Release |
-| 12 | Post-release: ride Dependabot root-pin PRs (submodules pinned previous root at tag time) `[noticed]` | Medium | S | Release |
-| 13 | pnpm-audit BuildFlow skip → upstream with subdirectory-lockfile repro `[noticed]` | Medium | M | Upstream |
-| 14 | branching-flow `IsIgnored` → upstream `pkg/phantom` repro `[noticed]` | Medium | M | Upstream |
-| 15 | go-structure-linter: run CLI directly (embedded snapshot ignores project config) and diff against `.go-structure-linter.yaml` intent `[noticed]` | Low | M | Quality |
-| 16 | Re-run erraudit battery after next toolchain bump (last green 2026-09-29) `[noticed]` | Medium | S | Quality |
-| 17 | Keep golangci-lint v2.13.2 pin in sync (ci.yml, release.yml, local) at next upgrade `[noticed]` | Low | S | Quality |
-| 18 | Website: verify no `package.json`-without-lockfile drift exists right now (standing rule) `[noticed]` | Low | S | Quality |
-| 19 | Website: keep untracked `bun.lock` uncommitted (standing canary) `[noticed]` | Low | S | Quality |
-| 20 | Website: confirm `website-check.yml` ran green on the latest `website/**` push `[noticed]` | Low | S | Quality |
-| 21 | Bridge adoption (zero external consumers): write one reference-implementation showcase post/README section `[noticed]` | Medium | L | Feature |
-| 22 | Under-adopted APIs (LogError ~3, HTTPHandler ~5, errorfamilytest ~3): add usage examples to README `[noticed]` | Medium | M | Documentation |
-| 23 | Define a fuzzing cadence for the 16 fuzz targets (not just ad-hoc) `[noticed]` | Medium | M | Quality |
-| 24 | Re-verify jsonv2 guard trio (CI `GOWORK=off` build + depguard canary + `GOEXPERIMENT=` reflex) `[noticed]` | Medium | S | Quality |
-| 25 | Re-run md-go-validator after any doc edit (114/114 baseline; mind system-binary lag gotcha) `[noticed]` | Low | S | Quality |
-| 26 | Re-sweep FEATURES.md coverage table (7 modules ≥ 89% `-race -cover`) after next significant change `[noticed]` | Low | M | Quality |
-| 27 | Ask upstream whether `check` should accept `--type-aware` for hash-compatible deep sweeps (same verify-before-filing gate as #3) `[dup]` | Low | M | Upstream |
-| 28 | If #6 wires the gate into CI, add the negative-path check as a fixture instead of ad-hoc `/tmp` tests `[dup]` | Low | S | Quality |
-| 29 | After next release tag, confirm baseline still green against the new tree (recordedAt is 2026-09-28) `[dup]` | Low | S | Quality |
-| 30 | Turn the copywriting rule "announcements never enter CHANGELOG" into a release-checklist line if not already there `[noticed]` | Low | S | Documentation |
+| #  | Task                                                                                                                                                    | Impact | Effort | Category      |
+| -- | ------------------------------------------------------------------------------------------------------------------------------------------------------- | ------ | ------ | ------------- |
+| 1  | Extend AGENTS.md art-dupl bullet: per-group rationales (clones 1–2) + canonical gate/sweep commands `[dup]`                                             | High   | S      | Documentation |
+| 2  | Rerun deep sweep, extract group hashes, diff vs baseline JSON mechanically `[dup]`                                                                      | Medium | S      | Quality       |
+| 3  | Decide flags-provenance fix: AGENTS.md note now; upstream `flags` field after verify-before-filing `[dup]`                                              | Medium | S–M    | Quality       |
+| 4  | Record exit-code semantics (0/1/2) in AGENTS.md art-dupl bullet `[dup]`                                                                                 | Low    | S      | Documentation |
+| 5  | Triage gopls `[nilness][nilpanic]` at `error_test.go:567:44`: deliberate or real? `[noticed]`                                                           | Medium | S      | Bug           |
+| 6  | Find where the art-dupl gates are enforced (CI/BuildFlow/pre-commit); if nowhere, wire `art-dupl check -t 5 .` into the routine gate `[dup]`            | High   | S      | Quality       |
+| 7  | Add "considered and rejected: generic Format extraction / cross-module resolveHost helper" line to AGENTS.md so future agents don't re-litigate `[dup]` | Low    | S      | Documentation |
+| 8  | Verify `art-dupl check` respects generated/test exclusion patterns same as scan `[dup]`                                                                 | Low    | S      | Quality       |
+| 9  | Spot-audit the `-t 1` "221 non-actionable + 96 suppressed" classes once — confirm nothing actionable hides there `[dup]`                                | Medium | M      | Quality       |
+| 10 | Set re-baseline trigger: after any cross-module refactor, re-record deliberately (never silently) `[dup]`                                               | Low    | S      | Quality       |
+| 11 | Ship next release: README Discussion-#12-withdrawal fix kills the dead pkg.go.dev link (TODO_LIST #2) `[noticed]`                                       | High   | M      | Release       |
+| 12 | Post-release: ride Dependabot root-pin PRs (submodules pinned previous root at tag time) `[noticed]`                                                    | Medium | S      | Release       |
+| 13 | pnpm-audit BuildFlow skip → upstream with subdirectory-lockfile repro `[noticed]`                                                                       | Medium | M      | Upstream      |
+| 14 | branching-flow `IsIgnored` → upstream `pkg/phantom` repro `[noticed]`                                                                                   | Medium | M      | Upstream      |
+| 15 | go-structure-linter: run CLI directly (embedded snapshot ignores project config) and diff against `.go-structure-linter.yaml` intent `[noticed]`        | Low    | M      | Quality       |
+| 16 | Re-run erraudit battery after next toolchain bump (last green 2026-09-29) `[noticed]`                                                                   | Medium | S      | Quality       |
+| 17 | Keep golangci-lint v2.13.2 pin in sync (ci.yml, release.yml, local) at next upgrade `[noticed]`                                                         | Low    | S      | Quality       |
+| 18 | Website: verify no `package.json`-without-lockfile drift exists right now (standing rule) `[noticed]`                                                   | Low    | S      | Quality       |
+| 19 | Website: keep untracked `bun.lock` uncommitted (standing canary) `[noticed]`                                                                            | Low    | S      | Quality       |
+| 20 | Website: confirm `website-check.yml` ran green on the latest `website/**` push `[noticed]`                                                              | Low    | S      | Quality       |
+| 21 | Bridge adoption (zero external consumers): write one reference-implementation showcase post/README section `[noticed]`                                  | Medium | L      | Feature       |
+| 22 | Under-adopted APIs (LogError ~3, HTTPHandler ~5, errorfamilytest ~3): add usage examples to README `[noticed]`                                          | Medium | M      | Documentation |
+| 23 | Define a fuzzing cadence for the 16 fuzz targets (not just ad-hoc) `[noticed]`                                                                          | Medium | M      | Quality       |
+| 24 | Re-verify jsonv2 guard trio (CI `GOWORK=off` build + depguard canary + `GOEXPERIMENT=` reflex) `[noticed]`                                              | Medium | S      | Quality       |
+| 25 | Re-run md-go-validator after any doc edit (114/114 baseline; mind system-binary lag gotcha) `[noticed]`                                                 | Low    | S      | Quality       |
+| 26 | Re-sweep FEATURES.md coverage table (7 modules ≥ 89% `-race -cover`) after next significant change `[noticed]`                                          | Low    | M      | Quality       |
+| 27 | Ask upstream whether `check` should accept `--type-aware` for hash-compatible deep sweeps (same verify-before-filing gate as #3) `[dup]`                | Low    | M      | Upstream      |
+| 28 | If #6 wires the gate into CI, add the negative-path check as a fixture instead of ad-hoc `/tmp` tests `[dup]`                                           | Low    | S      | Quality       |
+| 29 | After next release tag, confirm baseline still green against the new tree (recordedAt is 2026-09-28) `[dup]`                                            | Low    | S      | Quality       |
+| 30 | Turn the copywriting rule "announcements never enter CHANGELOG" into a release-checklist line if not already there `[noticed]`                          | Low    | S      | Documentation |
 
 ## g) Questions I Cannot Answer Myself
 
@@ -146,36 +146,36 @@ Baseline (.art-dupl-baseline.json, recordedAt 2026-09-28T20:34:22Z, threshold 1)
 
 User decisions (§g): baseline = gate-only; record rationales in AGENTS.md; HARVEST first. Dispositions per `docs-health` HARVEST:
 
-| Source (§item) | Disposition | Destination / reason |
-|---|---|---|
-| f.1 AGENTS.md art-dupl bullet | done in code | AGENTS.md rewritten 2026-09-30 (gate-only policy + rationales + exit codes) |
-| f.4 exit-code semantics | done in code | Included in the same AGENTS.md rewrite |
-| f.7 rejected-ideas record | done in code | Rejection rationale encoded per-group in the bullet |
-| f.2 mechanical hash diff | new row | TODO_LIST #5 |
-| f.3 + f.27 flags-provenance + `--type-aware` parity upstream | new row | TODO_LIST #6 |
-| f.5 gopls nilness triage | new row | TODO_LIST #7 |
-| f.6 gate enforcement | existing row | TODO_LIST #4 (2026-09-30 evidence merged) |
-| f.8 check exclusion parity | new row | TODO_LIST #8 |
-| f.9 `-t 1` suppression spot-audit | new row | TODO_LIST #9 |
-| f.10 + f.29 re-baseline trigger | new row | TODO_LIST #10 |
-| f.11 pkg.go.dev README heal | existing row | TODO_LIST #2 (no change) |
-| f.12 Dependabot wave | existing row | TODO_LIST #3 (no change) |
-| f.13 pnpm-audit upstream | new row | TODO_LIST #11 |
-| f.14 branching-flow upstream | new row | TODO_LIST #12 |
-| f.15 structure-linter CLI diff | new row | TODO_LIST #13 |
-| f.16 erraudit after bump | declined | Conditional reminder; AGENTS.md release-verification practice covers it |
-| f.17 golangci pin sync | declined | Covered by AGENTS.md lint bullet ("keep pins in sync") |
-| f.18 website lockfile drift check | declined | Standing AGENTS.md lockfile-sync rule; no evidence of drift |
-| f.19 bun.lock canary | declined | Standing AGENTS.md rule; structural vigilance |
-| f.20 website-check.yml retro-check | declined | Guard is structural (fires on every website push/PR) |
-| f.21 bridge README showcase | new row | ROADMAP Theme 4 raw idea (adoption = long-term; announcement stays TODO_LIST #1) |
-| f.22 under-adopted API examples | new row | TODO_LIST #14 |
-| f.23 fuzzing cadence | new row | TODO_LIST #15 |
-| f.24 jsonv2 guard re-verify | declined | Structural guards (CI `GOWORK=off` build + depguard canary) |
-| f.25 md-go-validator after edits | declined | Covered by AGENTS.md Quick Start + gotcha note |
-| f.26 FEATURES coverage re-sweep | declined | FEATURES.md owns the table; re-sweep rides release verification |
-| f.28 negative-path fixture | merged | Into TODO_LIST #4 as conditional clause |
-| f.30 CHANGELOG checklist line | declined | Covered by AGENTS.md Publishing Rules |
-| g.1–g.3 questions | answered | 2026-09-30: gate-only / yes / HARVEST-first (applied above) |
+| Source (§item)                                               | Disposition  | Destination / reason                                                             |
+| ------------------------------------------------------------ | ------------ | -------------------------------------------------------------------------------- |
+| f.1 AGENTS.md art-dupl bullet                                | done in code | AGENTS.md rewritten 2026-09-30 (gate-only policy + rationales + exit codes)      |
+| f.4 exit-code semantics                                      | done in code | Included in the same AGENTS.md rewrite                                           |
+| f.7 rejected-ideas record                                    | done in code | Rejection rationale encoded per-group in the bullet                              |
+| f.2 mechanical hash diff                                     | new row      | TODO_LIST #5                                                                     |
+| f.3 + f.27 flags-provenance + `--type-aware` parity upstream | new row      | TODO_LIST #6                                                                     |
+| f.5 gopls nilness triage                                     | new row      | TODO_LIST #7                                                                     |
+| f.6 gate enforcement                                         | existing row | TODO_LIST #4 (2026-09-30 evidence merged)                                        |
+| f.8 check exclusion parity                                   | new row      | TODO_LIST #8                                                                     |
+| f.9 `-t 1` suppression spot-audit                            | new row      | TODO_LIST #9                                                                     |
+| f.10 + f.29 re-baseline trigger                              | new row      | TODO_LIST #10                                                                    |
+| f.11 pkg.go.dev README heal                                  | existing row | TODO_LIST #2 (no change)                                                         |
+| f.12 Dependabot wave                                         | existing row | TODO_LIST #3 (no change)                                                         |
+| f.13 pnpm-audit upstream                                     | new row      | TODO_LIST #11                                                                    |
+| f.14 branching-flow upstream                                 | new row      | TODO_LIST #12                                                                    |
+| f.15 structure-linter CLI diff                               | new row      | TODO_LIST #13                                                                    |
+| f.16 erraudit after bump                                     | declined     | Conditional reminder; AGENTS.md release-verification practice covers it          |
+| f.17 golangci pin sync                                       | declined     | Covered by AGENTS.md lint bullet ("keep pins in sync")                           |
+| f.18 website lockfile drift check                            | declined     | Standing AGENTS.md lockfile-sync rule; no evidence of drift                      |
+| f.19 bun.lock canary                                         | declined     | Standing AGENTS.md rule; structural vigilance                                    |
+| f.20 website-check.yml retro-check                           | declined     | Guard is structural (fires on every website push/PR)                             |
+| f.21 bridge README showcase                                  | new row      | ROADMAP Theme 4 raw idea (adoption = long-term; announcement stays TODO_LIST #1) |
+| f.22 under-adopted API examples                              | new row      | TODO_LIST #14                                                                    |
+| f.23 fuzzing cadence                                         | new row      | TODO_LIST #15                                                                    |
+| f.24 jsonv2 guard re-verify                                  | declined     | Structural guards (CI `GOWORK=off` build + depguard canary)                      |
+| f.25 md-go-validator after edits                             | declined     | Covered by AGENTS.md Quick Start + gotcha note                                   |
+| f.26 FEATURES coverage re-sweep                              | declined     | FEATURES.md owns the table; re-sweep rides release verification                  |
+| f.28 negative-path fixture                                   | merged       | Into TODO_LIST #4 as conditional clause                                          |
+| f.30 CHANGELOG checklist line                                | declined     | Covered by AGENTS.md Publishing Rules                                            |
+| g.1–g.3 questions                                            | answered     | 2026-09-30: gate-only / yes / HARVEST-first (applied above)                      |
 
-*End of report. HARVEST executed 2026-09-30 (see ledger above) — TODO_LIST now 15 rows, ROADMAP +1 raw idea; source report left otherwise untouched.*
+_End of report. HARVEST executed 2026-09-30 (see ledger above) — TODO_LIST now 15 rows, ROADMAP +1 raw idea; source report left otherwise untouched._
