@@ -12,29 +12,15 @@ skip_steps:
   # skip stops the fleet-wide `buildflow --fix` orchestrator from re-breaking
   # the repo on every pass.
   - go-auto-upgrade
-  # pnpm-audit runs `pnpm audit` at the REPO ROOT, but the only pnpm-lock.yaml
-  # lives in website/ — a separate Node project with its own flake.nix and
-  # deploy pipeline. With no root lockfile the step fails closed with
-  # ERR_PNPM_AUDIT_NO_LOCKFILE (verified 2026-09-18 with
-  # BUILDFLOW_NO_RESULT_CACHE=1 — the cached ✔ hid the failure). Skipped until
-  # BuildFlow's pnpm-audit supports subdirectory lockfiles — tracked upstream:
-  # https://github.com/LarsArtmann/BuildFlow/issues/19 (incl. the trigger/execution
-  # glob mismatch: lockfilePatterns matches **/pnpm-lock.yaml, detector runs at root).
+  # pnpm-audit UNSKIPPED 2026-10-07: upstream issue #19's fix shipped —
+  # the audit runs in the lockfile's directory (lockfileDir), so the
+  # website/ Node project audits against its own pnpm-lock.yaml.
   # Dependabot ALERTS still detect website vulnerabilities, but Dependabot's
   # automatic security-update jobs fail on this repo (npm updater vs pnpm v9
   # lockfile + overrides — every job since 2026-09-15 errored out), so the
   # working remediation check is manual: `nix develop -c pnpm audit` in
   # website/. Last clean: 2026-09-18 (8 transitive vulns in devalue, fast-uri,
   # js-yaml, svgo fixed via `pnpm update --depth Infinity`).
-  - pnpm-audit
-  # BuildFlow's embedded go-structure-linter snapshot predates project-config
-  # support: it ignores this repo's .go-structure-linter.yaml (which uses the
-  # "flat" preset because the root package IS the published library API —
-  # /pkg/ restructure would break 50+ consumers) and keeps erroring on the
-  # deliberate flat layout. Run `go-structure-linter .` directly instead; it
-  # go-structure-linter snapshot ignores this repo's .go-structure-linter.yaml
-  # (see above), so it is skipped too.
-  - go-structure-linter
   # POLICY, deliberate: the published protocol types keep string-typed
   # fields/parameters. branching-flow's phantom analyzer flags every one of
   # them, and adopting its suggestions would be a breaking API change the
@@ -46,11 +32,3 @@ skip_steps:
   # analyzer parses `phantom` ignore directives (core ENUM) but never consults
   # IsIgnored, so directives are silently dropped.
   - branching-flow
-  # nix-hash-fix repairs vendorHash FOD mismatches, but this flake has no
-  # vendorHash (plain go build via pkgs.go_1_26; no vendor/ directory), so
-  # the step's default-package probe fails structurally: it targets
-  # packages.x86_64-linux.default, which this flake does not provide (it
-  # exposes named checks like checks.format instead). Deterministic failure,
-  # verified 2026-09-18 (42/42 historical failures). Re-add if a vendored
-  # Go build with vendorHash is ever introduced.
-  - nix-hash-fix

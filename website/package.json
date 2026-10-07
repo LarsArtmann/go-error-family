@@ -2,7 +2,7 @@
   "name": "go-error-family-website",
   "version": "1.0.0",
   "private": true,
-  "description": "Website and documentation for go-error-family — structured error protocol for Go",
+  "description": "Website and documentation for go-error-family \u2014 structured error protocol for Go",
   "keywords": [
     "astro",
     "classification",
@@ -43,7 +43,7 @@
   },
   "devDependencies": {
     "@astrojs/check": "^0.9.10",
-    "html-validate": "^11.16.1",
+    "html-validate": "^11.16.2",
     "typescript": "^7.0.2"
   },
   "overrides": {
@@ -53,5 +53,10 @@
     "esbuild@0.28.1": true,
     "sharp@0.35.3": true
   },
-  "packageManager": "pnpm@11.20.0"
+  "packageManager": "pnpm@11.20.0",
+  "pnpm": {
+    "overrides": {
+      "source-map-js": "1.2.2"
+    }
+  }
 }

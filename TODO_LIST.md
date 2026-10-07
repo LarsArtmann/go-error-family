@@ -10,6 +10,10 @@ the next docs-health pass prunes or promotes.
 
 ---
 
+## 🟡 Security (upstream-pinned advisories)
+
+- [ ] GHSA-rj75-hqrm-r3gf (postcss-selector-parser <7.1.6): upstream-pinned via @expressive-code/core 0.44.2 (Starlight chain); warning-severity build-time CPU advisory, gate stays green. Revisit when expressive-code bumps past 6.1.4 (2026-10-07: pnpm-audit unskipped after BuildFlow's lockfileDir fix; semver sweep + source-map-js override cleared the rest).
+
 ## Active
 
 1. **Announce the Bridge Patterns guide** (source: ROADMAP theme 4) —
