@@ -3,7 +3,7 @@
 // diagnose/postgres at go 1.26; bridge/examples at go 1.26.0 (dep-forced by
 // golang.org/x/text v0.42.0). Do NOT "normalize" the workspace line down to
 // match any single module — it pins the toolchain the monorepo develops with.
-go 1.26.7
+go 1.27
 
 use (
 	.

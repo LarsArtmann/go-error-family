@@ -1,6 +1,6 @@
 module github.com/larsartmann/go-error-family
 
-go 1.26
+go 1.27
 
 // v0.5.0 through v0.6.0 shipped local-directory replace directives
 // (./agent, ./diagnose) that break every consumer building from the
