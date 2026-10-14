@@ -2,7 +2,7 @@ module github.com/larsartmann/go-error-family/diagnose
 
 go 1.27
 
-require github.com/larsartmann/go-error-family v0.11.0
+require github.com/larsartmann/go-error-family v0.12.0
 
 // diagnose/v0.1.0 shipped a local-directory replace directive (=> ..)
 // that breaks every consumer building from the module proxy. Superseded
