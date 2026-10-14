@@ -47,6 +47,10 @@ func (e *Error) Error() string {
 
 // Unwrap returns the underlying cause for error chain traversal.
 func (e *Error) Unwrap() error {
+	if e == nil {
+		return nil
+	}
+
 	return e.cause
 }
 

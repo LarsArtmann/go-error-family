@@ -6,6 +6,14 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ## [Unreleased]
 
+## [0.12.0] - 2026-10-14
+
+### Fixed
+- **`(*Error).Unwrap` is nil-receiver safe** (DD22): a nil `*Error` unwraps
+  to nil instead of panicking - defensive guard for callers that forward
+  concrete pointers into `error` interfaces and unwrap without a nil check
+  (the gotcha-#213 typed-nil class). Red-first test pins it.
+
 ## [0.11.0] - 2026-09-29
 
 Discoverability release: **no public API changes.** Constructor-example
