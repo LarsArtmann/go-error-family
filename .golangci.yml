@@ -1,7 +1,7 @@
 version: "2"
 run:
   timeout: 5m
-  go: 1.26.7
+  go: "1.27"
   build-tags:
     - goexperiment.arenas
     - goexperiment.goroutineleakprofile
@@ -276,7 +276,7 @@ linters:
           - errcheck
           - paralleltest
           - revive
-          - exhaustruct
+          - exhaustruct_v5
           - err113
           - testpackage
           - fatcontext
@@ -294,7 +294,6 @@ linters:
           - recvcheck
           - contextcheck
           - exhaustive
-          - exhaustruct_v5
       - path: diagnose/
         linters:
           - wrapcheck
@@ -343,5 +342,5 @@ formatters:
       - diagnose/git/
       - mock_.*\.go$
 issues:
-  max-issues-per-linter: 50
-  max-same-issues: 10
+  max-issues-per-linter: 0
+  max-same-issues: 0
