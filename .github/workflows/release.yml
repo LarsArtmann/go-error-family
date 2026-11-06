@@ -14,6 +14,14 @@ on:
 permissions:
   contents: write
 
+# A manual second tag push (or a dispatch racing a tag push) must not race
+# an in-flight publish: one release job per ref, never cancelling a publish
+# that already started (fleet #ReleaseWorkflow policy; found fleet-wide by
+# the 2026-11-02 rollout).
+concurrency:
+  group: release-${{ github.ref }}
+  cancel-in-progress: false
+
 jobs:
   release:
     runs-on: ubuntu-latest

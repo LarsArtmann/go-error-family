@@ -92,3 +92,9 @@ the next docs-health pass prunes or promotes.
     report §f23) — targets exist (root 11, bridge 5) but no schedule;
     decide nightly job vs pre-release run and wire it. Bounded: one decision
     - wiring. Effort M.
+16. **30-day signal/noise review of the `policy-vet` CI job** (added
+    2026-11-06, wave 1 of the fleet workflow-policy rollout, together with
+    the `release.yml` concurrency guard) — review by 2026-12-06: if cue vet
+    produced zero unique findings and no false positives, re-affirm or
+    retire per the adoption memo (cue-policy
+    `docs/2026-11-02_adoption-memo.md`). Effort S.

@@ -137,3 +137,40 @@ jobs:
           GOWORK=off go mod tidy
           GOWORK=off go build ./...
           GOWORK=off go list -m all
+
+  # Fleet workflow policy (adopted 2026-11-02, cue-policy docs/
+  # 2026-11-02_adoption-memo.md): external cue schemas vet the workflow
+  # files for the policy classes actionlint has no concept of — action pin
+  # formats, runner allowlist, permission shape, release concurrency
+  # guards. The policy checkout is pinned by commit SHA: a policy change
+  # cannot silently redefine what this repo's CI enforces (bumping the pin
+  # is a deliberate, reviewable act).
+  policy-vet:
+    name: Workflow Policy (cue vet)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+
+      - name: Set up Go
+        uses: actions/setup-go@b7ad1dad31e06c5925ef5d2fc7ad053ef454303e # v7.0.0
+        with:
+          go-version-file: "go.mod"
+          cache: true
+
+      - name: Install pinned cue
+        run: go install cuelang.org/go/cmd/cue@v0.17.1
+
+      - name: Check out the fleet policy schemas
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          repository: LarsArtmann/cue-policy
+          ref: 7ecfcaf037309d83daf7c2e48375870de66285a2
+          path: cue-policy
+          persist-credentials: false
+
+      - name: Vet workflows against the fleet policy
+        run: |
+          cue vet -d '#ReleaseWorkflow' ./cue-policy .github/workflows/release.yml
+          cue vet -d '#CIWorkflow' ./cue-policy .github/workflows/ci.yml
+          cue vet -d '#CIWorkflow' ./cue-policy .github/workflows/website-check.yml
+          cue vet -d '#CIWorkflow' ./cue-policy .github/workflows/website-deploy.yml
