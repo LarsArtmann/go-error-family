@@ -6,6 +6,10 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ## [Unreleased]
 
+### Changed
+
+- CI lint pins raised v2.13.2 → v2.15.0 (golangci-lint-action `version:` inputs across ci.yml ×7 and release.yml ×3 module jobs), and the wrapcheck `ignore-sigs` list gained the six errorfamily-API signatures v2.15's new signature-based detection otherwise flags as "unwrapped externals": the four clone methods (`.WithContext(`, `.WithContextAny(`, `.WithContextf(`, `.WithCause(`) and the two package-level wrap funcs (`WrapRejection(`, `WrapTransient(`). All of them return `*errorfamily.Error` — the classified, wrapped error itself — so the findings are false positives by construction. Verified green locally with the v2.15.0 binary across the root and the agent, bridge, diagnose, and examples modules (the examples module's two `Wrap*` findings were the ones that forced the package-level sigs); the `git` and `postgres` submodule jobs were not locally runnable (submodules not initialized here).
+
 ## [0.12.0] - 2026-10-14
 
 ### Fixed

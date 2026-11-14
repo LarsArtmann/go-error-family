@@ -264,6 +264,12 @@ linters:
         - .WithMessage(
         - .WithMessagef(
         - .WithStack(
+        - .WithContext(
+        - .WithContextAny(
+        - .WithContextf(
+        - .WithCause(
+        - WrapRejection(
+        - WrapTransient(
   exclusions:
     generated: lax
     rules:
